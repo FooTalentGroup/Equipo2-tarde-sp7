@@ -27,7 +27,9 @@ export const DataTableClient = () => {
         <TableRow>
           <TableHead>Nombre</TableHead>
           <TableHead>Email</TableHead>
-          <TableHead>Number</TableHead>
+          <TableHead>Número</TableHead>
+          <TableHead>Editar</TableHead>
+          <TableHead>Eliminar</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -36,6 +38,8 @@ export const DataTableClient = () => {
             <TableCell>{c.name}</TableCell>
             <TableCell>{c.email}</TableCell>
             <TableCell>{c.number}</TableCell>
+            <TableCell>{/* Boton para editar */}</TableCell>
+            <TableCell>{/* Boton para eliminar */}</TableCell>
           </TableRow>
         })}
       </TableBody>
