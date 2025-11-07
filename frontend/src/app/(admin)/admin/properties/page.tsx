@@ -1,22 +1,22 @@
-import Link from "next/link";
-import { Button } from "@src/components/ui/button";
-import { Plus } from "lucide-react";
+import { CreatePropertyDialog } from "@src/modules/properties/components/CreatePropertyDialog";
+import { useCreateProperty } from "@src/modules/properties/hook/useCreateProperty";
 
 export const metadata = {
-	title: "Propiedades",
-	description: "Gestión de propiedades inmobiliarias",
+  title: "Propiedades",
+  description: "Gestión de propiedades inmobiliarias",
 };
 
-export default  function PropertiesPage() {
-	return (
-		<div className="container mx-auto px-4 py-8">
-			<h1>Propiedades</h1>
-			<Link href="/admin/properties/new">
-				<Button>
-					<Plus className="mr-2 h-4 w-4" />
-					Nueva propiedad
-				</Button>
-			</Link>
-		</div>
-	);
+export default function PropertiesPage() {
+  const { form, onSubmit, loading: creating } = useCreateProperty();
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1>Propiedades</h1>
+      <CreatePropertyDialog
+        form={form}
+        onSubmit={onSubmit}
+        loading={creating}
+      />
+    </div>
+  );
 }
+

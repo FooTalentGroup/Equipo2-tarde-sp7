@@ -1,0 +1,12 @@
+[
+  {
+    "id": "cb34ab48-4cb0-46a5-88db-f2f2462f44a0",
+    "title": "Casa en Palermo",
+    "description": "Casa chiquitita",
+    "price": 2000000,
+    "address": "Av Paz 1424",
+    "city": "Bueno Aires",
+    "beds": 2,
+    "baths": 1
+  }
+]
