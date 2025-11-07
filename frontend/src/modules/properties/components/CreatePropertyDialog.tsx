@@ -16,11 +16,21 @@ import { Button } from "@src/components/ui/button";
 import { Loader2, Plus } from "lucide-react";
 
 import { PropertyForm } from "./PropertyForm";
-import { useCreateProperty } from "../hook/useCreateProperty";
+import { createPropertySchema } from "../schemas/property.schema";
+import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
 
-export function CreatePropertyDialog() {
-  const { form, onSubmit, loading } = useCreateProperty();
+type CreatePropertyDialogProps = {
+  form: UseFormReturn<z.infer<typeof createPropertySchema>>;
+  onSubmit: (values: z.infer<typeof createPropertySchema>) => Promise<void>;
+  loading: boolean;
+};
 
+export function CreatePropertyDialog({
+  form,
+  onSubmit,
+  loading,
+}: CreatePropertyDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -28,7 +38,6 @@ export function CreatePropertyDialog() {
           <Plus className="mr-2 h-4 w-4" />
           Agregar propiedad
         </Button>
-        {/* <button className="btn-primary">Crear propiedad</button> */}
       </AlertDialogTrigger>
 
       <AlertDialogContent className="max-w-lg">
