@@ -2,11 +2,14 @@
 
 import { useGetProperties } from "@src/modules/properties/hook/useGetProperties";
 import { useCreateProperty } from "@src/modules/properties/hook/useCreateProperty";
+import { useUpdateProperty } from "@src/modules/properties/hook/useUpdateProperty";
 import { CreatePropertyDialog } from "@src/modules/properties/components/CreatePropertyDialog";
+import { EditPropertyDialog } from "@src/modules/properties/components/EditPropertyDialog";
 
 export function PropertiesClient() {
   const { properties, loading, refetch } = useGetProperties();
   const { form, onSubmit, loading: creating } = useCreateProperty(refetch);
+  const { onSubmit: onUpdate, loading: updating } = useUpdateProperty(refetch);
 
   return (
     <div>
@@ -24,8 +27,18 @@ export function PropertiesClient() {
       ) : (
         <ul className="space-y-2">
           {properties.map((prop) => (
-            <li key={prop.id} className="border p-2 rounded">
-              <strong>{prop.title}</strong> - ${prop.price}
+            <li
+              key={prop.id}
+              className="border p-3 rounded flex justify-between items-center"
+            >
+              <div>
+                <strong>{prop.title}</strong> - ${prop.price}
+              </div>
+              <EditPropertyDialog
+                property={prop}
+                onSubmit={onUpdate}
+                loading={updating}
+              />
             </li>
           ))}
         </ul>
