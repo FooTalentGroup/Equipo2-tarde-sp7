@@ -6,13 +6,14 @@ const filePath = path.join(process.cwd(), "src/data/properties.json");
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const body = await req.json();
 
   try {
     const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    const index = data.findIndex((p: any) => p.id === params.id);
+    const index = data.findIndex((p: any) => p.id === id);
 
     if (index === -1) {
       return NextResponse.json(
