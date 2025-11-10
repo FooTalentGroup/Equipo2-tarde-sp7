@@ -1,13 +1,17 @@
 "use client";
 
-import { useGetProperties } from "@src/modules/properties/hook/useGetProperties";
-import { useCreateProperty } from "@src/modules/properties/hook/useCreateProperty";
-import { useUpdateProperty } from "@src/modules/properties/hook/useUpdateProperty";
-import { usePropertySearch } from "@src/modules/properties/hook/usePropertySearch";
-import { CreatePropertyDialog } from "@src/modules/properties/components/CreatePropertyDialog";
-import { EditPropertyDialog } from "@src/modules/properties/components/EditPropertyDialog";
-import { DeletePropertyButton } from "@src/modules/properties/components/DeletePropertyButton";
-import { PropertySearchInput } from "@src/modules/properties/components/PropertySearchInput";
+import {
+  useGetProperties,
+  useCreateProperty,
+  useUpdateProperty,
+  usePropertySearch,
+} from "@src/modules/properties/hook";
+import {
+  CreatePropertyDialog,
+  EditPropertyDialog,
+  DeletePropertyButton,
+  PropertySearchInput,
+} from "@src/modules/properties/components";
 
 export function PropertiesClient() {
   const { properties, loading, refetch } = useGetProperties();

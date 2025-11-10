@@ -4,6 +4,32 @@ import path from "path";
 
 const filePath = path.join(process.cwd(), "src/data/properties.json");
 
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  try {
+    const fileData = fs.readFileSync(filePath, "utf-8");
+    const properties = JSON.parse(fileData);
+    const property = properties.find((p: any) => p.id === id);
+    if (!property) {
+      return NextResponse.json(
+        { message: "Propiedad no encontrada" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(property);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "Error al obtener la propiedad" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }

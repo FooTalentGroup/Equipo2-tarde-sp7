@@ -13,7 +13,7 @@ import {
 } from "@src/components/ui/alert-dialog";
 import { Button } from "@src/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { useDeleteProperty } from "../hook/useDeleteProperty";
+import { useDeleteProperty } from "@src/modules/properties/hook/useDeleteProperty";
 
 type Props = {
   id: string;
@@ -28,25 +28,29 @@ export function DeletePropertyButton({ id, onDeleted }: Props) {
       <AlertDialogTrigger asChild>
         <Button variant="destructive" size="sm">
           <Trash2 className="mr-2 h-4 w-4" />
-          Delete
+          Eliminar
         </Button>
       </AlertDialogTrigger>
+
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>
+            ¿Seguro que querés eliminar esta propiedad?
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. The property will be permanently
-            deleted from the database.
+            Esta acción no se puede deshacer. La propiedad se eliminará
+            permanentemente del sistema.
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             onClick={() => deleteProperty(id)}
             disabled={loading}
             className="bg-red-600 text-white hover:bg-red-700"
           >
-            {loading ? "Deleting..." : "Delete"}
+            {loading ? "Eliminando..." : "Eliminar"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
