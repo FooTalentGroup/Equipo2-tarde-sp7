@@ -1,11 +1,11 @@
-# Real Estate App
+# RedProp
 
 Aplicación de bienes raíces construida con Next.js 16, React 19, TypeScript y Tailwind CSS. Este proyecto incluye una biblioteca completa de componentes UI basados en shadcn/ui y Radix UI.
 
 ## Tabla de Contenidos
 
 - [Requisitos Previos](#requisitos-previos)
-- [Extensiones Requeridas](#extensiones-requeridas)
+- [Extensiones Requeridas](#extensiones-requeridas)s
 - [Instalación](#instalación)
 - [Scripts Disponibles](#scripts-disponibles)
 - [Estructura del Proyecto](#estructura-del-proyecto)

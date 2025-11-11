@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 import { AppSidebar } from "@src/components/sidebars/admin-sidebar";
 import {
 	Breadcrumb,
@@ -13,12 +15,20 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "@src/components/ui/sidebar";
+import { paths } from "@src/lib/paths";
+import { verifySession } from "@src/modules/auth/lib/dal";
 
-export default function AdminLayout({
+export default async function AdminLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
+	const { isAuth } = await verifySession();
+
+	if (!isAuth) {
+		redirect(paths.auth.login());
+	}
+
 	return (
 		<SidebarProvider>
 			<AppSidebar />
