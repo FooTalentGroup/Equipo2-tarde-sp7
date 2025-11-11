@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,22 +15,25 @@ import {
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
-import { wait } from "@src/lib/utils";
+import { paths } from "@src/lib/paths";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { loginAction } from "../actions/auth.actions";
 import { type LoginFormData, loginSchema } from "../schemas/login";
 
 type LoginFormProps = {
 	heading?: string;
 	buttonText?: string;
 	onSubmit?: (data: LoginFormData) => Promise<void> | void;
+	redirectTo?: string;
 };
 
 export default function LoginForm({
-	heading = "Real Estate App",
+	heading = "RedProp",
 	buttonText = "Iniciar Sesión",
 	onSubmit,
+	redirectTo,
 }: LoginFormProps) {
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(loginSchema),
@@ -43,18 +47,26 @@ export default function LoginForm({
 
 	const handleSubmit = async (data: LoginFormData) => {
 		try {
-			await wait(2000);
 			if (onSubmit) {
 				await onSubmit(data);
 			} else {
-				console.log("Login data:", data);
-				toast.success("Datos válidos - sesión iniciada");
+				const result = await loginAction(data);
+
+				if (result.success) {
+					toast.success(result.message);
+
+					const redirect = redirectTo || paths.dashboard();
+					router.push(redirect);
+					router.refresh();
+				} else {
+					toast.error(result.message || "Error al iniciar sesión");
+				}
 			}
 		} catch (error) {
-			toast.error("Error al iniciar sesión. Inténtalo de nuevo.");
+			const errorMessage =
+				error instanceof Error ? error.message : "Error al iniciar sesión";
+			toast.error(errorMessage);
 			console.error("Login error:", error);
-		} finally {
-			router.push("/admin/dashboard");
 		}
 	};
 
@@ -115,6 +127,12 @@ export default function LoginForm({
 					</Button>
 				</form>
 			</Form>
+			<p className="text-sm text-center">
+				Aun no tienes cuenta?
+				<Button asChild className="font-semibold px-2 py-0" variant="link">
+					<Link href={paths.auth.register()}>Registrate</Link>
+				</Button>
+			</p>
 		</div>
 	);
 }
