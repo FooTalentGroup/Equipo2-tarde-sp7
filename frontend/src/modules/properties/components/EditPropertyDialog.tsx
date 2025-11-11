@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -37,9 +39,28 @@ export function EditPropertyDialog({
   const form = useForm<z.infer<typeof createPropertySchema>>({
     defaultValues: property,
   });
+  // control open state so we can prevent closing while loading
+  const [open, setOpen] = useState(false);
+
+  function handleOpenChange(value: boolean) {
+    // prevent closing while a save is in progress
+    if (!value && loading) return;
+
+    // if closing, reset form to original property values
+    if (!value) {
+      try {
+        form.reset(property);
+        form.clearErrors();
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    setOpen(value);
+  }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger asChild>
         <Button variant="outline" size="sm">
           <Pencil className="mr-2 h-4 w-4" />
@@ -65,9 +86,10 @@ export function EditPropertyDialog({
 
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction type="submit" disabled={loading}>
+            {/* Use regular submit button so Radix doesn't auto-close the dialog */}
+            <Button type="submit" disabled={loading}>
               {loading ? "Guardando..." : "Guardar cambios"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </form>
       </AlertDialogContent>

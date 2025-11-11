@@ -1,7 +1,7 @@
 [
   {
     "id": "cb34ab48-4cb0-46a5-88db-f2f2462f44a0",
-    "title": "Casa en Palermo",
+    "title": "Casa en Palermo ",
     "description": "Casa chiquitita",
     "price": 2000000,
     "address": "Av Paz 1424",
@@ -13,7 +13,7 @@
     "id": "f28f1a42-31df-4910-88eb-6e888de97ba9",
     "title": "Depto en Recoleta",
     "description": "Depto cheto",
-    "price": 3000000,
+    "price": "-3000000",
     "address": "Av Santa fe 2300",
     "city": "Buenos Aires",
     "beds": 2,

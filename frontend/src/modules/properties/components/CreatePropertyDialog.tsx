@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -31,8 +33,24 @@ export function CreatePropertyDialog({
   onSubmit,
   loading,
 }: CreatePropertyDialogProps) {
+  // Control the dialog open state so we can reset the form on close
+  const [open, setOpen] = useState(false);
+
+  function handleOpenChange(value: boolean) {
+    // When dialog closes, reset form values and clear validation errors
+    if (!value) {
+      try {
+        form.reset();
+        form.clearErrors();
+      } catch (e) {
+        // ignore
+      }
+    }
+    setOpen(value);
+  }
+
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -53,7 +71,9 @@ export function CreatePropertyDialog({
 
           <AlertDialogFooter>
             <AlertDialogCancel disabled={loading}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction type="submit" disabled={loading}>
+            {/* Use a regular submit Button instead of AlertDialogAction so the dialog
+                does not auto-close before form validation / submission completes. */}
+            <Button type="submit" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -65,7 +85,7 @@ export function CreatePropertyDialog({
                   Crear
                 </>
               )}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </form>
       </AlertDialogContent>
