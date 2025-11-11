@@ -7,9 +7,8 @@ export function proxy(request: NextRequest) {
 	const isAuthPage =
 		request.nextUrl.pathname.startsWith(paths.auth.login()) ||
 		request.nextUrl.pathname.startsWith(paths.auth.register());
-	const isProtectedPage = request.nextUrl.pathname.startsWith(
-		paths.dashboard(),
-	);
+	// Proteger todas las rutas bajo /admin/*
+	const isProtectedPage = request.nextUrl.pathname.startsWith("/admin");
 
 	// Si está en una página protegida y no tiene token, redirigir a login
 	if (isProtectedPage && !token) {
