@@ -12,4 +12,11 @@ export const paths = {
 		detail: (id: string) => `/properties/${id}`,
 		edit: (id: string) => `/properties/${id}/edit`,
 	},
+
+	auth: {
+		login: () => "/login",
+		register: () => "/register",
+	},
+
+	dashboard: () => "/admin/dashboard",
 } as const;

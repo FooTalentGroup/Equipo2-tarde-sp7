@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,22 +16,25 @@ import {
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
-import { wait } from "@src/lib/utils";
+import { paths } from "@src/lib/paths";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { registerAction } from "../actions/auth.actions";
 import { type RegisterFormData, registerSchema } from "../schemas/register";
 
 type RegisterFormProps = {
 	heading?: string;
 	buttonText?: string;
 	onSubmit?: (data: RegisterFormData) => Promise<void> | void;
+	redirectTo?: string;
 };
 
 export default function RegisterForm({
-	heading = "Crear Cuenta",
+	heading = "RedProp",
 	buttonText = "Registrarse",
 	onSubmit,
+	redirectTo,
 }: RegisterFormProps) {
 	const form = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
@@ -47,18 +51,25 @@ export default function RegisterForm({
 
 	const handleSubmit = async (data: RegisterFormData) => {
 		try {
-			await wait(2000);
 			if (onSubmit) {
 				await onSubmit(data);
 			} else {
-				console.log("Register data:", data);
-				toast.success("Cuenta creada exitosamente");
+				const result = await registerAction(data);
+
+				if (result.success) {
+					toast.success(result.message);
+					const redirect = redirectTo || paths.dashboard();
+					router.push(redirect);
+					router.refresh();
+				} else {
+					toast.error(result.message || "Error al crear la cuenta");
+				}
 			}
 		} catch (error) {
-			toast.error("Error al crear la cuenta. Inténtalo de nuevo.");
+			const errorMessage =
+				error instanceof Error ? error.message : "Error al crear la cuenta";
+			toast.error(errorMessage);
 			console.error("Register error:", error);
-		} finally {
-			router.push("/admin/dashboard");
 		}
 	};
 
@@ -159,19 +170,17 @@ export default function RegisterForm({
 									<ButtonGroup className="w-full">
 										<Button
 											type="button"
-											variant={field.value === "agente" ? "default" : "outline"}
+											variant={field.value === "AGENTE" ? "default" : "outline"}
 											className="flex-1"
-											onClick={() => field.onChange("agente")}
+											onClick={() => field.onChange("AGENTE")}
 										>
 											Agente
 										</Button>
 										<Button
 											type="button"
-											variant={
-												field.value === "propietario" ? "default" : "outline"
-											}
+											variant={field.value === "ADMIN" ? "default" : "outline"}
 											className="flex-1"
-											onClick={() => field.onChange("propietario")}
+											onClick={() => field.onChange("ADMIN")}
 										>
 											Propietario
 										</Button>
@@ -192,6 +201,12 @@ export default function RegisterForm({
 					</Button>
 				</form>
 			</Form>
+			<p className="text-sm text-center">
+				Ya tienes cuenta?
+				<Button asChild className="font-semibold px-2 py-0" variant="link">
+					<Link href={paths.auth.login()}>Inicia sesión</Link>
+				</Button>
+			</p>
 		</div>
 	);
 }

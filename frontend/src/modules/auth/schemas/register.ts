@@ -21,7 +21,7 @@ export const registerSchema = z.object({
 		.string()
 		.min(1, "Debes seleccionar un tipo de cuenta")
 		.refine(
-			(val) => val === "agente" || val === "propietario",
+			(val) => val === "AGENT" || val === "ADMIN",
 			"Selecciona si eres agente o propietario",
 		),
 });
