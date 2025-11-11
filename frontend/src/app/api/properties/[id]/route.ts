@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { createPropertySchema } from "@src/modules/properties/schemas/property.schema";
 
 const filePath = path.join(process.cwd(), "src/data/properties.json");
 
@@ -48,12 +49,24 @@ export async function PUT(
       );
     }
 
-    data[index] = { ...data[index], ...body };
+    // Validate incoming fields (partial update allowed)
+    const updateSchema = createPropertySchema.partial();
+    const parsed = updateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Datos inválidos", details: parsed.error.format() },
+        { status: 400 }
+      );
+    }
+
+    // Apply only the validated data
+    data[index] = { ...data[index], ...parsed.data };
 
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 
     return NextResponse.json(data[index], { status: 200 });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { error: "Error al actualizar la propiedad" },
       { status: 500 }

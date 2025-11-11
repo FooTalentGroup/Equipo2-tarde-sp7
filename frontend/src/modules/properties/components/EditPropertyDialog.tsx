@@ -26,7 +26,8 @@ type EditPropertyDialogProps = {
   property: any;
   onSubmit: (
     id: string,
-    values: z.infer<typeof createPropertySchema>
+    values: z.infer<typeof createPropertySchema>,
+    form?: UseFormReturn<z.infer<typeof createPropertySchema>>
   ) => Promise<void>;
   loading: boolean;
 };
@@ -78,7 +79,7 @@ export function EditPropertyDialog({
 
         <form
           onSubmit={form.handleSubmit((values) =>
-            onSubmit(property.id, values)
+            onSubmit(property.id, values, form)
           )}
           className="space-y-4 mt-4"
         >
