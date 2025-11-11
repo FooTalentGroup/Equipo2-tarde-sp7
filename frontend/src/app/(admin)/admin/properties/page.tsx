@@ -1,7 +1,6 @@
 "use client";
 
-import { CreatePropertyDialog } from "@src/modules/properties/components/CreatePropertyDialog";
-import { useCreateProperty } from "@src/modules/properties/hook/useCreateProperty";
+import { PropertiesClient } from "./PropertiesClient";
 
 // export const metadata = {
 // 	title: "Propiedades",
@@ -9,15 +8,10 @@ import { useCreateProperty } from "@src/modules/properties/hook/useCreatePropert
 // };
 
 export default function PropertiesPage() {
-	const { form, onSubmit, loading: creating } = useCreateProperty();
-	return (
-		<div className="container mx-auto px-4 py-8">
-			<h1>Propiedades</h1>
-			<CreatePropertyDialog
-				form={form}
-				onSubmit={onSubmit}
-				loading={creating}
-			/>
-		</div>
-	);
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <PropertiesClient />
+    </div>
+  );
 }
+
