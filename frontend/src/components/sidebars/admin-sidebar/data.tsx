@@ -4,6 +4,7 @@ import {
 	type LucideIcon,
 	Settings,
 	Users,
+	UserPen
 } from "lucide-react";
 
 export type NavigationItem = {
@@ -25,6 +26,11 @@ export const navigation = [
 				title: "Propiedades",
 				href: "/admin/properties",
 				icon: Building2,
+			},
+			{
+				title: "Clientes",
+				href: "/admin/clients",
+				icon: UserPen,
 			},
 		],
 	},
