@@ -1,0 +1,15 @@
+# Lint and format only modified files
+npx lint-staged
+
+# Run tests only for modified projects
+if git diff --cached --name-only | grep -q "^frontend/"; then
+  echo "🧪 Running frontend tests..."
+  npm run test:frontend
+fi
+
+if git diff --cached --name-only | grep -q "^backend/"; then
+  echo "🧪 Running backend tests..."
+  npm run test:backend
+fi
+
+echo "✅ All checks passed!"

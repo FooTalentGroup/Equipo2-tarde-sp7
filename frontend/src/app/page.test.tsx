@@ -1,10 +1,10 @@
-import { describe, test } from "vitest"
-import { render } from "@testing-library/react"
+import { render } from "@testing-library/react";
+import { describe, test } from "vitest";
 
-import Home from "./page"
+import Home from "./page";
 
 describe("Home Page", () => {
-  test("renders homepage", () => {
-  render(<Home />)
-})
-})
+	test("renders homepage", () => {
+		render(<Home />);
+	});
+});

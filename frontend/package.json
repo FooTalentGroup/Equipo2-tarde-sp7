@@ -6,8 +6,8 @@
 		"dev": "next dev",
 		"build": "npm run test:run && next build",
 		"start": "next start",
-		"lint": "biome check",
-		"format": "biome format --write",
+		"lint": "biome check .",
+		"format": "biome format --write .",
 		"test": "vitest",
 		"test:run": "vitest run",
 		"test:watch": "vitest watch"
