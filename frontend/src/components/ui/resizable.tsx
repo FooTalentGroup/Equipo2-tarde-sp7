@@ -1,10 +1,10 @@
 "use client";
 
-import { GripVerticalIcon } from "lucide-react";
 import type * as React from "react";
-import * as ResizablePrimitive from "react-resizable-panels";
 
 import { cn } from "@src/lib/utils";
+import { GripVerticalIcon } from "lucide-react";
+import * as ResizablePrimitive from "react-resizable-panels";
 
 function ResizablePanelGroup({
 	className,

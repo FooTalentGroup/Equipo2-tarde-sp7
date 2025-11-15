@@ -3,8 +3,8 @@ import {
 	LayoutDashboard,
 	type LucideIcon,
 	Settings,
+	UserPen,
 	Users,
-	UserPen
 } from "lucide-react";
 
 export type NavigationItem = {

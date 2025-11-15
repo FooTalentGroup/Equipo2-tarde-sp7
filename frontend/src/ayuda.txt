@@ -1,3 +1,0 @@
-no se como deployar en nextjs.
-
-que f

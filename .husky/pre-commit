@@ -1,0 +1,27 @@
+# Lint and format only modified files
+npx lint-staged
+
+# Run biome lint for frontend
+if git diff --cached --name-only | grep -q "^frontend/"; then
+  echo "🔍 Running biome lint for frontend..."
+  npx biome lint ./frontend
+fi
+
+# Run biome lint for backend
+if git diff --cached --name-only | grep -q "^backend/"; then
+  echo "🔍 Running biome lint for backend..."
+  npx biome lint ./backend
+fi
+
+# Run tests only for modified projects
+if git diff --cached --name-only | grep -q "^frontend/"; then
+  echo "🧪 Running frontend tests..."
+  (cd frontend && npm run test:run)
+fi
+
+if git diff --cached --name-only | grep -q "^backend/"; then
+  echo "🧪 Running backend tests..."
+  (cd backend && npm test)
+fi
+
+echo "✅ All checks passed!"
