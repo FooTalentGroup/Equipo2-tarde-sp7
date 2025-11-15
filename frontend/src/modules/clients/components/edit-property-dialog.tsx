@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
 import {
 	Dialog,
@@ -10,21 +12,21 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@src/components/ui/dialog";
-import { Input } from "@src/components/ui/input";
-import { Pencil } from "lucide-react";
-import { Spinner } from "@src/components/ui/spinner";
-import { type ClientFormData, clientSchema } from "../schemas/create";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	Form,
+	FormControl,
 	FormField,
 	FormItem,
 	FormLabel,
-	FormControl,
 	FormMessage,
 } from "@src/components/ui/form";
-import { type Client } from "@src/types/client"
+import { Input } from "@src/components/ui/input";
+import { Spinner } from "@src/components/ui/spinner";
+import type { Client } from "@src/types/client";
+import { Pencil } from "lucide-react";
+import { useForm } from "react-hook-form";
+
+import { type ClientFormData, clientSchema } from "../schemas/create";
 
 type EditClientModalProps = {
 	client?: Client;
@@ -100,7 +102,10 @@ export const EditClientModal = ({
 					</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+					<form
+						onSubmit={form.handleSubmit(handleSubmit)}
+						className="space-y-4"
+					>
 						<div className="grid gap-4">
 							<FormField
 								control={form.control}
@@ -152,7 +157,9 @@ export const EditClientModal = ({
 												placeholder="04156218952"
 												className="text-sm"
 												{...field}
-												onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+												onChange={(e) =>
+													field.onChange(parseInt(e.target.value) || 0)
+												}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -161,12 +168,11 @@ export const EditClientModal = ({
 							/>
 						</div>
 						<DialogFooter>
-							<Button 
-								type="submit" 
-								disabled={form.formState.isSubmitting}
-							>
+							<Button type="submit" disabled={form.formState.isSubmitting}>
 								{form.formState.isSubmitting && <Spinner />}
-								{form.formState.isSubmitting ? "Guardando cambios..." : buttonText}
+								{form.formState.isSubmitting
+									? "Guardando cambios..."
+									: buttonText}
 							</Button>
 							<DialogClose asChild>
 								<Button variant="outline" type="button">

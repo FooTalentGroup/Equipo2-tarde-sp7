@@ -9,8 +9,8 @@
 		"install:all": "npm install && npm run install:front && npm run install:backend",
 		"build:frontend": "cd frontend && npm run build",
 		"build:backend": "cd backend && npm run build",
-		"test:frontend": "cd frontend && npm run test:run",
-		"test:backend": "cd backend && npm test",
+		"test:frontend": "npm --prefix frontend run test:run",
+		"test:backend": "npm --prefix backend test",
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write ."

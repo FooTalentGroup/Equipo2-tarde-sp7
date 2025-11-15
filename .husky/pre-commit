@@ -4,12 +4,12 @@ npx lint-staged
 # Run tests only for modified projects
 if git diff --cached --name-only | grep -q "^frontend/"; then
   echo "🧪 Running frontend tests..."
-  npm run test:frontend
+  (cd frontend && npm run test:run)
 fi
 
 if git diff --cached --name-only | grep -q "^backend/"; then
   echo "🧪 Running backend tests..."
-  npm run test:backend
+  (cd backend && npm test)
 fi
 
 echo "✅ All checks passed!"
