@@ -8,6 +8,7 @@ export const createPropertySchema = z.object({
 	city: z.string().min(2, "Ciudad obligatoria"),
 	beds: z.coerce.number().min(0),
 	baths: z.coerce.number().min(0),
+	imageUrl: z.string().optional(),
 });
 
 export type CreatePropertyDto = z.infer<typeof createPropertySchema>;
