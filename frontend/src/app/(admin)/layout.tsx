@@ -1,20 +1,8 @@
 import { redirect } from "next/navigation";
 
+import AdminHeader from "@src/components/layouts/header/admin-header";
 import { AppSidebar } from "@src/components/sidebars/admin-sidebar";
-import {
-	Breadcrumb,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbList,
-	BreadcrumbPage,
-	BreadcrumbSeparator,
-} from "@src/components/ui/breadcrumb";
-import { Separator } from "@src/components/ui/separator";
-import {
-	SidebarInset,
-	SidebarProvider,
-	SidebarTrigger,
-} from "@src/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@src/components/ui/sidebar";
 import { paths } from "@src/lib/paths";
 import { verifySession } from "@src/modules/auth/lib/dal";
 
@@ -30,10 +18,11 @@ export default async function AdminLayout({
 	}
 
 	return (
-		<SidebarProvider>
+		<SidebarProvider header={<AdminHeader />}>
 			<AppSidebar />
+			{/* <AdminHeader /> */}
 			<SidebarInset>
-				<header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+				{/* <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
 					<SidebarTrigger className="-ml-1" />
 					<Separator orientation="vertical" className="mr-2 h-4" />
 					<Breadcrumb>
@@ -47,7 +36,8 @@ export default async function AdminLayout({
 							</BreadcrumbItem>
 						</BreadcrumbList>
 					</Breadcrumb>
-				</header>
+				</header> */}
+
 				<div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
 			</SidebarInset>
 		</SidebarProvider>
