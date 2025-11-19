@@ -21,7 +21,8 @@
 		"indentStyle": "tab",
 		"indentWidth": 2,
 		"formatWithErrors": true,
-		"lineWidth": 80
+		"lineWidth": 80,
+		"lineEnding": "crlf"
 	},
 	"linter": {
 		"enabled": true,
@@ -63,7 +64,8 @@
 	},
 	"javascript": {
 		"formatter": {
-			"quoteStyle": "double"
+			"quoteStyle": "double",
+			"lineEnding": "crlf"
 		}
 	},
 	"css": {
