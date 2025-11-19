@@ -1,52 +1,41 @@
+import { paths } from "@src/lib/paths";
 import {
-	Building2,
-	LayoutDashboard,
+	Building2Icon,
+	ChartColumnIncreasing,
 	type LucideIcon,
-	Settings,
-	UserPen,
+	MessageSquare,
 	Users,
 } from "lucide-react";
 
 export type NavigationItem = {
-	title: string;
+	title?: string;
 	href: string;
 	icon: LucideIcon;
 };
 
 export const navigation = [
 	{
-		title: "General",
 		items: [
 			{
-				title: "Dashboard",
-				href: "/admin/dashboard",
-				icon: LayoutDashboard,
-			},
-			{
 				title: "Propiedades",
-				href: "/admin/properties",
-				icon: Building2,
+				href: paths.admin.properties.index(),
+				icon: Building2Icon,
 			},
 			{
 				title: "Clientes",
-				href: "/admin/clients",
-				icon: UserPen,
-			},
-		],
-	},
-	{
-		title: "Gestión",
-		items: [
-			{
-				title: "Usuarios",
-				href: "/users",
+				href: paths.admin.clients.index(),
 				icon: Users,
 			},
 			{
-				title: "Configuración",
-				href: "/settings",
-				icon: Settings,
+				title: "Reportes",
+				href: paths.admin.reports.index(),
+				icon: ChartColumnIncreasing,
 			},
-		],
+			{
+				title: "Consultas",
+				href: paths.admin.inquiries.index(),
+				icon: MessageSquare,
+			},
+		] as NavigationItem[],
 	},
 ];

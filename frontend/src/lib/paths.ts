@@ -24,8 +24,11 @@ export const paths = {
 			index: () => "/admin/properties",
 			detail: (id: string) => `/admin/properties/${id}`,
 		},
+		reports: {
+			index: () => "/admin/reports",
+		},
+		inquiries: {
+			index: () => "/admin/inquiries",
+		},
 	},
-
-	// Mantener por compatibilidad
-	dashboard: () => "/admin/dashboard",
 } as const;
