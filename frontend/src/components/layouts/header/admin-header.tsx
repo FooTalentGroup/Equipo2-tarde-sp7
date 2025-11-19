@@ -16,7 +16,7 @@ import { Search } from "lucide-react";
 
 export default function AdminHeader() {
 	return (
-		<header className="px-4 bg-primary text-primary-foreground min-h-(--admin-header-height) grid grid-cols-[0.7fr_1fr_0.7fr] items-center gap-4">
+		<header className="px-4 sticky top-0 z-50 bg-primary text-primary-foreground min-h-(--admin-header-height) grid grid-cols-[0.7fr_1fr_0.7fr] items-center gap-4">
 			<Button variant="link" className="w-[271px] h-auto p-0" asChild>
 				<Link href={paths.admin.properties.index()}>
 					<Image

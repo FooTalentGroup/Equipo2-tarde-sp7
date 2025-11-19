@@ -170,6 +170,7 @@ function Sidebar({
 	side = "left",
 	variant = "sidebar",
 	collapsible = "offcanvas",
+	width,
 	className,
 	children,
 	...props
@@ -177,8 +178,15 @@ function Sidebar({
 	side?: "left" | "right";
 	variant?: "sidebar" | "floating" | "inset";
 	collapsible?: "offcanvas" | "icon" | "none";
+	width?: string;
 }) {
 	const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+
+	const customStyle = width
+		? ({
+				"--sidebar-width": width,
+			} as CSSProperties)
+		: undefined;
 
 	if (collapsible === "none") {
 		return (
@@ -188,6 +196,7 @@ function Sidebar({
 					"bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
 					className,
 				)}
+				style={customStyle}
 				{...props}
 			>
 				{children}
@@ -205,7 +214,7 @@ function Sidebar({
 					className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
 					style={
 						{
-							"--sidebar-width": SIDEBAR_WIDTH_MOBILE,
+							"--sidebar-width": width || SIDEBAR_WIDTH_MOBILE,
 						} as CSSProperties
 					}
 					side={side}
@@ -228,6 +237,7 @@ function Sidebar({
 			data-variant={variant}
 			data-side={side}
 			data-slot="sidebar"
+			style={customStyle}
 		>
 			{/* This is what handles the sidebar gap on desktop */}
 			<div
