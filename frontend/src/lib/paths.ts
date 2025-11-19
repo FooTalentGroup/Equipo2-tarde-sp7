@@ -4,7 +4,10 @@
  */
 
 export const paths = {
-	home: () => "/",
+	public: {
+		home: () => "/",
+		properties: () => "/properties",
+	},
 
 	auth: {
 		login: () => "/login",
@@ -12,7 +15,6 @@ export const paths = {
 	},
 
 	admin: {
-		dashboard: () => "/admin/dashboard",
 		clients: {
 			index: () => "/admin/clients",
 			create: () => "/admin/clients/create",
