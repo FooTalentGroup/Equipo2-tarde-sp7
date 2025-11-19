@@ -3,20 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { PlusIcon } from "@heroicons/react/24/outline";
+import { Avatar, AvatarFallback, AvatarImage } from "@src/components/ui/avatar";
+import { Button } from "@src/components/ui/button";
 import {
 	Sidebar,
 	SidebarContent,
-	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarRail,
 } from "@src/components/ui/sidebar";
-import { Home } from "lucide-react";
 
 import { navigation } from "./data";
 
@@ -24,29 +23,31 @@ export function AppSidebar() {
 	const pathname = usePathname();
 
 	return (
-		<Sidebar collapsible="icon">
-			<SidebarHeader>
-				<SidebarMenu>
-					<SidebarMenuItem>
-						<SidebarMenuButton size="lg" asChild>
-							<Link href="/admin">
-								<div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-									<Home className="size-4" />
-								</div>
-								<div className="grid flex-1 text-left text-sm leading-tight">
-									<span className="truncate font-semibold">Real Estate</span>
-									<span className="truncate text-xs">Admin Panel</span>
-								</div>
-							</Link>
-						</SidebarMenuButton>
-					</SidebarMenuItem>
-				</SidebarMenu>
+		<Sidebar className="border-0!">
+			<SidebarHeader className="pt-5 pb-0 gap-[30px]">
+				<Avatar className="rounded-md aspect-video w-full max-w-[180px] mx-auto h-[130px]">
+					<AvatarImage
+						src="https://github.com/shadcn.png"
+						alt="@shadcn"
+						className="object-cover aspect-video w-full h-full"
+					/>
+					<AvatarFallback>CN</AvatarFallback>
+				</Avatar>
+				<Button
+					variant="secondary"
+					className="rounded-xl mx-auto w-full max-w-[167px] h-12 items-center"
+				>
+					<PlusIcon
+						className="w-4 h-4 text-secondary-foreground font-bold mb-0.5"
+						strokeWidth={3}
+					/>
+					Crear
+				</Button>
 			</SidebarHeader>
 
 			<SidebarContent>
-				{navigation.map((section) => (
-					<SidebarGroup key={section.title}>
-						<SidebarGroupLabel>{section.title}</SidebarGroupLabel>
+				{navigation.map((section, key: number) => (
+					<SidebarGroup key={`${key}`}>
 						<SidebarGroupContent>
 							<SidebarMenu>
 								{section.items.map((item) => {
@@ -61,7 +62,7 @@ export function AppSidebar() {
 												tooltip={item.title}
 											>
 												<Link href={item.href}>
-													<item.icon />
+													<item.icon className="size-5!" />
 													<span>{item.title}</span>
 												</Link>
 											</SidebarMenuButton>
@@ -74,7 +75,7 @@ export function AppSidebar() {
 				))}
 			</SidebarContent>
 
-			<SidebarFooter>
+			{/* <SidebarFooter>
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton asChild>
@@ -85,9 +86,9 @@ export function AppSidebar() {
 						</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
-			</SidebarFooter>
+			</SidebarFooter> */}
 
-			<SidebarRail />
+			{/* <SidebarRail /> */}
 		</Sidebar>
 	);
 }

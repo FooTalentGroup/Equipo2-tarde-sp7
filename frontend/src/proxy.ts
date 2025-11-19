@@ -20,7 +20,7 @@ export function proxy(request: NextRequest) {
 	// Si está autenticado y trata de acceder a login/register, redirigir al dashboard
 	if (isAuthPage && token) {
 		const redirectTo = request.nextUrl.searchParams.get("redirect");
-		const destination = redirectTo || paths.dashboard();
+		const destination = redirectTo || paths.admin.properties.index();
 		return NextResponse.redirect(new URL(destination, request.url));
 	}
 

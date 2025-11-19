@@ -55,7 +55,7 @@ export default function LoginForm({
 				if (result.success) {
 					toast.success(result.message);
 
-					const redirect = redirectTo || paths.dashboard();
+					const redirect = redirectTo || paths.admin.properties.index();
 					router.push(redirect);
 					router.refresh();
 				} else {
