@@ -8,7 +8,7 @@ export const metadata = {
 export default function DashboardPage() {
 	return (
 		<section>
-			<Heading variant="subtitle">Dashboard</Heading>
+			<Heading variant="subtitle1">Dashboard</Heading>
 		</section>
 	);
 }

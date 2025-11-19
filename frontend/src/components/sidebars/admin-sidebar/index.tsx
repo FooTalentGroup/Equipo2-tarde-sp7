@@ -3,9 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Avatar, AvatarFallback, AvatarImage } from "@src/components/ui/avatar";
 import { Button } from "@src/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuTrigger,
+} from "@src/components/ui/dropdown-menu";
 import {
 	Sidebar,
 	SidebarContent,
@@ -16,10 +24,11 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@src/components/ui/sidebar";
+import { Bell, MailIcon, UserIcon } from "lucide-react";
 
 import { navigation } from "./data";
 
-export function AppSidebar() {
+export function AdminSidebar() {
 	const pathname = usePathname();
 
 	return (
@@ -33,16 +42,41 @@ export function AppSidebar() {
 					/>
 					<AvatarFallback>CN</AvatarFallback>
 				</Avatar>
-				<Button
-					variant="secondary"
-					className="rounded-xl mx-auto w-full max-w-[167px] h-12 items-center"
-				>
-					<PlusIcon
-						className="w-4 h-4 text-secondary-foreground font-bold mb-0.5"
-						strokeWidth={3}
-					/>
-					Crear
-				</Button>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="secondary"
+							className="rounded-xl mx-auto w-full max-w-[167px] h-12 items-center"
+						>
+							<PlusIcon
+								className="w-4 h-4 text-secondary-foreground font-bold mb-0.5"
+								strokeWidth={3}
+							/>
+							Crear
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent side="right" className="w-[133px]">
+						<DropdownMenuLabel>Crear</DropdownMenuLabel>
+						<DropdownMenuGroup>
+							<DropdownMenuItem>
+								<UserIcon className="mr-2 size-4" />
+								<span>Contacto</span>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<HomeIcon className="mr-2 size-4" />
+								<span>Propiedad</span>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<MailIcon className="mr-2 size-4" />
+								<span>E-Mail</span>
+							</DropdownMenuItem>
+							<DropdownMenuItem>
+								<Bell className="mr-2 size-4" />
+								<span>Evento</span>
+							</DropdownMenuItem>
+						</DropdownMenuGroup>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			</SidebarHeader>
 
 			<SidebarContent>
