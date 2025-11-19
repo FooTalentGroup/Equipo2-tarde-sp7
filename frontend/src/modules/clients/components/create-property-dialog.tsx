@@ -1,5 +1,6 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
 import {
 	Dialog,
@@ -11,19 +12,19 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@src/components/ui/dialog";
-import { Input } from "@src/components/ui/input";
-import { Spinner } from "@src/components/ui/spinner";
-import { type ClientFormData, clientSchema } from "../schemas/create";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	Form,
+	FormControl,
 	FormField,
 	FormItem,
 	FormLabel,
-	FormControl,
 	FormMessage,
 } from "@src/components/ui/form";
+import { Input } from "@src/components/ui/input";
+import { Spinner } from "@src/components/ui/spinner";
+import { useForm } from "react-hook-form";
+
+import { type ClientFormData, clientSchema } from "../schemas/create";
 
 type CreateClientProps = {
 	buttonText?: string;
@@ -46,14 +47,14 @@ export const CreateClient = ({
 	const handleSubmit = async (data: ClientFormData) => {
 		try {
 			console.log("Submitting form...", data);
-			
+
 			if (onSubmit) {
 				await onSubmit(data);
 			} else {
 				// Aquí irá la acción del servidor cuando se implemente
 				// const result = await createClientAction(data);
 			}
-			
+
 			form.reset();
 		} catch (error) {
 			console.error("Error creating client:", error);
@@ -67,14 +68,17 @@ export const CreateClient = ({
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+					<form
+						onSubmit={form.handleSubmit(handleSubmit)}
+						className="space-y-4"
+					>
 						<DialogHeader>
 							<DialogTitle>Creación del cliente</DialogTitle>
 							<DialogDescription>
 								Ingrese los detalles del nuevo inquilino
 							</DialogDescription>
 						</DialogHeader>
-						
+
 						<div className="grid gap-4">
 							{/* Campo Nombre */}
 							<FormField
@@ -129,7 +133,9 @@ export const CreateClient = ({
 												placeholder="04156218952"
 												className="text-sm"
 												{...field}
-												onChange={(e) => field.onChange(parseInt(e.target.value) || 60)}
+												onChange={(e) =>
+													field.onChange(parseInt(e.target.value, 10) || 60)
+												}
 											/>
 										</FormControl>
 										<FormMessage />
@@ -139,14 +145,11 @@ export const CreateClient = ({
 						</div>
 
 						<DialogFooter>
-							<Button 
-								type="submit" 
-								disabled={form.formState.isSubmitting}
-							>
+							<Button type="submit" disabled={form.formState.isSubmitting}>
 								{form.formState.isSubmitting && <Spinner />}
 								{form.formState.isSubmitting ? "Guardando..." : buttonText}
 							</Button>
-							
+
 							<DialogClose asChild>
 								<Button variant="outline" type="button">
 									Cancelar

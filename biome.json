@@ -7,7 +7,14 @@
 	},
 	"files": {
 		"ignoreUnknown": true,
-		"includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
+		"includes": [
+			"frontend/**/*",
+			"backend/**/*",
+			"!node_modules",
+			"!.next",
+			"!dist",
+			"!build"
+		]
 	},
 	"formatter": {
 		"enabled": true,
@@ -31,7 +38,12 @@
 				}
 			},
 			"suspicious": {
-				"noUnknownAtRules": "off"
+				"noUnknownAtRules": "off",
+				"noArrayIndexKey": "off"
+			},
+			"a11y": {
+				"useSemanticElements": "off",
+				"useKeyWithClickEvents": "off"
 			},
 			"nursery": {
 				"useSortedClasses": {
@@ -52,6 +64,21 @@
 	"javascript": {
 		"formatter": {
 			"quoteStyle": "double"
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		},
+		"formatter": {
+			"enabled": true,
+			"indentStyle": "space",
+			"indentWidth": 2,
+			"lineWidth": 80,
+			"quoteStyle": "double"
+		},
+		"linter": {
+			"enabled": true
 		}
 	},
 	"assist": {

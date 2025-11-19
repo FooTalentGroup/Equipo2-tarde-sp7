@@ -1,33 +1,38 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import { Montserrat, Open_Sans } from "next/font/google";
+
+import "@src/styles/index.css";
+
+import type { ReactNode } from "react";
 
 import { Toaster } from "@src/components/ui/sonner";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
+const montserrat = Montserrat({
+	variable: "--font-montserrat",
 	subsets: ["latin"],
+	weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
+const openSans = Open_Sans({
+	variable: "--font-open-sans",
 	subsets: ["latin"],
+	weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-	title: "Real Estate App",
+	title: "RedProp",
 	description: "Aplicación de gestión de propiedades inmobiliarias",
 };
 
 export default function RootLayout({
 	children,
 }: Readonly<{
-	children: React.ReactNode;
+	children: ReactNode;
 }>) {
 	return (
 		<html lang="es">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${montserrat.variable} ${openSans.variable} antialiased`}
 			>
 				{children}
 				<Toaster />

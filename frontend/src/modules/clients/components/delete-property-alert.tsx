@@ -42,4 +42,4 @@ export const AlertDialogDeleteClient = ({
 			</AlertDialogContent>
 		</AlertDialog>
 	);
-}
+};
