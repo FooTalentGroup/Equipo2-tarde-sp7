@@ -40,6 +40,7 @@
   --color-primary-light: var(--primary-light);
   --color-primary-hover: var(--primary-hover);
   --color-grey-light: var(--grey-light);
+  --color-grey-normal: var(--grey-normal);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
@@ -77,6 +78,7 @@
   --outline-hover: #ececec;
   --secondary-hover: #17375a;
   --grey-light: #ececec;
+  --grey-normal: #808080;
   --muted: #e8ecf0;
   --muted-foreground: oklch(0.556 0 0);
   --accent: #cccccc;

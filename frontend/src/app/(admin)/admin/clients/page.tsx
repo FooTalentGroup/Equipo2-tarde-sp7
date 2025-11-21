@@ -62,190 +62,140 @@ const clients = [
 	},
 ] satisfies Client[];
 
-const tenants: Tenant[] = [
-	{
-		name: "Julián Benítez",
-		dni: "33.912.554",
-		address: "Lavalle 2240, CABA",
-		phone: "+54 11 5678-9012",
-		email: "julian.b@email.com",
-		type: "Inquilino",
-		rentAmount: 250000,
-		nextIncrease: {
-			date: "2025-03-15",
-			amount: 275000,
-		},
-		currentPayment: {
+const demoTenant: Tenant = {
+	name: "Julián Benítez",
+	dni: "33.912.554",
+	address: "Lavalle 2240, CABA",
+	phone: "+54 11 5678-9012",
+	email: "julian.b@email.com",
+	type: "Inquilino",
+	rentAmount: 250000,
+	nextIncrease: {
+		date: "2025-03-15",
+		amount: 275000,
+	},
+	currentPayment: {
+		amount: 250000,
+		dueDate: "2024-12-10",
+		status: "pending",
+	},
+	paymentHistory: [
+		{
+			month: "Noviembre",
 			amount: 250000,
-			dueDate: "2024-12-10",
-			status: "pending",
-		},
-		paymentHistory: [
-			{
-				month: "Noviembre",
-				amount: 250000,
-				status: "paid",
-				date: "2024-11-08",
-			},
-			{
-				month: "Octubre",
-				amount: 250000,
-				status: "paid",
-				date: "2024-10-10",
-			},
-		],
-	},
-	{
-		name: "Gonzalo Ramírez",
-		dni: "30.221.113",
-		address: "Córdoba 210, CABA",
-		phone: "+54 11 3344-5566",
-		email: "gonzalo.r@email.com",
-		type: "Inquilino",
-		rentAmount: 180000,
-		nextIncrease: {
-			date: "2025-06-01",
-			amount: 198000,
-		},
-		currentPayment: {
-			amount: 180000,
-			dueDate: "2024-12-05",
 			status: "paid",
+			date: "2024-11-08",
 		},
-		paymentHistory: [
-			{
-				month: "Noviembre",
-				amount: 180000,
-				status: "paid",
-				date: "2024-11-03",
-			},
-		],
-	},
-	{
-		name: "Lucía Fernández",
-		dni: "29.998.221",
-		address: "Cnel. Díaz 480, CABA",
-		phone: "+54 11 7788-9900",
-		email: "lucia.f@email.com",
-		type: "Inquilino",
-		rentAmount: 210000,
-		nextIncrease: {
-			date: "2025-01-01",
-			amount: 230000,
+		{
+			month: "Octubre",
+			amount: 250000,
+			status: "paid",
+			date: "2024-10-10",
 		},
-		currentPayment: {
-			amount: 210000,
-			dueDate: "2024-12-12",
-			status: "pending",
+		{
+			month: "Septiembre",
+			amount: 250000,
+			status: "paid",
+			date: "2024-09-09",
 		},
-		paymentHistory: [
-			{
-				month: "Octubre",
-				amount: 210000,
-				status: "paid",
-				date: "2024-10-10",
-			},
-		],
-	},
-];
+	],
+};
 
 export default function ClientSearchPage() {
 	return (
-		<div>
-			<div className="max-w-6xl mx-auto">
-				{/* Header */}
-				<Card>
-					<CardContent className="flex items-center gap-4 justify-between">
-						<Heading variant="h2" weight="semibold" className="text-secondary">
-							Buscar propiedad
-						</Heading>
-						<Button size="lg">
-							<PlusIcon className="" />
-							Agregar propiedad
-						</Button>
-					</CardContent>
-				</Card>
+		<div className="w-full mx-auto">
+			{/* Header */}
+			<Card>
+				<CardContent className="flex items-center gap-4 justify-between">
+					<Heading variant="h2" weight="semibold" className="text-secondary">
+						Buscar clientes
+					</Heading>
+					<Button size="lg">
+						<PlusIcon className="" />
+						Agregar clientes
+					</Button>
+				</CardContent>
+			</Card>
 
-				{/* Search and Tabs */}
-				<Tabs defaultValue="leads" className="w-full">
-					<div className="flex items-center my-4">
-						<div className="border-b w-full max-w-sm">
-							<div className="relative">
-								<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-								<Input
-									type="text"
-									placeholder="Buscar por nombre, DNI o dirección..."
-									className="pl-10 h-7"
-								/>
-							</div>
+			{/* Search and Tabs */}
+			<Tabs defaultValue="leads" className="w-full">
+				<div className="flex items-center my-4">
+					<div className="border-b w-full max-w-2/3">
+						<div className="relative">
+							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Input
+								type="text"
+								placeholder="Buscar por nombre, DNI o dirección..."
+								className="pl-10 h-7"
+							/>
 						</div>
-
-						<TabsList className="justify-start gap-2 rounded-none bg-transparent border-b px-5 text-black">
-							<TabsTrigger
-								value="leads"
-								className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
-							>
-								Leads
-							</TabsTrigger>
-							<TabsTrigger
-								value="inquilinos"
-								className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
-							>
-								Inquilinos
-							</TabsTrigger>
-							<TabsTrigger
-								value="propietarios"
-								className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
-							>
-								Propietarios
-							</TabsTrigger>
-						</TabsList>
 					</div>
 
-					{/* Tab Content - Leads */}
-					<TabsContent value="leads" className="mt-0">
-						<div className="space-y-0">
-							{clients
-								.filter((client) => client.type === "lead")
-								.map((client, index) => (
-									<LeadsCard
-										key={client.id}
-										client={client}
-										defaultOpen={index === 0}
-									/>
-								))}
-						</div>
-					</TabsContent>
+					<TabsList className="justify-start gap-2 rounded-none bg-transparent border-b px-5 text-black">
+						<TabsTrigger
+							value="leads"
+							className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
+						>
+							Leads
+						</TabsTrigger>
+						<TabsTrigger
+							value="inquilinos"
+							className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
+						>
+							Inquilinos
+						</TabsTrigger>
+						<TabsTrigger
+							value="propietarios"
+							className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
+						>
+							Propietarios
+						</TabsTrigger>
+					</TabsList>
+				</div>
 
-					{/* Tab Content - Inquilinos */}
-					<TabsContent value="inquilinos" className="mt-0">
-						<div className="space-y-0">
-							{tenants.map((tenant: Tenant, index: number) => (
-								<TenantCard
-									key={tenant.dni}
-									tenant={tenant}
+				{/* Tab Content - Leads */}
+				<TabsContent value="leads" className="mt-0">
+					<div className="space-y-0">
+						{clients
+							.filter((client) => client.type === "lead")
+							.map((client, index) => (
+								<LeadsCard
+									key={client.id}
+									client={client}
 									defaultOpen={index === 0}
 								/>
 							))}
-						</div>
-					</TabsContent>
+					</div>
+				</TabsContent>
 
-					{/* Tab Content - Propietarios */}
-					<TabsContent value="propietarios" className="mt-0">
-						<div className="space-y-0">
-							{clients
-								.filter((client) => client.type === "propietario")
-								.map((client, index) => (
-									<PropertyOwnerCard
-										key={client.id}
-										client={client}
-										defaultOpen={index === 0}
-									/>
-								))}
-						</div>
-					</TabsContent>
-				</Tabs>
-			</div>
+				{/* Tab Content - Inquilinos */}
+				<TabsContent value="inquilinos" className="mt-0">
+					<div className="space-y-0">
+						{([demoTenant] as Tenant[]).map((tenant: Tenant, index: number) => (
+							<TenantCard
+								key={tenant.dni}
+								tenant={tenant}
+								defaultOpen={index === 0}
+							/>
+						))}
+					</div>
+				</TabsContent>
+
+				{/* Tab Content - Propietarios */}
+				<TabsContent value="propietarios" className="mt-0">
+					<div className="space-y-0">
+						{clients
+							.filter((client) => client.type === "propietario")
+							.map((client, index) => (
+								<PropertyOwnerCard
+									key={client.id}
+									client={client}
+									defaultOpen={index === 0}
+								/>
+							))}
+					</div>
+				</TabsContent>
+			</Tabs>
 		</div>
 	);
 }

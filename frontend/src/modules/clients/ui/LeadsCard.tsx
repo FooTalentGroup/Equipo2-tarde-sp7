@@ -43,9 +43,10 @@ export function LeadsCard({
 							</div>
 							<div className="flex items-center gap-2">
 								{client.origin && (
-									<span className="text-sm text-slate-500 mr-2">
-										Origen: {client.origin}
-									</span>
+									<div className="flex flex-col">
+										<span className="text-xs mr-2">Origen</span>
+										<span className="text-black text-sm">{client.origin}</span>
+									</div>
 								)}
 								<ChevronDown className="h-5 w-5 text-slate-400" />
 							</div>
@@ -53,9 +54,9 @@ export function LeadsCard({
 					</CollapsibleTrigger>
 
 					<CollapsibleContent>
-						<div className="border-t px-4 py-4 bg-slate-50">
+						<div className="px-4 py-4">
 							<div className="grid grid-cols-2 gap-6">
-								<div>
+								<div className="border border-outline rounded-md p-2">
 									<h4 className="font-semibold text-sm text-slate-900 mb-3">
 										Contacto
 									</h4>
@@ -75,7 +76,7 @@ export function LeadsCard({
 									</div>
 								</div>
 
-								<div>
+								<div className="border border-outline rounded-md p-2">
 									<h4 className="font-semibold text-sm text-slate-900 mb-3">
 										Información del Lead
 									</h4>
@@ -93,7 +94,7 @@ export function LeadsCard({
 							</div>
 
 							{client.interest && (
-								<div className="mt-4 pt-4 border-t">
+								<div className="border border-outline rounded-md p-2 mt-4">
 									<h4 className="font-semibold text-sm text-slate-900 mb-2">
 										Interés
 									</h4>
@@ -101,7 +102,7 @@ export function LeadsCard({
 								</div>
 							)}
 
-							<div className="flex gap-2 mt-4 pt-4 border-t">
+							<div className="flex gap-2 mt-4 pt-4">
 								<Button size="lg">Convertir en cliente</Button>
 								<Button
 									variant="outline"
