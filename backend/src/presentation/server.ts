@@ -37,6 +37,11 @@ export class Server {
     //* Public Folder
     this.app.use( express.static( this.publicPath ) );
 
+    //* Swagger Documentation
+    const { swaggerSpec } = await import('../config/swagger');
+    const swaggerUi = await import('swagger-ui-express');
+    this.app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
     //* Routes
     this.app.use( this.routes );
 
