@@ -33,7 +33,6 @@ export const propertyFormSchema = z.object({
 		.transform(Number)
 		.pipe(z.number().positive("Este campo es requerido")),
 	disposition: z.string().optional(),
-
 	price: z
 		.transform(Number)
 		.pipe(z.number().positive("El precio es requerido")),
@@ -43,4 +42,4 @@ export const propertyFormSchema = z.object({
 	currency: z.string().min(1, "La moneda es obligatoria"),
 });
 
-export type PropertyFormData = z.infer<typeof propertyFormSchema>;
+export type PropertyData = z.infer<typeof propertyFormSchema>;

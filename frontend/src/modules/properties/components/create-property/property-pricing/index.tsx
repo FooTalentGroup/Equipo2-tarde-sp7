@@ -14,11 +14,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@src/components/ui/select";
-import type { PropertyFormData } from "@src/types/property";
+import type { PropertyData } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyPricingProps {
-	form: UseFormReturn<PropertyFormData>;
+	form: UseFormReturn<PropertyData>;
 }
 
 export default function PropertyPricing({ form }: PropertyPricingProps) {

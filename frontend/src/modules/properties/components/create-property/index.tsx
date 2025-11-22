@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@src/components/ui/form";
 import { Heading } from "@src/components/ui/heading";
 import { Separator } from "@src/components/ui/separator";
-import { type PropertyFormData, propertyFormSchema } from "@src/types/property";
+import { type PropertyData, propertyFormSchema } from "@src/types/property";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -13,13 +13,13 @@ import PropertyCharacteristics from "./property-characteristics";
 import PropertyPricing from "./property-pricing";
 
 type CreatePropertyFormProps = {
-	defaultValues?: PropertyFormData;
+	defaultValues?: PropertyData;
 };
 
 export default function CreatePropertyForm({
 	defaultValues,
 }: CreatePropertyFormProps) {
-	const form = useForm<PropertyFormData>({
+	const form = useForm<PropertyData>({
 		resolver: zodResolver(propertyFormSchema),
 		defaultValues: {
 			// Información de la propiedad
@@ -50,7 +50,7 @@ export default function CreatePropertyForm({
 		mode: "all",
 	});
 
-	function onSubmit(data: PropertyFormData) {
+	function onSubmit(data: PropertyData) {
 		toast.success("You submitted the following values:", {
 			description: (
 				<pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
