@@ -1,12 +1,5 @@
 import { z } from "zod";
 
-// Helper para coerción de números
-const numberField = z
-	.union([z.number(), z.string()])
-	.transform((val) => (typeof val === "string" ? Number(val) : val))
-	.pipe(z.number().min(0, "Debe ser mayor o igual a 0"));
-
-// Schema base de propiedad (sin ID) - usado para crear y actualizar
 export const propertyFormSchema = z.object({
 	id: z.string().optional(),
 	// Información básica
@@ -18,8 +11,6 @@ export const propertyFormSchema = z.object({
 	province: z.string().min(2, "La provincia es obligatoria"),
 	postalCode: z.string().min(1, "El código postal es obligatorio"),
 	assignedOwner: z.string().min(1, "El propietario asignado es obligatorio"),
-
-	// Características de la propiedad
 	rooms: z
 		.transform(Number)
 		.pipe(z.number().positive("Este campo es requerido")),
@@ -43,7 +34,6 @@ export const propertyFormSchema = z.object({
 		.pipe(z.number().positive("Este campo es requerido")),
 	disposition: z.string().optional(),
 
-	// Valores
 	price: z
 		.transform(Number)
 		.pipe(z.number().positive("El precio es requerido")),

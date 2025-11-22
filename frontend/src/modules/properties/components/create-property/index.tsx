@@ -96,9 +96,6 @@ export default function CreatePropertyForm({
 				</div>
 
 				<Separator />
-
-				{/* Futuras secciones se agregarán aquí */}
-				{/* Botón de submit se agregará cuando haya más secciones */}
 			</form>
 		</Form>
 	);
