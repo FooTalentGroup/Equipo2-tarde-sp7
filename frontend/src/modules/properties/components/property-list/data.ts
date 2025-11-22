@@ -1,4 +1,4 @@
-import type { Property } from "../../schemas/property.schema";
+import type { Property } from "@src/types/property";
 
 export const mockProperties: Property[] = [
 	{

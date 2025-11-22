@@ -25,6 +25,7 @@ export const paths = {
 		properties: {
 			index: () => "/admin/properties",
 			detail: (id: string) => `/admin/properties/${id}`,
+			new: () => "/admin/properties/new",
 		},
 		reports: {
 			index: () => "/admin/reports",

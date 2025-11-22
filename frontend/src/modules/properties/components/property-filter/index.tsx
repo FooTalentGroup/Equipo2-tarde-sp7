@@ -1,7 +1,7 @@
 "use client";
 
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import { Button } from "@src/components/ui/button";
-import { Checkbox } from "@src/components/ui/checkbox";
 import {
 	Form,
 	FormControl,
@@ -18,24 +18,17 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@src/components/ui/select";
+import type { PropertyFilterForm } from "@src/types/property-filter";
 import { useForm } from "react-hook-form";
-
-interface PropertyFilterForm {
-	operationType: string;
-	propertyType: string;
-	amount: string;
-	location: string;
-	available: boolean;
-	unavailable: boolean;
-	disabled: boolean;
-}
 
 export default function PropertyFilter() {
 	const form = useForm<PropertyFilterForm>({
 		defaultValues: {
 			operationType: "",
 			propertyType: "",
-			amount: "",
+			priceFrom: "",
+			priceTo: "",
+			currency: "",
 			location: "",
 			available: false,
 			unavailable: false,
@@ -48,11 +41,11 @@ export default function PropertyFilter() {
 	};
 
 	return (
-		<div className="">
+		<section className="">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-					{/* Primera fila: Tipo de operación, Tipo de propiedad, Monto, Ubicación y Botón */}
-					<div className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] items-end gap-2">
+					{/* Primera fila: Tipo de operación, Tipo de propiedad, Precio desde, Precio hasta, Moneda, Ubicación y Botón */}
+					<div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] items-end gap-2">
 						<FormField
 							control={form.control}
 							name="operationType"
@@ -107,17 +100,50 @@ export default function PropertyFilter() {
 
 						<FormField
 							control={form.control}
-							name="amount"
+							name="priceFrom"
 							render={({ field }) => (
 								<FormItem className="">
-									<FormLabel>Monto</FormLabel>
+									<FormLabel>Precio desde</FormLabel>
 									<FormControl>
-										<Input
-											type="number"
-											placeholder="Ingrese monto"
-											{...field}
-										/>
+										<Input type="number" placeholder="Desde" {...field} />
 									</FormControl>
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="priceTo"
+							render={({ field }) => (
+								<FormItem className="">
+									<FormLabel>Precio hasta</FormLabel>
+									<FormControl>
+										<Input type="number" placeholder="Hasta" {...field} />
+									</FormControl>
+								</FormItem>
+							)}
+						/>
+
+						<FormField
+							control={form.control}
+							name="currency"
+							render={({ field }) => (
+								<FormItem className="">
+									<FormLabel>Moneda</FormLabel>
+									<Select onValueChange={field.onChange} value={field.value}>
+										<FormControl>
+											<SelectTrigger className="w-full">
+												<SelectValue placeholder="Seleccionar" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											<SelectGroup>
+												<SelectItem value="usd">USD</SelectItem>
+												<SelectItem value="ars">ARS</SelectItem>
+												<SelectItem value="eur">EUR</SelectItem>
+											</SelectGroup>
+										</SelectContent>
+									</Select>
 								</FormItem>
 							)}
 						/>
@@ -128,83 +154,36 @@ export default function PropertyFilter() {
 							render={({ field }) => (
 								<FormItem className="">
 									<FormLabel>Ubicación</FormLabel>
-									<FormControl>
-										<Input
-											type="text"
-											placeholder="Ingrese ubicación"
-											{...field}
-										/>
-									</FormControl>
+									<Select onValueChange={field.onChange} value={field.value}>
+										<FormControl>
+											<SelectTrigger className="w-full">
+												<SelectValue placeholder="Seleccionar" />
+											</SelectTrigger>
+										</FormControl>
+										<SelectContent>
+											<SelectGroup>
+												<SelectItem value="caba">CABA</SelectItem>
+												<SelectItem value="zona_norte">Zona Norte</SelectItem>
+												<SelectItem value="zona_sur">Zona Sur</SelectItem>
+												<SelectItem value="zona_oeste">Zona Oeste</SelectItem>
+											</SelectGroup>
+										</SelectContent>
+									</Select>
 								</FormItem>
 							)}
 						/>
 
-						<Button type="submit" variant="default">
-							Filtrar
+						<Button
+							type="submit"
+							size="lg"
+							variant="outline"
+							className="w-[140px]"
+						>
+							<AdjustmentsHorizontalIcon className="size-6" /> Filtrar
 						</Button>
-					</div>
-
-					{/* Segunda fila: Checkboxes */}
-					<div className="flex items-center gap-6">
-						<FormField
-							control={form.control}
-							name="available"
-							render={({ field }) => (
-								<div className="flex items-center space-x-2">
-									<FormControl>
-										<Checkbox
-											id="available"
-											checked={field.value}
-											onCheckedChange={field.onChange}
-										/>
-									</FormControl>
-									<FormLabel htmlFor="available" className="">
-										Disponible
-									</FormLabel>
-								</div>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name="unavailable"
-							render={({ field }) => (
-								<div className="flex items-center space-x-2">
-									<FormControl>
-										<Checkbox
-											id="unavailable"
-											checked={field.value}
-											onCheckedChange={field.onChange}
-										/>
-									</FormControl>
-									<FormLabel htmlFor="unavailable" className="">
-										No disponible
-									</FormLabel>
-								</div>
-							)}
-						/>
-
-						<FormField
-							control={form.control}
-							name="disabled"
-							render={({ field }) => (
-								<div className="flex items-center space-x-2">
-									<FormControl>
-										<Checkbox
-											id="disabled"
-											checked={field.value}
-											onCheckedChange={field.onChange}
-										/>
-									</FormControl>
-									<FormLabel htmlFor="disabled" className="">
-										Deshabilitado
-									</FormLabel>
-								</div>
-							)}
-						/>
 					</div>
 				</form>
 			</Form>
-		</div>
+		</section>
 	);
 }

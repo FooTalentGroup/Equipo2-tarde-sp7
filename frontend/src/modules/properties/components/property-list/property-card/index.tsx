@@ -4,12 +4,11 @@ import { AspectRatio } from "@src/components/ui/aspect-ratio";
 import { Badge } from "@src/components/ui/badge";
 import { Card, CardContent } from "@src/components/ui/card";
 import { Separator } from "@src/components/ui/separator";
+import type { Property } from "@src/types/property";
 
-import type { Property } from "../../../schemas/property.schema";
-
-interface PropertyCardProps {
+type PropertyCardProps = {
 	property: Property;
-}
+};
 
 export default function PropertyCard({ property }: PropertyCardProps) {
 	return (
