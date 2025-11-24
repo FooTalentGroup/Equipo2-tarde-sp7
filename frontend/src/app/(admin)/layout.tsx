@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { redirect } from "next/navigation";
 
-import AdminHeader from "@src/components/layouts/header/admin-header";
+import AdminHeader from "@src/components/agent-header";
 import { AdminSidebar } from "@src/components/sidebars/admin-sidebar";
 import { SidebarInset, SidebarProvider } from "@src/components/ui/sidebar";
 import { paths } from "@src/lib/paths";
