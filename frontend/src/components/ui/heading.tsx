@@ -11,7 +11,9 @@ const headingVariants = cva("font-bold font-mono text-heading", {
 			h3: "text-[1.9375rem] leading-[1.2]", // 31px
 			subtitle1: "text-[1.5rem] leading-[1.2]", // 24px
 			subtitle2: "text-[1.25rem] leading-[1.2]", // 20px
-			subtitle3: "text-[1rem] leading-[1.2]", // 16px
+			subtitle3: "text-lg leading-[1.2]", // 18px
+			subtitle4: "text-base leading-[1.2]", // 16px
+			subtitle5: "text-sm leading-[1.2]", // 14px
 		},
 		align: {
 			left: "text-left",
