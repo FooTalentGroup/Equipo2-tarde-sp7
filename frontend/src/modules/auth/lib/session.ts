@@ -1,3 +1,14 @@
+/**
+ * Session Management Layer
+ *
+ * Provides low-level primitives for managing authentication sessions via cookies.
+ * Handles secure storage of authentication tokens and user data.
+ *
+ * @module session
+ * @layer Infrastructure
+ * @security Uses httpOnly cookies for tokens to prevent XSS attacks
+ */
+
 import "server-only";
 
 import { cookies } from "next/headers";
@@ -8,32 +19,30 @@ const TOKEN_NAME = "auth_token";
 const USER_DATA_NAME = "auth_user";
 
 /**
- * Configura una sesión guardando el token y datos del usuario en cookies
+ * Sets up a session by storing the token and user data in cookies
  */
 export async function setSession(token: string, user: User) {
 	const cookieStore = await cookies();
 
-	// Guardar token (httpOnly para seguridad)
 	cookieStore.set(TOKEN_NAME, token, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "lax",
-		maxAge: 60 * 60 * 24 * 7, // 7 días
+		maxAge: 60 * 60 * 24 * 7, // 7 days
 		path: "/",
 	});
 
-	// Guardar datos del usuario (no httpOnly para que el cliente pueda leerlo)
 	cookieStore.set(USER_DATA_NAME, JSON.stringify(user), {
 		httpOnly: false,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "lax",
-		maxAge: 60 * 60 * 24 * 7, // 7 días
+		maxAge: 60 * 60 * 24 * 7, // 7 days
 		path: "/",
 	});
 }
 
 /**
- * Obtiene el token de la sesión actual
+ * Gets the authentication token from the current session
  */
 export async function getToken(): Promise<string | undefined> {
 	const cookieStore = await cookies();
@@ -41,7 +50,7 @@ export async function getToken(): Promise<string | undefined> {
 }
 
 /**
- * Obtiene los datos del usuario de la sesión actual
+ * Gets the user data from the current session
  */
 export async function getUser(): Promise<User | null> {
 	const cookieStore = await cookies();
@@ -59,7 +68,7 @@ export async function getUser(): Promise<User | null> {
 }
 
 /**
- * Elimina la sesión
+ * Deletes the current session by removing all authentication cookies
  */
 export async function deleteSession() {
 	const cookieStore = await cookies();
@@ -68,7 +77,7 @@ export async function deleteSession() {
 }
 
 /**
- * Verifica si hay una sesión activa
+ * Checks if there is an active session
  */
 export async function hasSession(): Promise<boolean> {
 	const token = await getToken();
