@@ -1,5 +1,8 @@
 import type { ElementType } from "react";
 
+import { Badge } from "@src/components/ui/badge";
+import { Card } from "@src/components/ui/card";
+import { Heading } from "@src/components/ui/heading";
 import type { Notification } from "@src/types/notification";
 import {
 	CalendarIcon,
@@ -8,10 +11,6 @@ import {
 	KeyIcon,
 	PhoneIcon,
 } from "lucide-react";
-
-import { Badge } from "../ui/badge";
-import { Card } from "../ui/card";
-import { Heading } from "../ui/heading";
 
 const STATUS_ICON_MAP: Record<string, ElementType> = {
 	keys: KeyIcon,
@@ -39,7 +38,7 @@ export default function NotificationCard({
 
 	return (
 		<Card
-			className={`grid gap-3 px-3 py-2 items-center ${
+			className={`grid gap-3 p-3 items-start shadow-none ${
 				IconComponent ? "grid-cols-[2rem_1fr]" : "grid-cols-1"
 			}`}
 		>
@@ -52,9 +51,9 @@ export default function NotificationCard({
 				{statusLabel && <Badge variant="outline">{statusLabel}</Badge>}
 				{title && (
 					<Heading
-						variant="subtitle3"
+						variant="subtitle5"
 						weight="semibold"
-						className="line-clamp-1"
+						className="line-clamp-1 text-foreground"
 					>
 						{title}
 					</Heading>

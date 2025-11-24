@@ -1,0 +1,216 @@
+import {
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@src/components/ui/form";
+import { Input } from "@src/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@src/components/ui/select";
+import type { PropertyData } from "@src/types/property";
+import type { UseFormReturn } from "react-hook-form";
+
+interface PropertyCharacteristicsProps {
+	form: UseFormReturn<PropertyData>;
+}
+
+export default function PropertyCharacteristics({
+	form,
+}: PropertyCharacteristicsProps) {
+	return (
+		<div className="grid grid-cols-2 gap-10 items-start">
+			{/* Columna izquierda */}
+			<div className="grid gap-4">
+				<FormField
+					control={form.control}
+					name="rooms"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Ambientes</FormLabel>
+							<FormControl>
+								<Input type="number" placeholder="3" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="bedrooms"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Dormitorios</FormLabel>
+							<FormControl>
+								<Input type="number" placeholder="1" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="bathrooms"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Baños</FormLabel>
+							<FormControl>
+								<Input type="number" placeholder="1" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="toilets"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Toilettes</FormLabel>
+							<FormControl>
+								<Input type="number" placeholder="1" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="garages"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Cocheras</FormLabel>
+							<FormControl>
+								<Input type="number" placeholder="1" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+			</div>
+
+			{/* Columna derecha */}
+			<div className="grid gap-4 items-start">
+				<FormField
+					control={form.control}
+					name="floors"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Plantas</FormLabel>
+							<FormControl>
+								<Input type="number" placeholder="1" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="age"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Antigüedad</FormLabel>
+							<FormControl>
+								<Input placeholder="A estrenar" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="situation"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Situación</FormLabel>
+							<Select onValueChange={field.onChange} value={field.value}>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Seleccionar" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="front">Frente</SelectItem>
+										<SelectItem value="back">Contrafrente</SelectItem>
+										<SelectItem value="internal">Interno</SelectItem>
+										<SelectItem value="lateral">Lateral</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="orientation"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Orientación</FormLabel>
+							<Select onValueChange={field.onChange} value={field.value}>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Seleccionar" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="north">Norte</SelectItem>
+										<SelectItem value="south">Sur</SelectItem>
+										<SelectItem value="east">Este</SelectItem>
+										<SelectItem value="west">Oeste</SelectItem>
+										<SelectItem value="northeast">Noreste</SelectItem>
+										<SelectItem value="northwest">Noroeste</SelectItem>
+										<SelectItem value="southeast">Sureste</SelectItem>
+										<SelectItem value="southwest">Suroeste</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="disposition"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Disposición</FormLabel>
+							<Select onValueChange={field.onChange} value={field.value}>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Seleccionar" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="front">Frente</SelectItem>
+										<SelectItem value="rear">Contrafrente</SelectItem>
+										<SelectItem value="internal">Interna</SelectItem>
+										<SelectItem value="side">Lateral</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+			</div>
+		</div>
+	);
+}

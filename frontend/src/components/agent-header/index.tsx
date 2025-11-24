@@ -7,14 +7,18 @@ import {
 	UserIcon,
 } from "@heroicons/react/24/outline";
 import LogoWhite from "@public/images/logo-white.png";
-import { Avatar, AvatarFallback, AvatarImage } from "@src/components/ui/avatar";
 import { Button } from "@src/components/ui/button";
 import { Input } from "@src/components/ui/input";
-import { Text } from "@src/components/ui/text";
 import { paths } from "@src/lib/paths";
+import { getAuthenticatedUser } from "@src/modules/auth/lib/utils";
 import { Search } from "lucide-react";
 
-export default function AdminHeader() {
+import NotificationsSheet from "./notifications-sheet";
+import UserMenuTrigger from "./user-menu-trigger";
+
+export default async function AdminHeader() {
+	const user = await getAuthenticatedUser();
+
 	return (
 		<header className="px-4 sticky top-0 z-50 bg-primary text-primary-foreground min-h-(--admin-header-height) grid grid-cols-[0.7fr_1fr_0.7fr] items-center gap-4">
 			<Button variant="link" className="w-[271px] h-auto p-0" asChild>
@@ -55,14 +59,9 @@ export default function AdminHeader() {
 					</div>
 				</div>
 			</div>
-			<div className="justify-self-end">
-				<Button variant="ghost" className="h-auto">
-					<Avatar>
-						<AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-						<AvatarFallback>CN</AvatarFallback>
-					</Avatar>
-					<Text>Nicolas Rodriguez</Text>
-				</Button>
+			<div className="justify-self-end flex items-center">
+				<NotificationsSheet />
+				<UserMenuTrigger user={user} />
 			</div>
 		</header>
 	);

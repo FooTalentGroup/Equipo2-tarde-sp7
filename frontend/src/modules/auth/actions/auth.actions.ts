@@ -1,6 +1,20 @@
+/**
+ * Authentication Server Actions
+ *
+ * Handles authentication mutations (login, register, logout) triggered from Client Components.
+ * These functions are callable from the browser but execute on the server.
+ *
+ * @module auth.actions
+ * @layer Server Actions
+ * @usage Import and call from Client Components (forms, buttons, etc.)
+ * @security All mutations validate input and handle sessions securely
+ */
+
 "use server";
 
 import { redirect } from "next/navigation";
+
+import { paths } from "@src/lib/paths";
 
 import { deleteSession, setSession } from "../lib/session";
 import type { LoginFormData } from "../schemas/login";
@@ -22,7 +36,8 @@ type ActionResult = {
 };
 
 /**
- * Server Action para login
+ * Server Action for user login
+ * Authenticates user credentials and creates a session
  */
 export async function loginAction(
 	formData: LoginFormData,
@@ -41,30 +56,31 @@ export async function loginAction(
 			const error = await response.json();
 			return {
 				success: false,
-				message: error.message || "Credenciales inválidas",
+				message: error.message || "Invalid credentials",
 			};
 		}
 
 		const data: AuthResponse = await response.json();
 
-		// Guardar sesión en cookies
+		// Save session in cookies
 		await setSession(data.token, data.user);
 
 		return {
 			success: true,
-			message: `Bienvenido ${data.user.firstName}!`,
+			message: `Bienvenido ${data.user.first_name}!`,
 		};
 	} catch (error) {
 		console.error("Login error:", error);
 		return {
 			success: false,
-			message: "Error al iniciar sesión. Intenta de nuevo.",
+			message: "Error al iniciar sesion. Intenta de nuevo.",
 		};
 	}
 }
 
 /**
- * Server Action para registro
+ * Server Action for user registration
+ * Creates a new user account and establishes a session
  */
 export async function registerAction(
 	formData: RegisterFormData,
@@ -82,32 +98,33 @@ export async function registerAction(
 			const error = await response.json();
 			return {
 				success: false,
-				message: error.message || "Error al registrar usuario",
+				message: error.message || "Error registering user",
 			};
 		}
 
 		const data: AuthResponse = await response.json();
 
-		// Guardar sesión en cookies
+		// Save session in cookies
 		await setSession(data.token, data.user);
 
 		return {
 			success: true,
-			message: `Cuenta creada exitosamente! Bienvenido ${data.user.firstName}`,
+			message: `Cuenta creada exitosamente. Bienvenido ${data.user.first_name}`,
 		};
 	} catch (error) {
 		console.error("Register error:", error);
 		return {
 			success: false,
-			message: "Error al crear la cuenta. Intenta de nuevo.",
+			message: "Error creando cuenta. Intenta de nuevo.",
 		};
 	}
 }
 
 /**
- * Server Action para logout
+ * Server Action for user logout
+ * Deletes the current session and redirects to login page
  */
 export async function logoutAction() {
 	await deleteSession();
-	redirect("/login");
+	redirect(paths.auth.login());
 }
