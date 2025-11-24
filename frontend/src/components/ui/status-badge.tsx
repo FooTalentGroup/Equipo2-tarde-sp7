@@ -1,0 +1,41 @@
+import type * as React from "react";
+
+import { Badge } from "@src/components/ui/badge";
+import { cn } from "@src/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+
+const statusBadgeVariants = cva("", {
+	variants: {
+		status: {
+			lead: "border-[#B8C3CF] bg-[#E8ECF0] text-[#0C1B2D]",
+			inquilino: "border-[#00B88A] bg-[#E6F8F3] text-[#004030]",
+			pendiente: "border-[#FFE9C1] bg-[#FFF8EB] text-[#BF8B2A]",
+			atrasado: "border-[#FDBABE] bg-[#FEE9EA] text-[#BA1A22]",
+			pagado: "border-[#B0E9DB] bg-[#E6F8F3] text-[#008A68]",
+			propietario: "border-[#FFE9C1] bg-[#FFF8EB] text-[#BF8B2A]",
+		},
+	},
+});
+
+interface StatusBadgeProps
+	extends Omit<React.ComponentProps<typeof Badge>, "variant">,
+		VariantProps<typeof statusBadgeVariants> {
+	status:
+		| "lead"
+		| "inquilino"
+		| "pendiente"
+		| "atrasado"
+		| "pagado"
+		| "propietario";
+}
+
+function StatusBadge({ className, status, ...props }: StatusBadgeProps) {
+	return (
+		<Badge
+			className={cn(statusBadgeVariants({ status }), className)}
+			{...props}
+		/>
+	);
+}
+
+export { StatusBadge, statusBadgeVariants };

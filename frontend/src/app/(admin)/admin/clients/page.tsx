@@ -1,103 +1,201 @@
-"use client";
-
-import { useState } from "react";
-
+import { Button } from "@src/components/ui/button";
+import { Card, CardContent } from "@src/components/ui/card";
+import { Heading } from "@src/components/ui/heading";
+import { Input } from "@src/components/ui/input";
 import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@src/components/ui/table";
-import {
-	AlertDialogDeleteClient,
-	ColumnFilterDropdown,
-	CreateClient,
-	EditClientModal,
-	type FilterOption,
-} from "@src/modules/clients/components";
-import type { Client, ClientData } from "@src/types/client";
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from "@src/components/ui/tabs";
+import { LeadsCard } from "@src/modules/clients/ui/LeadsCard";
+import { PropertyOwnerCard } from "@src/modules/clients/ui/PropertyOwnerCard";
+import TenantCard from "@src/modules/clients/ui/TenantCard";
+import type { Client, Tenant } from "@src/types/client";
+import { PlusIcon, Search } from "lucide-react";
 
-export default function DataTableClient() {
-	let nextId = 0;
-	const [clients, setClients] = useState<Client[]>([]);
-	const [visibleColumns, setVisibleColumns] = useState({
-		name: true,
-		email: true,
-	});
+// Datos de ejemplo (en tu caso vendrían de la base de datos)
+const clients = [
+	{
+		id: 1,
+		name: "María González",
+		type: "lead",
+		dni: "28.345.112",
+		address: "Av. Rivadavia 7421, CABA",
+		phone: "+54 11 4567-8901",
+		email: "maria.g@email.com",
+		origin: "Web",
+		interest: "Alquilar • 2 amb en Palermo",
+	},
+	{
+		id: 2,
+		name: "Florencia Duarte",
+		type: "lead",
+		dni: "31.554.887",
+		address: "9 de Julio 128, San Isidro",
+		phone: "+54 11 2345-6789",
+		email: "florencia.d@email.com",
+		origin: "web",
+		interest: "Alquilar • Casa en San Isidro",
+	},
+	{
+		id: 3,
+		name: "Paula Herrera",
+		type: "lead",
+		dni: "27.771.338",
+		address: "Av. Santa Fe 3500, CABA",
+		phone: "+54 11 9876-5432",
+		email: "paula.h@email.com",
+		origin: "web",
+		interest: "Comprar • Departamento en Recoleta",
+	},
+	{
+		id: 4,
+		name: "Carolina Vega",
+		type: "propietario",
+		dni: "34.112.445",
+		address: "San Martín 1256, CABA",
+		phone: "+54 11 7654-3210",
+		email: "carolina.v@email.com",
+		origin: "3",
+		interest: "Alquilar • 3 amb en Belgrano",
+	},
+] satisfies Client[];
 
-	const handleCreateClient = (clientData: ClientData) => {
-		const newClient: Client = {
-			id: ++nextId,
-			name: clientData.name,
-			email: clientData.email,
-			number: clientData.number,
-		};
-		setClients([...clients, newClient]);
-	};
+const demoTenant: Tenant = {
+	name: "Julián Benítez",
+	dni: "33.912.554",
+	address: "Lavalle 2240, CABA",
+	phone: "+54 11 5678-9012",
+	email: "julian.b@email.com",
+	type: "Inquilino",
+	rentAmount: 250000,
+	nextIncrease: {
+		date: "2025-03-15",
+		amount: 275000,
+	},
+	currentPayment: {
+		amount: 250000,
+		dueDate: "2024-12-10",
+		status: "pending",
+	},
+	paymentHistory: [
+		{
+			month: "Noviembre",
+			amount: 250000,
+			status: "paid",
+			date: "2024-11-08",
+		},
+		{
+			month: "Octubre",
+			amount: 250000,
+			status: "paid",
+			date: "2024-10-10",
+		},
+		{
+			month: "Septiembre",
+			amount: 250000,
+			status: "paid",
+			date: "2024-09-09",
+		},
+	],
+};
 
-	const handleDeleteClient = (currentClient: Client) => {
-		setClients(clients.filter((c) => c.id !== currentClient.id));
-	};
-
-	const handleSaveEdit = (updatedClient: Client) => {
-		setClients(
-			clients.map((c) => (c.id === updatedClient.id ? updatedClient : c)),
-		);
-	};
-
-	const toggleColumn = (column: FilterOption) => {
-		setVisibleColumns((prev) => ({
-			...prev,
-			[column]: !prev[column],
-		}));
-	};
-
+export default function ClientSearchPage() {
 	return (
-		<>
-			<div className="flex justify-between items-center mt-2">
-				<CreateClient onSubmit={handleCreateClient} />
+		<div className="w-full mx-auto">
+			{/* Header */}
+			<Card>
+				<CardContent className="flex items-center gap-4 justify-between">
+					<Heading variant="h2" weight="semibold" className="text-secondary">
+						Buscar clientes
+					</Heading>
+					<Button size="lg">
+						<PlusIcon className="" />
+						Agregar clientes
+					</Button>
+				</CardContent>
+			</Card>
 
-				<ColumnFilterDropdown
-					visibleColumns={visibleColumns}
-					onToggleColumn={toggleColumn}
-				/>
-			</div>
+			{/* Search and Tabs */}
+			<Tabs defaultValue="leads" className="w-full">
+				<div className="flex items-center my-4">
+					<div className="border-b w-full max-w-2/3">
+						<div className="relative">
+							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+							<Input
+								type="text"
+								placeholder="Buscar por nombre, DNI o dirección..."
+								className="pl-10 h-7"
+							/>
+						</div>
+					</div>
 
-			{/* Tabla */}
-			<div className="overflow-hidden rounded-md border mt-2">
-				<Table>
-					<TableHeader>
-						<TableRow>
-							{visibleColumns.name && <TableHead>Nombre</TableHead>}
-							{visibleColumns.email && <TableHead>Email</TableHead>}
-							<TableHead>Número</TableHead>
-							<TableHead>Editar</TableHead>
-							<TableHead>Eliminar</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{clients.map((c) => {
-							return (
-								<TableRow key={++nextId}>
-									{visibleColumns.name && <TableCell>{c.name}</TableCell>}
-									{visibleColumns.email && <TableCell>{c.email}</TableCell>}
-									<TableCell>{c.number}</TableCell>
-									<TableCell>
-										<EditClientModal client={c} onSave={handleSaveEdit} />
-									</TableCell>
-									<TableCell>
-										<AlertDialogDeleteClient
-											handleClick={() => handleDeleteClient(c)}
-										/>
-									</TableCell>
-								</TableRow>
-							);
-						})}
-					</TableBody>
-				</Table>
-			</div>
-		</>
+					<TabsList className="justify-start gap-2 rounded-none bg-transparent border-b px-5 text-black">
+						<TabsTrigger
+							value="leads"
+							className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
+						>
+							Leads
+						</TabsTrigger>
+						<TabsTrigger
+							value="inquilinos"
+							className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
+						>
+							Inquilinos
+						</TabsTrigger>
+						<TabsTrigger
+							value="propietarios"
+							className="data-[state=active]:bg-secondary data-[state=active]:text-primary-foreground rounded-md bg-primary-light"
+						>
+							Propietarios
+						</TabsTrigger>
+					</TabsList>
+				</div>
+
+				{/* Tab Content - Leads */}
+				<TabsContent value="leads" className="mt-0">
+					<div className="space-y-0">
+						{clients
+							.filter((client) => client.type === "lead")
+							.map((client, index) => (
+								<LeadsCard
+									key={client.id}
+									client={client}
+									defaultOpen={index === 0}
+								/>
+							))}
+					</div>
+				</TabsContent>
+
+				{/* Tab Content - Inquilinos */}
+				<TabsContent value="inquilinos" className="mt-0">
+					<div className="space-y-0">
+						{([demoTenant] as Tenant[]).map((tenant: Tenant, index: number) => (
+							<TenantCard
+								key={tenant.dni}
+								tenant={tenant}
+								defaultOpen={index === 0}
+							/>
+						))}
+					</div>
+				</TabsContent>
+
+				{/* Tab Content - Propietarios */}
+				<TabsContent value="propietarios" className="mt-0">
+					<div className="space-y-0">
+						{clients
+							.filter((client) => client.type === "propietario")
+							.map((client, index) => (
+								<PropertyOwnerCard
+									key={client.id}
+									client={client}
+									defaultOpen={index === 0}
+								/>
+							))}
+					</div>
+				</TabsContent>
+			</Tabs>
+		</div>
 	);
 }
