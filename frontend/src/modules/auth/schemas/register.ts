@@ -1,21 +1,22 @@
 import { z } from "zod";
 
 export const registerSchema = z.object({
-	email: z
-		.string()
-		.min(1, "El correo es requerido")
-		.email("Ingresa un correo valido"),
+	email: z.email({ pattern: z.regexes.email, message: "Este campo es obligatorio" }),
 	password: z
 		.string()
-		.min(1, "La contraseña es requerida")
+		.min(1, "Este campo es obligatorio")
+		.min(6, "La contraseña debe tener al menos 6 caracteres"),
+	confirmPassword : z
+		.string()
+		.min(1, "Este campo es obligatorio")
 		.min(6, "La contraseña debe tener al menos 6 caracteres"),
 	firstName: z
 		.string()
-		.min(1, "El nombre es requerido")
+		.min(1, "Este campo es obligatorio")
 		.min(2, "El nombre debe tener al menos 2 caracteres"),
 	lastName: z
 		.string()
-		.min(1, "El apellido es requerido")
+		.min(1, "Este campo es obligatorio")
 		.min(2, "El apellido debe tener al menos 2 caracteres"),
 	role: z
 		.string()

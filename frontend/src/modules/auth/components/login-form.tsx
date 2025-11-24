@@ -18,10 +18,11 @@ import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
+import { Heading } from "@src/components/ui/heading";
 import { loginAction } from "../actions/auth.actions";
 import { type LoginFormData, loginSchema } from "../schemas/login";
-
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 type LoginFormProps = {
 	heading?: string;
 	buttonText?: string;
@@ -30,7 +31,7 @@ type LoginFormProps = {
 };
 
 export default function LoginForm({
-	heading = "RedProp",
+	heading = "INICIAR SESIÓN",
 	buttonText = "Iniciar Sesión",
 	onSubmit,
 	redirectTo,
@@ -42,6 +43,7 @@ export default function LoginForm({
 			password: "",
 		},
 	});
+	const [showPassword, setShowPassword] = useState(false)
 
 	const router = useRouter();
 
@@ -71,29 +73,28 @@ export default function LoginForm({
 	};
 
 	return (
-		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
-			{heading && <h1 className="text-xl font-semibold">{heading}</h1>}
+		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8">
+			{heading && <Heading align={"center"} variant={"h1"} weight={"semibold"} className="text-black mb-4">{heading}</Heading>}
 
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(handleSubmit)}
-					className="w-full space-y-4"
+					className="w-full space-y-7"
 				>
 					<FormField
 						control={form.control}
 						name="email"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Correo electrónico</FormLabel>
+								<FormLabel className="text-[#0A122B] font-semibold">Usuario o Email</FormLabel>
 								<FormControl>
 									<Input
 										type="email"
-										placeholder="correo@ejemplo.com"
-										className="text-sm"
+										className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D] focus-visible:ring-0 rounded-sm not-placeholder-shown:border-[#0F1E4D] md:min-w-[480px]"
+  									placeholder=" " 
 										{...field}
 									/>
 								</FormControl>
-								<FormMessage />
 							</FormItem>
 						)}
 					/>
@@ -103,15 +104,23 @@ export default function LoginForm({
 						name="password"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Contraseña</FormLabel>
+								<div className="flex justify-between">
+									<FormLabel className="text-[#0A122B] font-semibold">Contraseña</FormLabel>
+									<Link href={""} className="hover:underline text-sm text-[#103557]">¿Olvidaste tu contraseña?</Link>
+								</div>
+								<div className="flex items-center relative">
 								<FormControl>
 									<Input
-										type="password"
-										placeholder="Tu contraseña"
-										className="text-sm"
+										type={showPassword ? "text" : "password"}
+										className="text-md border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm not-placeholder-shown:border-[#0F1E4D] md:min-w-[480px]"
+										placeholder=" " 
 										{...field}
 									/>
 								</FormControl>
+									<div className="absolute right-2" onClick={() => setShowPassword(!showPassword)}>
+										{showPassword ? <EyeOff /> : <Eye />}
+									</div>
+								</div>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -119,7 +128,7 @@ export default function LoginForm({
 
 					<Button
 						type="submit"
-						className="w-full"
+						className="w-full rounded-sm"
 						disabled={form.formState.isSubmitting}
 					>
 						{form.formState.isSubmitting && <Spinner />}
@@ -127,10 +136,10 @@ export default function LoginForm({
 					</Button>
 				</form>
 			</Form>
-			<p className="text-sm text-center">
-				Aun no tienes cuenta?
-				<Button asChild className="font-semibold px-2 py-0" variant="link">
-					<Link href={paths.auth.register()}>Registrate</Link>
+			<p className="text-sm text-center text-[#103557]">
+				¿No tienes cuenta?
+				<Button asChild className="font-semibold text-[#021727] px-2!" variant="link" size="lg">
+					<Link className="underline font-semibold" href={paths.auth.register()}>Registrate</Link>
 				</Button>
 			</p>
 		</div>

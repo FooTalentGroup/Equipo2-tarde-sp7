@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
-import { ButtonGroup } from "@src/components/ui/button-group";
+import { Eye, EyeOff } from "lucide-react";
 import {
 	Form,
 	FormControl,
@@ -13,15 +13,17 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
+	FormMessageWithIcon,
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
+import { Heading } from "@src/components/ui/heading";
 import { registerAction } from "../actions/auth.actions";
 import { type RegisterFormData, registerSchema } from "../schemas/register";
+import { useState } from "react";
 
 type RegisterFormProps = {
 	heading?: string;
@@ -31,16 +33,18 @@ type RegisterFormProps = {
 };
 
 export default function RegisterForm({
-	heading = "RedProp",
-	buttonText = "Registrarse",
+	heading = "REGISTRO",
+	buttonText = "Aceptar",
 	onSubmit,
 	redirectTo,
 }: RegisterFormProps) {
+	const [showPassword, setShowPassword] = useState(false)
 	const form = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
 			email: "",
 			password: "",
+			confirmPassword: "",
 			firstName: "",
 			lastName: "",
 			role: "",
@@ -74,126 +78,135 @@ export default function RegisterForm({
 	};
 
 	return (
-		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
-			{heading && <h1 className="text-xl font-semibold">{heading}</h1>}
+		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8 min-w-md">
+			{heading && <Heading align={"center"} variant={"h1"} weight={"semibold"} className="text-black mb-4">{heading}</Heading>}
 
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(handleSubmit)}
 					className="w-full space-y-4"
 				>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div className="grid grid-cols-1 gap-4">
 						<FormField
 							control={form.control}
 							name="firstName"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Nombre</FormLabel>
-									<FormControl>
-										<Input
-											type="text"
-											placeholder="Tu nombre"
-											className="text-sm"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel className="text-[#0A122B] font-semibold">Nombre *</FormLabel>
+										<div className="relative">
+											<FormControl className="relative">
+												<Input
+													type="text"
+													className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
+													{...field}
+												/>
+											</FormControl>
+											<FormMessageWithIcon className="top-0" />
+										</div>
+									</FormItem>
+								);
+							}}
 						/>
 
 						<FormField
 							control={form.control}
 							name="lastName"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Apellido</FormLabel>
-									<FormControl>
-										<Input
-											type="text"
-											placeholder="Tu apellido"
-											className="text-sm"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
+							render={({ field }) => {
+								return (
+									<FormItem>
+										<FormLabel className="text-[#0A122B] font-semibold">Apellido *</FormLabel>
+										<div className="relative">
+											<FormControl className="relative">
+												<Input
+													type="text"
+													className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
+													{...field}
+												/>
+											</FormControl>
+											<FormMessageWithIcon className="top-0" />
+										</div>
+									</FormItem>
+								);
+							}}
 						/>
 					</div>
 
 					<FormField
 						control={form.control}
 						name="email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Correo electrónico</FormLabel>
-								<FormControl>
-									<Input
-										type="email"
-										placeholder="correo@ejemplo.com"
-										className="text-sm"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+						render={({ field }) => {
+							return (
+								<FormItem>
+									<FormLabel className="text-[#0A122B] font-semibold">Email *</FormLabel>
+									<div className="relative">
+										<FormControl className="relative">
+											<Input
+												type="email"
+												className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
+												{...field}
+											/>
+										</FormControl>
+										<FormMessageWithIcon className="top-0" />
+									</div>
+								</FormItem>
+							);
+						}}
 					/>
 
 					<FormField
 						control={form.control}
 						name="password"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Contraseña</FormLabel>
-								<FormControl>
-									<Input
-										type="password"
-										placeholder="Tu contraseña"
-										className="text-sm"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+						render={({ field }) => {
+							return (
+								<FormItem>
+									<FormLabel className="text-[#0A122B] font-semibold">Contraseña *</FormLabel>
+									<div className="relative">
+										<FormControl className="relative">
+											<Input
+												type={showPassword ? "text" : "password"}
+												className="text-md border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
+												{...field}
+											/>
+										</FormControl>
+										<div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+											{showPassword ? <EyeOff /> : <Eye />}
+										</div>
+										<FormMessageWithIcon className="top-0" />
+									</div>
+								</FormItem>
+							);
+						}}
 					/>
 
 					<FormField
 						control={form.control}
-						name="role"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Tipo de cuenta</FormLabel>
-								<FormControl>
-									<ButtonGroup className="w-full">
-										<Button
-											type="button"
-											variant={field.value === "AGENTE" ? "default" : "outline"}
-											className="flex-1"
-											onClick={() => field.onChange("AGENTE")}
-										>
-											Agente
-										</Button>
-										<Button
-											type="button"
-											variant={field.value === "ADMIN" ? "default" : "outline"}
-											className="flex-1"
-											onClick={() => field.onChange("ADMIN")}
-										>
-											Propietario
-										</Button>
-									</ButtonGroup>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+						name="confirmPassword"
+						render={({ field }) => {
+							return (
+								<FormItem>
+									<FormLabel className="text-[#0A122B] font-semibold">Repetir Contraseña *</FormLabel>
+									<div className="relative">
+										<FormControl className="relative">
+											<Input
+												type={showPassword ? "text" : "password"}
+												className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
+												{...field}
+											/>
+										</FormControl>
+										<div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+											{showPassword ? <EyeOff /> : <Eye />}
+										</div>
+										<FormMessageWithIcon className="top-0" />
+									</div>
+								</FormItem>
+							);
+						}}
 					/>
 
 					<Button
 						type="submit"
-						className="w-full"
+						className="w-full rounded-sm"
 						disabled={form.formState.isSubmitting}
 					>
 						{form.formState.isSubmitting && <Spinner />}
