@@ -64,7 +64,7 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-mono: var(--font-montserrat);
-  --font-sans: var(--font-open-sans);
+  --font-sans: var(--font-inter);
 }
 
 :root {
