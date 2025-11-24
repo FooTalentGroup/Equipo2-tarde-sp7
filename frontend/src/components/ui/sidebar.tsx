@@ -36,7 +36,7 @@ import { PanelLeftIcon } from "lucide-react";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "15.5625rem";
+const SIDEBAR_WIDTH = "16.9375rem";
 const SIDEBAR_WIDTH_MOBILE = "18rem";
 const SIDEBAR_WIDTH_ICON = "3rem";
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
@@ -539,7 +539,11 @@ function SidebarMenuButton({
 			data-sidebar="menu-button"
 			data-size={size}
 			data-active={isActive}
-			className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
+			className={cn(
+				sidebarMenuButtonVariants({ variant, size }),
+				className,
+				"h-11 [&>svg]:size-5 text-base",
+			)}
 			{...props}
 		/>
 	);
@@ -690,7 +694,7 @@ function SidebarMenuSubButton({
 	...props
 }: ComponentProps<"a"> & {
 	asChild?: boolean;
-	size?: "sm" | "md";
+	size?: "sm" | "md" | "lg";
 	isActive?: boolean;
 }) {
 	const Comp = asChild ? Slot : "a";
@@ -702,10 +706,11 @@ function SidebarMenuSubButton({
 			data-size={size}
 			data-active={isActive}
 			className={cn(
-				"text-sidebar-foreground ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground [&>svg]:text-sidebar-accent-foreground flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
-				"data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
+				"text-sidebar-foreground [&>svg]:text-sidebar-foreground h-11 ring-sidebar-ring hover:[&>svg]:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground flex px-4 py-2 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+				"data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:[&>svg]:text-sidebar-accent-foreground",
 				size === "sm" && "text-xs",
 				size === "md" && "text-sm",
+				size === "lg" && "text-base",
 				"group-data-[collapsible=icon]:hidden",
 				className,
 			)}

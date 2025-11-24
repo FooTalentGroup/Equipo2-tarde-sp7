@@ -2,7 +2,6 @@ import { z } from "zod";
 
 export const propertyFormSchema = z.object({
 	id: z.string().optional(),
-	// Información básica
 	title: z.string().min(3, "El título es obligatorio"),
 	propertyType: z.string().min(1, "El tipo de propiedad es obligatorio"),
 	status: z.string().min(1, "El estado actual es obligatorio"),

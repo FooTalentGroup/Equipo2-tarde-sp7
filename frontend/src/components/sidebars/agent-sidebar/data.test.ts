@@ -1,4 +1,4 @@
-import { navigation } from "@src/components/sidebars/admin-sidebar/data";
+import { navigation } from "@src/components/sidebars/agent-sidebar/data";
 import { describe, expect, it } from "vitest";
 
 describe("Navigation Data", () => {

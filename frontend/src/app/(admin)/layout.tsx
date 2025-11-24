@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 
 import AdminHeader from "@src/components/agent-header";
-import { AdminSidebar } from "@src/components/sidebars/admin-sidebar";
+import AgentSidebar from "@src/components/sidebars/agent-sidebar";
 import { SidebarInset, SidebarProvider } from "@src/components/ui/sidebar";
 import { paths } from "@src/lib/paths";
 import { verifySession } from "@src/modules/auth";
@@ -21,11 +21,10 @@ export default async function AdminLayout({ children }: Props) {
 
 	return (
 		<SidebarProvider header={<AdminHeader />}>
-			<AdminSidebar />
+			<AgentSidebar />
 			<SidebarInset className="w-full bg-card flex flex-1 flex-col gap-8 p-8">
 				{children}
 			</SidebarInset>
-			{/* <NotificationSidebar /> */}
 		</SidebarProvider>
 	);
 }
