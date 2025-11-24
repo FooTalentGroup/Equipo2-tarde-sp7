@@ -48,7 +48,7 @@ export default function PropertyDocumentation({
 			<FormField
 				control={form.control}
 				name="documents"
-				render={({ field }) => (
+				render={() => (
 					<FormItem>
 						<FormLabel>Documentación (opcional)</FormLabel>
 						<FormControl>
