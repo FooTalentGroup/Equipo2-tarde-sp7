@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
-import { ButtonGroup } from "@src/components/ui/button-group";
 import {
 	Form,
 	FormControl,
@@ -41,9 +40,9 @@ export default function RegisterForm({
 		defaultValues: {
 			email: "",
 			password: "",
-			firstName: "",
-			lastName: "",
-			role: "",
+			first_name: "",
+			last_name: "",
+			// role: "",
 		},
 	});
 
@@ -85,7 +84,7 @@ export default function RegisterForm({
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						<FormField
 							control={form.control}
-							name="firstName"
+							name="first_name"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Nombre</FormLabel>
@@ -104,7 +103,7 @@ export default function RegisterForm({
 
 						<FormField
 							control={form.control}
-							name="lastName"
+							name="last_name"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Apellido</FormLabel>
@@ -160,7 +159,7 @@ export default function RegisterForm({
 						)}
 					/>
 
-					<FormField
+					{/* <FormField
 						control={form.control}
 						name="role"
 						render={({ field }) => (
@@ -189,7 +188,7 @@ export default function RegisterForm({
 								<FormMessage />
 							</FormItem>
 						)}
-					/>
+					/> */}
 
 					<Button
 						type="submit"

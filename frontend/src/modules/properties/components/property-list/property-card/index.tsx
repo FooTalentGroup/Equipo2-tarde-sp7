@@ -40,7 +40,7 @@ const PROPERTY_STATUS_CONFIG = {
 export default function PropertyCard({ property }: PropertyCardProps) {
 	const propertyTypeLabel =
 		PROPERTY_TYPE_LABELS[property.propertyType] ?? property.propertyType;
-	const statusConfig = PROPERTY_STATUS_CONFIG[property.status];
+	const statusConfig = PROPERTY_STATUS_CONFIG[property.status || "available"];
 
 	return (
 		<Card className="py-0 grid gap-0 relative transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 outline-none focus-visible:ring-[3px]">
@@ -102,7 +102,8 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 				<Separator />
 				<div className="flex gap-3 justify-between items-center p-4">
 					<p className="font-semibold text-base text-foreground">
-						{property.currency.toUpperCase()} {property.price.toLocaleString()}
+						{property?.priceCurrency || "USD"}
+						{property.price.toLocaleString()}
 					</p>
 					<Badge
 						variant={statusConfig.variant}

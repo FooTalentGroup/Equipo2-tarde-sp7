@@ -104,9 +104,9 @@
   --destructive-foreground: #c61b24;
   --border: #e6e6e6;
   --input: #ffffff;
-  --input-border: #e6e6e6;
+  --input-border: #808080;
   --input-foreground: #2d2d2d;
-  --input-placeholder: #858484;
+  --input-placeholder: #545454;
   --ring: hsl(217.2 91.2% 59.8%);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
