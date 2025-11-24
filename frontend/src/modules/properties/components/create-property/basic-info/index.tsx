@@ -42,77 +42,6 @@ export default function PropertyBasicInfo({ form }: PropertyBasicInfoProps) {
 
 				<FormField
 					control={form.control}
-					name="status"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Estado actual</FormLabel>
-							<Select onValueChange={field.onChange} value={field.value}>
-								<FormControl>
-									<SelectTrigger className="w-full">
-										<SelectValue placeholder="Seleccionar" />
-									</SelectTrigger>
-								</FormControl>
-								<SelectContent>
-									<SelectGroup>
-										<SelectItem value="available">Disponible</SelectItem>
-										<SelectItem value="disabled">Deshabilitada</SelectItem>
-										<SelectItem value="reserved">Reservada</SelectItem>
-										<SelectItem value="sold">Vendida</SelectItem>
-									</SelectGroup>
-								</SelectContent>
-							</Select>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="city"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Ciudad</FormLabel>
-							<FormControl>
-								<Input placeholder="Buenos Aires" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="postalCode"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Código postal</FormLabel>
-							<FormControl>
-								<Input placeholder="C1425" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="assignedOwner"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Propietario asignado</FormLabel>
-							<FormControl>
-								<Input placeholder="Juan Perez" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-			</div>
-
-			{/* Columna derecha */}
-			<div className="grid gap-4 items-start">
-				<FormField
-					control={form.control}
 					name="propertyType"
 					render={({ field }) => (
 						<FormItem>
@@ -120,7 +49,7 @@ export default function PropertyBasicInfo({ form }: PropertyBasicInfoProps) {
 							<Select onValueChange={field.onChange} value={field.value}>
 								<FormControl>
 									<SelectTrigger className="w-full">
-										<SelectValue placeholder="Seleccionar" />
+										<SelectValue placeholder="Casa/Departamento/PH" />
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent>
@@ -155,12 +84,87 @@ export default function PropertyBasicInfo({ form }: PropertyBasicInfoProps) {
 
 				<FormField
 					control={form.control}
+					name="floor"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Piso/Unidad</FormLabel>
+							<FormControl>
+								<Input placeholder="4B" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="postalCode"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Código postal</FormLabel>
+							<FormControl>
+								<Input placeholder="Juan Perez" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+			</div>
+
+			{/* Columna derecha */}
+			<div className="grid gap-4 items-start">
+				<FormField
+					control={form.control}
 					name="province"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Provincia</FormLabel>
+							<Select onValueChange={field.onChange} value={field.value}>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Buenos Aires" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="buenos-aires">Buenos Aires</SelectItem>
+										<SelectItem value="caba">CABA</SelectItem>
+										<SelectItem value="cordoba">Córdoba</SelectItem>
+										<SelectItem value="santa-fe">Santa Fe</SelectItem>
+										<SelectItem value="mendoza">Mendoza</SelectItem>
+										<SelectItem value="tucuman">Tucumán</SelectItem>
+										<SelectItem value="salta">Salta</SelectItem>
+										<SelectItem value="entre-rios">Entre Ríos</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="city"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Ciudad</FormLabel>
 							<FormControl>
 								<Input placeholder="Buenos Aires" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="assignedOwner"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Propietario asignado</FormLabel>
+							<FormControl>
+								<Input placeholder="Juan Perez" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>

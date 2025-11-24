@@ -19,8 +19,9 @@ export const propertyFormSchema = z.object({
 	title: z.string().min(3, "El título es obligatorio"),
 	slug: z.string().optional(),
 	propertyType: z.string().min(1, "El tipo de propiedad es obligatorio"),
-	status: propertyStatusEnum,
+	status: propertyStatusEnum.optional(),
 	address: z.string().min(3, "La dirección es obligatoria"),
+	floor: z.string().optional(),
 	city: z.string().min(2, "La ciudad es obligatoria"),
 	province: z.string().min(2, "La provincia es obligatoria"),
 	postalCode: z.string().min(1, "El código postal es obligatorio"),
@@ -50,11 +51,18 @@ export const propertyFormSchema = z.object({
 	price: z
 		.transform(Number)
 		.pipe(z.number().positive("El precio es requerido")),
+	priceCurrency: z.string().min(1, "La moneda del precio es obligatoria"),
 	expenses: z
 		.transform(Number)
 		.pipe(z.number().min(0, "Debe ser mayor o igual a 0")),
-	currency: z.string().min(1, "La moneda es obligatoria"),
+	expensesCurrency: z
+		.string()
+		.min(1, "La moneda de las expensas es obligatoria"),
 	thumbnail: z.string().optional(),
+	// Documentación
+	documents: z.array(z.string()).optional(),
+	// Estado de publicación
+	isPublished: z.boolean().default(false).optional(),
 });
 
 export type PropertyData = z.infer<typeof propertyFormSchema>;

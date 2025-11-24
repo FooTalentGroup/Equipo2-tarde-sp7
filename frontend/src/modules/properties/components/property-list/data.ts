@@ -23,7 +23,8 @@ export const mockProperties: PropertyData[] = [
 		garages: 0,
 		price: 125000,
 		expenses: 15000,
-		currency: "usd",
+		priceCurrency: "usd",
+		expensesCurrency: "usd",
 	},
 	{
 		id: "2",
@@ -47,7 +48,8 @@ export const mockProperties: PropertyData[] = [
 		garages: 2,
 		price: 350000,
 		expenses: 25000,
-		currency: "usd",
+		priceCurrency: "usd",
+		expensesCurrency: "usd",
 	},
 	{
 		id: "3",
@@ -71,7 +73,8 @@ export const mockProperties: PropertyData[] = [
 		garages: 0,
 		price: 180000,
 		expenses: 18000,
-		currency: "usd",
+		priceCurrency: "usd",
+		expensesCurrency: "usd",
 	},
 	{
 		id: "4",
@@ -95,7 +98,8 @@ export const mockProperties: PropertyData[] = [
 		garages: 1,
 		price: 280000,
 		expenses: 22000,
-		currency: "usd",
+		priceCurrency: "usd",
+		expensesCurrency: "usd",
 	},
 	{
 		id: "5",
@@ -119,7 +123,8 @@ export const mockProperties: PropertyData[] = [
 		garages: 0,
 		price: 65000,
 		expenses: 8000,
-		currency: "usd",
+		priceCurrency: "usd",
+		expensesCurrency: "usd",
 	},
 	{
 		id: "6",
@@ -143,7 +148,8 @@ export const mockProperties: PropertyData[] = [
 		garages: 3,
 		price: 580000,
 		expenses: 45000,
-		currency: "usd",
+		priceCurrency: "usd",
+		expensesCurrency: "usd",
 	},
 	{
 		id: "7",
@@ -167,7 +173,8 @@ export const mockProperties: PropertyData[] = [
 		garages: 0,
 		price: 95000,
 		expenses: 10000,
-		currency: "usd",
+		priceCurrency: "usd",
+		expensesCurrency: "usd",
 	},
 	{
 		id: "8",
@@ -191,6 +198,7 @@ export const mockProperties: PropertyData[] = [
 		garages: 4,
 		price: 450000,
 		expenses: 30000,
-		currency: "usd",
+		priceCurrency: "usd",
+		expensesCurrency: "usd",
 	},
 ];

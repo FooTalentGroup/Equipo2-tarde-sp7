@@ -1,16 +1,27 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert, AlertDescription, AlertTitle } from "@src/components/ui/alert";
+import { Button } from "@src/components/ui/button";
 import { Form } from "@src/components/ui/form";
 import { Heading } from "@src/components/ui/heading";
 import { Separator } from "@src/components/ui/separator";
+import { Spinner } from "@src/components/ui/spinner";
+import { paths } from "@src/lib/paths";
+import { wait } from "@src/lib/utils";
 import { type PropertyData, propertyFormSchema } from "@src/types/property";
+import { Info } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import PropertyBasicInfo from "./basic-info";
 import PropertyCharacteristics from "./property-characteristics";
+import PropertyDocumentation from "./property-documentation";
 import PropertyPricing from "./property-pricing";
+import PropertyPublicationStatus from "./property-publication-status";
 
 type CreatePropertyFormProps = {
 	defaultValues?: PropertyData;
@@ -19,14 +30,16 @@ type CreatePropertyFormProps = {
 export default function CreatePropertyForm({
 	defaultValues,
 }: CreatePropertyFormProps) {
+	const router = useRouter();
+
 	const form = useForm<PropertyData>({
 		resolver: zodResolver(propertyFormSchema),
 		defaultValues: {
 			// Información de la propiedad
 			title: defaultValues?.title || "",
 			propertyType: defaultValues?.propertyType || "",
-			status: defaultValues?.status,
 			address: defaultValues?.address || "",
+			floor: defaultValues?.floor || "",
 			city: defaultValues?.city || "",
 			province: defaultValues?.province || "",
 			postalCode: defaultValues?.postalCode || "",
@@ -44,59 +57,106 @@ export default function CreatePropertyForm({
 			disposition: defaultValues?.disposition || "",
 			// Valores
 			price: defaultValues?.price ?? 0,
+			priceCurrency: defaultValues?.priceCurrency || "USD",
 			expenses: defaultValues?.expenses ?? 0,
-			currency: defaultValues?.currency || "",
+			expensesCurrency: defaultValues?.expensesCurrency || "USD",
+			// Documentación
+			documents: defaultValues?.documents || [],
+			// Estado de publicación
+			isPublished: defaultValues?.isPublished ?? false,
 		},
 		mode: "all",
 	});
 
-	function onSubmit(data: PropertyData) {
-		toast.success("You submitted the following values:", {
-			description: (
-				<pre className="bg-code text-code-foreground mt-2 w-[320px] overflow-x-auto rounded-md p-4">
-					<code>{JSON.stringify(data, null, 2)}</code>
-				</pre>
-			),
-			position: "bottom-right",
-			classNames: {
-				content: "flex flex-col gap-2",
-			},
-			style: {
-				"--border-radius": "calc(var(--radius)  + 4px)",
-			} as React.CSSProperties,
-		});
+	async function onSubmit(_data: PropertyData) {
+		try {
+			await wait(3000);
+			console.log(_data);
+			toast.success("Propiedad guardada exitosamente");
+
+			router.push(paths.admin.properties.index());
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error
+					? error.message
+					: "Error al guardar la propiedad";
+			toast.error(errorMessage);
+			console.error("Error al guardar propiedad:", error);
+		}
 	}
 
+	console.log(form.formState.errors);
+
 	return (
-		<Form {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-				<div className="grid gap-6">
-					<Heading variant="subtitle2" weight="semibold">
-						Información de la propiedad
-					</Heading>
-					<PropertyBasicInfo form={form} />
+		<section className="grid grid-cols-[1fr_auto_275px] gap-4">
+			<Form {...form}>
+				<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+					<div className="grid gap-6">
+						<Heading variant="subtitle2" weight="semibold">
+							Información de la propiedad
+						</Heading>
+						<PropertyBasicInfo form={form} />
+					</div>
+					<Separator />
+					<div className="grid gap-6">
+						<Heading variant="subtitle2" weight="semibold">
+							Características de la propiedad
+						</Heading>
+						<PropertyCharacteristics form={form} />
+					</div>
+					<Separator />
+					<div className="grid gap-6">
+						<Heading variant="subtitle2" weight="semibold">
+							Valores de la propiedad
+						</Heading>
+						<PropertyPricing form={form} />
+					</div>
+					<Separator />
+					<div className="grid gap-6">
+						<PropertyDocumentation form={form} />
+					</div>
+					<Separator />
+					<div className="grid gap-6">
+						<Heading variant="subtitle2" weight="semibold">
+							Estado de publicación
+						</Heading>
+						<PropertyPublicationStatus form={form} />
+					</div>
+
+					<div className="flex gap-4 justify-self-end">
+						<Button
+							type="button"
+							variant="ghost"
+							size="lg"
+							asChild
+							disabled={form.formState.isSubmitting}
+						>
+							<Link href={paths.admin.properties.index()}>Cancelar</Link>
+						</Button>
+						<Button
+							type="submit"
+							variant="tertiary"
+							size="lg"
+							disabled={form.formState.isSubmitting}
+						>
+							{form.formState.isSubmitting && <Spinner />}
+							{form.formState.isSubmitting ? "Guardando..." : "Guardar"}
+						</Button>
+					</div>
+				</form>
+			</Form>
+			<Separator orientation="vertical" />
+			<Alert className="h-fit grid grid-cols-[auto_1fr] gap-4">
+				<div className="bg-secondary/20 p-2 w-9 text-secondary h-9 grid place-content-center rounded-md">
+					<Info />
 				</div>
-
-				<Separator />
-
-				<div className="grid gap-6">
-					<Heading variant="subtitle2" weight="semibold">
-						Características de la propiedad
-					</Heading>
-					<PropertyCharacteristics form={form} />
+				<div className="grid items-start h-fit w-full">
+					<AlertTitle className="mb-2">Consejos</AlertTitle>
+					<AlertDescription>
+						Completa todos los campos para tener una publicación más efectiva
+					</AlertDescription>
 				</div>
-
-				<Separator />
-
-				<div className="grid gap-6">
-					<Heading variant="subtitle2" weight="semibold">
-						Valores
-					</Heading>
-					<PropertyPricing form={form} />
-				</div>
-
-				<Separator />
-			</form>
-		</Form>
+			</Alert>
+		</section>
 	);
 }
