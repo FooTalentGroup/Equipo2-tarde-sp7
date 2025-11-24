@@ -10,14 +10,14 @@ export function proxy(request: NextRequest) {
 	// Proteger todas las rutas bajo /admin/*
 	const isProtectedPage = request.nextUrl.pathname.startsWith("/admin");
 
-	// Si está en una página protegida y no tiene token, redirigir a login
+	//Si está en una página protegida y no tiene token, redirigir a login
 	if (isProtectedPage && !token) {
 		const loginUrl = new URL(paths.auth.login(), request.url);
 		loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
 		return NextResponse.redirect(loginUrl);
 	}
 
-	// Si está autenticado y trata de acceder a login/register, redirigir al dashboard
+	//Si está autenticado y trata de acceder a login/register, redirigir al dashboard
 	if (isAuthPage && token) {
 		const redirectTo = request.nextUrl.searchParams.get("redirect");
 		const destination = redirectTo || paths.admin.properties.index();

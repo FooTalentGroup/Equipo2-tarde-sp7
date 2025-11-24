@@ -3,13 +3,17 @@ import type { ElementType, ReactNode } from "react";
 import { cn } from "@src/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 
-const headingVariants = cva("font-bold font-mono", {
+const headingVariants = cva("font-bold font-mono text-heading", {
 	variants: {
 		variant: {
 			h1: "text-[3.3125rem] leading-[1.2]", // 53px
 			h2: "text-[2.5rem] leading-[1.2]", // 40px
 			h3: "text-[1.9375rem] leading-[1.2]", // 31px
-			subtitle: "text-[1.5rem] leading-[1.2]", // 24px
+			subtitle1: "text-[1.5rem] leading-[1.2]", // 24px
+			subtitle2: "text-[1.25rem] leading-[1.2]", // 20px
+			subtitle3: "text-lg leading-[1.2]", // 18px
+			subtitle4: "text-base leading-[1.2]", // 16px
+			subtitle5: "text-sm leading-[1.2]", // 14px
 		},
 		align: {
 			left: "text-left",

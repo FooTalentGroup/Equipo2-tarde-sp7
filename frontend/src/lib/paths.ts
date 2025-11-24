@@ -15,16 +15,17 @@ export const paths = {
 	},
 
 	admin: {
+		dashboard: () => "/admin/dashboard",
 		clients: {
 			index: () => "/admin/clients",
-			create: () => "/admin/clients/create",
-			edit: () => "/admin/clients/edit",
-			delete: () => "/admin/clients/delete",
-			filter: () => "/admin/clients/filter",
+			new: () => "/admin/clients/create",
+			leads: () => "/admin/clients/leads",
+			searchProperties: () => "/admin/clients/search",
 		},
 		properties: {
 			index: () => "/admin/properties",
 			detail: (id: string) => `/admin/properties/${id}`,
+			new: () => "/admin/properties/new",
 		},
 		reports: {
 			index: () => "/admin/reports",

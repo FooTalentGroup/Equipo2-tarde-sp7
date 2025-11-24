@@ -44,10 +44,9 @@ export default function RegisterForm({
 		defaultValues: {
 			email: "",
 			password: "",
-			confirmPassword: "",
-			firstName: "",
-			lastName: "",
-			role: "",
+			first_name: "",
+			last_name: "",
+			// role: "",
 		},
 	});
 
@@ -89,46 +88,40 @@ export default function RegisterForm({
 					<div className="grid grid-cols-1 gap-4">
 						<FormField
 							control={form.control}
-							name="firstName"
-							render={({ field }) => {
-								return (
-									<FormItem>
-										<FormLabel className="text-[#0A122B] font-semibold">Nombre *</FormLabel>
-										<div className="relative">
-											<FormControl className="relative">
-												<Input
-													type="text"
-													className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
-													{...field}
-												/>
-											</FormControl>
-											<FormMessageWithIcon className="top-0" />
-										</div>
-									</FormItem>
-								);
-							}}
+							name="first_name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Nombre</FormLabel>
+									<FormControl>
+										<Input
+											type="text"
+											placeholder="Tu nombre"
+											className="text-sm"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
 
 						<FormField
 							control={form.control}
-							name="lastName"
-							render={({ field }) => {
-								return (
-									<FormItem>
-										<FormLabel className="text-[#0A122B] font-semibold">Apellido *</FormLabel>
-										<div className="relative">
-											<FormControl className="relative">
-												<Input
-													type="text"
-													className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
-													{...field}
-												/>
-											</FormControl>
-											<FormMessageWithIcon className="top-0" />
-										</div>
-									</FormItem>
-								);
-							}}
+							name="last_name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Apellido</FormLabel>
+									<FormControl>
+										<Input
+											type="text"
+											placeholder="Tu apellido"
+											className="text-sm"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
 						/>
 					</div>
 
@@ -179,7 +172,7 @@ export default function RegisterForm({
 						}}
 					/>
 
-					<FormField
+					{/* <FormField
 						control={form.control}
 						name="confirmPassword"
 						render={({ field }) => {
@@ -202,7 +195,7 @@ export default function RegisterForm({
 								</FormItem>
 							);
 						}}
-					/>
+					/>*/}
 
 					<Button
 						type="submit"
