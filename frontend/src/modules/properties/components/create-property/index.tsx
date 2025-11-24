@@ -25,7 +25,7 @@ export default function CreatePropertyForm({
 			// Información de la propiedad
 			title: defaultValues?.title || "",
 			propertyType: defaultValues?.propertyType || "",
-			status: defaultValues?.status || "",
+			status: defaultValues?.status,
 			address: defaultValues?.address || "",
 			city: defaultValues?.city || "",
 			province: defaultValues?.province || "",

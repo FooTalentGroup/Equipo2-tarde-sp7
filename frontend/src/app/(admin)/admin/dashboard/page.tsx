@@ -11,10 +11,9 @@ export default async function DashboardPage() {
 
 	return (
 		<section>
-			<h1 className="text-3xl font-bold mb-4">
+			<Heading variant="h3" weight="semibold">
 				Bienvenido, {user?.first_name} {user?.last_name}
-			</h1>
-			<Heading variant="subtitle1">Dashboard</Heading>
+			</Heading>
 		</section>
 	);
 }

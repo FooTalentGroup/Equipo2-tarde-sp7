@@ -18,7 +18,12 @@ export default function PropertiesPage() {
 			<SectionHeading
 				title="Propiedades"
 				actions={
-					<Button size="lg" asChild aria-label="Crear propiedad">
+					<Button
+						size="lg"
+						variant="tertiary"
+						asChild
+						aria-label="Crear propiedad"
+					>
 						<Link href={paths.admin.properties.new()}>
 							<Plus />
 							Crear propiedad

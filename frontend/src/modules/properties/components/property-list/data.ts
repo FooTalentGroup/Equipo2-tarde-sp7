@@ -3,7 +3,10 @@ import type { PropertyData } from "@src/types/property";
 export const mockProperties: PropertyData[] = [
 	{
 		id: "1",
+		thumbnail:
+			"https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		title: "Moderno departamento en Palermo",
+		slug: "moderno-departamento-en-palermo",
 		propertyType: "apartment",
 		status: "available",
 		address: "Av. Santa Fe 2456",
@@ -24,7 +27,10 @@ export const mockProperties: PropertyData[] = [
 	},
 	{
 		id: "2",
+		thumbnail:
+			"https://images.unsplash.com/photo-1634344656611-0773d8dbbe2c?q=80&w=1169&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		title: "Casa en Belgrano con jardín",
+		slug: "casa-en-belgrano-con-jardin",
 		propertyType: "house",
 		status: "available",
 		address: "Juramento 3145",
@@ -45,7 +51,10 @@ export const mockProperties: PropertyData[] = [
 	},
 	{
 		id: "3",
+		thumbnail:
+			"https://images.unsplash.com/photo-1558036117-15d82a90b9b1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		title: "Loft en Recoleta",
+		slug: "loft-en-recoleta",
 		propertyType: "apartment",
 		status: "available",
 		address: "Av. Callao 1234",
@@ -66,9 +75,12 @@ export const mockProperties: PropertyData[] = [
 	},
 	{
 		id: "4",
+		thumbnail:
+			"https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		title: "Departamento con vista al río",
+		slug: "departamento-con-vista-al-rio",
 		propertyType: "apartment",
-		status: "reserved",
+		status: "available",
 		address: "Av. del Libertador 5678",
 		city: "Núñez",
 		province: "Buenos Aires",
@@ -87,7 +99,10 @@ export const mockProperties: PropertyData[] = [
 	},
 	{
 		id: "5",
+		thumbnail:
+			"https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		title: "Monoambiente en Caballito",
+		slug: "monoambiente-en-caballito",
 		propertyType: "apartment",
 		status: "available",
 		address: "Av. Rivadavia 6789",
@@ -108,7 +123,10 @@ export const mockProperties: PropertyData[] = [
 	},
 	{
 		id: "6",
+		thumbnail:
+			"https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		title: "Penthouse en Puerto Madero",
+		slug: "penthouse-en-puerto-madero",
 		propertyType: "ph",
 		status: "available",
 		address: "Juana Manso 1200",
@@ -129,7 +147,10 @@ export const mockProperties: PropertyData[] = [
 	},
 	{
 		id: "7",
+		thumbnail:
+			"https://images.unsplash.com/photo-1723110994499-df46435aa4b3?q=80&w=1179&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		title: "Departamento en Villa Urquiza",
+		slug: "departamento-en-villa-urquiza",
 		propertyType: "apartment",
 		status: "available",
 		address: "Triunvirato 4567",
@@ -150,7 +171,10 @@ export const mockProperties: PropertyData[] = [
 	},
 	{
 		id: "8",
+		thumbnail:
+			"https://images.unsplash.com/photo-1628133287836-40bd5453bed1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		title: "Casa quinta en San Isidro",
+		slug: "casa-quinta-en-san-isidro",
 		propertyType: "house",
 		status: "available",
 		address: "Av. Centenario 890",
