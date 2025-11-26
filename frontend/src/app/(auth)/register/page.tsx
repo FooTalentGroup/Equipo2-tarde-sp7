@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+
+import HeaderAuth from "@src/modules/auth/components/header";
 import RegisterForm from "@src/modules/auth/components/register-form";
-import HeaderAuth from "@src/modules/auth/components/header"
 
 export const metadata: Metadata = {
 	title: "Registro",

@@ -25,11 +25,13 @@ import type { User } from "@src/types";
 import { LogOut } from "lucide-react";
 
 type Props = {
-	user: User;
+	user: User | null;
 };
 
 export default function UserMenuTrigger({ user }: Props) {
 	const isMobile = useIsMobile();
+
+	if (!user) return null;
 
 	async function handleLogout() {
 		await logoutAction();

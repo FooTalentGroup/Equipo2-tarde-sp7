@@ -43,10 +43,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 	const statusConfig = PROPERTY_STATUS_CONFIG[property.status || "available"];
 
 	return (
-		<Card className="py-0 grid gap-0 relative transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 outline-none focus-visible:ring-[3px]">
+		<Card className="py-0 grid gap-0 relative transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50  focus-visible:ring-[3px]">
 			<AspectRatio
 				ratio={16 / 9}
-				className="bg-muted rounded-t-lg w-full relative"
+				className="bg-muted rounded-t-lg w-full relative "
 			>
 				<Image
 					width={300}
@@ -56,10 +56,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 						"https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
 					}
 					alt={property.title}
-					className="h-full w-full rounded-t-lg object-cover"
+					className=" w-full rounded-t-lg object-cover h-full"
 				/>
 				<div className="absolute top-3 left-3 flex gap-2">
-					<Badge variant="secondary" className="bg-white text-secondary">
+					<Badge variant="secondary" className="bg-card text-secondary">
 						{propertyTypeLabel}
 					</Badge>
 					<Badge
@@ -74,7 +74,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
 				<div className="grid gap-4 p-4">
 					<h2 className={cn("text-base font-semibold line-clamp-2")}>
 						<Link
-							href={paths.admin.properties.detail(property.slug || "#")}
+							href={paths.agent.properties.detail(property.slug || "#")}
 							className="outline-none after:content-[''] after:absolute after:inset-0"
 						>
 							{property.title}

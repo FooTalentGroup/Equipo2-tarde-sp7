@@ -44,7 +44,6 @@ export default function PropertyFilter() {
 		<section className="">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-					{/* Primera fila: Tipo de operación, Tipo de propiedad, Precio desde, Precio hasta, Moneda, Ubicación y Botón */}
 					<div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] items-end gap-2">
 						<FormField
 							control={form.control}

@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
 import {
 	Form,
 	FormControl,
@@ -15,30 +16,30 @@ import {
 	FormMessage,
 	FormMessageWithIcon,
 } from "@src/components/ui/form";
+import { Heading } from "@src/components/ui/heading";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
+import { ROLES } from "@src/types/user";
+import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Heading } from "@src/components/ui/heading";
+
 import { registerAction } from "../actions/auth.actions";
 import { type RegisterFormData, registerSchema } from "../schemas/register";
-import { useState } from "react";
 
 type RegisterFormProps = {
 	heading?: string;
 	buttonText?: string;
 	onSubmit?: (data: RegisterFormData) => Promise<void> | void;
-	redirectTo?: string;
 };
 
 export default function RegisterForm({
 	heading = "REGISTRO",
 	buttonText = "Aceptar",
 	onSubmit,
-	redirectTo,
 }: RegisterFormProps) {
-	const [showPassword, setShowPassword] = useState(false)
+	const [showPassword, setShowPassword] = useState(false);
 	const form = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
@@ -61,7 +62,15 @@ export default function RegisterForm({
 
 				if (result.success) {
 					toast.success(result.message);
-					const redirect = redirectTo || paths.admin.properties.index();
+
+					let redirect = "";
+
+					if (result.role === ROLES.ADMIN) {
+						redirect = paths.admin.dashboard();
+					} else {
+						redirect = paths.agent.dashboard();
+					}
+
 					router.push(redirect);
 					router.refresh();
 				} else {
@@ -78,7 +87,16 @@ export default function RegisterForm({
 
 	return (
 		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8 min-w-md">
-			{heading && <Heading align={"center"} variant={"h1"} weight={"semibold"} className="text-black mb-4">{heading}</Heading>}
+			{heading && (
+				<Heading
+					align={"center"}
+					variant={"h1"}
+					weight={"semibold"}
+					className="text-black mb-4"
+				>
+					{heading}
+				</Heading>
+			)}
 
 			<Form {...form}>
 				<form
@@ -131,7 +149,9 @@ export default function RegisterForm({
 						render={({ field }) => {
 							return (
 								<FormItem>
-									<FormLabel className="text-[#0A122B] font-semibold">Email *</FormLabel>
+									<FormLabel className="text-[#0A122B] font-semibold">
+										Email *
+									</FormLabel>
 									<div className="relative">
 										<FormControl className="relative">
 											<Input
@@ -153,7 +173,9 @@ export default function RegisterForm({
 						render={({ field }) => {
 							return (
 								<FormItem>
-									<FormLabel className="text-[#0A122B] font-semibold">Contraseña *</FormLabel>
+									<FormLabel className="text-[#0A122B] font-semibold">
+										Contraseña *
+									</FormLabel>
 									<div className="relative">
 										<FormControl className="relative">
 											<Input
@@ -162,9 +184,13 @@ export default function RegisterForm({
 												{...field}
 											/>
 										</FormControl>
-										<div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+										<button
+											type="button"
+											className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+											onClick={() => setShowPassword(!showPassword)}
+										>
 											{showPassword ? <EyeOff /> : <Eye />}
-										</div>
+										</button>
 										<FormMessageWithIcon className="top-0" />
 									</div>
 								</FormItem>

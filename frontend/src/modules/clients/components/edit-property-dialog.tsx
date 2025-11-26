@@ -45,7 +45,7 @@ export const EditClientModal = ({
 		defaultValues: {
 			name: client?.name || "",
 			email: client?.email || "",
-			number: (client as any)?.number || 60,
+			number: client?.phone ? Number(client.phone) : 60,
 		},
 	});
 
@@ -55,7 +55,7 @@ export const EditClientModal = ({
 			form.reset({
 				name: client.name,
 				email: client.email ?? "",
-				number: (client as any).number,
+				number: client.phone ? Number(client.phone) : 0,
 			});
 		}
 	}, [client, form]);

@@ -24,7 +24,7 @@ export default function PropertiesPage() {
 						asChild
 						aria-label="Crear propiedad"
 					>
-						<Link href={paths.admin.properties.new()}>
+						<Link href={paths.agent.properties.new()}>
 							<Plus />
 							Crear propiedad
 						</Link>
