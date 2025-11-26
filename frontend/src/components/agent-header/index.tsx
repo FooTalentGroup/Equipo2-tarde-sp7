@@ -1,28 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import {
-	BuildingOfficeIcon,
-	HomeIcon,
-	UserIcon,
-} from "@heroicons/react/24/outline";
 import LogoWhite from "@public/images/logo-white.png";
 import { Button } from "@src/components/ui/button";
-import { Input } from "@src/components/ui/input";
 import { paths } from "@src/lib/paths";
-import { getAuthenticatedUser } from "@src/modules/auth/lib/utils";
-import { Search } from "lucide-react";
+import { getCurrentUser } from "@src/modules/auth/lib/dal";
 
 import NotificationsSheet from "./notifications-sheet";
 import UserMenuTrigger from "./user-menu-trigger";
 
 export default async function AdminHeader() {
-	const user = await getAuthenticatedUser();
+	const user = await getCurrentUser();
 
 	return (
 		<header className="px-4 sticky top-0 z-50 bg-primary text-primary-foreground min-h-(--admin-header-height) grid grid-cols-[0.7fr_1fr_0.7fr] items-center gap-4">
 			<Button variant="link" className="w-[271px] h-auto p-0" asChild>
-				<Link href={paths.admin.properties.index()}>
+				<Link href={paths.agent.properties.index()}>
 					<Image
 						src={LogoWhite}
 						alt="Red prop"
@@ -33,7 +26,7 @@ export default async function AdminHeader() {
 				</Link>
 			</Button>
 			<div className="flex">
-				<div className="relative bg-card mx-auto foreground max-w-xl w-full rounded-lg overflow-hidden">
+				{/* <div className="relative bg-card mx-auto foreground max-w-xl w-full rounded-lg overflow-hidden">
 					<Button
 						variant="link"
 						className=" p-0 absolute left-2 top-1/2 -translate-y-1/2 px-0! h-auto"
@@ -57,7 +50,7 @@ export default async function AdminHeader() {
 							<HomeIcon className="w-5 h-5" />
 						</Button>
 					</div>
-				</div>
+				</div> */}
 			</div>
 			<div className="justify-self-end flex items-center">
 				<NotificationsSheet />

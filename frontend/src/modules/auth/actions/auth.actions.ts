@@ -15,6 +15,7 @@
 import { redirect } from "next/navigation";
 
 import { paths } from "@src/lib/paths";
+import { ROLES } from "@src/types/user";
 
 import { deleteSession, setSession } from "../lib/session";
 import type { LoginFormData } from "../schemas/login";
@@ -33,6 +34,7 @@ type ActionResult = {
 	success: boolean;
 	message?: string;
 	errors?: Record<string, string[]>;
+	role?: string;
 };
 
 /**
@@ -62,12 +64,14 @@ export async function loginAction(
 
 		const data: AuthResponse = await response.json();
 
-		// Save session in cookies
+		// TODO: Remove this override when backend is ready
+		data.user.role = ROLES.AGENT;
+
 		await setSession(data.token, data.user);
 
 		return {
 			success: true,
-			message: `Bienvenido ${data.user.first_name}!`,
+			role: data.user.role,
 		};
 	} catch (error) {
 		console.error("Login error:", error);
@@ -104,12 +108,14 @@ export async function registerAction(
 
 		const data: AuthResponse = await response.json();
 
-		// Save session in cookies
+		// TODO: Remove this override when backend is ready
+		data.user.role = ROLES.AGENT;
+
 		await setSession(data.token, data.user);
 
 		return {
 			success: true,
-			message: `Cuenta creada exitosamente. Bienvenido ${data.user.first_name}`,
+			role: data.user.role,
 		};
 	} catch (error) {
 		console.error("Register error:", error);

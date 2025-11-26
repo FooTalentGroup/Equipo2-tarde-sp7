@@ -22,56 +22,56 @@ export type NavigationItem = {
 export const navigation = [
 	{
 		title: "Panel principal",
-		href: paths.admin.dashboard(),
+		href: paths.agent.dashboard(),
 		icon: House,
 	},
 	{
-		title: "Propiedades",
+		title: "Mis Propiedades",
 		icon: Building2Icon,
 		isActive: false,
 		items: [
 			{
 				title: "Lista de propiedades",
 				icon: List,
-				href: paths.admin.properties.index(),
+				href: paths.agent.properties.index(),
 			},
 			{
 				title: "Agregar propiedad",
 				icon: Plus,
-				href: paths.admin.properties.new(),
+				href: paths.agent.properties.new(),
 			},
 		],
 	},
 	{
-		title: "Clientes",
+		title: "Mis Clientes",
 		icon: Users,
 		isActive: false,
 		items: [
 			{
 				title: "Agregar cliente",
 				icon: Plus,
-				href: paths.admin.clients.new(),
+				href: paths.agent.clients.new(),
 			},
 			{
 				title: "Leads",
 				icon: UserCheck,
-				href: paths.admin.clients.leads(),
+				href: paths.agent.clients.leads(),
 			},
 			{
 				title: "Buscar propiedades",
 				icon: House,
-				href: paths.admin.clients.searchProperties(),
+				href: paths.agent.clients.searchProperties(),
 			},
 		],
 	},
 	{
 		title: "Reportes",
-		href: paths.admin.reports.index(),
+		href: paths.agent.reports.index(),
 		icon: ChartColumnIncreasing,
 	},
 	{
 		title: "Consultas",
-		href: paths.admin.inquiries.index(),
+		href: paths.agent.inquiries.index(),
 		icon: MessageSquare,
 	},
 ] as NavigationItem[];

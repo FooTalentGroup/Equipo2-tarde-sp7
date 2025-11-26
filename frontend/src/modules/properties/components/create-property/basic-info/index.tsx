@@ -24,7 +24,6 @@ interface PropertyBasicInfoProps {
 export default function PropertyBasicInfo({ form }: PropertyBasicInfoProps) {
 	return (
 		<div className="grid grid-cols-2 gap-10 items-start">
-			{/* Columna izquierda */}
 			<div className="grid gap-4">
 				<FormField
 					control={form.control}

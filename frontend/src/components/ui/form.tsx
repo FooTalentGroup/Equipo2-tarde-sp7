@@ -160,7 +160,10 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
 	);
 }
 
-function FormMessageWithIcon({ className, ...props }: React.ComponentProps<"p">) {
+function FormMessageWithIcon({
+	className,
+	...props
+}: React.ComponentProps<"p">) {
 	const { error, formMessageId } = useFormField();
 	const body = error ? String(error?.message ?? "") : props.children;
 
@@ -172,13 +175,13 @@ function FormMessageWithIcon({ className, ...props }: React.ComponentProps<"p">)
 		<div className="flex items-center gap-1.5 absolute top-1/2 left-3 transform -translate-y-1/2 pointer-events-none">
 			<Info className="text-destructive" />
 			<p
-			data-slot="form-message"
-			id={formMessageId}
-			className={cn("text-destructive text-sm", className)}
-			{...props}
-		>
-			{body}
-		</p>
+				data-slot="form-message"
+				id={formMessageId}
+				className={cn("text-destructive text-sm", className)}
+				{...props}
+			>
+				{body}
+			</p>
 		</div>
 	);
 }
@@ -192,5 +195,5 @@ export {
 	FormDescription,
 	FormMessage,
 	FormField,
-	FormMessageWithIcon
+	FormMessageWithIcon,
 };

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -13,28 +15,28 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@src/components/ui/form";
+import { Heading } from "@src/components/ui/heading";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
+import { ROLES } from "@src/types/user";
+import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Heading } from "@src/components/ui/heading";
+
 import { loginAction } from "../actions/auth.actions";
 import { type LoginFormData, loginSchema } from "../schemas/login";
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+
 type LoginFormProps = {
 	heading?: string;
 	buttonText?: string;
 	onSubmit?: (data: LoginFormData) => Promise<void> | void;
-	redirectTo?: string;
 };
 
 export default function LoginForm({
 	heading = "INICIAR SESIÓN",
 	buttonText = "Iniciar Sesión",
 	onSubmit,
-	redirectTo,
 }: LoginFormProps) {
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(loginSchema),
@@ -43,7 +45,7 @@ export default function LoginForm({
 			password: "",
 		},
 	});
-	const [showPassword, setShowPassword] = useState(false)
+	const [showPassword, setShowPassword] = useState(false);
 
 	const router = useRouter();
 
@@ -57,7 +59,14 @@ export default function LoginForm({
 				if (result.success) {
 					toast.success(result.message);
 
-					const redirect = redirectTo || paths.admin.properties.index();
+					let redirect = "";
+
+					if (result.role === ROLES.ADMIN) {
+						redirect = paths.admin.dashboard();
+					} else {
+						redirect = paths.agent.dashboard();
+					}
+
 					router.push(redirect);
 					router.refresh();
 				} else {
@@ -74,7 +83,16 @@ export default function LoginForm({
 
 	return (
 		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8">
-			{heading && <Heading align={"center"} variant={"h1"} weight={"semibold"} className="text-black mb-4">{heading}</Heading>}
+			{heading && (
+				<Heading
+					align={"center"}
+					variant={"h1"}
+					weight={"semibold"}
+					className="text-black mb-4"
+				>
+					{heading}
+				</Heading>
+			)}
 
 			<Form {...form}>
 				<form
@@ -86,12 +104,14 @@ export default function LoginForm({
 						name="email"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-[#0A122B] font-semibold">Usuario o Email</FormLabel>
+								<FormLabel className="text-[#0A122B] font-semibold">
+									Usuario o Email
+								</FormLabel>
 								<FormControl>
 									<Input
 										type="email"
 										className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D] focus-visible:ring-0 rounded-sm not-placeholder-shown:border-[#0F1E4D] md:min-w-[480px]"
-  									placeholder=" " 
+										placeholder=" "
 										{...field}
 									/>
 								</FormControl>
@@ -105,21 +125,32 @@ export default function LoginForm({
 						render={({ field }) => (
 							<FormItem>
 								<div className="flex justify-between">
-									<FormLabel className="text-[#0A122B] font-semibold">Contraseña</FormLabel>
-									<Link href={""} className="hover:underline text-sm text-[#103557]">¿Olvidaste tu contraseña?</Link>
+									<FormLabel className="text-[#0A122B] font-semibold">
+										Contraseña
+									</FormLabel>
+									<Link
+										href={""}
+										className="hover:underline text-sm text-[#103557]"
+									>
+										¿Olvidaste tu contraseña?
+									</Link>
 								</div>
 								<div className="flex items-center relative">
-								<FormControl>
-									<Input
-										type={showPassword ? "text" : "password"}
-										className="text-md border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm not-placeholder-shown:border-[#0F1E4D] md:min-w-[480px]"
-										placeholder=" " 
-										{...field}
-									/>
-								</FormControl>
-									<div className="absolute right-2" onClick={() => setShowPassword(!showPassword)}>
+									<FormControl>
+										<Input
+											type={showPassword ? "text" : "password"}
+											className="text-md border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm not-placeholder-shown:border-[#0F1E4D] md:min-w-[480px]"
+											placeholder=" "
+											{...field}
+										/>
+									</FormControl>
+									<button
+										type="button"
+										className="absolute right-2"
+										onClick={() => setShowPassword(!showPassword)}
+									>
 										{showPassword ? <EyeOff /> : <Eye />}
-									</div>
+									</button>
 								</div>
 								<FormMessage />
 							</FormItem>
@@ -138,8 +169,18 @@ export default function LoginForm({
 			</Form>
 			<p className="text-sm text-center text-[#103557]">
 				¿No tienes cuenta?
-				<Button asChild className="font-semibold text-[#021727] px-2!" variant="link" size="lg">
-					<Link className="underline font-semibold" href={paths.auth.register()}>Registrate</Link>
+				<Button
+					asChild
+					className="font-semibold text-[#021727] px-2!"
+					variant="link"
+					size="lg"
+				>
+					<Link
+						className="underline font-semibold"
+						href={paths.auth.register()}
+					>
+						Registrate
+					</Link>
 				</Button>
 			</p>
 		</div>

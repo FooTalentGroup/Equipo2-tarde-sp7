@@ -23,13 +23,11 @@ import PropertyDocumentation from "./property-documentation";
 import PropertyPricing from "./property-pricing";
 import PropertyPublicationStatus from "./property-publication-status";
 
-type CreatePropertyFormProps = {
+type Props = {
 	defaultValues?: PropertyData;
 };
 
-export default function CreatePropertyForm({
-	defaultValues,
-}: CreatePropertyFormProps) {
+export default function CreatePropertyForm({ defaultValues }: Props) {
 	const router = useRouter();
 
 	const form = useForm<PropertyData>({
@@ -68,13 +66,13 @@ export default function CreatePropertyForm({
 		mode: "all",
 	});
 
-	async function onSubmit(_data: PropertyData) {
+	async function onSubmit(data: PropertyData) {
 		try {
 			await wait(3000);
-			console.log(_data);
+			console.log(data);
 			toast.success("Propiedad guardada exitosamente");
 
-			router.push(paths.admin.properties.index());
+			router.push(paths.agent.properties.index());
 		} catch (error) {
 			const errorMessage =
 				error instanceof Error
@@ -84,8 +82,6 @@ export default function CreatePropertyForm({
 			console.error("Error al guardar propiedad:", error);
 		}
 	}
-
-	console.log(form.formState.errors);
 
 	return (
 		<section className="grid grid-cols-[1fr_auto_275px] gap-4">
@@ -131,7 +127,7 @@ export default function CreatePropertyForm({
 							asChild
 							disabled={form.formState.isSubmitting}
 						>
-							<Link href={paths.admin.properties.index()}>Cancelar</Link>
+							<Link href={paths.agent.properties.index()}>Cancelar</Link>
 						</Button>
 						<Button
 							type="submit"
