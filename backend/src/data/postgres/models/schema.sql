@@ -584,7 +584,7 @@ ON property_prices(property_id, updated_at DESC);
 -- Rentals optimizations
 CREATE INDEX idx_rentals_active 
 ON rentals(property_id, start_date, end_date) 
-WHERE end_date IS NULL OR end_date >= CURRENT_DATE;
+WHERE end_date IS NULL;
 
 CREATE INDEX idx_rentals_reminders 
 ON rentals(next_increase_date, remind_increase, remind_contract_end) 
@@ -630,7 +630,7 @@ WHERE deleted = false AND email IS NOT NULL;
 -- CRM interactions optimizations
 CREATE INDEX idx_crm_interactions_scheduled_status 
 ON crm_interactions(scheduled_datetime, status) 
-WHERE scheduled_datetime >= CURRENT_TIMESTAMP;
+WHERE scheduled_datetime IS NOT NULL;
 
 CREATE INDEX idx_crm_interactions_user_date 
 ON crm_interactions(responsible_user_id, scheduled_datetime DESC);

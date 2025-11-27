@@ -15,9 +15,7 @@
     "db:seed-roles": "ts-node --transpile-only scripts/seed-roles.ts",
     "db:seed-catalogs": "ts-node --transpile-only scripts/seed-catalogs.ts",
     "db:seed-geography": "ts-node --transpile-only scripts/seed-geography.ts",
-    "db:seed-admin": "ts-node --transpile-only scripts/seed-admin.ts",
-    "db:add-updated-at": "ts-node --transpile-only scripts/add-updated-at-column.ts",
-    "db:fix-roles": "ts-node --transpile-only scripts/fix-roles-constraint.ts"
+    "db:seed-admin": "ts-node --transpile-only scripts/seed-admin.ts"
   },
   "keywords": [],
   "author": "",
