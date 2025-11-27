@@ -1,13 +1,12 @@
 import { PostgresDatabase } from '../../database';
-import { v4 as uuidv4 } from 'uuid';
 
 export interface Role {
-    id?: string;
-    title: string;
+    id?: number;
+    name: string;
 }
 
 export interface CreateRoleDto {
-    title: string;
+    name: string;
 }
 
 export class RoleModel {
@@ -15,44 +14,83 @@ export class RoleModel {
 
     static async create(data: CreateRoleDto): Promise<Role> {
         const client = PostgresDatabase.getClient();
-        const id = uuidv4();
-        const query = `INSERT INTO ${this.TABLE_NAME} (id, title) VALUES ($1, $2) RETURNING *`;
-        const result = await client.query(query, [id, data.title]);
-        return result.rows[0];
+        // La tabla usa 'name' como columna
+        const query = `INSERT INTO ${this.TABLE_NAME} (name) VALUES ($1) RETURNING *`;
+        const result = await client.query(query, [data.name]);
+        const row = result.rows[0];
+        
+        return {
+            ...row,
+            name: row.name
+        };
     }
 
     static async findAll(): Promise<Role[]> {
         const client = PostgresDatabase.getClient();
-        const query = `SELECT * FROM ${this.TABLE_NAME} ORDER BY title`;
+        // La tabla usa 'name' como columna
+        const query = `SELECT * FROM ${this.TABLE_NAME} ORDER BY name`;
         const result = await client.query(query);
-        return result.rows;
+        return result.rows.map(row => ({
+            ...row,
+            name: row.name
+        }));
     }
 
-    static async findById(id: string): Promise<Role | null> {
+    static async findById(id: number | string): Promise<Role | null> {
         const client = PostgresDatabase.getClient();
+        // La tabla usa SERIAL (números)
         const query = `SELECT * FROM ${this.TABLE_NAME} WHERE id = $1`;
         const result = await client.query(query, [id]);
-        return result.rows[0] || null;
+        const row = result.rows[0];
+        if (!row) return null;
+        
+        return {
+            ...row,
+            name: row.name
+        };
+    }
+
+    static async findByName(name: string): Promise<Role | null> {
+        const client = PostgresDatabase.getClient();
+        // La tabla usa 'name' como columna
+        const query = `SELECT * FROM ${this.TABLE_NAME} WHERE name = $1`;
+        const result = await client.query(query, [name]);
+        const row = result.rows[0];
+        if (!row) return null;
+        
+        return {
+            ...row,
+            name: row.name
+        };
+    }
+
+    // Alias para mantener compatibilidad con código existente
+    static async findByNombre(nombre: string): Promise<Role | null> {
+        return this.findByName(nombre);
     }
 
     static async findByTitle(title: string): Promise<Role | null> {
-        const client = PostgresDatabase.getClient();
-        const query = `SELECT * FROM ${this.TABLE_NAME} WHERE title = $1`;
-        const result = await client.query(query, [title]);
-        return result.rows[0] || null;
+        return this.findByName(title);
     }
 
-    static async update(id: string, updateData: Partial<CreateRoleDto>): Promise<Role | null> {
+    static async update(id: number | string, updateData: Partial<CreateRoleDto>): Promise<Role | null> {
         const client = PostgresDatabase.getClient();
-        if (!updateData.title) {
+        if (!updateData.name) {
             return await this.findById(id);
         }
-        const query = `UPDATE ${this.TABLE_NAME} SET title = $1 WHERE id = $2 RETURNING *`;
-        const result = await client.query(query, [updateData.title, id]);
-        return result.rows[0] || null;
+        // La tabla usa 'name' como columna
+        const query = `UPDATE ${this.TABLE_NAME} SET name = $1 WHERE id = $2 RETURNING *`;
+        const result = await client.query(query, [updateData.name, id]);
+        const row = result.rows[0];
+        if (!row) return null;
+        
+        return {
+            ...row,
+            name: row.name
+        };
     }
 
-    static async delete(id: string): Promise<boolean> {
+    static async delete(id: number | string): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         const query = `DELETE FROM ${this.TABLE_NAME} WHERE id = $1`;
         const result = await client.query(query, [id]);

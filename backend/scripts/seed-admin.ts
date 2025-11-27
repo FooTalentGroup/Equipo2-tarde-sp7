@@ -20,7 +20,6 @@ const adminUser = {
   email: 'admin@example.com',
   password: 'admin123', // Will be hashed
   phone: undefined as string | undefined,
-  whatsapp_number: undefined as string | undefined,
 };
 
 async function seedAdmin() {
@@ -52,8 +51,8 @@ async function seedAdmin() {
       console.log(`   ⚠️  Admin user with email "${adminUser.email}" already exists (ID: ${existingAdmin.id})`);
       console.log('   💡 If you want to recreate it, delete it first from the database.\n');
     } else {
-      // Get admin role
-      const adminRole = await RoleModel.findByTitle('admin');
+      // Get admin role (lowercase)
+      const adminRole = await RoleModel.findByName('admin');
       if (!adminRole) {
         throw new Error('Admin role not found. Please run "npm run db:seed-roles" first.');
       }
@@ -68,17 +67,16 @@ async function seedAdmin() {
         first_name: adminUser.first_name,
         last_name: adminUser.last_name,
         email: adminUser.email,
-        password: hashedPassword,
+        password_hash: hashedPassword,
         phone: adminUser.phone,
         role_id: adminRole.id!,
-        whatsapp_number: adminUser.whatsapp_number,
       });
 
       console.log(`   ✅ Admin user created successfully!`);
       console.log(`      ID: ${newAdmin.id}`);
       console.log(`      Email: ${newAdmin.email}`);
       console.log(`      Name: ${newAdmin.first_name} ${newAdmin.last_name}`);
-      console.log(`      Role: admin`);
+      console.log(`      Role: Admin`);
       console.log(`      📧 Login credentials:`);
       console.log(`         Email: ${adminUser.email}`);
       console.log(`         Password: ${adminUser.password}`);

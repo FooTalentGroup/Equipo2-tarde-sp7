@@ -155,7 +155,7 @@ export class AuthMiddleware {
                 }
 
                 const role = await RoleModel.findById(profile.role_id);
-                isAdmin = role && role.name.toLowerCase() === 'admin';
+                isAdmin = !!(role && role.name.toLowerCase() === 'admin');
                 
                 // Actualizar el rol en el request
                 (req as any).user = {
