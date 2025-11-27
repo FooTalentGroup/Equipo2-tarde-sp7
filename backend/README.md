@@ -22,7 +22,7 @@ src/
 
 ## 🚀 Instalación
 
-1. Clonar `.env.template` a `.env` y configurar las variables de entorno
+1. Copiar `.env.template` a `.env` y configurar las variables de entorno
 2. Ejecutar `npm install` para instalar las dependencias
 3. Configurar `docker-compose.yml` y ejecutar `docker-compose up -d` para levantar PostgreSQL
 4. Ejecutar `npm run db:setup` para crear la base de datos y datos iniciales
@@ -37,7 +37,18 @@ PORT=3000
 POSTGRES_DB=nombre_de_tu_base_de_datos
 POSTGRES_USER=tu_usuario
 POSTGRES_PASSWORD=tu_contraseña
-JWT_SECRET=tu_secret_key_super_segura
+JWT_SECRET=tu_secret_key_super_segura_minimo_32_caracteres
+```
+
+### Opcionales con Valores por Defecto
+
+```env
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+DB_POOL_MAX=20
+DB_POOL_MIN=5
+DB_POOL_IDLE_TIMEOUT=30000
+DB_POOL_CONNECTION_TIMEOUT=2000
 ```
 
 ### Opcionales (Cloudinary)
@@ -47,6 +58,16 @@ CLOUDINARY_CLOUD_NAME=tu-cloud-name
 CLOUDINARY_API_KEY=tu-api-key
 CLOUDINARY_API_SECRET=tu-api-secret
 ```
+
+### Para Docker Compose
+
+```env
+PGADMIN_EMAIL=admin@admin.com
+PGADMIN_PASSWORD=tu_contraseña_pgadmin
+PGADMIN_PORT=5050
+```
+
+**Nota:** Copia `.env.template` a `.env` y configura las variables según tu entorno.
 
 ## 📜 Scripts Disponibles
 

@@ -2,25 +2,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { envs } from './envs';
 import { FileUploadAdapter } from '../domain/interfaces/file-upload.adapter';
 
-// Función para parsear CLOUDINARY_URL
-function parseCloudinaryUrl(url: string | undefined): { cloud_name: string; api_key: string; api_secret: string } | null {
-    if (!url) return null;
-    
-    // Formato: cloudinary://api_key:api_secret@cloud_name
-    const match = url.match(/^cloudinary:\/\/([^:]+):([^@]+)@(.+)$/);
-    if (match) {
-        return {
-            api_key: match[1],
-            api_secret: match[2],
-            cloud_name: match[3]
-        };
-    }
-    return null;
-}
-
-// Obtener configuración de Cloudinary
 function getCloudinaryConfig() {
-    // Prioridad 1: Variables individuales (más fáciles de modificar)
     if (envs.CLOUDINARY_CLOUD_NAME && envs.CLOUDINARY_API_KEY && envs.CLOUDINARY_API_SECRET) {
         return {
             cloud_name: envs.CLOUDINARY_CLOUD_NAME,
@@ -29,13 +11,6 @@ function getCloudinaryConfig() {
         };
     }
     
-    // Prioridad 2: CLOUDINARY_URL (fallback)
-    const urlConfig = parseCloudinaryUrl(envs.CLOUDINARY_URL);
-    if (urlConfig) {
-        return urlConfig;
-    }
-    
-    // Si no hay ninguna, retornar vacío
     return {
         cloud_name: '',
         api_key: '',
@@ -58,8 +33,7 @@ export class CloudinaryAdapter implements FileUploadAdapter {
         if (!config.cloud_name || !config.api_key || !config.api_secret) {
             throw new Error(
                 'Cloudinary credentials are not configured. ' +
-                'Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET environment variables ' +
-                '(or CLOUDINARY_URL as fallback: cloudinary://api_key:api_secret@cloud_name).'
+                'Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET environment variables.'
             );
         }
     }
