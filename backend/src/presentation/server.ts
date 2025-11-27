@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
 import path from 'path';
+import { PostgresDatabase } from '../data/postgres/database';
 
 interface Options {
   port: number;
@@ -69,8 +70,17 @@ export class Server {
 
   }
 
-  public close() {
-    this.serverListener?.close();
+  public async close() {
+    return new Promise<void>((resolve) => {
+      if (this.serverListener) {
+        this.serverListener.close(async () => {
+          await PostgresDatabase.disconnect();
+          resolve();
+        });
+      } else {
+        PostgresDatabase.disconnect().then(() => resolve());
+      }
+    });
   }
 
 }
