@@ -32,13 +32,13 @@ async function main() {
     // Manejar cierre de la aplicación
     process.on('SIGINT', async () => {
       console.log('\n🛑 Cerrando aplicación...');
-      await PostgresDatabase.disconnect();
+      await server.close();
       process.exit(0);
     });
 
     process.on('SIGTERM', async () => {
       console.log('\n🛑 Cerrando aplicación...');
-      await PostgresDatabase.disconnect();
+      await server.close();
       process.exit(0);
     });
 
