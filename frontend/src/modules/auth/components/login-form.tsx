@@ -57,7 +57,7 @@ export default function LoginForm({
 				const result = await loginAction(data);
 
 				if (result.success) {
-					toast.success(result.message);
+					toast.success("Bienvenido");
 
 					let redirect = "";
 

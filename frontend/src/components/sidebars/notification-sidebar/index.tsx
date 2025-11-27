@@ -1,4 +1,4 @@
-import NotificationCard from "@src/components/agent-header/notifications-sheet/notification-card";
+import NotificationCard from "@src/components/protected-header/notifications-sheet/notification-card";
 import { Button } from "@src/components/ui/button";
 import { Heading } from "@src/components/ui/heading";
 import {

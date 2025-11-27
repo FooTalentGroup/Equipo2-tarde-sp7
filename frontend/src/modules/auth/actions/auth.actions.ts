@@ -15,7 +15,6 @@
 import { redirect } from "next/navigation";
 
 import { paths } from "@src/lib/paths";
-import { ROLES } from "@src/types/user";
 
 import { deleteSession, setSession } from "../lib/session";
 import type { LoginFormData } from "../schemas/login";
@@ -64,10 +63,9 @@ export async function loginAction(
 
 		const data: AuthResponse = await response.json();
 
-		// TODO: Remove this override when backend is ready
-		data.user.role = ROLES.AGENT;
-
 		await setSession(data.token, data.user);
+
+		console.log(data.user.role);
 
 		return {
 			success: true,
@@ -107,9 +105,6 @@ export async function registerAction(
 		}
 
 		const data: AuthResponse = await response.json();
-
-		// TODO: Remove this override when backend is ready
-		data.user.role = ROLES.AGENT;
 
 		await setSession(data.token, data.user);
 
