@@ -42,6 +42,7 @@ async function migrateDatabase() {
       .replace(/\/\*[\s\S]*?\*\//g, '');
     
     // Dividir por punto y coma, filtrar líneas vacías
+    // Mejorar el parsing para manejar mejor las sentencias complejas
     const statements = cleanSql
       .split(';')
       .map(stmt => stmt.trim())
@@ -49,7 +50,8 @@ async function migrateDatabase() {
         // Filtrar líneas vacías y comentarios residuales
         const trimmed = stmt.trim();
         return trimmed.length > 0 && 
-               !trimmed.match(/^\s*$/);
+               !trimmed.match(/^\s*$/) &&
+               !trimmed.match(/^COMMENT\s+ON/i); // Filtrar comentarios que pueden causar problemas
       });
 
     console.log(`📦 Ejecutando ${statements.length} sentencias SQL...\n`);
@@ -84,11 +86,14 @@ async function migrateDatabase() {
           console.log(`   ✅ [${i + 1}/${statements.length}] ${preview}...`);
         }
       } catch (err: any) {
-        // Si es un error de "already exists", lo ignoramos (IF NOT EXISTS)
-        if (err.message.includes('already exists') || 
-            err.message.includes('does not exist') ||
-            err.message.includes('duplicate key') ||
-            err.message.includes('duplicate')) {
+        // Si es un error de "already exists" o constraint duplicada, lo ignoramos
+        const errorMessage = err.message.toLowerCase();
+        if (errorMessage.includes('already exists') || 
+            errorMessage.includes('does not exist') ||
+            errorMessage.includes('duplicate key') ||
+            errorMessage.includes('duplicate') ||
+            errorMessage.includes('cannot be implemented') ||
+            errorMessage.includes('constraint') && errorMessage.includes('already')) {
           skippedCount++;
           
           const createMatch = statement.match(/CREATE\s+(?:TABLE|EXTENSION|INDEX)\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:public\.)?["']?(\w+)["']?/i);

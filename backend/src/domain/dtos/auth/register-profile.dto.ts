@@ -7,7 +7,7 @@ export class RegisterProfileDto {
         public readonly email: string,
         public readonly password: string,
         public readonly phone?: string,
-        public readonly role_id?: string,
+        public readonly role_id?: number,
         public readonly whatsapp_number?: string,
     ){}
 

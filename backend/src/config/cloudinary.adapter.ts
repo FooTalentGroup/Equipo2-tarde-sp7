@@ -91,12 +91,23 @@ export class CloudinaryAdapter implements FileUploadAdapter {
             let uploadResult;
             
             if (typeof file === 'string') {
-                // Si es base64
+                // Si es base64 o URL
                 uploadResult = await cloudinary.uploader.upload(file, uploadOptions);
             } else {
-                // Si es Buffer, convertir a base64
+                // Si es Buffer, convertir a base64 con el tipo MIME correcto
                 const base64 = file.toString('base64');
-                const dataUri = `data:image/jpeg;base64,${base64}`;
+                const resourceType = options?.resourceType || 'auto';
+                
+                let dataUri: string;
+                if (resourceType === 'raw' || resourceType === 'auto') {
+                    // Para PDFs y otros archivos raw, usar formato genérico
+                    dataUri = `data:application/octet-stream;base64,${base64}`;
+                } else {
+                    // Para imágenes, usar formato específico
+                    const mimeType = resourceType === 'image' ? 'image/jpeg' : `application/${resourceType}`;
+                    dataUri = `data:${mimeType};base64,${base64}`;
+                }
+                
                 uploadResult = await cloudinary.uploader.upload(dataUri, uploadOptions);
             }
 
