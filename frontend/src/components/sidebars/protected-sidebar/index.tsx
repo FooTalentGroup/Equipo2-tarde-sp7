@@ -20,13 +20,29 @@ import {
 	SidebarMenuSubButton,
 	SidebarMenuSubItem,
 } from "@src/components/ui/sidebar";
+import { ROLES, type Role } from "@src/types/user";
 import { ChevronRight } from "lucide-react";
 
-import { navigation } from "./data";
+import { adminnavigation, agentNavigation } from "./data";
 
-export default function AgentSidebar() {
+type Props = {
+	role: Role;
+};
+
+export default function ProtectedSidebar({ role }: Props) {
 	const pathname = usePathname();
 
+	function handleGetCurrentNavigation() {
+		if (role === ROLES.ADMIN) {
+			return adminnavigation;
+		}
+
+		if (role === ROLES.AGENT) {
+			return agentNavigation;
+		}
+
+		return [];
+	}
 	return (
 		<Sidebar className="">
 			<SidebarHeader className="pt-8 pb-0 gap-[30px]">
@@ -42,7 +58,7 @@ export default function AgentSidebar() {
 
 			<SidebarGroup className="py-8">
 				<SidebarMenu className="">
-					{navigation.map((item) => {
+					{handleGetCurrentNavigation().map((item) => {
 						if (item.items && item.items.length > 0) {
 							const isItemActive = pathname.startsWith(item.href);
 

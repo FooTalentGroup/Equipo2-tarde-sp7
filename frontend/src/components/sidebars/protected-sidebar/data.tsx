@@ -19,7 +19,7 @@ export type NavigationItem = {
 	items?: NavigationItem[];
 };
 
-export const navigation = [
+export const agentNavigation = [
 	{
 		title: "Panel principal",
 		href: paths.agent.dashboard(),
@@ -73,5 +73,30 @@ export const navigation = [
 		title: "Consultas",
 		href: paths.agent.inquiries.index(),
 		icon: MessageSquare,
+	},
+] as NavigationItem[];
+
+export const adminnavigation = [
+	{
+		title: "Panel principal",
+		href: paths.admin.dashboard(),
+		icon: House,
+	},
+	{
+		title: "Usuarios",
+		icon: Users,
+		isActive: false,
+		items: [
+			{
+				title: "Lista de usuarios",
+				icon: List,
+				href: paths.admin.users.index(),
+			},
+			{
+				title: "Agregar usuario",
+				icon: Plus,
+				href: paths.admin.users.new(),
+			},
+		],
 	},
 ] as NavigationItem[];

@@ -9,7 +9,7 @@ import { getCurrentUser } from "@src/modules/auth/lib/dal";
 import NotificationsSheet from "./notifications-sheet";
 import UserMenuTrigger from "./user-menu-trigger";
 
-export default async function AdminHeader() {
+export default async function ProtectedHeader() {
 	const user = await getCurrentUser();
 
 	return (
