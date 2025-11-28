@@ -1054,7 +1054,7 @@
                     property_type_id: propertyTypeId,
                     property_status_id: propertyStatusId,
                     visibility_status_id: visibilityStatusId,
-                    owner_id: basic.owner_id,
+                    owner_id: finalOwnerId ?? 0,
                     captured_by_user_id: capturedByUserId,
                     // Characteristics
                     bedrooms_count: characteristics?.bedrooms_count,
