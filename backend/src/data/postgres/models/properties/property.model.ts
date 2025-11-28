@@ -32,7 +32,7 @@ export interface Property {
     zoning?: string;
     property_type_id: number;
     property_status_id: number;
-    owner_id: number;
+    owner_id?: number | null;
     situation_id?: number;
     age_id?: number;
     orientation_id?: number;

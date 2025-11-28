@@ -948,7 +948,7 @@
             return await TransactionHelper.executeInTransaction(async () => {
                 const { basic, geography: geoData, address: addrData, values, characteristics, surface, services: servicesData, internal } = createPropertyGroupedDto;
                 let ownerClient = null;
-                let finalOwnerId: number | null = null; // ✅ Permitir null
+                let finalOwnerId: number | undefined = undefined; // ✅ Permitir null
 
 
                 if (basic.owner_id !== undefined && basic.owner_id !== null) {
