@@ -23,7 +23,8 @@ export class CreatePropertyDto {
         public readonly property_status: string | undefined,
         public readonly visibility_status_id: number | undefined,
         public readonly visibility_status: string | undefined,
-        public readonly owner_id: number, // Requerido: cliente propietario (tabla clients)
+        public readonly owner_id?: number, // Ahora opcional
+        //public readonly owner_id: number, // Requerido: cliente propietario (tabla clients)
         
         // Geografía y dirección (requeridos)
         public readonly geography: CreatePropertyGeographyDto,
@@ -303,7 +304,8 @@ export class CreatePropertyDto {
                     hasPropertyStatusName ? propertyStatusName.trim() : undefined,
                     hasVisibilityStatusId ? Number(visibilityStatusId) : undefined,
                     hasVisibilityStatusName ? visibilityStatusName.trim() : undefined,
-                    Number(ownerId), // Cliente propietario (requerido)
+                    ownerId ? Number(ownerId) : undefined,  // ✅ Ahora opcional
+                    //Number(ownerId), // Cliente propietario (requerido)
                     geography,
                     address,
                     prices,
