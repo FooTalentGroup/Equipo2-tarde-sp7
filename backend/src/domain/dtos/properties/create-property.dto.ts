@@ -182,12 +182,17 @@ export class CreatePropertyDto {
             return ['Visibility status ID must be a number', undefined];
         }
 
-        // owner_id es requerido (cliente propietario)
+        // owner_id es puede ser null (cliente propietario)
         // Puede venir en propertyDetails (form-data) o directamente en object
-        const ownerId = propertyDetails.owner_id || object.owner_id;
-        if (!ownerId || isNaN(Number(ownerId))) {
-            return ['Owner ID is required and must be a number. This should be a client (propietario) ID. Make sure to include "owner_id" in propertyDetails JSON string.', undefined];
+        const ownerId = propertyDetails.owner_id || object.owner_id || null;
+        if (ownerId && (isNaN(Number(ownerId)) || Number(ownerId) <= 0)) {
+            return ['Owner ID must be a valid positive number if provided.', undefined];
         }
+        //owner_id es obligatorio
+        //const ownerId = propertyDetails.owner_id || object.owner_id 
+        //if (!ownerId || isNaN(Number(ownerId))) {
+        //    return ['Owner ID is required and must be a number. This should be a client (propietario) ID. Make sure to include "owner_id" in propertyDetails JSON string.', undefined];
+        //}
 
         // Validar geography
         const [geoError, geography] = CreatePropertyGeographyDto.create(geographyData);
