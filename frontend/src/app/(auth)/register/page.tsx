@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+
 import RegisterForm from "@src/modules/auth/components/register-form";
-import HeaderAuth from "@src/modules/auth/components/header"
 
 export const metadata: Metadata = {
 	title: "Registro",
@@ -9,8 +9,7 @@ export const metadata: Metadata = {
 
 export default function RegisterPage() {
 	return (
-		<section className="min-h-screen flex flex-col">
-			<HeaderAuth />
+		<section className="min-h-screen flex flex-col bg-primary-foreground">
 			<main className="flex-1 flex items-center justify-center m-auto w-full z-10 relative">
 				<RegisterForm />
 			</main>
