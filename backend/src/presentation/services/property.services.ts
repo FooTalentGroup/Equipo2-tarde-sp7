@@ -947,23 +947,31 @@
         ) {
             return await TransactionHelper.executeInTransaction(async () => {
                 const { basic, geography: geoData, address: addrData, values, characteristics, surface, services: servicesData, internal } = createPropertyGroupedDto;
-                
+                let ownerClient = null;
+                let finalOwnerId: number | null = null;
+
                 if (basic.owner_id !== undefined && basic.owner_id !== null) {
-                    // Validar que owner_id es un número válido positivo
+            // Validar que owner_id es un número válido positivo
                     if (isNaN(Number(basic.owner_id)) || Number(basic.owner_id) <= 0) {
                         throw CustomError.badRequest('owner_id must be a valid positive number');
                     }
-                } 
-
+                    
+                    // ✅ CORREGIR LÍNEA ~963: Buscar cliente solo si owner_id existe
+                    ownerClient = await ClientModel.findById(basic.owner_id);
+                    if (!ownerClient) {
+                        throw CustomError.badRequest(`Client with ID ${basic.owner_id} not found`);
+                    }
+                    finalOwnerId = basic.owner_id;
+                }
                 // 0. Validate owner (property owner client)
                 //if (!basic.owner_id) {
                 //    throw CustomError.badRequest('owner_id is required in Basic');
                 //}
                 
-                const ownerClient = await ClientModel.findById(basic.owner_id);
-                if (!ownerClient) {
-                    throw CustomError.badRequest(`Client with ID ${basic.owner_id} not found`);
-                }
+                //const ownerClient = await ClientModel.findById(basic.owner_id);
+                //if (!ownerClient) {
+                //    throw CustomError.badRequest(`Client with ID ${basic.owner_id} not found`);
+                //}
 
                 // 1. Resolve geography
                 const geography = await this.resolveGeography(geoData);
