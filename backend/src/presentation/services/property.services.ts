@@ -948,7 +948,8 @@
             return await TransactionHelper.executeInTransaction(async () => {
                 const { basic, geography: geoData, address: addrData, values, characteristics, surface, services: servicesData, internal } = createPropertyGroupedDto;
                 let ownerClient = null;
-                let finalOwnerId: number | null = null;
+                let finalOwnerId: number | null = null; // ✅ Permitir null
+
 
                 if (basic.owner_id !== undefined && basic.owner_id !== null) {
             // Validar que owner_id es un número válido positivo
@@ -1054,7 +1055,7 @@
                     property_type_id: propertyTypeId,
                     property_status_id: propertyStatusId,
                     visibility_status_id: visibilityStatusId,
-                    owner_id: finalOwnerId ?? 0,
+                    owner_id: finalOwnerId,
                     captured_by_user_id: capturedByUserId,
                     // Characteristics
                     bedrooms_count: characteristics?.bedrooms_count,
@@ -1261,7 +1262,7 @@
                             // Use property owner_id as client_id for the document
                             const docRecord = await PropertyDocumentModel.create({
                                 property_id: property.id,
-                                client_id: basic.owner_id, // Use property owner as the client
+                                client_id: finalOwnerId,  // Use property owner as the client
                                 document_name: documentName,
                                 file_path: documentUrl,
                             });
