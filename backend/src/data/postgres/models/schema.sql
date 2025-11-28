@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS properties (
     -- Catalog IDs and Relations
     property_type_id INTEGER NOT NULL,
     property_status_id INTEGER NOT NULL,
-    owner_id INTEGER NOT NULL,
+    owner_id INTEGER,
     situation_id INTEGER,
     age_id INTEGER,
     orientation_id INTEGER,
@@ -371,16 +371,25 @@ CREATE INDEX idx_property_characteristics_property ON property_characteristics(p
 CREATE TABLE IF NOT EXISTS client_consultations (
     id SERIAL PRIMARY KEY,
     client_id INTEGER NOT NULL,
+    property_id INTEGER,
     consultation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     consultation_type_id INTEGER NOT NULL,
     assigned_user_id INTEGER,
+    message TEXT NOT NULL,
+    response TEXT,
+    responded_by_user_id INTEGER,
+    response_date TIMESTAMP,
     CONSTRAINT fk_client_consultations_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
+    CONSTRAINT fk_client_consultations_property FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE SET NULL,
     CONSTRAINT fk_client_consultations_type FOREIGN KEY (consultation_type_id) REFERENCES consultation_types(id) ON DELETE RESTRICT,
-    CONSTRAINT fk_client_consultations_user FOREIGN KEY (assigned_user_id) REFERENCES users(id) ON DELETE SET NULL
+    CONSTRAINT fk_client_consultations_user FOREIGN KEY (assigned_user_id) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_client_consultations_responded_by FOREIGN KEY (responded_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 CREATE INDEX idx_client_consultations_client ON client_consultations(client_id);
+CREATE INDEX idx_client_consultations_property ON client_consultations(property_id);
 CREATE INDEX idx_client_consultations_date ON client_consultations(consultation_date);
+CREATE INDEX idx_client_consultations_responded_by ON client_consultations(responded_by_user_id);
 
 -- CRM Interactions
 CREATE TABLE IF NOT EXISTS crm_interactions (

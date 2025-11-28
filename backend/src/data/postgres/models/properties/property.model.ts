@@ -32,7 +32,7 @@ export interface Property {
     zoning?: string;
     property_type_id: number;
     property_status_id: number;
-    owner_id: number;
+    owner_id?: number;
     situation_id?: number;
     age_id?: number;
     orientation_id?: number;
@@ -71,7 +71,7 @@ export interface CreatePropertyDto {
     zoning?: string;
     property_type_id: number;
     property_status_id: number;
-    owner_id: number;
+    owner_id?: number;
     situation_id?: number;
     age_id?: number;
     orientation_id?: number;
@@ -129,9 +129,12 @@ export class PropertyModel {
         values.push(propertyData.property_status_id);
         placeholders.push(`$${paramIndex++}`);
 
-        fields.push('owner_id');
-        values.push(propertyData.owner_id);
-        placeholders.push(`$${paramIndex++}`);
+        // Campos opcionales - solo agregar si tienen valores
+        if (propertyData.owner_id !== undefined && propertyData.owner_id !== null) {
+            fields.push('owner_id');
+            values.push(propertyData.owner_id);
+            placeholders.push(`$${paramIndex++}`);
+        }
 
         // Campos opcionales - solo agregar si tienen valores
         const addOptionalField = (fieldName: string, value: any) => {

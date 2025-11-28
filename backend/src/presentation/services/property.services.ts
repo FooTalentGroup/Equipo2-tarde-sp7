@@ -57,28 +57,24 @@ export class PropertyServices {
         images?: Express.Multer.File[]
     ) {
         return await TransactionHelper.executeInTransaction(async () => {
-            // 0. Validar que el owner (cliente propietario) existe y es de categoría "Propietario"
-            if (!createPropertyDto.owner_id) {
-                throw CustomError.badRequest('owner_id is required. Please specify a client (propietario) for this property.');
-            }
+            // 0. Validar que el owner (cliente propietario) existe si se proporciona
+            let finalOwnerId: number | undefined = undefined;
             
-            const ownerClient = await ClientModel.findById(createPropertyDto.owner_id);
-            if (!ownerClient) {
-                throw CustomError.badRequest(`Client with ID ${createPropertyDto.owner_id} not found. Please create a client first.`);
+            if (createPropertyDto.owner_id !== undefined && createPropertyDto.owner_id !== null) {
+                const ownerClient = await ClientModel.findById(createPropertyDto.owner_id);
+                if (!ownerClient) {
+                    throw CustomError.badRequest(`Client with ID ${createPropertyDto.owner_id} not found. Please create a client first.`);
+                }
+                
+                // Verificar que el cliente sea de categoría "Propietario" (opcional pero recomendado)
+                const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
+                if (ownerClient.contact_category_id) {
+                    const category = await ContactCategoryModel.findById(ownerClient.contact_category_id);
+                    // No bloqueamos si no es "Propietario", pero es recomendado
+                }
+                
+                finalOwnerId = createPropertyDto.owner_id;
             }
-            
-            // Verificar que el cliente sea de categoría "Propietario" (opcional pero recomendado)
-            const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
-            if (ownerClient.contact_category_id) {
-                const category = await ContactCategoryModel.findById(ownerClient.contact_category_id);
-                // No bloqueamos si no es "Propietario", pero es recomendado
-                // Puedes descomentar esto si quieres forzar que sea "Propietario"
-                // if (category && category.name !== 'Propietario') {
-                //     throw CustomError.badRequest(`Client with ID ${createPropertyDto.owner_id} is not a "Propietario". Only clients with category "Propietario" can own properties.`);
-                // }
-            }
-            
-            const finalOwnerId = createPropertyDto.owner_id;
 
             // 1. Obtener/validar geografía (country -> province -> city)
             const geography = await this.resolveGeography(
@@ -284,17 +280,18 @@ export class PropertyServices {
             }
 
             // Enriquecer respuesta con nombres de catálogos y datos del propietario
-            // Reutilizar el owner ya obtenido arriba, solo necesitamos obtener los catálogos
             const [
                 propertyType,
                 propertyStatus,
                 visibilityStatus,
-                addressCity
+                addressCity,
+                ownerClient
             ] = await Promise.all([
                 PropertyTypeModel.findById(propertyTypeId),
                 PropertyStatusModel.findById(propertyStatusId),
                 VisibilityStatusModel.findById(visibilityStatusId),
-                CityModel.findById(geography.cityId)
+                CityModel.findById(geography.cityId),
+                finalOwnerId ? ClientModel.findById(finalOwnerId) : Promise.resolve(null)
             ]);
 
             const addressProvince = addressCity ? await ProvinceModel.findById(addressCity.province_id) : null;
@@ -936,14 +933,14 @@ export class PropertyServices {
         return await TransactionHelper.executeInTransaction(async () => {
             const { basic, geography: geoData, address: addrData, values, characteristics, surface, services: servicesData, internal } = createPropertyGroupedDto;
 
-            // 0. Validate owner (property owner client)
-            if (!basic.owner_id) {
-                throw CustomError.badRequest('owner_id is required in Basic');
-            }
-            
-            const ownerClient = await ClientModel.findById(basic.owner_id);
-            if (!ownerClient) {
-                throw CustomError.badRequest(`Client with ID ${basic.owner_id} not found`);
+            // 0. Validate owner (property owner client) if provided
+            let finalOwnerId: number | undefined = undefined;
+            if (basic.owner_id !== undefined && basic.owner_id !== null) {
+                const ownerClient = await ClientModel.findById(basic.owner_id);
+                if (!ownerClient) {
+                    throw CustomError.badRequest(`Client with ID ${basic.owner_id} not found`);
+                }
+                finalOwnerId = basic.owner_id;
             }
 
             // 1. Resolve geography
@@ -1027,7 +1024,7 @@ export class PropertyServices {
                 property_type_id: propertyTypeId,
                 property_status_id: propertyStatusId,
                 visibility_status_id: visibilityStatusId,
-                owner_id: basic.owner_id,
+                owner_id: finalOwnerId,
                 captured_by_user_id: capturedByUserId,
                 // Characteristics
                 bedrooms_count: characteristics?.bedrooms_count,
@@ -1234,7 +1231,7 @@ export class PropertyServices {
                         // Use property owner_id as client_id for the document
                         const docRecord = await PropertyDocumentModel.create({
                             property_id: property.id,
-                            client_id: basic.owner_id, // Use property owner as the client
+                            client_id: finalOwnerId || undefined, // Use property owner as the client
                             document_name: documentName,
                             file_path: documentUrl,
                         });
@@ -1258,12 +1255,14 @@ export class PropertyServices {
                 propertyType,
                 propertyStatus,
                 visibilityStatus,
-                addressCity
+                addressCity,
+                ownerClient
             ] = await Promise.all([
                 PropertyTypeModel.findById(propertyTypeId),
                 PropertyStatusModel.findById(propertyStatusId),
                 VisibilityStatusModel.findById(visibilityStatusId),
-                CityModel.findById(geography.cityId)
+                CityModel.findById(geography.cityId),
+                finalOwnerId ? ClientModel.findById(finalOwnerId) : Promise.resolve(null)
             ]);
 
             const addressProvince = addressCity ? await ProvinceModel.findById(addressCity.province_id) : null;

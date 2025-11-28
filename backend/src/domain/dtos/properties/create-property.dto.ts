@@ -23,7 +23,7 @@ export class CreatePropertyDto {
         public readonly property_status: string | undefined,
         public readonly visibility_status_id: number | undefined,
         public readonly visibility_status: string | undefined,
-        public readonly owner_id: number, // Requerido: cliente propietario (tabla clients)
+        public readonly owner_id?: number, // Opcional: cliente propietario (tabla clients)
         
         // Geografía y dirección (requeridos)
         public readonly geography: CreatePropertyGeographyDto,
@@ -182,11 +182,11 @@ export class CreatePropertyDto {
             return ['Visibility status ID must be a number', undefined];
         }
 
-        // owner_id es requerido (cliente propietario)
+        // owner_id es opcional (cliente propietario)
         // Puede venir en propertyDetails (form-data) o directamente en object
         const ownerId = propertyDetails.owner_id || object.owner_id;
-        if (!ownerId || isNaN(Number(ownerId))) {
-            return ['Owner ID is required and must be a number. This should be a client (propietario) ID. Make sure to include "owner_id" in propertyDetails JSON string.', undefined];
+        if (ownerId !== undefined && ownerId !== null && isNaN(Number(ownerId))) {
+            return ['Owner ID must be a number if provided. This should be a client (propietario) ID.', undefined];
         }
 
         // Validar geography
@@ -298,7 +298,7 @@ export class CreatePropertyDto {
                     hasPropertyStatusName ? propertyStatusName.trim() : undefined,
                     hasVisibilityStatusId ? Number(visibilityStatusId) : undefined,
                     hasVisibilityStatusName ? visibilityStatusName.trim() : undefined,
-                    Number(ownerId), // Cliente propietario (requerido)
+                    ownerId ? Number(ownerId) : undefined, // Cliente propietario (opcional)
                     geography,
                     address,
                     prices,

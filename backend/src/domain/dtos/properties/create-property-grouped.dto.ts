@@ -108,9 +108,6 @@ export class CreatePropertyGroupedDto {
             if (!basic.title || !basic.title.trim()) {
                 return ['title is required in basic', undefined];
             }
-            if (!basic.owner_id) {
-                return ['owner_id is required in basic', undefined];
-            }
 
             // 2. Parse Geography (required) - prefer camelCase, but accept PascalCase for compatibility
             const geographyField = object.geography || object.Geography;
