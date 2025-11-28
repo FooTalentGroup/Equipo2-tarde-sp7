@@ -24,22 +24,24 @@ import { ROLES } from "@src/types/user";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
+import { HeadingForm } from "@src/modules/auth/components/heading-form";
 import { registerAction } from "../actions/auth.actions";
 import { type RegisterFormData, registerSchema } from "../schemas/register";
 
 type RegisterFormProps = {
+	title?: string;
 	heading?: string;
 	buttonText?: string;
 	onSubmit?: (data: RegisterFormData) => Promise<void> | void;
 };
 
 export default function RegisterForm({
+	title = "REDPROP",
 	heading = "REGISTRO",
 	buttonText = "Aceptar",
 	onSubmit,
 }: RegisterFormProps) {
-	const [showPassword, setShowPassword] = useState(false);
+	const [showPassword, setShowPassword] = useState(true);
 	const form = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
@@ -47,6 +49,7 @@ export default function RegisterForm({
 			password: "",
 			first_name: "",
 			last_name: "",
+			confirmPassword: "",
 			// role: "",
 		},
 	});
@@ -86,13 +89,14 @@ export default function RegisterForm({
 	};
 
 	return (
-		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8 min-w-md">
+		<div className="bg-primary-foreground grid items-center gap-y-4 rounded-md px-6 py-8">
+			<HeadingForm title={title} />
 			{heading && (
 				<Heading
 					align={"center"}
 					variant={"h1"}
 					weight={"semibold"}
-					className="text-black mb-4"
+					className="text-secondary mb-7"
 				>
 					{heading}
 				</Heading>
@@ -101,24 +105,24 @@ export default function RegisterForm({
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(handleSubmit)}
-					className="w-full space-y-4"
+					className="w-full space-y-7"
 				>
-					<div className="grid grid-cols-1 gap-4">
+					<div className="grid grid-cols-1 gap-7">
 						<FormField
 							control={form.control}
 							name="first_name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Nombre</FormLabel>
+									<FormLabel className="text-secondary-dark font-semibold">Nombre *</FormLabel>
 									<FormControl>
 										<Input
 											type="text"
-											placeholder="Tu nombre"
-											className="text-sm"
+											placeholder=" "
+											className="text-base border-input-border focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-10 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 											{...field}
 										/>
 									</FormControl>
-									<FormMessage />
+									<FormMessageWithIcon />
 								</FormItem>
 							)}
 						/>
@@ -128,16 +132,18 @@ export default function RegisterForm({
 							name="last_name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Apellido</FormLabel>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Apellido *
+									</FormLabel>
 									<FormControl>
 										<Input
 											type="text"
-											placeholder="Tu apellido"
-											className="text-sm"
+											className="text-base border-input-border focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-10 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+											placeholder=" "
 											{...field}
 										/>
 									</FormControl>
-									<FormMessage />
+									<FormMessageWithIcon />
 								</FormItem>
 							)}
 						/>
@@ -149,19 +155,18 @@ export default function RegisterForm({
 						render={({ field }) => {
 							return (
 								<FormItem>
-									<FormLabel className="text-[#0A122B] font-semibold">
+									<FormLabel className="text-secondary-dark font-semibold">
 										Email *
 									</FormLabel>
-									<div className="relative">
-										<FormControl className="relative">
-											<Input
-												type="email"
-												className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessageWithIcon className="top-0" />
-									</div>
+									<FormControl>
+										<Input
+											type="email"
+											className="text-base border-input-border focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active md:min-w-[480px] h-10 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+											placeholder=" "
+											{...field}
+										/>
+									</FormControl>
+									<FormMessageWithIcon />
 								</FormItem>
 							);
 						}}
@@ -173,25 +178,26 @@ export default function RegisterForm({
 						render={({ field }) => {
 							return (
 								<FormItem>
-									<FormLabel className="text-[#0A122B] font-semibold">
+									<FormLabel className="text-secondary-dark font-semibold">
 										Contraseña *
 									</FormLabel>
-									<div className="relative">
+									<div className="flex items-center relative">
 										<FormControl className="relative">
 											<Input
 												type={showPassword ? "text" : "password"}
-												className="text-md border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
+												className="text-base border-input-border focus-visible:border-2 focus-visible:border-input-active focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 md:min-w-[480px] h-10 py-2 shadow-input-border text-primary-normal-active aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+												placeholder=" "
 												{...field}
 											/>
 										</FormControl>
 										<button
 											type="button"
-											className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+											className="absolute right-2"
 											onClick={() => setShowPassword(!showPassword)}
 										>
 											{showPassword ? <EyeOff /> : <Eye />}
 										</button>
-										<FormMessageWithIcon className="top-0" />
+										<FormMessageWithIcon />
 									</div>
 								</FormItem>
 							);
@@ -204,20 +210,27 @@ export default function RegisterForm({
 						render={({ field }) => {
 							return (
 								<FormItem>
-									<FormLabel className="text-[#0A122B] font-semibold">Repetir Contraseña *</FormLabel>
-									<div className="relative">
+									<FormLabel className="text-secondary-dark font-semibold">
+										Repetir Contraseña *
+									</FormLabel>
+									<div className="flex items-center relative">
 										<FormControl className="relative">
 											<Input
 												type={showPassword ? "text" : "password"}
-												className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm relative md:min-w-[480px]"
+												className="text-base border-input-border focus-visible:border-2 focus-visible:border-input-active focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 md:min-w-[480px] h-10 py-2 shadow-input-border text-primary-normal-active aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+												placeholder=" "
 												{...field}
 											/>
 										</FormControl>
-										<div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer" onClick={() => setShowPassword(!showPassword)}>
+										<button
+											type="button"
+											className="absolute right-2"
+											onClick={() => setShowPassword(!showPassword)}
+										>
 											{showPassword ? <EyeOff /> : <Eye />}
+										</button>
 										</div>
-										<FormMessageWithIcon className="top-0" />
-									</div>
+										<FormMessageWithIcon />
 								</FormItem>
 							);
 						}}
@@ -225,7 +238,7 @@ export default function RegisterForm({
 
 					<Button
 						type="submit"
-						className="w-full rounded-sm"
+						className="w-full text-base rounded-md py-3! px-6! h-12!"
 						disabled={form.formState.isSubmitting}
 					>
 						{form.formState.isSubmitting && <Spinner />}
@@ -233,10 +246,17 @@ export default function RegisterForm({
 					</Button>
 				</form>
 			</Form>
-			<p className="text-sm text-center">
-				Ya tienes cuenta?
-				<Button asChild className="font-semibold px-2 py-0" variant="link">
-					<Link href={paths.auth.login()}>Inicia sesión</Link>
+			<p className="text-center text-secondary">
+				¿Ya tienes cuenta?
+				<Button
+					asChild
+					className="font-semibold text-primary px-2!"
+					variant="link"
+					size="lg"
+				>
+					<Link className="font-semibold" href={paths.auth.login()}>
+						Inicia sesión
+					</Link>
 				</Button>
 			</p>
 		</div>
