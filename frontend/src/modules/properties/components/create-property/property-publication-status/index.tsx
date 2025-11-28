@@ -7,11 +7,11 @@ import {
 	FormLabel,
 } from "@src/components/ui/form";
 import { Switch } from "@src/components/ui/switch";
-import type { PropertyData } from "@src/types/property";
+import type { Property } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyPublicationStatusProps {
-	form: UseFormReturn<PropertyData>;
+	form: UseFormReturn<Property>;
 }
 
 export default function PropertyPublicationStatus({
