@@ -90,7 +90,7 @@
                     // }
                 }
                 
-                finalOwnerId = createPropertyDto.owner_id; // ✅ number
+                finalOwnerId = createPropertyDto.owner_id !== undefined ? createPropertyDto.owner_id : null;
 
                 // 1. Obtener/validar geografía (country -> province -> city)
                 const geography = await this.resolveGeography(
