@@ -83,7 +83,7 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 	const currentIndex = utils.getIndex(stepper.current.id);
 
 	const form = useForm<Property>({
-		// biome-ignore lint/suspicious/noTsIgnore: <explanation>
+		// biome-ignore lint/suspicious/noTsIgnore: Resolver type complexity requires ts-ignore
 		// @ts-ignore
 		resolver: zodResolver(stepper.current.schema) as Resolver<Property>,
 		defaultValues: {
