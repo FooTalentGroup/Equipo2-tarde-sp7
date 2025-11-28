@@ -59,7 +59,7 @@
             return await TransactionHelper.executeInTransaction(async () => {
 
                 let ownerClient = null;
-                let finalOwnerId = null;
+                let finalOwnerId: number | null = null;
                 if (createPropertyDto.owner_id) {
                     // Si viene owner_id, validar que existe y es válido
                     if (isNaN(Number(createPropertyDto.owner_id)) || Number(createPropertyDto.owner_id) <= 0) {
@@ -71,7 +71,7 @@
                 //  throw CustomError.badRequest('owner_id is required. Please specify a client (propietario) for this property.');
             //
                 
-                ownerClient = await ClientModel.findById(createPropertyDto.owner_id);
+                ownerClient = await ClientModel.findById(createPropertyDto.owner_id!);
                 if (!ownerClient) {
                     throw CustomError.badRequest(`Client with ID ${createPropertyDto.owner_id} not found. Please create a client first.`);
                 }

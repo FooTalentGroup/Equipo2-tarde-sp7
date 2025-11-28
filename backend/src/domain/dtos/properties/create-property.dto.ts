@@ -16,6 +16,7 @@ export class CreatePropertyDto {
     constructor(
         // Detalles básicos (requeridos primero)
         public readonly title: string,
+        
         // Acepta ID o nombre para mayor flexibilidad (requeridos - uno u otro)
         public readonly property_type_id: number | undefined,
         public readonly property_type: string | undefined,
@@ -23,7 +24,6 @@ export class CreatePropertyDto {
         public readonly property_status: string | undefined,
         public readonly visibility_status_id: number | undefined,
         public readonly visibility_status: string | undefined,
-        public readonly owner_id?: number, // Ahora opcional
         //public readonly owner_id: number, // Requerido: cliente propietario (tabla clients)
         
         // Geografía y dirección (requeridos)
@@ -37,6 +37,7 @@ export class CreatePropertyDto {
         public readonly description?: string,
         public readonly publication_date?: Date | string,
         public readonly featured_web?: boolean,
+        public readonly owner_id?: number, // Ahora opcional
         
         // Características físicas (opcionales)
         public readonly bedrooms_count?: number,
@@ -304,11 +305,11 @@ export class CreatePropertyDto {
                     hasPropertyStatusName ? propertyStatusName.trim() : undefined,
                     hasVisibilityStatusId ? Number(visibilityStatusId) : undefined,
                     hasVisibilityStatusName ? visibilityStatusName.trim() : undefined,
-                    ownerId ? Number(ownerId) : undefined,  // ✅ Ahora opcional
                     //Number(ownerId), // Cliente propietario (requerido)
                     geography,
                     address,
                     prices,
+                    ownerId ? Number(ownerId) : undefined,  // ✅ Ahora opcional
                     propertyDetails.description?.trim() || object.description?.trim(),
                     publicationDate,
                     featuredWeb,
