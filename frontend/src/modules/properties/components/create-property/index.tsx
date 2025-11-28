@@ -207,8 +207,8 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 
 				const result = await createProperty(formData);
 
-				if (result && "error" in result) {
-					throw new Error(result.error);
+				if (result && typeof result === "object" && "error" in result) {
+					throw new Error((result as { error: string }).error);
 				}
 
 				toast.success("Propiedad guardada exitosamente");
@@ -256,7 +256,6 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 									>
 										{index + 1}
 									</Button>
-									<span className="text-sm font-medium">{step.title}</span>
 								</li>
 								{index < _array.length - 1 && (
 									<Separator
