@@ -108,9 +108,7 @@ export class CreatePropertyGroupedDto {
             if (!basic.title || !basic.title.trim()) {
                 return ['title is required in basic', undefined];
             }
-            if (!basic.title || !basic.title.trim()) {
-                return ['title is required in basic', undefined];
-            }
+           
             //if (!basic.owner_id) {
             //    return ['owner_id is required in basic', undefined];
             //}
