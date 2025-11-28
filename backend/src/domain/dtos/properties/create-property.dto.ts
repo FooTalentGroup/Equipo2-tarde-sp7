@@ -309,10 +309,10 @@ export class CreatePropertyDto {
                     geography,
                     address,
                     prices,
-                    ownerId ? Number(ownerId) : undefined,  // ✅ Ahora opcional
                     propertyDetails.description?.trim() || object.description?.trim(),
                     publicationDate,
                     featuredWeb,
+                    ownerId ? Number(ownerId) : undefined,  // ✅ Ahora opcional
                     validateOptionalNumber(propertyDetails.bedrooms_count || object.bedrooms_count, 'bedrooms_count'),
                     validateOptionalNumber(propertyDetails.bathrooms_count || object.bathrooms_count, 'bathrooms_count'),
                     validateOptionalNumber(propertyDetails.rooms_count || object.rooms_count, 'rooms_count'),

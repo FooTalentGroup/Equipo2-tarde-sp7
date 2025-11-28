@@ -60,11 +60,14 @@
 
                 let ownerClient = null;
                 let finalOwnerId: number | null = null;
+
                 if (createPropertyDto.owner_id) {
-                    // Si viene owner_id, validar que existe y es válido
+                    // Validar que owner_id es un número válido positivo
                     if (isNaN(Number(createPropertyDto.owner_id)) || Number(createPropertyDto.owner_id) <= 0) {
                         throw CustomError.badRequest('owner_id must be a valid positive number.');
                     }
+                    finalOwnerId = createPropertyDto.owner_id !== undefined ? createPropertyDto.owner_id : null;
+                    //finalOwnerId = createPropertyDto.owner_id; // ✅ number | null
                 }
                 // 0. Validar que el owner (cliente propietario) existe y es de categoría "Propietario"
                 // (!createPropertyDto.owner_id) {
@@ -87,7 +90,7 @@
                     // }
                 }
                 
-                finalOwnerId = createPropertyDto.owner_id;
+                finalOwnerId = createPropertyDto.owner_id; // ✅ number
 
                 // 1. Obtener/validar geografía (country -> province -> city)
                 const geography = await this.resolveGeography(
@@ -171,7 +174,7 @@
                     property_type_id: propertyTypeId,
                     property_status_id: propertyStatusId,
                     visibility_status_id: visibilityStatusId,
-                    owner_id: finalOwnerId,
+                    owner_id: finalOwnerId !== null ? finalOwnerId : 0, 
                     captured_by_user_id: capturedByUserId,
                     bedrooms_count: createPropertyDto.bedrooms_count,
                     bathrooms_count: createPropertyDto.bathrooms_count,
