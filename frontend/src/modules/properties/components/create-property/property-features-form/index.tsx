@@ -14,14 +14,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@src/components/ui/select";
-import type { PropertyData } from "@src/types/property";
+import type { Property } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyCharacteristicsProps {
-	form: UseFormReturn<PropertyData>;
+	form: UseFormReturn<Property>;
 }
 
-export default function PropertyCharacteristics({
+export default function PropertyFeaturesForm({
 	form,
 }: PropertyCharacteristicsProps) {
 	return (
@@ -117,24 +117,10 @@ export default function PropertyCharacteristics({
 
 				<FormField
 					control={form.control}
-					name="age"
+					name="antiquity"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Antigüedad</FormLabel>
-							<FormControl>
-								<Input placeholder="A estrenar" {...field} />
-							</FormControl>
-							<FormMessage />
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					control={form.control}
-					name="situation"
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Situación</FormLabel>
 							<Select onValueChange={field.onChange} value={field.value}>
 								<FormControl>
 									<SelectTrigger className="w-full">
@@ -143,10 +129,13 @@ export default function PropertyCharacteristics({
 								</FormControl>
 								<SelectContent>
 									<SelectGroup>
-										<SelectItem value="front">Frente</SelectItem>
-										<SelectItem value="back">Contrafrente</SelectItem>
-										<SelectItem value="internal">Interno</SelectItem>
-										<SelectItem value="lateral">Lateral</SelectItem>
+										<SelectItem value="A estrenar">A estrenar</SelectItem>
+										<SelectItem value="1 - 5 años">1 - 5 años</SelectItem>
+										<SelectItem value="4 - 10 años">4 - 10 años</SelectItem>
+										<SelectItem value="11 - 20 años">11 - 20 años</SelectItem>
+										<SelectItem value="Más de 20 años">
+											Más de 20 años
+										</SelectItem>
 									</SelectGroup>
 								</SelectContent>
 							</Select>
@@ -203,6 +192,32 @@ export default function PropertyCharacteristics({
 										<SelectItem value="rear">Contrafrente</SelectItem>
 										<SelectItem value="internal">Interna</SelectItem>
 										<SelectItem value="side">Lateral</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="situation"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Situación</FormLabel>
+							<Select onValueChange={field.onChange} value={field.value}>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Seleccionar" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="front">Frente</SelectItem>
+										<SelectItem value="back">Contrafrente</SelectItem>
+										<SelectItem value="internal">Interno</SelectItem>
+										<SelectItem value="lateral">Lateral</SelectItem>
 									</SelectGroup>
 								</SelectContent>
 							</Select>

@@ -8,14 +8,14 @@ import { Separator } from "@src/components/ui/separator";
 import { paths } from "@src/lib/paths";
 import { cn } from "@src/lib/utils";
 import {
-	type PropertyData,
+	type Property,
 	PropertyStatus,
 	PropertyType,
 } from "@src/types/property";
 import { Bath, Bed, MapPin, Square } from "lucide-react";
 
 type PropertyCardProps = {
-	property: PropertyData;
+	property: Property;
 };
 
 const PROPERTY_TYPE_LABELS: Record<string, string> = {

@@ -14,14 +14,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@src/components/ui/select";
-import type { PropertyData } from "@src/types/property";
+import type { Property } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
-interface PropertyBasicInfoProps {
-	form: UseFormReturn<PropertyData>;
-}
+type Props = {
+	form: UseFormReturn<Property>;
+};
 
-export default function PropertyBasicInfo({ form }: PropertyBasicInfoProps) {
+export default function PropertyInfoForm({ form }: Props) {
 	return (
 		<div className="grid grid-cols-2 gap-10 items-start">
 			<div className="grid gap-4">

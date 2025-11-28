@@ -10,12 +10,12 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@src/components/ui/form";
-import type { PropertyData } from "@src/types/property";
+import type { Property } from "@src/types/property";
 import { Upload } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyDocumentationProps {
-	form: UseFormReturn<PropertyData>;
+	form: UseFormReturn<Property>;
 }
 
 export default function PropertyDocumentation({
