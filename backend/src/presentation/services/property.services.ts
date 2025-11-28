@@ -65,6 +65,7 @@
                     if (isNaN(Number(createPropertyDto.owner_id)) || Number(createPropertyDto.owner_id) <= 0) {
                         throw CustomError.badRequest('owner_id must be a valid positive number.');
                     }
+                }
                 // 0. Validar que el owner (cliente propietario) existe y es de categoría "Propietario"
                 // (!createPropertyDto.owner_id) {
                 //  throw CustomError.badRequest('owner_id is required. Please specify a client (propietario) for this property.');
