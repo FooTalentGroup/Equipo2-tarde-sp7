@@ -11,8 +11,8 @@ export class PropertyEntity {
         public property_type_id: number,
         public property_status_id: number,
         public visibility_status_id: number,
-        public owner_id: number,
         public captured_by_user_id: number,
+        public owner_id?: number,
         public description?: string,
         public bedrooms_count?: number,
         public bathrooms_count?: number,
@@ -59,9 +59,6 @@ export class PropertyEntity {
         if (!visibility_status_id) {
             throw CustomError.badRequest('Visibility status ID is required');
         }
-        if (!owner_id) {
-            throw CustomError.badRequest('Owner ID is required');
-        }
         if (!captured_by_user_id) {
             throw CustomError.badRequest('Captured by user ID is required');
         }
@@ -72,8 +69,8 @@ export class PropertyEntity {
             Number(property_type_id),
             Number(property_status_id),
             Number(visibility_status_id),
-            Number(owner_id),
             Number(captured_by_user_id),
+            owner_id ? Number(owner_id) : undefined,
             description?.trim(),
             bedrooms_count !== undefined ? Number(bedrooms_count) : undefined,
             bathrooms_count !== undefined ? Number(bathrooms_count) : undefined,
