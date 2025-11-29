@@ -61,12 +61,12 @@ export class PropertyConsultationServices {
                 });
             }
 
-            // 3. Obtener tipo de consulta "Consulta Web"
-            const consultationType = await ConsultationTypeModel.findByName('Consulta Web');
+            // 3. Obtener tipo de consulta "Consulta de Propiedad"
+            const consultationType = await ConsultationTypeModel.findByName('Consulta de Propiedad');
             
             if (!consultationType || !consultationType.id) {
                 throw CustomError.internalServerError(
-                    'Consultation type "Consulta Web" not configured. Please run database seeds.'
+                    'Consultation type "Consulta de Propiedad" not configured. Please run database seeds.'
                 );
             }
 
