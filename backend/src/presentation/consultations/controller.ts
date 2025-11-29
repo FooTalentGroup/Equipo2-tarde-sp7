@@ -50,6 +50,14 @@ export class ConsultationController {
      */
     getAllConsultations = async (req: Request, res: Response) => {
         try {
+            // Verificar que el usuario esté autenticado (viene del middleware)
+            const user = (req as any).user;
+            if (!user || !user.id) {
+                return res.status(401).json({
+                    message: 'User not authenticated'
+                });
+            }
+
             const { limit, offset, consultation_type_id, start_date, end_date } = req.query;
 
             const filters = {
