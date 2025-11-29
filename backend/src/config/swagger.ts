@@ -8,6 +8,12 @@ const options: swaggerJSDoc.Options = {
       version: '0.0.1',
       description: 'API documentation for Redprop',
     },
+    tags: [
+      {
+        name: 'Consultations',
+        description: 'Property consultation endpoints (public access)',
+      },
+    ],
     servers: [
       {
         url: 'http://localhost:3000/api',
