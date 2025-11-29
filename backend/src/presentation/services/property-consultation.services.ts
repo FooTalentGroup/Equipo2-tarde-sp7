@@ -5,6 +5,7 @@ import { ClientModel } from '../../data/postgres/models/clients/client.model';
 import { ClientConsultationModel } from '../../data/postgres/models/crm/client-consultation.model';
 import { ContactCategoryModel } from '../../data/postgres/models/clients/contact-category.model';
 import { ConsultationTypeModel } from '../../data/postgres/models/crm/consultation-type.model';
+import { PostgresDatabase } from '../../data/postgres/database';
 
 export class PropertyConsultationServices {
     constructor() {}
@@ -61,12 +62,39 @@ export class PropertyConsultationServices {
                 });
             }
 
-            // 3. Obtener tipo de consulta "Consulta de Propiedad"
-            const consultationType = await ConsultationTypeModel.findByName('Consulta de Propiedad');
+            // 3. Determinar tipo de consulta basado en la operación de la propiedad
+            let consultationTypeName = 'Consulta de Propiedad'; // Default genérico
+            
+            // Obtener los precios/operaciones de la propiedad
+            const dbClient = PostgresDatabase.getClient();
+            const pricesQuery = `
+                SELECT pot.name as operation_type_name
+                FROM property_prices pp
+                JOIN property_operation_types pot ON pp.operation_type_id = pot.id
+                WHERE pp.property_id = $1
+                ORDER BY pp.updated_at DESC
+            `;
+            const pricesResult = await dbClient.query(pricesQuery, [dto.property_id]);
+            
+            if (pricesResult.rows.length > 0) {
+                // Si solo tiene un tipo de operación, usar ese específico
+                if (pricesResult.rows.length === 1) {
+                    const operationType = pricesResult.rows[0].operation_type_name;
+                    
+                    if (operationType === 'Venta') {
+                        consultationTypeName = 'Consulta de Venta';
+                    } else if (operationType === 'Alquiler' || operationType === 'Alquiler Temporal') {
+                        consultationTypeName = 'Consulta de Alquiler';
+                    }
+                }
+                // Si tiene múltiples operaciones (ej: Venta y Alquiler), usar genérico
+            }
+            
+            const consultationType = await ConsultationTypeModel.findByName(consultationTypeName);
             
             if (!consultationType || !consultationType.id) {
                 throw CustomError.internalServerError(
-                    'Consultation type "Consulta de Propiedad" not configured. Please run database seeds.'
+                    `Consultation type "${consultationTypeName}" not configured. Please run database seeds.`
                 );
             }
 
