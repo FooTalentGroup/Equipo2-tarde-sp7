@@ -23,7 +23,6 @@ export class CreatePropertyDto {
         public readonly property_status: string | undefined,
         public readonly visibility_status_id: number | undefined,
         public readonly visibility_status: string | undefined,
-        public readonly owner_id?: number, // Opcional: cliente propietario (tabla clients)
         
         // Geografía y dirección (requeridos)
         public readonly geography: CreatePropertyGeographyDto,
@@ -31,7 +30,8 @@ export class CreatePropertyDto {
         
         // Precios (array - puede tener venta y/o alquiler) (requerido)
         public readonly prices: CreatePropertyPriceDto[],
-        
+        public readonly owner_id?: number, // Opcional: cliente propietario (tabla clients)
+
         // Opcionales (después de los requeridos)
         public readonly description?: string,
         public readonly publication_date?: Date | string,
@@ -182,12 +182,6 @@ export class CreatePropertyDto {
             return ['Visibility status ID must be a number', undefined];
         }
 
-        // owner_id es opcional (cliente propietario)
-        // Puede venir en propertyDetails (form-data) o directamente en object
-        const ownerId = propertyDetails.owner_id || object.owner_id;
-        if (ownerId !== undefined && ownerId !== null && isNaN(Number(ownerId))) {
-            return ['Owner ID must be a number if provided. This should be a client (propietario) ID.', undefined];
-        }
 
         // Validar geography
         const [geoError, geography] = CreatePropertyGeographyDto.create(geographyData);
@@ -204,6 +198,12 @@ export class CreatePropertyDto {
         // Validar prices (debe tener al menos uno)
         if (!pricesData || pricesData.length === 0) {
             return ['At least one price is required', undefined];
+        }
+        // owner_id es opcional (cliente propietario)
+        // Puede venir en propertyDetails (form-data) o directamente en object
+        const ownerId = propertyDetails.owner_id || object.owner_id;
+        if (ownerId !== undefined && ownerId !== null && isNaN(Number(ownerId))) {
+            return ['Owner ID must be a number if provided. This should be a client (propietario) ID.', undefined];
         }
 
         const prices: CreatePropertyPriceDto[] = [];
@@ -298,10 +298,10 @@ export class CreatePropertyDto {
                     hasPropertyStatusName ? propertyStatusName.trim() : undefined,
                     hasVisibilityStatusId ? Number(visibilityStatusId) : undefined,
                     hasVisibilityStatusName ? visibilityStatusName.trim() : undefined,
-                    ownerId ? Number(ownerId) : undefined, // Cliente propietario (opcional)
                     geography,
                     address,
                     prices,
+                    ownerId ? Number(ownerId) : undefined, // Cliente propietario (opcional)
                     propertyDetails.description?.trim() || object.description?.trim(),
                     publicationDate,
                     featuredWeb,
