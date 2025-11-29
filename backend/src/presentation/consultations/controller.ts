@@ -43,4 +43,28 @@ export class ConsultationController {
             this.handleError(error, res);
         }
     }
+
+    /**
+     * Get all consultations with filters and pagination
+     * Requires authentication
+     */
+    getAllConsultations = async (req: Request, res: Response) => {
+        try {
+            const { limit, offset, consultation_type_id, start_date, end_date } = req.query;
+
+            const filters = {
+                limit: limit ? parseInt(limit as string) : undefined,
+                offset: offset ? parseInt(offset as string) : undefined,
+                consultation_type_id: consultation_type_id ? parseInt(consultation_type_id as string) : undefined,
+                start_date: start_date as string,
+                end_date: end_date as string,
+            };
+
+            const result = await this.consultationServices.getAllConsultations(filters);
+            
+            return res.status(200).json(result);
+        } catch (error) {
+            this.handleError(error, res);
+        }
+    }
 }

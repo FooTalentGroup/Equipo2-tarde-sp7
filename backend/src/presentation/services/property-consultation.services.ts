@@ -136,4 +136,128 @@ export class PropertyConsultationServices {
             throw CustomError.internalServerError('Error creating consultation');
         }
     }
+
+    /**
+     * Obtener todas las consultas con información completa
+     * - Incluye datos del cliente, propiedad y tipo de consulta
+     * - Soporta paginación y filtros
+     */
+    async getAllConsultations(filters?: {
+        limit?: number;
+        offset?: number;
+        consultation_type_id?: number;
+        start_date?: string;
+        end_date?: string;
+    }) {
+        try {
+            const dbClient = PostgresDatabase.getClient();
+            
+            // Construir query con JOINs para obtener información completa
+            let query = `
+                SELECT 
+                    cc.id,
+                    cc.consultation_date,
+                    cc.message,
+                    cc.response,
+                    cc.response_date,
+                    -- Cliente
+                    c.id as client_id,
+                    c.first_name as client_first_name,
+                    c.last_name as client_last_name,
+                    c.email as client_email,
+                    c.phone as client_phone,
+                    -- Propiedad
+                    p.id as property_id,
+                    p.title as property_title,
+                    -- Tipo de consulta
+                    ct.id as consultation_type_id,
+                    ct.name as consultation_type_name
+                FROM client_consultations cc
+                INNER JOIN clients c ON cc.client_id = c.id
+                LEFT JOIN properties p ON cc.property_id = p.id
+                INNER JOIN consultation_types ct ON cc.consultation_type_id = ct.id
+            `;
+
+            const conditions: string[] = [];
+            const values: any[] = [];
+            let paramIndex = 1;
+
+            // Aplicar filtros
+            if (filters) {
+                if (filters.consultation_type_id) {
+                    conditions.push(`cc.consultation_type_id = $${paramIndex++}`);
+                    values.push(filters.consultation_type_id);
+                }
+                if (filters.start_date) {
+                    conditions.push(`cc.consultation_date >= $${paramIndex++}`);
+                    values.push(filters.start_date);
+                }
+                if (filters.end_date) {
+                    conditions.push(`cc.consultation_date <= $${paramIndex++}`);
+                    values.push(filters.end_date);
+                }
+            }
+
+            if (conditions.length > 0) {
+                query += ` WHERE ${conditions.join(' AND ')}`;
+            }
+
+            query += ` ORDER BY cc.consultation_date DESC`;
+
+            // Paginación
+            const limit = filters?.limit || 50;
+            const offset = filters?.offset || 0;
+            
+            query += ` LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
+            values.push(limit, offset);
+
+            const result = await dbClient.query(query, values);
+
+            // Formatear respuesta
+            const consultations = result.rows.map(row => ({
+                id: row.id,
+                consultation_date: row.consultation_date,
+                message: row.message,
+                response: row.response,
+                response_date: row.response_date,
+                client: {
+                    id: row.client_id,
+                    first_name: row.client_first_name,
+                    last_name: row.client_last_name,
+                    email: row.client_email,
+                    phone: row.client_phone,
+                },
+                property: row.property_id ? {
+                    id: row.property_id,
+                    title: row.property_title,
+                } : null,
+                consultation_type: {
+                    id: row.consultation_type_id,
+                    name: row.consultation_type_name,
+                },
+            }));
+
+            // Obtener total de registros para paginación
+            const countQuery = `
+                SELECT COUNT(*) as total
+                FROM client_consultations cc
+                ${conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''}
+            `;
+            const countResult = await dbClient.query(countQuery, values.slice(0, values.length - 2));
+            const total = parseInt(countResult.rows[0].total);
+
+            return {
+                consultations,
+                pagination: {
+                    total,
+                    limit,
+                    offset,
+                    hasMore: offset + consultations.length < total,
+                },
+            };
+        } catch (error) {
+            console.error('Error getting consultations:', error);
+            throw CustomError.internalServerError('Error retrieving consultations');
+        }
+    }
 }

@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { ConsultationController } from './controller';
 import { PropertyConsultationServices } from '../services/property-consultation.services';
+import { AuthMiddleware } from '../middlewares/auth.middleware';
+import { jwtAdapter } from '../../config';
 
 export class ConsultationRoutes {
     static get routes(): Router {
@@ -8,6 +10,129 @@ export class ConsultationRoutes {
         
         const consultationServices = new PropertyConsultationServices();
         const controller = new ConsultationController(consultationServices);
+        const authMiddleware = new AuthMiddleware(jwtAdapter);
+
+        /**
+         * @swagger
+         * /api/consultations:
+         *   get:
+         *     summary: Get all consultations with pagination and filters
+         *     description: |
+         *       Protected endpoint to retrieve all property consultations.
+         *       - Requires authentication
+         *       - Supports pagination and filtering
+         *       - Returns complete information (client, property, consultation type)
+         *     tags: [Consultations]
+         *     security:
+         *       - bearerAuth: []
+         *     parameters:
+         *       - in: query
+         *         name: limit
+         *         schema:
+         *           type: integer
+         *           default: 50
+         *         description: Number of results per page
+         *       - in: query
+         *         name: offset
+         *         schema:
+         *           type: integer
+         *           default: 0
+         *         description: Number of results to skip
+         *       - in: query
+         *         name: consultation_type_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by consultation type ID
+         *       - in: query
+         *         name: start_date
+         *         schema:
+         *           type: string
+         *           format: date
+         *         description: Filter consultations from this date
+         *         example: "2025-11-01"
+         *       - in: query
+         *         name: end_date
+         *         schema:
+         *           type: string
+         *           format: date
+         *         description: Filter consultations until this date
+         *         example: "2025-11-30"
+         *     responses:
+         *       200:
+         *         description: List of consultations retrieved successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 consultations:
+         *                   type: array
+         *                   items:
+         *                     type: object
+         *                     properties:
+         *                       id:
+         *                         type: integer
+         *                       consultation_date:
+         *                         type: string
+         *                         format: date-time
+         *                       message:
+         *                         type: string
+         *                       response:
+         *                         type: string
+         *                         nullable: true
+         *                       response_date:
+         *                         type: string
+         *                         format: date-time
+         *                         nullable: true
+         *                       client:
+         *                         type: object
+         *                         properties:
+         *                           id:
+         *                             type: integer
+         *                           first_name:
+         *                             type: string
+         *                           last_name:
+         *                             type: string
+         *                           email:
+         *                             type: string
+         *                           phone:
+         *                             type: string
+         *                       property:
+         *                         type: object
+         *                         nullable: true
+         *                         properties:
+         *                           id:
+         *                             type: integer
+         *                           title:
+         *                             type: string
+         *                       consultation_type:
+         *                         type: object
+         *                         properties:
+         *                           id:
+         *                             type: integer
+         *                           name:
+         *                             type: string
+         *                 pagination:
+         *                   type: object
+         *                   properties:
+         *                     total:
+         *                       type: integer
+         *                     limit:
+         *                       type: integer
+         *                     offset:
+         *                       type: integer
+         *                     hasMore:
+         *                       type: boolean
+         *       401:
+         *         description: Unauthorized - Authentication required
+         *       500:
+         *         description: Internal server error
+         */
+        router.get(
+            '/',
+            authMiddleware.authenticate,
+            (req, res) => controller.getAllConsultations(req, res)
+        );
 
         /**
          * @swagger
