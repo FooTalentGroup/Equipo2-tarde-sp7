@@ -33,12 +33,12 @@ import {
 import { cn } from "@src/lib/utils";
 import { getClients } from "@src/modules/properties/services/property-service";
 import type { Client } from "@src/types/client";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 };
 
 export default function PropertyInfoForm({ form }: Props) {

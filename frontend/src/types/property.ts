@@ -146,6 +146,93 @@ export const documentsSchema = z.object({
 });
 
 export const propertySchema = z.object({
+	id: z.number(),
+	title: z.string(),
+	description: z.string().nullable(),
+	publication_date: z.string(),
+	featured_web: z.boolean(),
+	property_type: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+	property_status: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+	visibility_status: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+	owner: z.object({
+		id: z.number().nullable(),
+		name: z.string().nullable(),
+		email: z.string().nullable(),
+		phone: z.string().nullable(),
+	}),
+	age: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+	orientation: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+	disposition: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+	situation: z.object({
+		id: z.number(),
+		name: z.string(),
+	}),
+	bedrooms_count: z.number(),
+	bathrooms_count: z.number(),
+	rooms_count: z.number(),
+	parking_spaces_count: z.number(),
+	land_area: z.string(),
+	covered_area: z.string(),
+	total_area: z.string(),
+	main_price: z.object({
+		price: z.string(),
+		currency: z.object({
+			id: z.number(),
+			name: z.string(),
+			symbol: z.string(),
+		}),
+		operation_type: z.object({
+			id: z.number(),
+			name: z.string(),
+		}),
+	}),
+	main_address: z.object({
+		full_address: z.string(),
+		neighborhood: z.string().nullable(),
+		city: z.object({
+			id: z.number(),
+			name: z.string(),
+			province: z.object({
+				name: z.string(),
+			}),
+		}),
+	}),
+	primary_image: z
+		.object({
+			id: z.number(),
+			file_path: z.string(),
+			is_primary: z.boolean(),
+		})
+		.nullable(),
+	images_count: z.string(),
+	updated_at: z.string(),
+	slug: z.string().optional(),
+});
+
+export const propertyResponseSchema = z.object({
+	count: z.number(),
+	properties: z.array(propertySchema),
+});
+
+export const propertyFormSchema = z.object({
 	basic: basicSchema,
 	geography: geographySchema,
 	address: addressSchema,
@@ -159,6 +246,8 @@ export const propertySchema = z.object({
 });
 
 export type Property = z.infer<typeof propertySchema>;
+export type PropertyResponse = z.infer<typeof propertyResponseSchema>;
+export type PropertyForm = z.infer<typeof propertyFormSchema>;
 export type PropertyBasic = z.infer<typeof basicSchema>;
 export type PropertyGeography = z.infer<typeof geographySchema>;
 export type PropertyAddress = z.infer<typeof addressSchema>;

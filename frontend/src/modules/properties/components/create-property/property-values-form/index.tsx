@@ -19,11 +19,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@src/components/ui/select";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 };
 
 export default function PropertyValuesForm({ form }: Props) {

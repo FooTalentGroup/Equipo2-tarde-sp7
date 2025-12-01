@@ -18,7 +18,7 @@ import {
 	documentsSchema,
 	geographySchema,
 	imagesSchema,
-	type Property,
+	type PropertyForm,
 	PropertyStatus,
 	servicesSchema,
 	surfaceSchema,
@@ -41,7 +41,7 @@ import PropertySurfacesForm from "./property-surfaces-form";
 import PropertyValuesForm from "./property-values-form";
 
 type Props = {
-	defaultValues?: Property;
+	defaultValues?: PropertyForm;
 };
 
 const { useStepper, steps, utils } = defineStepper(
@@ -92,7 +92,7 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 	const stepper = useStepper();
 	const currentIndex = utils.getIndex(stepper.current.id);
 
-	const form = useForm<Property>({
+	const form = useForm<PropertyForm>({
 		// biome-ignore lint/suspicious/noTsIgnore: Resolver type complexity requires ts-ignore
 		// @ts-ignore
 		resolver: zodResolver(stepper.current.schema) as Resolver<Property>,
@@ -190,7 +190,7 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 
 	console.log(form.formState.errors);
 
-	async function onSubmit(_data: Property) {
+	async function onSubmit(_data: PropertyForm) {
 		if (stepper.isLast) {
 			try {
 				const allData = form.getValues();

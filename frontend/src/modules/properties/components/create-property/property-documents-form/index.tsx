@@ -14,12 +14,12 @@ import {
 	FormItem,
 	FormMessage,
 } from "@src/components/ui/form";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import { FileText, Plus, Trash2 } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyDocumentsProps {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 }
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB

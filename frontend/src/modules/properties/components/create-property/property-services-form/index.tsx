@@ -8,11 +8,11 @@ import {
 	FormItem,
 	FormMessage,
 } from "@src/components/ui/form";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 };
 
 const SERVICES_OPTIONS: Option[] = [

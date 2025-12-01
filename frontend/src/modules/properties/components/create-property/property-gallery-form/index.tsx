@@ -18,12 +18,12 @@ import {
 } from "@src/components/ui/form";
 import * as Sortable from "@src/components/ui/sortable";
 import { cn } from "@src/lib/utils";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import { Move, Plus, Trash2 } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyCharacteristicsProps {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 }
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024;

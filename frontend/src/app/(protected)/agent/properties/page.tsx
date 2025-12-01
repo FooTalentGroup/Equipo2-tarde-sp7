@@ -5,6 +5,7 @@ import { Button } from "@src/components/ui/button";
 import { paths } from "@src/lib/paths";
 import PropertyFilter from "@src/modules/properties/components/property-filter";
 import PropertyList from "@src/modules/properties/components/property-list";
+import { getProperties } from "@src/modules/properties/services/property-service";
 import { Plus } from "lucide-react";
 
 export const metadata = {
@@ -12,7 +13,9 @@ export const metadata = {
 	description: "Gestión de propiedades inmobiliarias",
 };
 
-export default function PropertiesPage() {
+export default async function PropertiesPage() {
+	const data = await getProperties();
+
 	return (
 		<>
 			<SectionHeading
@@ -32,7 +35,7 @@ export default function PropertiesPage() {
 				}
 			/>
 			<PropertyFilter />
-			<PropertyList />
+			<PropertyList properties={data.properties} />
 		</>
 	);
 }

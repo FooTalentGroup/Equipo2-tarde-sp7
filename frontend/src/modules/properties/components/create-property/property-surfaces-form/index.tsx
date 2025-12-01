@@ -6,11 +6,11 @@ import {
 	FormMessage,
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertySurfacesProps {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 }
 
 export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
