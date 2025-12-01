@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@src/components/ui/button";
 import { paths } from "@src/lib/paths";
 import { getCurrentUser } from "@src/modules/auth/lib/dal";
+import { ROLES } from "@src/types/user";
 
 import ActionDropdown from "./action-dropdown";
 import NotificationsSheet from "./notifications-sheet";
@@ -72,7 +73,7 @@ export default async function ProtectedHeader() {
 				</div> */}
 			</div>
 			<div className="justify-self-end flex items-center gap-8">
-				<ActionDropdown />
+				{user?.role === ROLES.AGENT ? <ActionDropdown /> : null}
 				<div className="flex items-center">
 					<NotificationsSheet />
 					<UserMenuTrigger user={user} />
