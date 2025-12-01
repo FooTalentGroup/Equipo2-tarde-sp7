@@ -1,187 +1,168 @@
-import { PostgresDatabase } from '../../database';
+import { PostgresDatabase } from "../../database";
+import {
+  CreateInteractionDto,
+  UpdateInteractionDto,
+} from "../../../../domain/dtos/interactions/interaction.dto";
 
-export interface CrmInteraction {
-    id?: number;
-    event_type_id: number;
-    title: string;
-    scheduled_datetime: Date;
-    client_id?: number;
-    property_id?: number;
-    responsible_user_id: number;
-    comments?: string;
-    status?: string;
+export interface Interaction {
+  id_interaccion: number;
+  id_tipo_evento: number;
+  titulo: string;
+  fecha_hora_programada: Date;
+  id_cliente: number;
+  id_propiedad?: number;
+  id_usuario_responsable: number;
+  comentarios?: string;
+  estado: string;
 }
 
-export interface CreateCrmInteractionDto {
-    event_type_id: number;
-    title: string;
-    scheduled_datetime: Date;
-    client_id?: number;
-    property_id?: number;
-    responsible_user_id: number;
-    comments?: string;
-    status?: string;
+export interface AgendaItem extends Interaction {
+  client_name: string;
+  property_title?: string;
+  property_address?: string;
+  event_type: string;
 }
 
-export interface CrmInteractionFilters {
-    event_type_id?: number;
-    client_id?: number;
-    property_id?: number;
-    responsible_user_id?: number;
-    status?: string;
-    start_datetime?: Date;
-    end_datetime?: Date;
-    upcoming?: boolean; // scheduled_datetime >= CURRENT_TIMESTAMP
-    limit?: number;
-    offset?: number;
+export interface InteractionHistoryItem {
+  fecha_hora_programada: Date;
+  agent_name: string;
+  event_type: string;
+  comentarios: string;
 }
 
 export class CrmInteractionModel {
-    private static readonly TABLE_NAME = 'crm_interactions';
+  private static readonly TABLE_NAME = "Interaccion_CRM";
 
-    static async create(interactionData: CreateCrmInteractionDto): Promise<CrmInteraction> {
-        const client = PostgresDatabase.getClient();
-        
-        const query = `
+  static async create(data: CreateInteractionDto): Promise<Interaction> {
+    const client = PostgresDatabase.getClient();
+
+    const query = `
             INSERT INTO ${this.TABLE_NAME} (
-                event_type_id, title, scheduled_datetime, client_id, property_id,
-                responsible_user_id, comments, status
+                id_usuario_responsable, id_cliente, id_propiedad, id_tipo_evento,
+                titulo, fecha_hora_programada, comentarios, estado
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, 'Programada')
             RETURNING *
         `;
-        
-        const result = await client.query(query, [
-            interactionData.event_type_id,
-            interactionData.title,
-            interactionData.scheduled_datetime,
-            interactionData.client_id || null,
-            interactionData.property_id || null,
-            interactionData.responsible_user_id,
-            interactionData.comments || null,
-            interactionData.status || 'Scheduled',
-        ]);
 
-        return result.rows[0];
+    const result = await client.query(query, [
+      data.id_usuario_responsable,
+      data.id_cliente,
+      data.id_propiedad || null,
+      data.id_tipo_evento,
+      data.titulo,
+      data.fecha_hora_programada,
+      data.comentarios || null,
+    ]);
+
+    return result.rows[0];
+  }
+
+  static async checkConflict(userId: number, date: Date): Promise<boolean> {
+    const client = PostgresDatabase.getClient();
+    // Check +/- 30 minutes
+    const query = `
+            SELECT COUNT(*) as count
+            FROM ${this.TABLE_NAME}
+            WHERE id_usuario_responsable = $1
+            AND estado = 'Programada'
+            AND fecha_hora_programada >= $2::timestamp - INTERVAL '30 minutes'
+            AND fecha_hora_programada <= $2::timestamp + INTERVAL '30 minutes'
+        `;
+
+    const result = await client.query(query, [userId, date]);
+    return parseInt(result.rows[0].count) > 0;
+  }
+
+  static async findAgenda(
+    userId: number,
+    startDate: string,
+    endDate: string
+  ): Promise<AgendaItem[]> {
+    const client = PostgresDatabase.getClient();
+
+    const query = `
+            SELECT 
+                i.*,
+                c.nombre || ' ' || c.apellido as client_name,
+                p.titulo as property_title,
+                d.direccion_completa as property_address,
+                te.nombre as event_type
+            FROM ${this.TABLE_NAME} i
+            JOIN Clientes c ON i.id_cliente = c.id_cliente
+            JOIN TipoEvento te ON i.id_tipo_evento = te.id_tipo_evento
+            LEFT JOIN Propiedades p ON i.id_propiedad = p.id_propiedad
+            LEFT JOIN PropiedadDireccion pd ON p.id_propiedad = pd.id_propiedad
+            LEFT JOIN Direccion d ON pd.id_direccion = d.id_direccion
+            WHERE i.id_usuario_responsable = $1
+            AND i.fecha_hora_programada BETWEEN $2 AND $3
+            ORDER BY i.fecha_hora_programada ASC
+        `;
+
+    const result = await client.query(query, [userId, startDate, endDate]);
+    return result.rows;
+  }
+
+  static async findById(id: number): Promise<Interaction | null> {
+    const client = PostgresDatabase.getClient();
+    const query = `SELECT * FROM ${this.TABLE_NAME} WHERE id_interaccion = $1`;
+    const result = await client.query(query, [id]);
+    return result.rows[0] || null;
+  }
+
+  static async update(
+    id: number,
+    data: UpdateInteractionDto
+  ): Promise<Interaction | null> {
+    const client = PostgresDatabase.getClient();
+
+    const fields: string[] = [];
+    const values: any[] = [];
+    let paramIndex = 1;
+
+    if (data.estado) {
+      fields.push(`estado = $${paramIndex++}`);
+      values.push(data.estado);
+    }
+    if (data.comentarios !== undefined) {
+      fields.push(`comentarios = $${paramIndex++}`);
+      values.push(data.comentarios);
     }
 
-    static async findById(id: number): Promise<CrmInteraction | null> {
-        const client = PostgresDatabase.getClient();
-        const query = `SELECT * FROM ${this.TABLE_NAME} WHERE id = $1`;
-        const result = await client.query(query, [id]);
-        return result.rows[0] || null;
-    }
+    if (fields.length === 0) return this.findById(id);
 
-    static async findAll(filters?: CrmInteractionFilters): Promise<CrmInteraction[]> {
-        const client = PostgresDatabase.getClient();
-        let query = `SELECT * FROM ${this.TABLE_NAME}`;
-        const conditions: string[] = [];
-        const values: any[] = [];
-        let paramIndex = 1;
-
-        if (filters) {
-            if (filters.event_type_id !== undefined) {
-                conditions.push(`event_type_id = $${paramIndex++}`);
-                values.push(filters.event_type_id);
-            }
-            if (filters.client_id !== undefined) {
-                conditions.push(`client_id = $${paramIndex++}`);
-                values.push(filters.client_id);
-            }
-            if (filters.property_id !== undefined) {
-                conditions.push(`property_id = $${paramIndex++}`);
-                values.push(filters.property_id);
-            }
-            if (filters.responsible_user_id !== undefined) {
-                conditions.push(`responsible_user_id = $${paramIndex++}`);
-                values.push(filters.responsible_user_id);
-            }
-            if (filters.status) {
-                conditions.push(`status = $${paramIndex++}`);
-                values.push(filters.status);
-            }
-            if (filters.start_datetime) {
-                conditions.push(`scheduled_datetime >= $${paramIndex++}`);
-                values.push(filters.start_datetime);
-            }
-            if (filters.end_datetime) {
-                conditions.push(`scheduled_datetime <= $${paramIndex++}`);
-                values.push(filters.end_datetime);
-            }
-            if (filters.upcoming !== undefined) {
-                if (filters.upcoming) {
-                    conditions.push(`scheduled_datetime >= CURRENT_TIMESTAMP`);
-                } else {
-                    conditions.push(`scheduled_datetime < CURRENT_TIMESTAMP`);
-                }
-            }
-        }
-
-        if (conditions.length > 0) {
-            query += ` WHERE ${conditions.join(' AND ')}`;
-        }
-
-        query += ` ORDER BY scheduled_datetime ASC`;
-
-        if (filters?.limit) {
-            query += ` LIMIT $${paramIndex++}`;
-            values.push(filters.limit);
-            if (filters.offset) {
-                query += ` OFFSET $${paramIndex++}`;
-                values.push(filters.offset);
-            }
-        }
-
-        const result = await client.query(query, values);
-        return result.rows;
-    }
-
-    static async update(id: number, updateData: Partial<CreateCrmInteractionDto>): Promise<CrmInteraction | null> {
-        const client = PostgresDatabase.getClient();
-        
-        const fields: string[] = [];
-        const values: any[] = [];
-        let paramIndex = 1;
-
-        if (updateData.title) {
-            fields.push(`title = $${paramIndex++}`);
-            values.push(updateData.title);
-        }
-        if (updateData.scheduled_datetime) {
-            fields.push(`scheduled_datetime = $${paramIndex++}`);
-            values.push(updateData.scheduled_datetime);
-        }
-        if (updateData.comments !== undefined) {
-            fields.push(`comments = $${paramIndex++}`);
-            values.push(updateData.comments || null);
-        }
-        if (updateData.status !== undefined) {
-            fields.push(`status = $${paramIndex++}`);
-            values.push(updateData.status);
-        }
-
-        if (fields.length === 0) {
-            return await this.findById(id);
-        }
-
-        values.push(id);
-
-        const query = `
+    values.push(id);
+    const query = `
             UPDATE ${this.TABLE_NAME}
-            SET ${fields.join(', ')}
-            WHERE id = $${paramIndex}
+            SET ${fields.join(", ")}
+            WHERE id_interaccion = $${paramIndex}
             RETURNING *
         `;
 
-        const result = await client.query(query, values);
-        return result.rows[0] || null;
-    }
+    const result = await client.query(query, values);
+    return result.rows[0] || null;
+  }
 
-    static async delete(id: number): Promise<boolean> {
-        const client = PostgresDatabase.getClient();
-        const query = `DELETE FROM ${this.TABLE_NAME} WHERE id = $1`;
-        const result = await client.query(query, [id]);
-        return (result.rowCount ?? 0) > 0;
-    }
+  static async findHistoryByProperty(
+    propertyId: number
+  ): Promise<InteractionHistoryItem[]> {
+    const client = PostgresDatabase.getClient();
+
+    const query = `
+            SELECT 
+                i.fecha_hora_programada,
+                u.nombre || ' ' || u.apellido as agent_name,
+                te.nombre as event_type,
+                i.comentarios
+            FROM ${this.TABLE_NAME} i
+            JOIN Usuarios u ON i.id_usuario_responsable = u.id_usuario
+            JOIN TipoEvento te ON i.id_tipo_evento = te.id_tipo_evento
+            WHERE i.id_propiedad = $1
+            AND i.estado != 'Cancelada'
+            ORDER BY i.fecha_hora_programada DESC
+        `;
+
+    const result = await client.query(query, [propertyId]);
+    return result.rows;
+  }
 }
-
