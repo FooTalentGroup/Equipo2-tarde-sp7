@@ -19,10 +19,10 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 			<div className="grid gap-4">
 				<FormField
 					control={form.control}
-					name="landArea"
+					name="surface.land_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Superficie del terreno (m²)</FormLabel>
+							<FormLabel>Terreno</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -33,10 +33,10 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 
 				<FormField
 					control={form.control}
-					name="coveredArea"
+					name="surface.covered_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Superficie cubierta (m²)</FormLabel>
+							<FormLabel>Cubierta (m²)</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -47,10 +47,10 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 
 				<FormField
 					control={form.control}
-					name="semiCoveredArea"
+					name="surface.uncovered_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Superficie semicubierta (m²)</FormLabel>
+							<FormLabel>Descubierta</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -63,10 +63,10 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 			<div className="grid gap-4 items-start">
 				<FormField
 					control={form.control}
-					name="totalBuiltArea"
+					name="surface.semi_covered_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Superficie total construida (m²)</FormLabel>
+							<FormLabel>Semicubierta</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -77,10 +77,10 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 
 				<FormField
 					control={form.control}
-					name="uncoveredArea"
+					name="surface.total_built_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Superficie descubierta (m²)</FormLabel>
+							<FormLabel>Total construido</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -91,10 +91,10 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 
 				<FormField
 					control={form.control}
-					name="totalArea"
+					name="surface.total_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Superficie total (m²)</FormLabel>
+							<FormLabel>Total</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>

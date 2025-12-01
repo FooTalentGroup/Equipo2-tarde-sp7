@@ -13,7 +13,7 @@ export function PropertyOwnerCard({
 	client,
 	defaultOpen = false,
 }: {
-	client: Client;
+	client: Client & { type?: string; origin?: string };
 	defaultOpen?: boolean;
 }) {
 	return (
@@ -31,7 +31,10 @@ export function PropertyOwnerCard({
 										<span className="font-semibold text-slate-900">
 											{client.name}
 										</span>
-										<StatusBadge status={client.type} className="text-xs">
+										<StatusBadge
+											status={client.type as any}
+											className="text-xs"
+										>
 											{client.type}
 										</StatusBadge>
 									</div>

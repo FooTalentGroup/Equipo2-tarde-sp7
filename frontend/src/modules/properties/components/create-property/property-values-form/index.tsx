@@ -31,7 +31,7 @@ export default function PropertyValuesForm({ form }: Props) {
 		<div className="grid grid-cols-2 gap-10 items-start">
 			<FormField
 				control={form.control}
-				name="price"
+				name="values.prices.0.price"
 				render={({ field }) => (
 					<FormItem>
 						<FormLabel>Precio</FormLabel>
@@ -40,17 +40,20 @@ export default function PropertyValuesForm({ form }: Props) {
 								<InputGroupAddon align="inline-start" className="">
 									<FormField
 										control={form.control}
-										name="priceCurrency"
+										name="values.prices.0.currency_symbol"
 										render={({ field: currencyField }) => (
 											<Select
 												onValueChange={currencyField.onChange}
 												value={currencyField.value}
 											>
-												<SelectTrigger className=" border-t-0 border-b-0 border-l-0 rounded-t-none rounded-b-none h-11! bg-transparent! rounded-r-none shadow-none">
+												<SelectTrigger
+													size="default"
+													className=" border-t-0 border-b-0 border-l-0 rounded-t-none rounded-b-none bg-transparent! rounded-r-none shadow-none"
+												>
 													<InputGroupButton
+														asChild
 														variant="ghost"
 														className=""
-														asChild
 													>
 														<SelectValue placeholder="Moneda" />
 													</InputGroupButton>
@@ -78,7 +81,7 @@ export default function PropertyValuesForm({ form }: Props) {
 			/>
 			<FormField
 				control={form.control}
-				name="expenses"
+				name="values.expenses.0.amount"
 				render={({ field }) => (
 					<FormItem>
 						<FormLabel>Expensas</FormLabel>
@@ -87,13 +90,16 @@ export default function PropertyValuesForm({ form }: Props) {
 								<InputGroupAddon align="inline-start" className="">
 									<FormField
 										control={form.control}
-										name="expensesCurrency"
+										name="values.expenses.0.currency_symbol"
 										render={({ field: currencyField }) => (
 											<Select
 												onValueChange={currencyField.onChange}
 												value={currencyField.value}
 											>
-												<SelectTrigger className=" border-t-0 border-b-0 border-l-0 rounded-t-none rounded-b-none h-11! bg-transparent! rounded-r-none shadow-none">
+												<SelectTrigger
+													size="default"
+													className=" border-t-0 border-b-0 border-l-0 rounded-t-none rounded-b-none bg-transparent! rounded-r-none shadow-none"
+												>
 													<InputGroupButton
 														variant="ghost"
 														className=""

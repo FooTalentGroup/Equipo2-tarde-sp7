@@ -1,3 +1,14 @@
+import { useEffect, useState } from "react";
+
+import { Button } from "@src/components/ui/button";
+import {
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandInput,
+	CommandItem,
+	CommandList,
+} from "@src/components/ui/command";
 import {
 	FormControl,
 	FormField,
@@ -7,6 +18,11 @@ import {
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
 import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@src/components/ui/popover";
+import {
 	Select,
 	SelectContent,
 	SelectGroup,
@@ -14,7 +30,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@src/components/ui/select";
+import { cn } from "@src/lib/utils";
+import { getClients } from "@src/modules/properties/services/property-service";
+import type { Client } from "@src/types/client";
 import type { Property } from "@src/types/property";
+import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
@@ -22,12 +42,34 @@ type Props = {
 };
 
 export default function PropertyInfoForm({ form }: Props) {
+	const [clients, setClients] = useState<Client[]>([]);
+
+	const [open, setOpen] = useState(false);
+
+	useEffect(() => {
+		async function fetchData() {
+			try {
+				const [clientsResponse] = await Promise.all([getClients()]);
+
+				if (clientsResponse?.clients) {
+					const owners = clientsResponse.clients.filter(
+						(client) => client.contact_category.name === "Propietario",
+					);
+					setClients(owners);
+				}
+			} catch (error) {
+				console.error("Error fetching data:", error);
+			}
+		}
+		fetchData();
+	}, []);
+
 	return (
 		<div className="grid grid-cols-2 gap-10 items-start">
 			<div className="grid gap-4">
 				<FormField
 					control={form.control}
-					name="title"
+					name="basic.title"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Título de la propiedad</FormLabel>
@@ -41,24 +83,24 @@ export default function PropertyInfoForm({ form }: Props) {
 
 				<FormField
 					control={form.control}
-					name="propertyType"
+					name="basic.property_type"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Tipo de propiedad</FormLabel>
 							<Select onValueChange={field.onChange} value={field.value}>
 								<FormControl>
 									<SelectTrigger className="w-full">
-										<SelectValue placeholder="Casa/Departamento/PH" />
+										<SelectValue placeholder="Seleccionar tipo" />
 									</SelectTrigger>
 								</FormControl>
 								<SelectContent>
 									<SelectGroup>
-										<SelectItem value="house">Casa</SelectItem>
-										<SelectItem value="apartment">Departamento</SelectItem>
+										<SelectItem value="Casa">Casa</SelectItem>
+										{/* <SelectItem value="apartment">Departamento</SelectItem>
 										<SelectItem value="ph">PH</SelectItem>
 										<SelectItem value="land">Terreno</SelectItem>
 										<SelectItem value="commercial">Local comercial</SelectItem>
-										<SelectItem value="office">Oficina</SelectItem>
+										<SelectItem value="office">Oficina</SelectItem> */}
 									</SelectGroup>
 								</SelectContent>
 							</Select>
@@ -69,7 +111,7 @@ export default function PropertyInfoForm({ form }: Props) {
 
 				<FormField
 					control={form.control}
-					name="address"
+					name="address.street"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Dirección</FormLabel>
@@ -83,12 +125,12 @@ export default function PropertyInfoForm({ form }: Props) {
 
 				<FormField
 					control={form.control}
-					name="floor"
+					name="address.floor"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Piso/Unidad</FormLabel>
 							<FormControl>
-								<Input placeholder="4B" {...field} />
+								<Input placeholder="4B" type="string" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -97,7 +139,7 @@ export default function PropertyInfoForm({ form }: Props) {
 
 				<FormField
 					control={form.control}
-					name="postalCode"
+					name="address.postal_code"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Código postal</FormLabel>
@@ -114,7 +156,29 @@ export default function PropertyInfoForm({ form }: Props) {
 			<div className="grid gap-4 items-start">
 				<FormField
 					control={form.control}
-					name="province"
+					name="geography.country"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>País</FormLabel>
+							<Select onValueChange={field.onChange} value={field.value}>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Seleccionar país" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value="Argentina">Argentina</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<FormField
+					control={form.control}
+					name="geography.province"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Provincia</FormLabel>
@@ -144,7 +208,7 @@ export default function PropertyInfoForm({ form }: Props) {
 
 				<FormField
 					control={form.control}
-					name="city"
+					name="geography.city"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Ciudad</FormLabel>
@@ -158,13 +222,95 @@ export default function PropertyInfoForm({ form }: Props) {
 
 				<FormField
 					control={form.control}
-					name="assignedOwner"
+					name="basic.owner_id"
 					render={({ field }) => (
-						<FormItem>
+						<FormItem className="flex flex-col">
 							<FormLabel>Propietario asignado</FormLabel>
-							<FormControl>
-								<Input placeholder="Juan Perez" {...field} />
-							</FormControl>
+							<Popover open={open} onOpenChange={setOpen}>
+								<PopoverTrigger asChild>
+									<FormControl>
+										<Button
+											variant="combobox"
+											role="combobox"
+											aria-expanded={open}
+											className={cn(
+												"w-full justify-between",
+												field.value && "text-input-foreground",
+											)}
+										>
+											{field.value
+												? clients.find(
+														(client) => client.id.toString() === field.value,
+													)
+													? `${
+															clients.find(
+																(client) =>
+																	client.id.toString() === field.value,
+															)?.first_name
+														} ${
+															clients.find(
+																(client) =>
+																	client.id.toString() === field.value,
+															)?.last_name
+														}`
+													: "Seleccionar propietario"
+												: "Seleccionar propietario"}
+											<ChevronsUpDownIcon className="ml-2 size-5 shrink-0 text-input-foreground" />
+										</Button>
+									</FormControl>
+								</PopoverTrigger>
+								<PopoverContent className="w-full p-0">
+									<Command
+										defaultValue={
+											field.value
+												? `${
+														clients.find(
+															(client) => client.id.toString() === field.value,
+														)?.first_name
+													} ${
+														clients.find(
+															(client) => client.id.toString() === field.value,
+														)?.last_name
+													}`
+												: undefined
+										}
+									>
+										<CommandInput placeholder="Buscar propietario..." />
+										<CommandList>
+											<CommandEmpty>
+												No se encontraron propietarios.
+											</CommandEmpty>
+											<CommandGroup>
+												{clients.map((client) => (
+													<CommandItem
+														className="justify-between"
+														value={`${client.first_name} ${client.last_name}`}
+														key={client.id}
+														onSelect={() => {
+															form.setValue(
+																"basic.owner_id",
+																client.id.toString(),
+																{ shouldValidate: true },
+															);
+															setOpen(false);
+														}}
+													>
+														{client.first_name} {client.last_name}
+														<CheckIcon
+															className={cn(
+																"mr-2 h-4 w-4",
+																client.id.toString() === field.value
+																	? "opacity-100"
+																	: "opacity-0",
+															)}
+														/>
+													</CommandItem>
+												))}
+											</CommandGroup>
+										</CommandList>
+									</Command>
+								</PopoverContent>
+							</Popover>
 							<FormMessage />
 						</FormItem>
 					)}
