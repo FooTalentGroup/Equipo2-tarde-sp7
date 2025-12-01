@@ -23,17 +23,19 @@ import { ROLES } from "@src/types/user";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
+import { HeadingForm } from "@src/modules/auth/components/heading-form";
 import { loginAction } from "../actions/auth.actions";
 import { type LoginFormData, loginSchema } from "../schemas/login";
 
 type LoginFormProps = {
+	title?: string;
 	heading?: string;
 	buttonText?: string;
 	onSubmit?: (data: LoginFormData) => Promise<void> | void;
 };
 
 export default function LoginForm({
+	title = "REDPROP",
 	heading = "INICIAR SESIÓN",
 	buttonText = "Iniciar Sesión",
 	onSubmit,
@@ -82,13 +84,14 @@ export default function LoginForm({
 	};
 
 	return (
-		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8">
+		<div className="bg-primary-foreground grid items-center gap-y-4 rounded-md px-6 py-8">
+			<HeadingForm title={title} />
 			{heading && (
 				<Heading
 					align={"center"}
 					variant={"h1"}
 					weight={"semibold"}
-					className="text-black mb-4"
+					className="text-secondary mb-7"
 				>
 					{heading}
 				</Heading>
@@ -104,13 +107,13 @@ export default function LoginForm({
 						name="email"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel className="text-[#0A122B] font-semibold">
+								<FormLabel className="text-secondary-dark font-semibold">
 									Usuario o Email
 								</FormLabel>
 								<FormControl>
 									<Input
 										type="email"
-										className="text-lg border-[#B3B3B3] focus-visible:border-[#0F1E4D] focus-visible:ring-0 rounded-sm not-placeholder-shown:border-[#0F1E4D] md:min-w-[480px]"
+										className="text-base border-input-border focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active md:min-w-[480px] h-10 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										placeholder=" "
 										{...field}
 									/>
@@ -125,12 +128,12 @@ export default function LoginForm({
 						render={({ field }) => (
 							<FormItem>
 								<div className="flex justify-between">
-									<FormLabel className="text-[#0A122B] font-semibold">
+									<FormLabel className="text-secondary-dark font-semibold">
 										Contraseña
 									</FormLabel>
 									<Link
 										href={""}
-										className="hover:underline text-sm text-[#103557]"
+										className="hover:underline text-secondary"
 									>
 										¿Olvidaste tu contraseña?
 									</Link>
@@ -139,11 +142,18 @@ export default function LoginForm({
 									<FormControl>
 										<Input
 											type={showPassword ? "text" : "password"}
-											className="text-md border-[#B3B3B3] focus-visible:border-[#0F1E4D]! focus-visible:ring-0 rounded-sm not-placeholder-shown:border-[#0F1E4D] md:min-w-[480px]"
+											className="text-base border-input-border focus-visible:border-2 focus-visible:border-input-active focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 md:min-w-[480px] h-10 py-2 shadow-input-border text-primary-normal-active aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 											placeholder=" "
 											{...field}
 										/>
 									</FormControl>
+									<button
+										type="button"
+										className="absolute right-2"
+										onClick={() => setShowPassword(!showPassword)}
+									>
+										{showPassword ? <EyeOff /> : <Eye />}
+									</button>
 									<button
 										type="button"
 										className="absolute right-2"
@@ -159,7 +169,7 @@ export default function LoginForm({
 
 					<Button
 						type="submit"
-						className="w-full rounded-sm"
+						className="w-full text-base rounded-md py-3! px-6! h-12!"
 						disabled={form.formState.isSubmitting}
 					>
 						{form.formState.isSubmitting && <Spinner />}
@@ -167,18 +177,15 @@ export default function LoginForm({
 					</Button>
 				</form>
 			</Form>
-			<p className="text-sm text-center text-[#103557]">
+			<p className="text-center text-secondary">
 				¿No tienes cuenta?
 				<Button
 					asChild
-					className="font-semibold text-[#021727] px-2!"
+					className="font-semibold text-primary px-2!"
 					variant="link"
 					size="lg"
 				>
-					<Link
-						className="underline font-semibold"
-						href={paths.auth.register()}
-					>
+					<Link className="font-semibold" href={paths.auth.register()}>
 						Registrate
 					</Link>
 				</Button>
