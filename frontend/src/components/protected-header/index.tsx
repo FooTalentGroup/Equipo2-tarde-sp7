@@ -53,7 +53,7 @@ export default async function ProtectedHeader() {
 				</div> */}
 			</div>
 			<div className="justify-self-end flex items-center">
-				<NotificationsSheet />
+				{/* <NotificationsSheet /> */}
 				<UserMenuTrigger user={user} />
 			</div>
 		</header>

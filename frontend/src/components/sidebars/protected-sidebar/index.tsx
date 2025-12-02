@@ -46,9 +46,9 @@ export default function ProtectedSidebar({ role }: Props) {
 	return (
 		<Sidebar className="">
 			<SidebarHeader className="pt-8 pb-0 gap-[30px]">
-				<Avatar className="rounded-md aspect-video w-full max-w-[180px] mx-auto h-[130px]">
+				<Avatar className="rounded-md aspect-video w-full max-w-[180px] mx-auto h-[130px] border-primary border p-3">
 					<AvatarImage
-						src="https://github.com/shadcn.png"
+						src="/images/sidebar-company-picture.png"
 						alt="@shadcn"
 						className="object-cover aspect-video w-full h-full"
 					/>
