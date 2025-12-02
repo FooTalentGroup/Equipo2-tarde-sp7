@@ -1,5 +1,5 @@
 import ClientsLayout from "@src/components/layouts/client-layout";
-import TenantCard from "@src/modules/clients/ui/TenantCard";
+import { TenantCard } from "@src/modules/clients/ui/TenantCard";
 import type { Tenant } from "@src/types/client";
 
 const tenants: Tenant[] = [
@@ -47,12 +47,8 @@ export default function InquilinosPage() {
 	return (
 		<ClientsLayout activeTab="inquilinos">
 			<div className="space-y-0">
-				{tenants.map((tenant, index) => (
-					<TenantCard
-						key={tenant.dni}
-						tenant={tenant}
-						defaultOpen={index === 0}
-					/>
+				{tenants.map((tenant) => (
+					<TenantCard key={tenant.dni} tenant={tenant} />
 				))}
 			</div>
 		</ClientsLayout>
