@@ -3,6 +3,7 @@ import {
 	Building2Icon,
 	ChartColumnIncreasing,
 	House,
+	HouseIcon,
 	List,
 	type LucideIcon,
 	MessageSquare,
@@ -48,19 +49,19 @@ export const agentNavigation = [
 		isActive: false,
 		items: [
 			{
-				title: "Agregar cliente",
-				icon: Plus,
-				href: paths.agent.clients.new(),
-			},
-			{
 				title: "Leads",
 				icon: UserCheck,
 				href: paths.agent.clients.leads(),
 			},
 			{
-				title: "Buscar propiedades",
-				icon: House,
-				href: paths.agent.clients.searchProperties(),
+				title: "Inquilinos",
+				icon: Users,
+				href: paths.agent.clients.inquilinos(),
+			},
+			{
+				title: "Propiedades",
+				icon: HouseIcon,
+				href: paths.agent.clients.propietarios(),
 			},
 		],
 	},
