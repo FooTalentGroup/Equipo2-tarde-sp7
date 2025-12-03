@@ -1,11 +1,12 @@
 import { z } from "zod";
 
-export const PropertyStatus = {
-	AVAILABLE: "Disponible",
-	UNAVAILABLE: "No Disponible",
-} as const;
-
-export const propertyStatusEnum = z.enum(["Disponible", "No Disponible"]);
+export const propertyStatusEnum = z.enum([
+	"Disponible",
+	"En Venta",
+	"Alquilada",
+	"Vendida",
+	"Reservada",
+]);
 export type PropertyStatusType = z.infer<typeof propertyStatusEnum>;
 
 export const VisibilityStatus = {

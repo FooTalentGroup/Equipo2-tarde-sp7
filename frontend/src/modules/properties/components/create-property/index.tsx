@@ -20,7 +20,6 @@ import {
 	geographySchema,
 	imagesSchema,
 	type PropertyForm,
-	PropertyStatus,
 	servicesSchema,
 	surfaceSchema,
 	VisibilityStatus,
@@ -101,10 +100,9 @@ export default function CreatePropertyForm({ defaultValues, clients }: Props) {
 		defaultValues: {
 			basic: {
 				title: defaultValues?.basic?.title || "",
-				property_type: defaultValues?.basic?.property_type || "",
+				property_type: defaultValues?.basic?.property_type || "Casa",
 				description: defaultValues?.basic?.description || "",
-				property_status:
-					defaultValues?.basic?.property_status || PropertyStatus.AVAILABLE,
+				property_status: defaultValues?.basic?.property_status || "Disponible",
 				visibility_status:
 					defaultValues?.basic?.visibility_status || VisibilityStatus.PUBLISHED,
 				featured_web: defaultValues?.basic?.featured_web || false,

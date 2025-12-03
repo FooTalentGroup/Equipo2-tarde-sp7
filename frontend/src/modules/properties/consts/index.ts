@@ -1,4 +1,4 @@
-import { PropertyStatus, type PropertyType } from "@src/types/property";
+import type { PropertyStatusType, PropertyType } from "@src/types/property";
 
 export const PROPERTY_TYPE: { label: string; value: PropertyType }[] = [
 	{
@@ -35,15 +35,60 @@ export const PROPERTY_TYPE: { label: string; value: PropertyType }[] = [
 	},
 ];
 
-export const PROPERTY_STATUS_CONFIG = {
-	[PropertyStatus.AVAILABLE]: {
+export const PROPERTY_STATUS: { label: string; value: PropertyStatusType }[] = [
+	{
 		label: "Disponible",
-		variant: "success" as const,
-		badgeLabel: "Venta",
+		value: "Disponible",
 	},
-	[PropertyStatus.UNAVAILABLE]: {
-		label: "No Disponible",
-		variant: "destructive" as const,
-		badgeLabel: "Vendido",
+	{
+		label: "En Venta",
+		value: "En Venta",
+	},
+	{
+		label: "Alquilada",
+		value: "Alquilada",
+	},
+	{
+		label: "Vendida",
+		value: "Vendida",
+	},
+	{
+		label: "Reservada",
+		value: "Reservada",
+	},
+];
+
+export const PROPERTY_STATUS_CONFIG: Record<
+	PropertyStatusType,
+	{
+		label: string;
+		variant: "success" | "destructive" | "default" | "secondary" | "outline";
+		badgeLabel: string;
+	}
+> = {
+	Disponible: {
+		label: "Disponible",
+		variant: "success",
+		badgeLabel: "Disponible",
+	},
+	"En Venta": {
+		label: "En Venta",
+		variant: "default",
+		badgeLabel: "En Venta",
+	},
+	Alquilada: {
+		label: "Alquilada",
+		variant: "secondary",
+		badgeLabel: "Alquilada",
+	},
+	Vendida: {
+		label: "Vendida",
+		variant: "destructive",
+		badgeLabel: "Vendida",
+	},
+	Reservada: {
+		label: "Reservada",
+		variant: "outline",
+		badgeLabel: "Reservada",
 	},
 } as const;
