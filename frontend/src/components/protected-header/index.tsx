@@ -6,23 +6,15 @@ import { getCurrentUser } from "@src/modules/auth/lib/dal";
 import { ROLES } from "@src/types/user";
 
 import ActionDropdown from "./action-dropdown";
-import NotificationsSheet from "./notifications-sheet";
 import UserMenuTrigger from "./user-menu-trigger";
 
 export default async function ProtectedHeader() {
 	const user = await getCurrentUser();
 
 	return (
-		<header className="px-4 bg-sidebar sticky top-0 z-50 min-h-(--admin-header-height) grid grid-cols-[1fr_1fr_1fr] items-center gap-4 ">
+		<header className="px-4 bg-sidebar sticky top-0 z-50 min-h-(--admin-header-height) grid grid-cols-2 items-center gap-4 ">
 			<Button variant="link" className="w-[271px] h-[64px] p-0" asChild>
 				<Link href={paths.agent.properties.index()}>
-					{/* <Image
-						src={LogoWhite}
-						alt="Red prop"
-						width={271}
-						height={64}
-						className="w-full object-contain"
-					/> */}
 					<svg
 						className="w-full! h-full!"
 						width="271"
@@ -45,39 +37,10 @@ export default async function ProtectedHeader() {
 					</svg>
 				</Link>
 			</Button>
-			<div className="flex">
-				{/* <div className="relative bg-card mx-auto foreground max-w-xl w-full rounded-lg overflow-hidden">
-					<Button
-						variant="link"
-						className=" p-0 absolute left-2 top-1/2 -translate-y-1/2 px-0! h-auto"
-						tabIndex={-1}
-					>
-						<Search className="w-5 h-5" />
-					</Button>
-					<Input
-						placeholder=""
-						className="pl-8 pr-28 h-9 text-foreground"
-						type="text"
-					/>
-					<div className="absolute right-2 bg-card top-1/2 text-foreground -translate-y-1/2 grid items-center grid-cols-3 w-fit">
-						<Button variant="ghost" className="px-2! h-[30px] w-[30px]">
-							<UserIcon className="w-5 h-5" />
-						</Button>
-						<Button variant="ghost" className="px-2! h-[30px] w-[30px]">
-							<BuildingOfficeIcon className="w-5 h-5" />
-						</Button>
-						<Button variant="ghost" className="px-2! h-[30px] w-[30px]">
-							<HomeIcon className="w-5 h-5" />
-						</Button>
-					</div>
-				</div> */}
-			</div>
-			<div className="justify-self-end flex items-center gap-8">
-				{user?.role === ROLES.AGENT ? <ActionDropdown /> : null}
-				<div className="flex items-center">
-					<NotificationsSheet />
-					<UserMenuTrigger user={user} />
-				</div>
+
+			<div className="justify-self-end flex items-center gap-12">
+				{user?.role === ROLES.AGENT && <ActionDropdown />}
+				<UserMenuTrigger user={user} />
 			</div>
 		</header>
 	);
