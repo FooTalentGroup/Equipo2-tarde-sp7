@@ -11,22 +11,28 @@ import { Heading } from "@src/components/ui/heading";
 import { Separator } from "@src/components/ui/separator";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
+import type { Client } from "@src/types/client";
 import {
-	basicInfoPropertySchema,
-	documentsPropertySchema,
-	featuresPropertySchema,
-	galleryPropertySchema,
-	type Property,
-	servicesPropertySchema,
-	surfacesPropertySchema,
-	valuesPropertySchema,
+	addressSchema,
+	basicSchema,
+	characteristicsSchema,
+	documentsSchema,
+	geographySchema,
+	imagesSchema,
+	type PropertyForm,
+	servicesSchema,
+	surfaceSchema,
+	VisibilityStatus,
+	valuesSchema,
 } from "@src/types/property";
 import { defineStepper } from "@stepperize/react";
 import { Info, InfoIcon } from "lucide-react";
 import { type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { createProperty } from "../../services/property-service";
+import PropertyDocumentsForm from "./property-documents-form";
 import PropertyFeaturesForm from "./property-features-form";
 import PropertyGalleryForm from "./property-gallery-form";
 import PropertyBasicInfoForm from "./property-info-form";
@@ -35,173 +41,199 @@ import PropertySurfacesForm from "./property-surfaces-form";
 import PropertyValuesForm from "./property-values-form";
 
 type Props = {
-	defaultValues?: Property;
+	defaultValues?: PropertyForm;
+	clients?: Client[];
 };
 
 const { useStepper, steps, utils } = defineStepper(
 	{
 		id: "info",
 		title: "Información básica",
-		schema: basicInfoPropertySchema,
+		schema: z.object({
+			basic: basicSchema,
+			geography: geographySchema,
+			address: addressSchema,
+		}),
 	},
 	{
 		id: "features",
 		title: "Característica de la propiedad",
-		schema: featuresPropertySchema,
+		schema: z.object({ characteristics: characteristicsSchema }),
 	},
 	{
 		id: "surfaces",
 		title: "Superficies",
-		schema: surfacesPropertySchema,
+		schema: z.object({ surface: surfaceSchema }),
 	},
 	{
 		id: "values",
 		title: "Valores de la propiedad",
-		schema: valuesPropertySchema,
+		schema: z.object({ values: valuesSchema }),
 	},
 	{
 		id: "services",
 		title: "Servicios",
-		schema: servicesPropertySchema,
+		schema: z.object({ services: servicesSchema }),
 	},
 	{
 		id: "gallery",
 		title: "Galería",
-		schema: galleryPropertySchema,
+		schema: z.object({ images: imagesSchema }),
 	},
 	{
 		id: "documents",
 		title: "Documentación",
-		schema: documentsPropertySchema,
+		schema: z.object({ documents: documentsSchema }),
 	},
 );
 
-export default function CreatePropertyForm({ defaultValues }: Props) {
+export default function CreatePropertyForm({ defaultValues, clients }: Props) {
 	const router = useRouter();
 
 	const stepper = useStepper();
 	const currentIndex = utils.getIndex(stepper.current.id);
 
-	const form = useForm<Property>({
+	const form = useForm<PropertyForm>({
 		// biome-ignore lint/suspicious/noTsIgnore: Resolver type complexity requires ts-ignore
 		// @ts-ignore
 		resolver: zodResolver(stepper.current.schema) as Resolver<Property>,
 		defaultValues: {
-			// Información de la propiedad
-			title: defaultValues?.title || "",
-			propertyType: defaultValues?.propertyType || "",
-			address: defaultValues?.address || "",
-			floor: defaultValues?.floor || "",
-			city: defaultValues?.city || "",
-			province: defaultValues?.province || "",
-			postalCode: defaultValues?.postalCode || "",
-			assignedOwner: defaultValues?.assignedOwner || "",
-			// Características de la propiedad
-			rooms: defaultValues?.rooms ?? 0,
-			floors: defaultValues?.floors ?? 0,
-			bedrooms: defaultValues?.bedrooms ?? 0,
-			antiquity: defaultValues?.antiquity || "",
-			bathrooms: defaultValues?.bathrooms ?? 0,
-			situation: defaultValues?.situation || "",
-			toilets: defaultValues?.toilets ?? 0,
-			orientation: defaultValues?.orientation || "",
-			garages: defaultValues?.garages ?? 0,
-			disposition: defaultValues?.disposition || "",
-			// Valores
-			price: defaultValues?.price ?? 0,
-			priceCurrency: defaultValues?.priceCurrency || "USD",
-			expenses: defaultValues?.expenses ?? 0,
-			expensesCurrency: defaultValues?.expensesCurrency || "USD",
-			// Servicios
-			services: defaultValues?.services || [],
-			// Galería
-			gallery: defaultValues?.gallery || [],
-			// Documentación
-			documents: defaultValues?.documents || [],
-			// Estado de publicación
-			isPublished: defaultValues?.isPublished ?? false,
+			basic: {
+				title: defaultValues?.basic?.title || "",
+				property_type: defaultValues?.basic?.property_type || "Casa",
+				description: defaultValues?.basic?.description || "",
+				property_status: defaultValues?.basic?.property_status || "Disponible",
+				visibility_status:
+					defaultValues?.basic?.visibility_status || VisibilityStatus.PUBLISHED,
+				featured_web: defaultValues?.basic?.featured_web || false,
+				publication_date: defaultValues?.basic?.publication_date || "",
+				owner_id: defaultValues?.basic?.owner_id || "",
+			},
+			geography: {
+				country: defaultValues?.geography?.country || "",
+				province: defaultValues?.geography?.province || "",
+				city: defaultValues?.geography?.city || "",
+			},
+			address: {
+				street: defaultValues?.address?.street || "",
+				number: defaultValues?.address?.number || "",
+				floor: defaultValues?.address?.floor || "",
+				postal_code: defaultValues?.address?.postal_code || "",
+				neighborhood: defaultValues?.address?.neighborhood || "",
+				latitude: defaultValues?.address?.latitude || 0,
+				longitude: defaultValues?.address?.longitude || 0,
+			},
+			values: {
+				prices: defaultValues?.values?.prices || [
+					{
+						price: 100,
+						currency_symbol: "USD",
+						operation_type: "Venta",
+					},
+				],
+				expenses: defaultValues?.values?.expenses || [
+					{
+						amount: 100,
+						currency_symbol: "ARS",
+						frequency: "Mensual",
+					},
+				],
+			},
+			characteristics: {
+				rooms_count: defaultValues?.characteristics?.rooms_count || 0,
+				bedrooms_count: defaultValues?.characteristics?.bedrooms_count || 0,
+				bathrooms_count: defaultValues?.characteristics?.bathrooms_count || 0,
+				toilets_count: defaultValues?.characteristics?.toilets_count || 0,
+				parking_spaces_count:
+					defaultValues?.characteristics?.parking_spaces_count || 0,
+				floors_count: defaultValues?.characteristics?.floors_count || 0,
+				situation: defaultValues?.characteristics?.situation || "",
+				age: defaultValues?.characteristics?.age || "",
+				orientation: defaultValues?.characteristics?.orientation || "",
+				disposition: defaultValues?.characteristics?.disposition || "",
+				zoning: defaultValues?.characteristics?.zoning || "",
+			},
+			surface: {
+				land_area: defaultValues?.surface?.land_area || 0,
+				semi_covered_area: defaultValues?.surface?.semi_covered_area || 0,
+				covered_area: defaultValues?.surface?.covered_area || 0,
+				total_built_area: defaultValues?.surface?.total_built_area || 0,
+				uncovered_area: defaultValues?.surface?.uncovered_area || 0,
+				total_area: defaultValues?.surface?.total_area || 0,
+				zoning: defaultValues?.surface?.zoning || "",
+			},
+			services: {
+				services: defaultValues?.services?.services || [],
+			},
+			internal: {
+				branch_name: defaultValues?.internal?.branch_name || "",
+				appraiser: defaultValues?.internal?.appraiser || "",
+				producer: defaultValues?.internal?.producer || "",
+				maintenance_user: defaultValues?.internal?.maintenance_user || "",
+				keys_location: defaultValues?.internal?.keys_location || "",
+				internal_comments: defaultValues?.internal?.internal_comments || "",
+				social_media_info: defaultValues?.internal?.social_media_info || "",
+				operation_commission_percentage:
+					defaultValues?.internal?.operation_commission_percentage || 0,
+				producer_commission_percentage:
+					defaultValues?.internal?.producer_commission_percentage || 0,
+			},
+			images: {
+				gallery: defaultValues?.images?.gallery || [],
+			},
+			documents: {
+				files: defaultValues?.documents?.files || [],
+			},
 		},
 		mode: "all",
 	});
 
-	async function onSubmit(_data: Property) {
+	console.log(form.formState.errors);
+
+	async function onSubmit(_data: PropertyForm) {
 		if (stepper.isLast) {
 			try {
 				const allData = form.getValues();
 				const formData = new FormData();
 
 				// 1. Basic
-				const basic = {
-					title: allData.title,
-					description: "", // Missing in form
-					owner_id: Number.parseInt(allData.assignedOwner, 10) || 1,
-					property_type: allData.propertyType,
-					operation_type: "Venta", // Default
-				};
-				formData.append("basic", JSON.stringify(basic));
+				formData.append("basic", JSON.stringify(allData.basic));
 
 				// 2. Geography
-				const geography = {
-					country: "Argentina", // Default
-					province: allData.province,
-					city: allData.city,
-				};
-				formData.append("geography", JSON.stringify(geography));
+				formData.append("geography", JSON.stringify(allData.geography));
 
 				// 3. Address
-				const address = {
-					street: allData.address,
-					number: "S/N", // Missing in form
-					neighborhood: "", // Missing in form
-					postal_code: allData.postalCode,
-				};
-				formData.append("address", JSON.stringify(address));
+				formData.append("address", JSON.stringify(allData.address));
 
 				// 4. Values
-				const values = {
-					prices: [
-						{
-							price: allData.price,
-							currency_symbol: allData.priceCurrency,
-						},
-					],
-				};
-				formData.append("values", JSON.stringify(values));
+				formData.append("values", JSON.stringify(allData.values));
 
 				// 5. Characteristics
-				const characteristics = {
-					rooms_count: allData.rooms,
-					bedrooms_count: allData.bedrooms,
-					bathrooms_count: allData.bathrooms,
-					garage: allData.garages > 0,
-				};
-				formData.append("characteristics", JSON.stringify(characteristics));
+				formData.append(
+					"characteristics",
+					JSON.stringify(allData.characteristics),
+				);
 
 				// 6. Surface
-				const surface = {
-					land_area: allData.landArea,
-					semi_covered_area: allData.semiCoveredArea,
-					covered_area: allData.coveredArea,
-				};
-				formData.append("surface", JSON.stringify(surface));
+				formData.append("surface", JSON.stringify(allData.surface));
 
 				// 7. Services
-				const services = {
-					services: allData.services,
-				};
-				formData.append("services", JSON.stringify(services));
+				formData.append("services", JSON.stringify(allData.services));
 
 				// 8. Internal
-				const internal = {
-					branch_name: "Sucursal Centro",
-					appraiser: "Juan Pérez",
-				};
-				formData.append("internal", JSON.stringify(internal));
+				formData.append("internal", JSON.stringify(allData.internal));
 
 				// Files
-				if (allData.gallery && allData.gallery.length > 0) {
-					allData.gallery.forEach((file) => {
+				if (allData.images?.gallery && allData.images.gallery.length > 0) {
+					allData.images.gallery.forEach((file: File) => {
 						formData.append("images", file);
+					});
+				}
+
+				// Documents
+				if (allData.documents?.files && allData.documents.files.length > 0) {
+					allData.documents.files.forEach((file: File) => {
+						formData.append("documents", file);
 					});
 				}
 
@@ -276,7 +308,7 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 									<Heading variant="subtitle2" weight="semibold">
 										{title}
 									</Heading>
-									<PropertyBasicInfoForm form={form} />
+									<PropertyBasicInfoForm form={form} clients={clients ?? []} />
 								</div>
 							),
 							features: ({ title }) => (
@@ -326,6 +358,14 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 										principal y se mostrará en el portal
 									</Badge>
 									<PropertyGalleryForm form={form} />
+								</div>
+							),
+							documents: ({ title }) => (
+								<div className="grid gap-6">
+									<Heading variant="subtitle2" weight="semibold">
+										{title}
+									</Heading>
+									<PropertyDocumentsForm form={form} />
 								</div>
 							),
 						})}

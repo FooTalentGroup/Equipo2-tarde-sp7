@@ -8,11 +8,11 @@ import {
 	FormItem,
 	FormMessage,
 } from "@src/components/ui/form";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 };
 
 const SERVICES_OPTIONS: Option[] = [
@@ -34,13 +34,13 @@ export default function PropertyServicesForm({ form }: Props) {
 		<div className="grid gap-4 max-w-xl mx-auto w-full">
 			<FormField
 				control={form.control}
-				name="services"
+				name="services.services"
 				render={({ field }) => (
 					<FormItem>
 						<FormControl>
 							<FancyMultiSelect
 								options={SERVICES_OPTIONS}
-								value={field.value}
+								value={field.value || []}
 								onChange={field.onChange}
 								placeholder="Seleccionar servicios..."
 							/>

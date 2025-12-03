@@ -18,13 +18,15 @@ import {
 } from "@src/components/ui/form";
 import * as Sortable from "@src/components/ui/sortable";
 import { cn } from "@src/lib/utils";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import { Move, Plus, Trash2 } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyCharacteristicsProps {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 }
+
+const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
 export default function PropertyGalleryForm({
 	form,
@@ -32,42 +34,43 @@ export default function PropertyGalleryForm({
 	return (
 		<FormField
 			control={form.control}
-			name="gallery"
+			name="images.gallery"
 			render={({ field }) => (
 				<FormItem>
 					<FormControl>
 						<FileUpload
 							value={field.value}
 							onValueChange={field.onChange}
-							accept="image/png, image/jpeg, image/avif"
+							accept="image/png, image/jpeg, image/webp"
 							maxFiles={Infinity}
-							maxSize={3 * 1024 * 1024}
+							maxSize={MAX_FILE_SIZE}
 							onFileReject={(_, message) => {
 								let error = message;
 								if (message === "File too large") {
 									error =
-										"El archivo es demasiado grande. El tamaño máximo es 3MB.";
+										"El archivo es demasiado grande. El tamaño máximo es 1MB.";
 								} else if (message === "File type not accepted") {
 									error = "Tipo de archivo no aceptado.";
 								}
-								form.setError("gallery", {
+								form.setError("images.gallery", {
 									message: error,
 								});
 							}}
 							multiple
 						>
 							<Sortable.Root
-								value={field.value}
+								value={field.value || []}
 								onValueChange={field.onChange}
-								getItemValue={(file) =>
-									`${file.name}-${file.size}-${file.lastModified}`
-								}
+								getItemValue={(item) => {
+									const file = item as File;
+									return `${file.name}-${file.size}-${file.lastModified}`;
+								}}
 								orientation="mixed"
 							>
 								<div className="grid grid-cols-4 gap-4">
 									<Sortable.Content asChild>
 										<FileUploadList className="contents">
-											{field.value.map((file, index) => {
+											{field.value?.map((file, index) => {
 												const fileId = `${file.name}-${file.size}-${file.lastModified}`;
 												return (
 													<Sortable.Item key={fileId} value={fileId} asChild>
@@ -139,7 +142,7 @@ export default function PropertyGalleryForm({
 								</div>
 								<Sortable.Overlay>
 									{(params) => {
-										const file = field.value.find(
+										const file = field.value?.find(
 											(f) =>
 												`${f.name}-${f.size}-${f.lastModified}` ===
 												params.value,
@@ -159,8 +162,8 @@ export default function PropertyGalleryForm({
 						</FileUpload>
 					</FormControl>
 					<FormDescription>
-						Sube al menos 3 imágenes (PNG, JPG, AVIF) con un tamaño máximo de
-						3MB.
+						Sube al menos 3 imágenes (PNG, JPG, WEBP) con un tamaño máximo de
+						1MB.
 					</FormDescription>
 					<FormMessage />
 				</FormItem>

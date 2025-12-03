@@ -15,7 +15,7 @@ function InputGroup({ className, ...props }: React.ComponentProps<"div">) {
 			role="group"
 			className={cn(
 				"group/input-group border-input-border relative flex w-full items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none",
-				"h-12 min-w-0 has-[>textarea]:h-auto",
+				"h-10 min-w-0 has-[>textarea]:h-auto",
 
 				// Variants based on alignment.
 				"has-[>[data-align=inline-start]]:[&>input]:pl-2",
@@ -131,7 +131,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<"span">) {
 function InputGroupInput({
 	className,
 	...props
-}: React.ComponentProps<"input">) {
+}: React.ComponentProps<typeof Input>) {
 	return (
 		<Input
 			data-slot="input-group-control"
