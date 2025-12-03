@@ -28,18 +28,19 @@ export class PropertyConsultationServices {
             // 2. Buscar o crear cliente
             let client = null;
 
-            // Buscar por teléfono primero
+            // Buscar clientes por teléfono
             const clientsByPhone = await ClientModel.findByPhone(dto.phone);
+            
+            // Verificar si alguno coincide exactamente con nombre, apellido y teléfono
             if (clientsByPhone && clientsByPhone.length > 0) {
-                client = clientsByPhone[0];
+                client = clientsByPhone.find(c => 
+                    c.first_name === dto.first_name && 
+                    c.last_name === dto.last_name &&
+                    c.phone === dto.phone
+                ) || null;
             }
 
-            // Si no se encontró por teléfono y tiene email, buscar por email
-            if (!client && dto.email) {
-                client = await ClientModel.findByEmail(dto.email);
-            }
-
-            // Si no existe, crear nuevo cliente con categoría "Lead"
+            // Si no existe un cliente con los 3 campos coincidentes, crear nuevo cliente con categoría "Lead"
             if (!client) {
                 // Obtener ID de categoría "Lead"
                 const leadCategory = await ContactCategoryModel.findByName('Lead');
