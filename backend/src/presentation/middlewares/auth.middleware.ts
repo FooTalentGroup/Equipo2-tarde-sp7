@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { JwtAdapter } from '../../domain';
 import { CustomError } from '../../domain';
+import { ProfileModel, RoleModel } from '../../data/postgres/models';
 
 /**
  * Middleware de autenticación JWT
@@ -54,6 +55,156 @@ export class AuthMiddleware {
             
             return res.status(401).json({
                 message: 'Authentication failed'
+            });
+        }
+    }
+
+    /**
+     * Middleware que verifica que el usuario autenticado sea admin
+     * Usa el rol del token para evitar consultas innecesarias a la BD
+     * Debe usarse después de authenticate
+     */
+    requireAdmin = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const user = (req as any).user;
+            
+            if (!user || !user.id) {
+                return res.status(401).json({
+                    message: 'User not authenticated'
+                });
+            }
+
+            // Verificar rol desde el token (más eficiente)
+            const userRole = user.role?.toLowerCase();
+            
+            if (userRole !== 'admin') {
+                // Si no hay rol en el token o no es admin, verificar en BD (backup)
+                const userId = typeof user.id === 'string' ? parseInt(user.id, 10) : user.id;
+                const profile = await ProfileModel.findById(userId);
+                
+                if (!profile) {
+                    return res.status(401).json({
+                        message: 'User not found'
+                    });
+                }
+
+                const role = await RoleModel.findById(profile.role_id);
+                
+                if (!role || role.name.toLowerCase() !== 'admin') {
+                    return res.status(403).json({
+                        message: 'Admin access required'
+                    });
+                }
+
+                // Actualizar el rol en el request si estaba faltante
+                (req as any).user = {
+                    ...user,
+                    role: role.name,
+                    isAdmin: true
+                };
+            } else {
+                // El token ya tiene el rol de admin
+                (req as any).user = {
+                    ...user,
+                    isAdmin: true
+                };
+            }
+            
+            next();
+        } catch (error) {
+            if (error instanceof CustomError) {
+                return res.status(error.statusCode).json({
+                    message: error.message
+                });
+            }
+            
+            return res.status(500).json({
+                message: 'Error verifying admin access'
+            });
+        }
+    }
+
+    /**
+     * Middleware que verifica que el usuario autenticado sea admin O el dueño del recurso
+     * Útil para permitir que usuarios editen su propio perfil o que admins editen cualquier perfil
+     * Debe usarse después de authenticate
+     */
+    requireAdminOrOwner = async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const user = (req as any).user;
+            
+            if (!user || !user.id) {
+                return res.status(401).json({
+                    message: 'User not authenticated'
+                });
+            }
+
+            // Verificar rol desde el token primero
+            const userRole = user.role?.toLowerCase();
+            let isAdmin = userRole === 'admin';
+            
+            // Si no hay rol en el token, obtenerlo de la BD
+            if (!userRole) {
+                const userId = typeof user.id === 'string' ? parseInt(user.id, 10) : user.id;
+                const profile = await ProfileModel.findById(userId);
+                
+                if (!profile) {
+                    return res.status(401).json({
+                        message: 'User not found'
+                    });
+                }
+
+                const role = await RoleModel.findById(profile.role_id);
+                isAdmin = !!(role && role.name.toLowerCase() === 'admin');
+                
+                // Actualizar el rol en el request
+                (req as any).user = {
+                    ...user,
+                    role: role?.name || null
+                };
+            }
+
+            // Obtener el ID del recurso desde los parámetros de la ruta
+            const resourceId = req.params.id;
+            if (!resourceId) {
+                return res.status(400).json({
+                    message: 'Resource ID is required'
+                });
+            }
+
+            const resourceIdNumber = parseInt(resourceId, 10);
+            if (isNaN(resourceIdNumber)) {
+                return res.status(400).json({
+                    message: 'Invalid resource ID'
+                });
+            }
+
+            // Verificar si es admin o si es el dueño del recurso
+            const userId = typeof user.id === 'string' ? parseInt(user.id, 10) : user.id;
+            const isOwner = userId === resourceIdNumber;
+            
+            if (!isAdmin && !isOwner) {
+                return res.status(403).json({
+                    message: 'Access denied. You can only edit your own profile or must be an admin'
+                });
+            }
+
+            // Agregar información completa del usuario al request
+            (req as any).user = {
+                ...(req as any).user,
+                isAdmin
+            };
+            
+            next();
+        } catch (error) {
+            if (error instanceof CustomError) {
+                return res.status(error.statusCode).json({
+                    message: error.message
+                });
+            }
+            
+            return res.status(500).json({
+                message: 'Error verifying access'
             });
         }
     }

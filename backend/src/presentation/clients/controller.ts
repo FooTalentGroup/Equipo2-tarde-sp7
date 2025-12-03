@@ -5,7 +5,7 @@ import { ClientServices } from '../services/client.services';
 export class ClientController {
     constructor(
         private readonly clientServices: ClientServices
-    ){}
+    ) {}
 
     private handleError = (error: unknown, res: Response) => {
         if (error instanceof CustomError) {
@@ -13,81 +13,161 @@ export class ClientController {
                 message: error.message
             });
         }
-        console.log(`error: ${error}`);
+        console.error('Client Controller Error:', error);
         return res.status(500).json({
             message: 'Internal server error'
         });
     }
 
-    createClient = (req: Request, res: Response) => {
-        const [error, createDto] = CreateClientDto.create(req.body);
+    /**
+     * Crea un nuevo cliente
+     */
+    createClient = async (req: Request, res: Response) => {
+        try {
+            const [error, createClientDto] = CreateClientDto.create(req.body);
 
-        if (error || !createDto) {
-            return res.status(400).json({
-                message: error || 'Invalid data'
+            if (error || !createClientDto) {
+                return res.status(400).json({
+                    message: error || 'Invalid client data'
+                });
+            }
+
+            const result = await this.clientServices.createClient(createClientDto);
+            return res.status(201).json({
+                message: 'Client created successfully',
+                data: result
             });
+        } catch (error) {
+            this.handleError(error, res);
         }
-
-        this.clientServices.createClient(createDto)
-        .then( result => {
-            res.status(201).json(result);
-        })
-        .catch( error => {
-            this.handleError(error, res);
-        });
     }
 
-    getClient = (req: Request, res: Response) => {
-        const { id } = req.params;
+    /**
+     * Lista clientes con filtros opcionales
+     */
+    listClients = async (req: Request, res: Response) => {
+        try {
+            const {
+                contact_category_id,
+                purchase_interest,
+                rental_interest,
+                city_id,
+                search,
+                includeDeleted,
+                limit,
+                offset,
+            } = req.query;
 
-        this.clientServices.getClientById(id)
-        .then( result => {
-            res.json(result);
-        })
-        .catch( error => {
+            const filters: any = {};
+
+            if (contact_category_id) filters.contact_category_id = Number(contact_category_id);
+            if (purchase_interest !== undefined) filters.purchase_interest = purchase_interest === 'true';
+            if (rental_interest !== undefined) filters.rental_interest = rental_interest === 'true';
+            if (city_id) filters.city_id = Number(city_id);
+            if (search) filters.search = String(search);
+            if (limit) filters.limit = Number(limit);
+            if (offset) filters.offset = Number(offset);
+            if (includeDeleted === 'true') filters.includeDeleted = true;
+
+            const result = await this.clientServices.listClients(filters);
+            return res.json(result);
+        } catch (error) {
             this.handleError(error, res);
-        });
+        }
     }
 
-    getAllClients = (req: Request, res: Response) => {
-        this.clientServices.getAllClients()
-        .then( result => {
-            res.json(result);
-        })
-        .catch( error => {
+    /**
+     * Obtiene un cliente por ID
+     */
+    getClientById = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({
+                    message: 'Invalid client ID'
+                });
+            }
+
+            const result = await this.clientServices.getClientById(Number(id));
+            return res.json(result);
+        } catch (error) {
             this.handleError(error, res);
-        });
+        }
     }
 
-    updateClient = (req: Request, res: Response) => {
-        const { id } = req.params;
-        const [error, updateDto] = UpdateClientDto.create(req.body);
+    /**
+     * Actualiza un cliente
+     */
+    updateClient = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
 
-        if (error || !updateDto) {
-            return res.status(400).json({
-                message: error || 'Invalid data'
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({
+                    message: 'Invalid client ID'
+                });
+            }
+
+            const [error, updateClientDto] = UpdateClientDto.create(req.body);
+
+            if (error || !updateClientDto) {
+                return res.status(400).json({
+                    message: error || 'Invalid client data'
+                });
+            }
+
+            const result = await this.clientServices.updateClient(Number(id), updateClientDto);
+            return res.json({
+                message: 'Client updated successfully',
+                data: result
             });
-        }
-
-        this.clientServices.updateClient(id, updateDto)
-        .then( result => {
-            res.json(result);
-        })
-        .catch( error => {
+        } catch (error) {
             this.handleError(error, res);
-        });
+        }
     }
 
-    deleteClient = (req: Request, res: Response) => {
-        const { id } = req.params;
+    /**
+     * Soft delete: marca el cliente como eliminado
+     */
+    deleteClient = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
 
-        this.clientServices.deleteClient(id)
-        .then( result => {
-            res.json(result);
-        })
-        .catch( error => {
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({
+                    message: 'Invalid client ID'
+                });
+            }
+
+            const result = await this.clientServices.deleteClient(Number(id));
+            return res.json(result);
+        } catch (error) {
             this.handleError(error, res);
-        });
+        }
+    }
+
+    /**
+     * Restaura un cliente eliminado
+     */
+    restoreClient = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({
+                    message: 'Invalid client ID'
+                });
+            }
+
+            const result = await this.clientServices.restoreClient(Number(id));
+            return res.json(result);
+        } catch (error) {
+            this.handleError(error, res);
+        }
     }
 }
+
+
+
 

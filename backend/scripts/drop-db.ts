@@ -11,38 +11,6 @@ const dbConfig = {
   database: get('POSTGRES_DB').required().asString(),
 };
 
-// Orden inverso para eliminar tablas (respetando foreign keys)
-const tablesToDrop = [
-  // Tablas de relación (primero)
-  'property_amenities',
-  'property_services',
-  'property_images',
-  'contracts',
-  'rentals',
-  'leads',
-  'audit_log',
-  
-  // Tablas principales
-  'properties',
-  'clients',
-  'profiles',
-  
-  // Tablas de ubicación (en orden inverso de dependencias)
-  'addresses',
-  'departments',
-  'cities',
-  'countries',
-  
-  // Tablas de lookup
-  'amenities',
-  'services',
-  'lead_status',
-  'operation_types',
-  'property_status',
-  'property_types',
-  'roles',
-];
-
 async function dropDatabase() {
   const client = new Client(dbConfig);
 
@@ -56,50 +24,68 @@ async function dropDatabase() {
     console.log('✅ Conexión establecida\n');
 
     console.log('⚠️  ADVERTENCIA: Se eliminarán TODAS las tablas de la base de datos\n');
-    console.log(`📦 Eliminando ${tablesToDrop.length} tablas...\n`);
 
-    let droppedCount = 0;
-    let notFoundCount = 0;
+    // Obtener todas las tablas de la base de datos dinámicamente
+    console.log('📋 Obteniendo lista de tablas...\n');
+    const tablesQuery = `
+      SELECT tablename 
+      FROM pg_tables 
+      WHERE schemaname = 'public'
+      ORDER BY tablename;
+    `;
+    const tablesResult = await client.query(tablesQuery);
+    const tablesToDrop = tablesResult.rows.map((row: any) => row.tablename);
 
-    // Eliminar tablas en orden inverso
-    for (let i = 0; i < tablesToDrop.length; i++) {
-      const tableName = tablesToDrop[i];
-      
+    if (tablesToDrop.length === 0) {
+      console.log('ℹ️  No hay tablas para eliminar.\n');
+    } else {
+      console.log(`📦 Eliminando ${tablesToDrop.length} tablas...\n`);
+
+      let droppedCount = 0;
+      let notFoundCount = 0;
+
+      // Eliminar todas las tablas con CASCADE para eliminar dependencias automáticamente
+      for (let i = 0; i < tablesToDrop.length; i++) {
+        const tableName = tablesToDrop[i];
+        
+        try {
+          const query = `DROP TABLE IF EXISTS ${tableName} CASCADE`;
+          await client.query(query);
+          droppedCount++;
+          console.log(`   ✅ [${i + 1}/${tablesToDrop.length}] Tabla eliminada: ${tableName}`);
+        } catch (error: any) {
+          if (error.message.includes('does not exist') || 
+              error.message.includes('not exist')) {
+            notFoundCount++;
+            console.log(`   ⚠️  [${i + 1}/${tablesToDrop.length}] Tabla no existe: ${tableName}`);
+          } else {
+            console.error(`   ❌ [${i + 1}/${tablesToDrop.length}] Error al eliminar ${tableName}:`, error.message);
+            throw error;
+          }
+        }
+      }
+
+      console.log(`\n📊 Resumen:`);
+      console.log(`   ✅ Eliminadas: ${droppedCount}`);
+      if (notFoundCount > 0) console.log(`   ⚠️  No encontradas: ${notFoundCount}`);
+    }
+
+    // Eliminar todas las extensiones personalizadas (mantener las del sistema)
+    console.log('\n📦 Eliminando extensiones personalizadas...\n');
+    
+    const extensionsToDrop = ['pgcrypto'];
+    for (const extName of extensionsToDrop) {
       try {
-        // Usar DROP TABLE IF EXISTS CASCADE para eliminar dependencias automáticamente
-        const query = `DROP TABLE IF EXISTS ${tableName} CASCADE`;
-        await client.query(query);
-        droppedCount++;
-        console.log(`   ✅ [${i + 1}/${tablesToDrop.length}] Tabla eliminada: ${tableName}`);
+        await client.query(`DROP EXTENSION IF EXISTS "${extName}" CASCADE`);
+        console.log(`   ✅ Extensión eliminada: ${extName}`);
       } catch (error: any) {
-        if (error.message.includes('does not exist') || 
-            error.message.includes('not exist')) {
-          notFoundCount++;
-          console.log(`   ⚠️  [${i + 1}/${tablesToDrop.length}] Tabla no existe: ${tableName}`);
+        if (error.message.includes('does not exist')) {
+          console.log(`   ⚠️  Extensión no existe: ${extName}`);
         } else {
-          console.error(`   ❌ [${i + 1}/${tablesToDrop.length}] Error al eliminar ${tableName}:`, error.message);
-          throw error;
+          console.log(`   ⚠️  No se pudo eliminar extensión: ${error.message}`);
         }
       }
     }
-
-    // Intentar eliminar extensiones (opcional, puede fallar si no existen)
-    console.log('\n📦 Eliminando extensiones...\n');
-    
-    try {
-      await client.query('DROP EXTENSION IF EXISTS "pgcrypto" CASCADE');
-      console.log('   ✅ Extensión eliminada: pgcrypto');
-    } catch (error: any) {
-      if (error.message.includes('does not exist')) {
-        console.log('   ⚠️  Extensión no existe: pgcrypto');
-      } else {
-        console.log(`   ⚠️  No se pudo eliminar extensión: ${error.message}`);
-      }
-    }
-
-    console.log(`\n📊 Resumen:`);
-    console.log(`   ✅ Eliminadas: ${droppedCount}`);
-    if (notFoundCount > 0) console.log(`   ⚠️  No encontradas: ${notFoundCount}`);
 
     console.log('\n✅ Base de datos reseteada correctamente!');
     console.log('🎉 Todas las tablas han sido eliminadas.\n');

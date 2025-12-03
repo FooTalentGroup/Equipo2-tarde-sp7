@@ -23,13 +23,20 @@ export class AuthServices {
             const hashedPassword = await this.hashAdapter.hash(registerProfileDto.password);
             
             // Assign default role if none is specified
-            let roleId = registerProfileDto.role_id;
+            let roleId: number = registerProfileDto.role_id || 0;
             if (!roleId) {
-                const defaultRole = await RoleModel.findByTitle('agent');
-                if (!defaultRole) {
-                    throw CustomError.internalServerError('Default role "agent" not found. Run: npm run db:seed-roles');
+                // Buscar por 'agent' en minúsculas
+                const defaultRole = await RoleModel.findByName('agent');
+                if (!defaultRole || !defaultRole.id) {
+                    // Intentar con "admin"
+                    const adminRole = await RoleModel.findByName('admin');
+                    if (!adminRole || !adminRole.id) {
+                        throw CustomError.internalServerError('Default role "agent" or "admin" not found. Run: npm run db:seed-roles');
+                    }
+                    roleId = adminRole.id as number;
+                } else {
+                    roleId = defaultRole.id as number;
                 }
-                roleId = defaultRole.id!;
             }
             
             // Create profile in database (this generates the ID)
@@ -37,21 +44,32 @@ export class AuthServices {
                 first_name: registerProfileDto.first_name,
                 last_name: registerProfileDto.last_name,
                 email: registerProfileDto.email,
-                password: hashedPassword,
+                password_hash: hashedPassword,
                 phone: registerProfileDto.phone,
-                role_id: roleId,
-                whatsapp_number: registerProfileDto.whatsapp_number
+                role_id: roleId
             });
 
             // Create entity from created profile (which already has the ID)
             const profileEntity = ProfileEntity.fromObject(profile);
             
-            // Generate JWT token
-            const token = await this.jwtAdapter.generateToken({ id: profileEntity.id, email: profileEntity.email });
+            // Get role information to include title
+            const role = await RoleModel.findById(profileEntity.role_id);
             
-            // Return public object without password and token
+            // Generate JWT token with role included (convert id to string for JWT)
+            const token = await this.jwtAdapter.generateToken({ 
+                id: profileEntity.id.toString(), 
+                email: profileEntity.email,
+                role: role?.name || 'agent' // Include role name in token
+            });
+            
+            // Return public object without password and token, with role name instead of role_id
+            const publicUser = profileEntity.toPublicObject();
             return {
-                user: profileEntity.toPublicObject(),
+                user: {
+                    ...publicUser,
+                    role: role?.name || null,
+                    role_id: undefined // Remove role_id from response
+                },
                 token
             };
         } catch (error) {
@@ -62,13 +80,13 @@ export class AuthServices {
 
     public async loginProfile(loginProfileDto: LoginProfileDto) {
         // Find profile by email
-        const profile = await ProfileModel.findByEmail(loginProfileDto.email);
+        const profile = await ProfileModel.findByEmailWithPassword(loginProfileDto.email);
         if (!profile) {
             throw CustomError.badRequest('Invalid credentials');
         }
 
         // Compare password using adapter
-        const isMatch = await this.hashAdapter.compare(loginProfileDto.password, profile.password);
+        const isMatch = await this.hashAdapter.compare(loginProfileDto.password, profile.password_hash);
         if (!isMatch) {
             throw CustomError.badRequest('Invalid credentials');
         }
@@ -76,25 +94,47 @@ export class AuthServices {
         // Create entity from profile
         const profileEntity = ProfileEntity.fromObject(profile);
         
-        // Generate JWT token
-        const token = await this.jwtAdapter.generateToken({ id: profileEntity.id, email: profileEntity.email });
+        // Get role information to include title
+        const role = await RoleModel.findById(profileEntity.role_id);
         
-        // Return user without password and token
+        // Generate JWT token with role included (convert id to string for JWT)
+        const token = await this.jwtAdapter.generateToken({ 
+            id: profileEntity.id.toString(), 
+            email: profileEntity.email,
+            role: role?.name || 'agent' // Include role name in token
+        });
+        
+        // Return user without password and token, with role name instead of role_id
+        const publicUser = profileEntity.toPublicObject();
         return {
-            user: profileEntity.toPublicObject(),
+            user: {
+                ...publicUser,
+                role: role?.name || null,
+                role_id: undefined // Remove role_id from response
+            },
             token
         };
     }
 
-    public async getProfile(userId: string) {
+    public async getProfile(userId: string | number) {
         try {
+            // La tabla users usa SERIAL (números)
             const profile = await ProfileModel.findById(userId);
             if (!profile) {
                 throw CustomError.notFound('Profile not found');
             }
 
             const profileEntity = ProfileEntity.fromObject(profile);
-            return profileEntity.toPublicObject();
+            
+            // Get role information to include name
+            const role = await RoleModel.findById(profileEntity.role_id);
+            
+            const publicUser = profileEntity.toPublicObject();
+            return {
+                ...publicUser,
+                role: role?.name || null,
+                role_id: undefined // Remove role_id from response
+            };
         } catch (error) {
             if (error instanceof CustomError) {
                 throw error;

@@ -97,7 +97,7 @@ async function fetchApi<T>(
 		try {
 			const errorData = await response.json();
 			errorMessage = errorData.message || errorData.error || errorMessage;
-		} catch (e) {
+		} catch {
 			// Si no es JSON, usar statusText
 		}
 

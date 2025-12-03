@@ -99,7 +99,7 @@ function FormLabel({
 			data-slot="form-label"
 			data-error={!!error}
 			className={cn(
-				"data-[error=true]:text-destructive-foreground text-secondary font-semibold text-base",
+				"data-[error=true]:text-inherit text-danger-normal font-semibold text-base",
 				className,
 			)}
 			htmlFor={formItemId}
@@ -152,7 +152,7 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
 		<p
 			data-slot="form-message"
 			id={formMessageId}
-			className={cn("text-destructive-foreground text-sm", className)}
+			className={cn("text-danger-normal", className)}
 			{...props}
 		>
 			{body}
@@ -172,12 +172,12 @@ function FormMessageWithIcon({
 	}
 
 	return (
-		<div className="flex items-center gap-1.5 absolute top-1/2 left-3 transform -translate-y-1/2 pointer-events-none">
-			<Info className="text-destructive" />
+		<div className="flex items-center gap-1.5 pointer-events-none">
+			<Info className="text-danger-normal" />
 			<p
 				data-slot="form-message"
 				id={formMessageId}
-				className={cn("text-destructive text-sm", className)}
+				className={cn("text-danger-normal", className)}
 				{...props}
 			>
 				{body}

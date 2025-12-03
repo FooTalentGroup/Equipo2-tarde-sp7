@@ -1,7 +1,10 @@
 // Exportar todos los modelos organizados por dominio
 export * from './users';
 export * from './clients';
-export * from './location';
 export * from './properties';
-export * from './business';
-export * from './system';
+export * from './geography';
+export * from './payments';
+export * from './rentals';
+export * from './sales';
+export * from './crm';
+export * from './shared';

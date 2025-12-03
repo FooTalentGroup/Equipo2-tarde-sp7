@@ -13,10 +13,10 @@ const dbConfig = {
   database: get('POSTGRES_DB').required().asString(),
 };
 
-// Roles to create
+// Roles to create (only lowercase: admin and agent)
 const roles = [
-  'agent',
-  'admin'
+  'admin',
+  'agent'
 ];
 
 async function seedRoles() {
@@ -42,22 +42,22 @@ async function seedRoles() {
     let createdCount = 0;
     let existingCount = 0;
 
-    for (const roleTitle of roles) {
+    for (const roleName of roles) {
       try {
         // Check if role already exists
-        const existingRole = await RoleModel.findByTitle(roleTitle);
+        const existingRole = await RoleModel.findByName(roleName);
         
         if (existingRole) {
-          console.log(`   ⚠️  "${roleTitle}" - Already exists (ID: ${existingRole.id})`);
+          console.log(`   ⚠️  "${roleName}" - Already exists (ID: ${existingRole.id})`);
           existingCount++;
         } else {
           // Create the role
-          const newRole = await RoleModel.create({ title: roleTitle });
-          console.log(`   ✅ "${roleTitle}" - Created (ID: ${newRole.id})`);
+          const newRole = await RoleModel.create({ name: roleName });
+          console.log(`   ✅ "${roleName}" - Created (ID: ${newRole.id})`);
           createdCount++;
         }
       } catch (error: any) {
-        console.error(`   ❌ Error creating "${roleTitle}": ${error.message}`);
+        console.error(`   ❌ Error creating "${roleName}": ${error.message}`);
       }
     }
 
@@ -70,7 +70,7 @@ async function seedRoles() {
     const allRoles = await RoleModel.findAll();
     console.log('📋 Roles in database:');
     allRoles.forEach((role, index) => {
-      console.log(`   ${index + 1}. ${role.title} (ID: ${role.id})`);
+      console.log(`   ${index + 1}. ${role.name} (ID: ${role.id})`);
     });
     console.log('');
 

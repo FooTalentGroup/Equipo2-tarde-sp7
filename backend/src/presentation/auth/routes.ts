@@ -14,7 +14,7 @@ export class Authroutes {
     // Rutas públicas
     /**
      * @swagger
-     * /auth/login:
+     * /api/auth/login:
      *   post:
      *     summary: Login a user
      *     tags: [Auth]
@@ -42,10 +42,12 @@ export class Authroutes {
 
     /**
      * @swagger
-     * /auth/register:
+     * /api/auth/register:
      *   post:
-     *     summary: Register a new user
+     *     summary: Register a new user (Admin only)
      *     tags: [Auth]
+     *     security:
+     *       - bearerAuth: []
      *     requestBody:
      *       required: true
      *       content:
@@ -53,23 +55,39 @@ export class Authroutes {
      *           schema:
      *             type: object
      *             required:
-     *               - name
+     *               - first_name
+     *               - last_name
      *               - email
      *               - password
      *             properties:
-     *               name:
+     *               first_name:
+     *                 type: string
+     *               last_name:
      *                 type: string
      *               email:
      *                 type: string
      *               password:
      *                 type: string
+     *               phone:
+     *                 type: string
+     *               role_id:
+     *                 type: integer
      *     responses:
      *       201:
      *         description: User created
      *       400:
      *         description: Bad request
+     *       401:
+     *         description: Unauthorized
+     *       403:
+     *         description: Admin access required
      */
-    router.post('/register', (req, res) => controller.registerUser(req, res));
+    router.post(
+        '/register', 
+        authMiddleware.authenticate,
+        authMiddleware.requireAdmin,
+        (req, res) => controller.registerUser(req, res)
+    );
     router.get('/validate-email/:token', (req, res) => controller.validateEmail(req, res));
     
     // Rutas protegidas (requieren autenticación)

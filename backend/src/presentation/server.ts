@@ -1,5 +1,6 @@
 import express, { Router } from 'express';
 import path from 'path';
+import { PostgresDatabase } from '../data/postgres/database';
 
 interface Options {
   port: number;
@@ -40,7 +41,9 @@ export class Server {
     //* Swagger Documentation
     const { swaggerSpec } = await import('../config/swagger');
     const swaggerUi = await import('swagger-ui-express');
+    // Setup Swagger UI at both /docs and /api-docs
     this.app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
     //* Routes
     this.app.use( this.routes );
@@ -50,7 +53,12 @@ export class Server {
     this.app.use(ErrorHandlerMiddleware.handle);
 
     //* SPA /^\/(?!api).*/  <== Únicamente si no empieza con la palabra api
-    this.app.get('*', (req, res) => {
+    // Exclude /docs, /api-docs, and /api routes from SPA routing
+    this.app.get('*', (req, res, next) => {
+      // Skip SPA routing for Swagger docs and API routes
+      if (req.path.startsWith('/docs') || req.path.startsWith('/api-docs') || req.path.startsWith('/api')) {
+        return next();
+      }
       const indexPath = path.join( __dirname + `../../../${ this.publicPath }/index.html` );
       res.sendFile(indexPath);
     });
@@ -62,8 +70,17 @@ export class Server {
 
   }
 
-  public close() {
-    this.serverListener?.close();
+  public async close() {
+    return new Promise<void>((resolve) => {
+      if (this.serverListener) {
+        this.serverListener.close(async () => {
+          await PostgresDatabase.disconnect();
+          resolve();
+        });
+      } else {
+        PostgresDatabase.disconnect().then(() => resolve());
+      }
+    });
   }
 
 }
