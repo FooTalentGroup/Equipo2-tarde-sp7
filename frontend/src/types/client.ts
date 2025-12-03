@@ -1,25 +1,19 @@
 export type Client = {
-	id: number;
-	first_name: string;
-	last_name: string;
-	email: string | null;
-	dni: string | null;
-	phone: string | null;
-	property_interest_phone: string | null;
-	address: string | null;
-	notes: string | null;
-	contact_category_id: number;
-	interest_zone: string | null;
-	purchase_interest: boolean;
-	rental_interest: boolean;
-	property_search_type_id: number | null;
-	city_id: number | null;
-	registered_at: string;
-	contact_category: {
-		id: number;
-		name: string;
-	};
+	id: string | number;
 	name: string;
+	type:
+		| "lead"
+		| "inquilino"
+		| "pendiente"
+		| "atrasado"
+		| "pagado"
+		| "propietario";
+	dni: string;
+	address: string;
+	phone: string | null;
+	email: string | null;
+	origin: string | null;
+	interest: string | null;
 };
 
 export type ClientData = {
