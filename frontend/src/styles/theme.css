@@ -157,9 +157,9 @@
 
   /* Danger / Destructive */
   --danger-normal: #f8222d;
-  --destructive: #fee9ea;
-  --destructive-border: #fdbabe;
-  --destructive-foreground: #c61b24;
+  --destructive: #fff3f6;
+  --destructive-border: #f8222d;
+  --destructive-foreground: #f8222d;
 
   /* Borders / Inputs */
   --border: #e6e6e6;
