@@ -15,3 +15,13 @@ export interface Lead extends CreateLead {
 }
 
 export type UpdateLead = Partial<CreateLead>;
+
+// Tipo auxiliar para mapear desde el formulario inicial
+export interface LeadFormInitialData {
+	first_name: string;
+	last_name: string;
+	phone: string;
+	email: string;
+	consultation_type: "rental" | "sale" | "purchase";
+	interest_zone: string;
+}

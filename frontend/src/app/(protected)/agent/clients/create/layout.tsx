@@ -34,7 +34,7 @@ export default function CreateClientLayout({ children }: ClientsLayoutProps) {
 			{/* Search and Navigation Tabs */}
 			<div className="w-full">
 				<div className="flex items-center my-4">
-					<div className="justify-start gap-2 rounded-none bg-transparent px-5 text-black flex">
+					<div className="justify-start gap-2 rounded-none bg-transparent text-black flex">
 						<Link
 							href={paths.agent.clients.newLeads()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
