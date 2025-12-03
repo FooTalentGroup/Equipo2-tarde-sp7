@@ -31,7 +31,7 @@ export function OwnerCard({ owner }: { owner: Owner }) {
 						<div className="flex items-center gap-4">
 							<div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-semibold text-slate-700">
 								{owner.first_name.charAt(0)}
-							</div>                                                                                                                                                                                                                     
+							</div>
 							<div className="text-left">
 								<div className="flex items-center gap-2">
 									<span className="font-semibold text-slate-900">
