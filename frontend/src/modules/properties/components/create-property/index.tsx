@@ -11,7 +11,7 @@ import { Heading } from "@src/components/ui/heading";
 import { Separator } from "@src/components/ui/separator";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
-import type { Client } from "@src/types/client";
+import type { Owner } from "@src/types/clients/owner";
 import {
 	addressSchema,
 	basicSchema,
@@ -42,7 +42,7 @@ import PropertyValuesForm from "./property-values-form";
 
 type Props = {
 	defaultValues?: PropertyForm;
-	clients?: Client[];
+	clients?: Owner[];
 };
 
 const { useStepper, steps, utils } = defineStepper(
@@ -188,56 +188,11 @@ export default function CreatePropertyForm({ defaultValues, clients }: Props) {
 		mode: "all",
 	});
 
-	console.log(form.formState.errors);
-
 	async function onSubmit(_data: PropertyForm) {
 		if (stepper.isLast) {
 			try {
 				const allData = form.getValues();
-				const formData = new FormData();
-
-				// 1. Basic
-				formData.append("basic", JSON.stringify(allData.basic));
-
-				// 2. Geography
-				formData.append("geography", JSON.stringify(allData.geography));
-
-				// 3. Address
-				formData.append("address", JSON.stringify(allData.address));
-
-				// 4. Values
-				formData.append("values", JSON.stringify(allData.values));
-
-				// 5. Characteristics
-				formData.append(
-					"characteristics",
-					JSON.stringify(allData.characteristics),
-				);
-
-				// 6. Surface
-				formData.append("surface", JSON.stringify(allData.surface));
-
-				// 7. Services
-				formData.append("services", JSON.stringify(allData.services));
-
-				// 8. Internal
-				formData.append("internal", JSON.stringify(allData.internal));
-
-				// Files
-				if (allData.images?.gallery && allData.images.gallery.length > 0) {
-					allData.images.gallery.forEach((file: File) => {
-						formData.append("images", file);
-					});
-				}
-
-				// Documents
-				if (allData.documents?.files && allData.documents.files.length > 0) {
-					allData.documents.files.forEach((file: File) => {
-						formData.append("documents", file);
-					});
-				}
-
-				const result = await createProperty(formData);
+				const result = await createProperty(allData);
 
 				if (result && typeof result === "object" && "error" in result) {
 					throw new Error((result as { error: string }).error);

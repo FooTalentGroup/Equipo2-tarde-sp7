@@ -140,7 +140,19 @@ export const internalSchema = z.object({
 });
 
 export const imagesSchema = z.object({
-	gallery: z.array(z.any()).optional(),
+	gallery: z
+		.array(z.any())
+		.max(10, "Solo se permiten un máximo de 10 imágenes")
+		.optional()
+		.refine(
+			(files) => {
+				if (!files) return true;
+				return files.every((file) => file.size <= 1 * 1024 * 1024);
+			},
+			{
+				message: "El archivo es demasiado grande. El tamaño máximo es 1MB.",
+			},
+		),
 });
 
 export const documentsSchema = z.object({
