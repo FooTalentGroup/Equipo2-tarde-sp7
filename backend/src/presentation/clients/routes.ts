@@ -116,8 +116,8 @@ export class ClientRoutes {
         /**
          * @swagger
          * /api/clients/{id}:
-         *   put:
-         *     summary: Update a client
+         *   patch:
+         *     summary: Update a client (partial update)
          *     tags: [Clients]
          *     security:
          *       - bearerAuth: []
@@ -133,13 +133,16 @@ export class ClientRoutes {
          *         application/json:
          *           schema:
          *             type: object
+         *             description: All fields are optional. At least one field must be provided.
          *     responses:
          *       200:
          *         description: Client updated
+         *       400:
+         *         description: Bad request
          *       404:
          *         description: Client not found
          */
-        router.put(
+        router.patch(
             '/:id',
             authMiddleware.authenticate,
             (req, res) => controller.updateClient(req, res)

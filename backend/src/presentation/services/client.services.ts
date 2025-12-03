@@ -6,7 +6,7 @@ import {
     CountryModel
 } from '../../data/postgres/models';
 import { CreateClientDto, UpdateClientDto } from '../../domain/dtos/clients';
-import { CustomError, ClientEntity } from '../../domain';
+import { CustomError, ClientEntity, hasValueChanged } from '../../domain';
 
 /**
  * Service para manejar operaciones de clientes
@@ -83,8 +83,8 @@ export class ClientServices {
             throw CustomError.internalServerError('Failed to create client');
         }
 
-        // Create entity from client data for validation and business logic
-        const clientEntity = ClientEntity.fromObject(client);
+        // Create entity from database object (data already validated before saving)
+        const clientEntity = ClientEntity.fromDatabaseObject(client);
 
         return { client: clientEntity.toPublicObject() };
     }
@@ -120,8 +120,8 @@ export class ClientServices {
         const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
         const enrichedClients = await Promise.all(
             clients.map(async (client) => {
-                // Create entity from client data for validation
-                const clientEntity = ClientEntity.fromObject(client);
+                // Create entity from database object (no format validation needed for reading)
+                const clientEntity = ClientEntity.fromDatabaseObject(client);
                 const category = await ContactCategoryModel.findById(clientEntity.contact_category_id);
                 return {
                     ...clientEntity.toPublicObject(),
@@ -145,8 +145,8 @@ export class ClientServices {
             throw CustomError.notFound(`Client with ID ${id} not found`);
         }
 
-        // Create entity from client data for validation and business logic
-        const clientEntity = ClientEntity.fromObject(client);
+        // Create entity from database object (no format validation needed for reading)
+        const clientEntity = ClientEntity.fromDatabaseObject(client);
 
         // Enriquecer con nombres de catálogos
         const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
@@ -203,8 +203,8 @@ export class ClientServices {
             throw CustomError.notFound(`Client with ID ${id} not found`);
         }
 
-        // Create entity to check business rules
-        const clientEntity = ClientEntity.fromObject(existingClient);
+        // Create entity from database object to check business rules
+        const clientEntity = ClientEntity.fromDatabaseObject(existingClient);
         
         // Check if client can be updated
         if (!clientEntity.canBeUpdated()) {
@@ -236,31 +236,65 @@ export class ClientServices {
             propertySearchTypeId = searchType.id;
         }
 
-        // Preparar datos de actualización
+        // Preparar datos de actualización - solo incluir campos que realmente cambiaron
         const updateData: any = {};
-        if (updateClientDto.first_name !== undefined) updateData.first_name = updateClientDto.first_name;
-        if (updateClientDto.last_name !== undefined) updateData.last_name = updateClientDto.last_name;
-        if (updateClientDto.phone !== undefined) updateData.phone = updateClientDto.phone;
-        if (updateClientDto.email !== undefined) updateData.email = updateClientDto.email;
-        if (updateClientDto.dni !== undefined) updateData.dni = updateClientDto.dni;
-        if (updateClientDto.property_interest_phone !== undefined) updateData.property_interest_phone = updateClientDto.property_interest_phone;
-        if (updateClientDto.address !== undefined) updateData.address = updateClientDto.address;
-        if (updateClientDto.notes !== undefined) updateData.notes = updateClientDto.notes;
-        if (contactCategoryId !== undefined) updateData.contact_category_id = contactCategoryId;
-        if (updateClientDto.interest_zone !== undefined) updateData.interest_zone = updateClientDto.interest_zone;
-        if (updateClientDto.purchase_interest !== undefined) updateData.purchase_interest = updateClientDto.purchase_interest;
-        if (updateClientDto.rental_interest !== undefined) updateData.rental_interest = updateClientDto.rental_interest;
-        if (propertySearchTypeId !== undefined) updateData.property_search_type_id = propertySearchTypeId;
-        if (updateClientDto.city_id !== undefined) updateData.city_id = updateClientDto.city_id;
+        
+        if (updateClientDto.first_name !== undefined && hasValueChanged(updateClientDto.first_name, existingClient.first_name)) {
+            updateData.first_name = updateClientDto.first_name;
+        }
+        if (updateClientDto.last_name !== undefined && hasValueChanged(updateClientDto.last_name, existingClient.last_name)) {
+            updateData.last_name = updateClientDto.last_name;
+        }
+        if (updateClientDto.phone !== undefined && hasValueChanged(updateClientDto.phone, existingClient.phone)) {
+            updateData.phone = updateClientDto.phone;
+        }
+        if (updateClientDto.email !== undefined && hasValueChanged(updateClientDto.email, existingClient.email)) {
+            updateData.email = updateClientDto.email;
+        }
+        if (updateClientDto.dni !== undefined && hasValueChanged(updateClientDto.dni, existingClient.dni)) {
+            updateData.dni = updateClientDto.dni;
+        }
+        if (updateClientDto.property_interest_phone !== undefined && hasValueChanged(updateClientDto.property_interest_phone, existingClient.property_interest_phone)) {
+            updateData.property_interest_phone = updateClientDto.property_interest_phone;
+        }
+        if (updateClientDto.address !== undefined && hasValueChanged(updateClientDto.address, existingClient.address)) {
+            updateData.address = updateClientDto.address;
+        }
+        if (updateClientDto.notes !== undefined && hasValueChanged(updateClientDto.notes, existingClient.notes)) {
+            updateData.notes = updateClientDto.notes;
+        }
+        if (contactCategoryId !== undefined && hasValueChanged(contactCategoryId, existingClient.contact_category_id)) {
+            updateData.contact_category_id = contactCategoryId;
+        }
+        if (updateClientDto.interest_zone !== undefined && hasValueChanged(updateClientDto.interest_zone, existingClient.interest_zone)) {
+            updateData.interest_zone = updateClientDto.interest_zone;
+        }
+        if (updateClientDto.purchase_interest !== undefined && hasValueChanged(updateClientDto.purchase_interest, existingClient.purchase_interest)) {
+            updateData.purchase_interest = updateClientDto.purchase_interest;
+        }
+        if (updateClientDto.rental_interest !== undefined && hasValueChanged(updateClientDto.rental_interest, existingClient.rental_interest)) {
+            updateData.rental_interest = updateClientDto.rental_interest;
+        }
+        if (propertySearchTypeId !== undefined && hasValueChanged(propertySearchTypeId, existingClient.property_search_type_id)) {
+            updateData.property_search_type_id = propertySearchTypeId;
+        }
+        if (updateClientDto.city_id !== undefined && hasValueChanged(updateClientDto.city_id, existingClient.city_id)) {
+            updateData.city_id = updateClientDto.city_id;
+        }
 
-        // Actualizar cliente
+        // Si no hay cambios, retornar el cliente existente sin actualizar
+        if (Object.keys(updateData).length === 0) {
+            return { client: clientEntity.toPublicObject() };
+        }
+
+        // Actualizar cliente solo con los campos que cambiaron
         const updatedClient = await ClientModel.update(id, updateData);
         if (!updatedClient) {
             throw CustomError.internalServerError('Failed to update client');
         }
 
-        // Create entity from updated client data
-        const updatedClientEntity = ClientEntity.fromObject(updatedClient);
+        // Create entity from database object (data already validated before saving)
+        const updatedClientEntity = ClientEntity.fromDatabaseObject(updatedClient);
 
         return { client: updatedClientEntity.toPublicObject() };
     }
@@ -274,12 +308,9 @@ export class ClientServices {
             throw CustomError.notFound(`Client with ID ${id} not found`);
         }
 
-        // Create entity to check business rules
-        const clientEntity = ClientEntity.fromObject(client);
-        
-        // Check if client can be deleted
-        if (!clientEntity.canBeDeleted()) {
-            throw CustomError.badRequest('Cannot delete this client');
+        // Check if client is already deleted (no need to create entity for this simple check)
+        if (client.deleted === true) {
+            throw CustomError.badRequest('Client is already deleted');
         }
 
         const deleted = await ClientModel.delete(id);
