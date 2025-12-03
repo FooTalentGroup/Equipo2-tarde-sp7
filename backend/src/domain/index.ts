@@ -11,3 +11,4 @@ export * from './interfaces/file-upload.adapter';
 export * from './use-cases';
 export * from './interfaces/hash.adapter';
 export * from './interfaces/jwt.adapter';
+export * from './utils';
