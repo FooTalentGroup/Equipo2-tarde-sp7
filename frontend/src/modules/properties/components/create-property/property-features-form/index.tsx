@@ -14,11 +14,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@src/components/ui/select";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyCharacteristicsProps {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 }
 
 export default function PropertyFeaturesForm({
@@ -30,7 +30,7 @@ export default function PropertyFeaturesForm({
 			<div className="grid gap-4">
 				<FormField
 					control={form.control}
-					name="rooms"
+					name="characteristics.rooms_count"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Ambientes</FormLabel>
@@ -41,10 +41,9 @@ export default function PropertyFeaturesForm({
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
-					name="bedrooms"
+					name="characteristics.bedrooms_count"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Dormitorios</FormLabel>
@@ -55,10 +54,9 @@ export default function PropertyFeaturesForm({
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
-					name="bathrooms"
+					name="characteristics.bathrooms_count"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Baños</FormLabel>
@@ -69,10 +67,9 @@ export default function PropertyFeaturesForm({
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
-					name="toilets"
+					name="characteristics.toilets_count"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Toilettes</FormLabel>
@@ -83,10 +80,9 @@ export default function PropertyFeaturesForm({
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
-					name="garages"
+					name="characteristics.parking_spaces_count"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Cocheras</FormLabel>
@@ -103,7 +99,7 @@ export default function PropertyFeaturesForm({
 			<div className="grid gap-4 items-start">
 				<FormField
 					control={form.control}
-					name="floors"
+					name="characteristics.floors_count"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Plantas</FormLabel>
@@ -117,7 +113,7 @@ export default function PropertyFeaturesForm({
 
 				<FormField
 					control={form.control}
-					name="antiquity"
+					name="characteristics.age"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Antigüedad</FormLabel>
@@ -143,10 +139,9 @@ export default function PropertyFeaturesForm({
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
-					name="orientation"
+					name="characteristics.orientation"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Orientación</FormLabel>
@@ -173,10 +168,9 @@ export default function PropertyFeaturesForm({
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
-					name="disposition"
+					name="characteristics.disposition"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Disposición</FormLabel>
@@ -199,10 +193,9 @@ export default function PropertyFeaturesForm({
 						</FormItem>
 					)}
 				/>
-
 				<FormField
 					control={form.control}
-					name="situation"
+					name="characteristics.situation"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Situación</FormLabel>

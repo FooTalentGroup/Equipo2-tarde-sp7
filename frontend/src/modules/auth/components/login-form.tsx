@@ -19,11 +19,12 @@ import { Heading } from "@src/components/ui/heading";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
+import { HeadingForm } from "@src/modules/auth/components/heading-form";
 import { ROLES } from "@src/types/user";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { HeadingForm } from "@src/modules/auth/components/heading-form";
+
 import { loginAction } from "../actions/auth.actions";
 import { type LoginFormData, loginSchema } from "../schemas/login";
 
@@ -131,10 +132,7 @@ export default function LoginForm({
 									<FormLabel className="text-secondary-dark font-semibold">
 										Contraseña
 									</FormLabel>
-									<Link
-										href={""}
-										className="hover:underline text-secondary"
-									>
+									<Link href={""} className="hover:underline text-secondary">
 										¿Olvidaste tu contraseña?
 									</Link>
 								</div>

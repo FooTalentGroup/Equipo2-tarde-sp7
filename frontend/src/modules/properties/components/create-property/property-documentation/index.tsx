@@ -10,12 +10,12 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@src/components/ui/form";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import { Upload } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 interface PropertyDocumentationProps {
-	form: UseFormReturn<Property>;
+	form: UseFormReturn<PropertyForm>;
 }
 
 export default function PropertyDocumentation({
@@ -27,9 +27,12 @@ export default function PropertyDocumentation({
 	const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const files = event.target.files;
 		if (files) {
-			const fileNames = Array.from(files).map((file) => file.name);
+			const newFiles = Array.from(files);
+			const fileNames = newFiles.map((file) => file.name);
 			setUploadedFiles((prev) => [...prev, ...fileNames]);
-			form.setValue("documents", [...uploadedFiles, ...fileNames]);
+
+			const currentFiles = form.getValues("documents.files") || [];
+			form.setValue("documents.files", [...currentFiles, ...newFiles]);
 		}
 	};
 
@@ -40,14 +43,17 @@ export default function PropertyDocumentation({
 	const removeFile = (index: number) => {
 		const newFiles = uploadedFiles.filter((_, i) => i !== index);
 		setUploadedFiles(newFiles);
-		form.setValue("documents", newFiles);
+
+		const currentFiles = form.getValues("documents.files") || [];
+		const updatedFiles = currentFiles.filter((_, i) => i !== index);
+		form.setValue("documents.files", updatedFiles);
 	};
 
 	return (
 		<div className="grid gap-4">
 			<FormField
 				control={form.control}
-				name="documents"
+				name="documents.files"
 				render={() => (
 					<FormItem>
 						<FormLabel>Documentación (opcional)</FormLabel>

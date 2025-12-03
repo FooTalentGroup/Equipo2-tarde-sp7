@@ -1,344 +1,483 @@
-import { 
-    ClientModel, 
-    ContactCategoryModel,
-    CityModel,
-    ProvinceModel,
-    CountryModel
-} from '../../data/postgres/models';
-import { CreateClientDto, UpdateClientDto } from '../../domain/dtos/clients';
-import { CustomError, ClientEntity } from '../../domain';
+import {
+	CityModel,
+	ClientModel,
+	ContactCategoryModel,
+	CountryModel,
+	ProvinceModel,
+} from "../../data/postgres/models";
+import { ClientEntity, CustomError, hasValueChanged } from "../../domain";
+import type {
+	CreateClientDto,
+	UpdateClientDto,
+} from "../../domain/dtos/clients";
 
 /**
  * Service para manejar operaciones de clientes
  */
 export class ClientServices {
-    
-    /**
-     * Crea un nuevo cliente
-     */
-    async createClient(createClientDto: CreateClientDto) {
-        // Resolver contact_category_id si se envió nombre
-        let contactCategoryId: number;
-        if (createClientDto.contact_category_id) {
-            contactCategoryId = createClientDto.contact_category_id;
-        } else if (createClientDto.contact_category) {
-            const category = await ContactCategoryModel.findByName(createClientDto.contact_category);
-            if (!category || !category.id) {
-                throw CustomError.badRequest(
-                    `Contact category "${createClientDto.contact_category}" not found. Valid categories: Lead, Inquilino, Propietario`
-                );
-            }
-            contactCategoryId = category.id;
-        } else {
-            throw CustomError.badRequest('Contact category is required');
-        }
+	/**
+	 * Crea un nuevo cliente
+	 */
+	async createClient(createClientDto: CreateClientDto) {
+		// Resolver contact_category_id si se envió nombre
+		let contactCategoryId: number;
+		if (createClientDto.contact_category_id) {
+			contactCategoryId = createClientDto.contact_category_id;
+		} else if (createClientDto.contact_category) {
+			const category = await ContactCategoryModel.findByName(
+				createClientDto.contact_category,
+			);
+			if (!category || !category.id) {
+				throw CustomError.badRequest(
+					`Contact category "${createClientDto.contact_category}" not found. Valid categories: Lead, Inquilino, Propietario`,
+				);
+			}
+			contactCategoryId = category.id;
+		} else {
+			throw CustomError.badRequest("Contact category is required");
+		}
 
-        // Resolver property_search_type_id si se envió nombre
-        let propertySearchTypeId: number | undefined = undefined;
-        if (createClientDto.property_search_type_id) {
-            propertySearchTypeId = createClientDto.property_search_type_id;
-        } else if (createClientDto.property_search_type) {
-            const { PropertySearchTypeModel } = await import('../../data/postgres/models/clients/property-search-type.model');
-            const searchType = await PropertySearchTypeModel.findByName(createClientDto.property_search_type);
-            if (!searchType || !searchType.id) {
-                throw CustomError.badRequest(
-                    `Property search type "${createClientDto.property_search_type}" not found`
-                );
-            }
-            propertySearchTypeId = searchType.id;
-        }
+		// Resolver property_search_type_id si se envió nombre
+		let propertySearchTypeId: number | undefined;
+		if (createClientDto.property_search_type_id) {
+			propertySearchTypeId = createClientDto.property_search_type_id;
+		} else if (createClientDto.property_search_type) {
+			const { PropertySearchTypeModel } = await import(
+				"../../data/postgres/models/clients/property-search-type.model"
+			);
+			const searchType = await PropertySearchTypeModel.findByName(
+				createClientDto.property_search_type,
+			);
+			if (!searchType || !searchType.id) {
+				throw CustomError.badRequest(
+					`Property search type "${createClientDto.property_search_type}" not found`,
+				);
+			}
+			propertySearchTypeId = searchType.id;
+		}
 
-        // Resolver city_id si se proporcionó ciudad/nombre
-        let cityId: number | undefined = createClientDto.city_id;
-        
-        if (!cityId && (createClientDto.city || createClientDto.province || createClientDto.country)) {
-            // Resolver geografía si se proporcionaron nombres
-            const geography = await this.resolveGeography({
-                country: createClientDto.country,
-                province: createClientDto.province,
-                city: createClientDto.city
-            });
-            cityId = geography.cityId;
-        }
+		// Resolver city_id si se proporcionó ciudad/nombre
+		let cityId: number | undefined = createClientDto.city_id;
 
-        // Crear cliente
-        const client = await ClientModel.create({
-            first_name: createClientDto.first_name,
-            last_name: createClientDto.last_name,
-            phone: createClientDto.phone,
-            email: createClientDto.email,
-            dni: createClientDto.dni,
-            property_interest_phone: createClientDto.property_interest_phone,
-            address: createClientDto.address,
-            notes: createClientDto.notes,
-            contact_category_id: contactCategoryId,
-            interest_zone: createClientDto.interest_zone,
-            purchase_interest: createClientDto.purchase_interest,
-            rental_interest: createClientDto.rental_interest,
-            property_search_type_id: propertySearchTypeId,
-            city_id: cityId,
-        });
+		if (
+			!cityId &&
+			(createClientDto.city ||
+				createClientDto.province ||
+				createClientDto.country)
+		) {
+			// Resolver geografía si se proporcionaron nombres
+			const geography = await this.resolveGeography({
+				country: createClientDto.country,
+				province: createClientDto.province,
+				city: createClientDto.city,
+			});
+			cityId = geography.cityId;
+		}
 
-        if (!client.id) {
-            throw CustomError.internalServerError('Failed to create client');
-        }
+		// Crear cliente
+		const client = await ClientModel.create({
+			first_name: createClientDto.first_name,
+			last_name: createClientDto.last_name,
+			phone: createClientDto.phone,
+			email: createClientDto.email,
+			dni: createClientDto.dni,
+			property_interest_phone: createClientDto.property_interest_phone,
+			address: createClientDto.address,
+			notes: createClientDto.notes,
+			contact_category_id: contactCategoryId,
+			interest_zone: createClientDto.interest_zone,
+			purchase_interest: createClientDto.purchase_interest,
+			rental_interest: createClientDto.rental_interest,
+			property_search_type_id: propertySearchTypeId,
+			city_id: cityId,
+		});
 
-        // Create entity from client data for validation and business logic
-        const clientEntity = ClientEntity.fromObject(client);
+		if (!client.id) {
+			throw CustomError.internalServerError("Failed to create client");
+		}
 
-        return { client: clientEntity.toPublicObject() };
-    }
+		// Create entity from database object (data already validated before saving)
+		const clientEntity = ClientEntity.fromDatabaseObject(client);
 
-    /**
-     * Lista clientes con filtros opcionales
-     */
-    async listClients(filters?: {
-        contact_category_id?: number;
-        purchase_interest?: boolean;
-        rental_interest?: boolean;
-        city_id?: number;
-        limit?: number;
-        offset?: number;
-        search?: string;
-        includeDeleted?: boolean;
-    }) {
-        let clients = await ClientModel.findAll(filters);
+		return { client: clientEntity.toPublicObject() };
+	}
 
-        // Si hay búsqueda por texto, filtrar en memoria
-        if (filters?.search) {
-            const searchLower = filters.search.toLowerCase();
-            clients = clients.filter(client => 
-                client.first_name?.toLowerCase().includes(searchLower) ||
-                client.last_name?.toLowerCase().includes(searchLower) ||
-                client.email?.toLowerCase().includes(searchLower) ||
-                client.phone?.includes(searchLower) ||
-                client.dni?.includes(searchLower)
-            );
-        }
+	/**
+	 * Lista clientes con filtros opcionales
+	 */
+	async listClients(filters?: {
+		contact_category_id?: number;
+		purchase_interest?: boolean;
+		rental_interest?: boolean;
+		city_id?: number;
+		limit?: number;
+		offset?: number;
+		search?: string;
+		includeDeleted?: boolean;
+	}) {
+		let clients = await ClientModel.findAll(filters);
 
-        // Enriquecer con nombres de catálogos y usar entities
-        const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
-        const enrichedClients = await Promise.all(
-            clients.map(async (client) => {
-                // Create entity from client data for validation
-                const clientEntity = ClientEntity.fromObject(client);
-                const category = await ContactCategoryModel.findById(clientEntity.contact_category_id);
-                return {
-                    ...clientEntity.toPublicObject(),
-                    contact_category: category ? {
-                        id: category.id,
-                        name: category.name
-                    } : null
-                };
-            })
-        );
+		// Si hay búsqueda por texto, filtrar en memoria
+		if (filters?.search) {
+			const searchLower = filters.search.toLowerCase();
+			clients = clients.filter(
+				(client) =>
+					client.first_name?.toLowerCase().includes(searchLower) ||
+					client.last_name?.toLowerCase().includes(searchLower) ||
+					client.email?.toLowerCase().includes(searchLower) ||
+					client.phone?.includes(searchLower) ||
+					client.dni?.includes(searchLower),
+			);
+		}
 
-        return { clients: enrichedClients, count: enrichedClients.length };
-    }
+		// Enriquecer con nombres de catálogos y usar entities
+		const { ContactCategoryModel } = await import(
+			"../../data/postgres/models/clients/contact-category.model"
+		);
+		const enrichedClients = await Promise.all(
+			clients.map(async (client) => {
+				// Create entity from database object (no format validation needed for reading)
+				const clientEntity = ClientEntity.fromDatabaseObject(client);
+				const category = await ContactCategoryModel.findById(
+					clientEntity.contact_category_id,
+				);
+				return {
+					...clientEntity.toPublicObject(),
+					contact_category: category
+						? {
+								id: category.id,
+								name: category.name,
+							}
+						: null,
+				};
+			}),
+		);
 
-    /**
-     * Obtiene un cliente por ID
-     */
-    async getClientById(id: number) {
-        const client = await ClientModel.findById(id);
-        if (!client) {
-            throw CustomError.notFound(`Client with ID ${id} not found`);
-        }
+		return { clients: enrichedClients, count: enrichedClients.length };
+	}
 
-        // Create entity from client data for validation and business logic
-        const clientEntity = ClientEntity.fromObject(client);
+	/**
+	 * Obtiene un cliente por ID
+	 */
+	async getClientById(id: number) {
+		const client = await ClientModel.findById(id);
+		if (!client) {
+			throw CustomError.notFound(`Client with ID ${id} not found`);
+		}
 
-        // Enriquecer con nombres de catálogos
-        const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
-        const category = await ContactCategoryModel.findById(clientEntity.contact_category_id);
-        
-        let propertySearchType = null;
-        if (clientEntity.property_search_type_id) {
-            const { PropertySearchTypeModel } = await import('../../data/postgres/models/clients/property-search-type.model');
-            propertySearchType = await PropertySearchTypeModel.findById(clientEntity.property_search_type_id);
-        }
+		// Create entity from database object (no format validation needed for reading)
+		const clientEntity = ClientEntity.fromDatabaseObject(client);
 
-        let city = null;
-        if (clientEntity.city_id) {
-            city = await CityModel.findById(clientEntity.city_id);
-            if (city) {
-                const province = await ProvinceModel.findById(city.province_id);
-                if (province) {
-                    const country = await CountryModel.findById(province.country_id);
-                    (city as any).province = province ? {
-                        id: province.id,
-                        name: province.name,
-                        country: country ? {
-                            id: country.id,
-                            name: country.name
-                        } : null
-                    } : null;
-                }
-            }
-        }
+		// Enriquecer con nombres de catálogos
+		const { ContactCategoryModel } = await import(
+			"../../data/postgres/models/clients/contact-category.model"
+		);
+		const category = await ContactCategoryModel.findById(
+			clientEntity.contact_category_id,
+		);
 
-        return {
-            client: {
-                ...clientEntity.toPublicObject(),
-                contact_category: category ? {
-                    id: category.id,
-                    name: category.name
-                } : null,
-                property_search_type: propertySearchType ? {
-                    id: propertySearchType.id,
-                    name: propertySearchType.name
-                } : null,
-                city: city
-            }
-        };
-    }
+		let propertySearchType = null;
+		if (clientEntity.property_search_type_id) {
+			const { PropertySearchTypeModel } = await import(
+				"../../data/postgres/models/clients/property-search-type.model"
+			);
+			propertySearchType = await PropertySearchTypeModel.findById(
+				clientEntity.property_search_type_id,
+			);
+		}
 
-    /**
-     * Actualiza un cliente
-     */
-    async updateClient(id: number, updateClientDto: UpdateClientDto) {
-        // Verificar que el cliente existe y crear entity
-        const existingClient = await ClientModel.findById(id);
-        if (!existingClient) {
-            throw CustomError.notFound(`Client with ID ${id} not found`);
-        }
+		let city = null;
+		if (clientEntity.city_id) {
+			city = await CityModel.findById(clientEntity.city_id);
+			if (city) {
+				const province = await ProvinceModel.findById(city.province_id);
+				if (province) {
+					const country = await CountryModel.findById(province.country_id);
+					(city as any).province = province
+						? {
+								id: province.id,
+								name: province.name,
+								country: country
+									? {
+											id: country.id,
+											name: country.name,
+										}
+									: null,
+							}
+						: null;
+				}
+			}
+		}
 
-        // Create entity to check business rules
-        const clientEntity = ClientEntity.fromObject(existingClient);
-        
-        // Check if client can be updated
-        if (!clientEntity.canBeUpdated()) {
-            throw CustomError.badRequest('Cannot update deleted client');
-        }
+		return {
+			client: {
+				...clientEntity.toPublicObject(),
+				contact_category: category
+					? {
+							id: category.id,
+							name: category.name,
+						}
+					: null,
+				property_search_type: propertySearchType
+					? {
+							id: propertySearchType.id,
+							name: propertySearchType.name,
+						}
+					: null,
+				city: city,
+			},
+		};
+	}
 
-        // Resolver contact_category_id si se envió nombre
-        let contactCategoryId: number | undefined = updateClientDto.contact_category_id;
-        if (!contactCategoryId && updateClientDto.contact_category) {
-            const category = await ContactCategoryModel.findByName(updateClientDto.contact_category);
-            if (!category || !category.id) {
-                throw CustomError.badRequest(
-                    `Contact category "${updateClientDto.contact_category}" not found. Valid categories: Lead, Inquilino, Propietario`
-                );
-            }
-            contactCategoryId = category.id;
-        }
+	/**
+	 * Actualiza un cliente
+	 */
+	async updateClient(id: number, updateClientDto: UpdateClientDto) {
+		// Verificar que el cliente existe y crear entity
+		const existingClient = await ClientModel.findById(id);
+		if (!existingClient) {
+			throw CustomError.notFound(`Client with ID ${id} not found`);
+		}
 
-        // Resolver property_search_type_id si se envió nombre
-        let propertySearchTypeId: number | undefined = updateClientDto.property_search_type_id;
-        if (!propertySearchTypeId && updateClientDto.property_search_type) {
-            const { PropertySearchTypeModel } = await import('../../data/postgres/models/clients/property-search-type.model');
-            const searchType = await PropertySearchTypeModel.findByName(updateClientDto.property_search_type);
-            if (!searchType || !searchType.id) {
-                throw CustomError.badRequest(
-                    `Property search type "${updateClientDto.property_search_type}" not found`
-                );
-            }
-            propertySearchTypeId = searchType.id;
-        }
+		// Create entity from database object to check business rules
+		const clientEntity = ClientEntity.fromDatabaseObject(existingClient);
 
-        // Preparar datos de actualización
-        const updateData: any = {};
-        if (updateClientDto.first_name !== undefined) updateData.first_name = updateClientDto.first_name;
-        if (updateClientDto.last_name !== undefined) updateData.last_name = updateClientDto.last_name;
-        if (updateClientDto.phone !== undefined) updateData.phone = updateClientDto.phone;
-        if (updateClientDto.email !== undefined) updateData.email = updateClientDto.email;
-        if (updateClientDto.dni !== undefined) updateData.dni = updateClientDto.dni;
-        if (updateClientDto.property_interest_phone !== undefined) updateData.property_interest_phone = updateClientDto.property_interest_phone;
-        if (updateClientDto.address !== undefined) updateData.address = updateClientDto.address;
-        if (updateClientDto.notes !== undefined) updateData.notes = updateClientDto.notes;
-        if (contactCategoryId !== undefined) updateData.contact_category_id = contactCategoryId;
-        if (updateClientDto.interest_zone !== undefined) updateData.interest_zone = updateClientDto.interest_zone;
-        if (updateClientDto.purchase_interest !== undefined) updateData.purchase_interest = updateClientDto.purchase_interest;
-        if (updateClientDto.rental_interest !== undefined) updateData.rental_interest = updateClientDto.rental_interest;
-        if (propertySearchTypeId !== undefined) updateData.property_search_type_id = propertySearchTypeId;
-        if (updateClientDto.city_id !== undefined) updateData.city_id = updateClientDto.city_id;
+		// Check if client can be updated
+		if (!clientEntity.canBeUpdated()) {
+			throw CustomError.badRequest("Cannot update deleted client");
+		}
 
-        // Actualizar cliente
-        const updatedClient = await ClientModel.update(id, updateData);
-        if (!updatedClient) {
-            throw CustomError.internalServerError('Failed to update client');
-        }
+		// Resolver contact_category_id si se envió nombre
+		let contactCategoryId: number | undefined =
+			updateClientDto.contact_category_id;
+		if (!contactCategoryId && updateClientDto.contact_category) {
+			const category = await ContactCategoryModel.findByName(
+				updateClientDto.contact_category,
+			);
+			if (!category || !category.id) {
+				throw CustomError.badRequest(
+					`Contact category "${updateClientDto.contact_category}" not found. Valid categories: Lead, Inquilino, Propietario`,
+				);
+			}
+			contactCategoryId = category.id;
+		}
 
-        // Create entity from updated client data
-        const updatedClientEntity = ClientEntity.fromObject(updatedClient);
+		// Resolver property_search_type_id si se envió nombre
+		let propertySearchTypeId: number | undefined =
+			updateClientDto.property_search_type_id;
+		if (!propertySearchTypeId && updateClientDto.property_search_type) {
+			const { PropertySearchTypeModel } = await import(
+				"../../data/postgres/models/clients/property-search-type.model"
+			);
+			const searchType = await PropertySearchTypeModel.findByName(
+				updateClientDto.property_search_type,
+			);
+			if (!searchType || !searchType.id) {
+				throw CustomError.badRequest(
+					`Property search type "${updateClientDto.property_search_type}" not found`,
+				);
+			}
+			propertySearchTypeId = searchType.id;
+		}
 
-        return { client: updatedClientEntity.toPublicObject() };
-    }
+		// Preparar datos de actualización - solo incluir campos que realmente cambiaron
+		const updateData: any = {};
 
-    /**
-     * Soft delete: marca el cliente como eliminado
-     */
-    async deleteClient(id: number) {
-        const client = await ClientModel.findById(id);
-        if (!client) {
-            throw CustomError.notFound(`Client with ID ${id} not found`);
-        }
+		if (
+			updateClientDto.first_name !== undefined &&
+			hasValueChanged(updateClientDto.first_name, existingClient.first_name)
+		) {
+			updateData.first_name = updateClientDto.first_name;
+		}
+		if (
+			updateClientDto.last_name !== undefined &&
+			hasValueChanged(updateClientDto.last_name, existingClient.last_name)
+		) {
+			updateData.last_name = updateClientDto.last_name;
+		}
+		if (
+			updateClientDto.phone !== undefined &&
+			hasValueChanged(updateClientDto.phone, existingClient.phone)
+		) {
+			updateData.phone = updateClientDto.phone;
+		}
+		if (
+			updateClientDto.email !== undefined &&
+			hasValueChanged(updateClientDto.email, existingClient.email)
+		) {
+			updateData.email = updateClientDto.email;
+		}
+		if (
+			updateClientDto.dni !== undefined &&
+			hasValueChanged(updateClientDto.dni, existingClient.dni)
+		) {
+			updateData.dni = updateClientDto.dni;
+		}
+		if (
+			updateClientDto.property_interest_phone !== undefined &&
+			hasValueChanged(
+				updateClientDto.property_interest_phone,
+				existingClient.property_interest_phone,
+			)
+		) {
+			updateData.property_interest_phone =
+				updateClientDto.property_interest_phone;
+		}
+		if (
+			updateClientDto.address !== undefined &&
+			hasValueChanged(updateClientDto.address, existingClient.address)
+		) {
+			updateData.address = updateClientDto.address;
+		}
+		if (
+			updateClientDto.notes !== undefined &&
+			hasValueChanged(updateClientDto.notes, existingClient.notes)
+		) {
+			updateData.notes = updateClientDto.notes;
+		}
+		if (
+			contactCategoryId !== undefined &&
+			hasValueChanged(contactCategoryId, existingClient.contact_category_id)
+		) {
+			updateData.contact_category_id = contactCategoryId;
+		}
+		if (
+			updateClientDto.interest_zone !== undefined &&
+			hasValueChanged(
+				updateClientDto.interest_zone,
+				existingClient.interest_zone,
+			)
+		) {
+			updateData.interest_zone = updateClientDto.interest_zone;
+		}
+		if (
+			updateClientDto.purchase_interest !== undefined &&
+			hasValueChanged(
+				updateClientDto.purchase_interest,
+				existingClient.purchase_interest,
+			)
+		) {
+			updateData.purchase_interest = updateClientDto.purchase_interest;
+		}
+		if (
+			updateClientDto.rental_interest !== undefined &&
+			hasValueChanged(
+				updateClientDto.rental_interest,
+				existingClient.rental_interest,
+			)
+		) {
+			updateData.rental_interest = updateClientDto.rental_interest;
+		}
+		if (
+			propertySearchTypeId !== undefined &&
+			hasValueChanged(
+				propertySearchTypeId,
+				existingClient.property_search_type_id,
+			)
+		) {
+			updateData.property_search_type_id = propertySearchTypeId;
+		}
+		if (
+			updateClientDto.city_id !== undefined &&
+			hasValueChanged(updateClientDto.city_id, existingClient.city_id)
+		) {
+			updateData.city_id = updateClientDto.city_id;
+		}
 
-        // Create entity to check business rules
-        const clientEntity = ClientEntity.fromObject(client);
-        
-        // Check if client can be deleted
-        if (!clientEntity.canBeDeleted()) {
-            throw CustomError.badRequest('Cannot delete this client');
-        }
+		// Si no hay cambios, retornar el cliente existente sin actualizar
+		if (Object.keys(updateData).length === 0) {
+			return { client: clientEntity.toPublicObject() };
+		}
 
-        const deleted = await ClientModel.delete(id);
-        if (!deleted) {
-            throw CustomError.internalServerError('Failed to delete client');
-        }
+		// Actualizar cliente solo con los campos que cambiaron
+		const updatedClient = await ClientModel.update(id, updateData);
+		if (!updatedClient) {
+			throw CustomError.internalServerError("Failed to update client");
+		}
 
-        return { message: 'Client deleted successfully' };
-    }
+		// Create entity from database object (data already validated before saving)
+		const updatedClientEntity = ClientEntity.fromDatabaseObject(updatedClient);
 
-    /**
-     * Restaura un cliente eliminado (soft delete)
-     */
-    async restoreClient(id: number) {
-        const restored = await ClientModel.restore(id);
-        if (!restored) {
-            throw CustomError.notFound(`Deleted client with ID ${id} not found or already restored`);
-        }
+		return { client: updatedClientEntity.toPublicObject() };
+	}
 
-        return { message: 'Client restored successfully' };
-    }
+	/**
+	 * Soft delete: marca el cliente como eliminado
+	 */
+	async deleteClient(id: number) {
+		const client = await ClientModel.findById(id);
+		if (!client) {
+			throw CustomError.notFound(`Client with ID ${id} not found`);
+		}
 
-    /**
-     * Helper para resolver geografía (country -> province -> city)
-     */
-    private async resolveGeography(geography: {
-        country?: string;
-        province?: string;
-        city?: string;
-    }): Promise<{ cityId: number }> {
-        if (!geography.country || !geography.province || !geography.city) {
-            throw CustomError.badRequest('Country, province, and city are required for geography');
-        }
+		// Check if client is already deleted (no need to create entity for this simple check)
+		if (client.deleted === true) {
+			throw CustomError.badRequest("Client is already deleted");
+		}
 
-        // Buscar o crear país
-        let country = await CountryModel.findByName(geography.country);
-        if (!country || !country.id) {
-            country = await CountryModel.create({ name: geography.country });
-        }
+		const deleted = await ClientModel.delete(id);
+		if (!deleted) {
+			throw CustomError.internalServerError("Failed to delete client");
+		}
 
-        // Buscar o crear provincia
-        let province = await ProvinceModel.findByName(geography.province);
-        if (!province || !province.id) {
-            province = await ProvinceModel.create({
-                name: geography.province,
-                country_id: country.id!
-            });
-        }
+		return { message: "Client deleted successfully" };
+	}
 
-        // Buscar o crear ciudad
-        let city = await CityModel.findByNameAndProvince(geography.city, province.id!);
-        if (!city || !city.id) {
-            city = await CityModel.create({
-                name: geography.city,
-                province_id: province.id!
-            });
-        }
+	/**
+	 * Restaura un cliente eliminado (soft delete)
+	 */
+	async restoreClient(id: number) {
+		const restored = await ClientModel.restore(id);
+		if (!restored) {
+			throw CustomError.notFound(
+				`Deleted client with ID ${id} not found or already restored`,
+			);
+		}
 
-        return { cityId: city.id! };
-    }
+		return { message: "Client restored successfully" };
+	}
+
+	/**
+	 * Helper para resolver geografía (country -> province -> city)
+	 */
+	private async resolveGeography(geography: {
+		country?: string;
+		province?: string;
+		city?: string;
+	}): Promise<{ cityId: number }> {
+		if (!geography.country || !geography.province || !geography.city) {
+			throw CustomError.badRequest(
+				"Country, province, and city are required for geography",
+			);
+		}
+
+		// Buscar o crear país
+		let country = await CountryModel.findByName(geography.country);
+		if (!country || !country.id) {
+			country = await CountryModel.create({ name: geography.country });
+		}
+
+		// Buscar o crear provincia
+		let province = await ProvinceModel.findByName(geography.province);
+		if (!province || !province.id) {
+			province = await ProvinceModel.create({
+				name: geography.province,
+				country_id: country.id!,
+			});
+		}
+
+		// Buscar o crear ciudad
+		let city = await CityModel.findByNameAndProvince(
+			geography.city,
+			province.id!,
+		);
+		if (!city || !city.id) {
+			city = await CityModel.create({
+				name: geography.city,
+				province_id: province.id!,
+			});
+		}
+
+		return { cityId: city.id! };
+	}
 }
-

@@ -165,9 +165,9 @@
 
   /* Danger / Destructive */
   --danger-normal: #f8222d;
-  --destructive: #fee9ea;
-  --destructive-border: #fdbabe;
-  --destructive-foreground: #c61b24;
+  --destructive: #fff3f6;
+  --destructive-border: #f8222d;
+  --destructive-foreground: #f8222d;
 
   /* Borders / Inputs */
   --border: #e6e6e6;
@@ -191,7 +191,7 @@
   --dropdown-background: #f1f5ff;
 
   /* Sidebar */
-  --sidebar: #fff;
+  --sidebar: #f5f5f5;
   --sidebar-foreground: #364153;
   --sidebar-primary: #1a3d64;
   --sidebar-primary-foreground: #ffffff;
