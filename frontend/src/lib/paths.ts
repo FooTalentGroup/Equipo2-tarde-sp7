@@ -27,7 +27,7 @@ export const paths = {
 			searchProperties: () => "/agent/clients/search",
 		},
 		owners: {
-			new: () => "/agent/clients/create/new/propietarios",
+			new: () => "/agent/clients/create/propietarios",
 			detail: (id: string) => `/agent/clients/propietarios/${id}`,
 		},
 		properties: {
