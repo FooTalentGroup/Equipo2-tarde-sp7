@@ -149,6 +149,7 @@ export class PropertyConsultationServices {
         consultation_type_id?: number;
         start_date?: string;
         end_date?: string;
+        is_read?: boolean;
     }) {
         try {
             const dbClient = PostgresDatabase.getClient();
@@ -161,6 +162,7 @@ export class PropertyConsultationServices {
                     cc.message,
                     cc.response,
                     cc.response_date,
+                    cc.is_read,
                     -- Cliente
                     c.id as client_id,
                     c.first_name as client_first_name,
@@ -197,6 +199,10 @@ export class PropertyConsultationServices {
                     conditions.push(`cc.consultation_date <= $${paramIndex++}`);
                     values.push(filters.end_date);
                 }
+                if (filters.is_read !== undefined) {
+                    conditions.push(`cc.is_read = $${paramIndex++}`);
+                    values.push(filters.is_read);
+                }
             }
 
             if (conditions.length > 0) {
@@ -215,12 +221,13 @@ export class PropertyConsultationServices {
             const result = await dbClient.query(query, values);
 
             // Formatear respuesta
-            const consultations = result.rows.map(row => ({
+            const consultations = result.rows.map((row: any) => ({
                 id: row.id,
                 consultation_date: row.consultation_date,
                 message: row.message,
                 response: row.response,
                 response_date: row.response_date,
+                is_read: row.is_read,
                 client: {
                     id: row.client_id,
                     first_name: row.client_first_name,
@@ -259,6 +266,92 @@ export class PropertyConsultationServices {
         } catch (error) {
             console.error('Error getting consultations:', error);
             throw CustomError.internalServerError('Error retrieving consultations');
+        }
+    }
+
+    /**
+     * Eliminar una consulta individual
+     * - Verifica que la consulta existe
+     * - Elimina de la base de datos
+     */
+    async deleteConsultation(id: number) {
+        try {
+            // Verificar que la consulta existe
+            const consultation = await ClientConsultationModel.findById(id);
+            
+            if (!consultation) {
+                throw CustomError.notFound('Consultation not found');
+            }
+
+            // Eliminar la consulta
+            const deleted = await ClientConsultationModel.delete(id);
+            
+            if (!deleted) {
+                throw CustomError.internalServerError('Failed to delete consultation');
+            }
+
+            return {
+                message: 'Consultation deleted successfully',
+            };
+        } catch (error) {
+            if (error instanceof CustomError) {
+                throw error;
+            }
+            console.error('Error deleting consultation:', error);
+            throw CustomError.internalServerError('Error deleting consultation');
+        }
+    }
+
+    /**
+     * Eliminar múltiples consultas
+     * - Elimina todas las consultas con los IDs proporcionados
+     * - Retorna el número de consultas eliminadas
+     */
+    async deleteMultipleConsultations(ids: number[]) {
+        try {
+            const deletedCount = await ClientConsultationModel.deleteMultiple(ids);
+            
+            return {
+                message: `${deletedCount} consultation(s) deleted successfully`,
+                deleted_count: deletedCount,
+            };
+        } catch (error) {
+            console.error('Error deleting multiple consultations:', error);
+            throw CustomError.internalServerError('Error deleting consultations');
+        }
+    }
+
+    /**
+     * Marcar una consulta como leída
+     * - Verifica que la consulta existe
+     * - Actualiza el campo is_read a true
+     */
+    async markAsRead(id: number) {
+        try {
+            // Verificar que la consulta existe
+            const consultation = await ClientConsultationModel.findById(id);
+            
+            if (!consultation) {
+                throw CustomError.notFound('Consultation not found');
+            }
+
+            // Marcar como leída
+            const updated = await ClientConsultationModel.update(id, { is_read: true });
+            
+            if (!updated) {
+                throw CustomError.internalServerError('Failed to mark consultation as read');
+            }
+
+            return {
+                message: 'Consultation marked as read',
+                consultation: updated,
+            };
+        } catch (error) {
+            if (error instanceof CustomError) {
+                throw error;
+            }
+            console.error('Error marking consultation as read:', error);
+            throw CustomError.internalServerError('Error updating consultation');
         }
     }
 }

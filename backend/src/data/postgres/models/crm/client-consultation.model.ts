@@ -11,6 +11,7 @@ export interface ClientConsultation {
     response?: string;
     responded_by_user_id?: number;
     response_date?: Date;
+    is_read?: boolean;
 }
 
 export interface CreateClientConsultationDto {
@@ -23,6 +24,7 @@ export interface CreateClientConsultationDto {
     response?: string;
     responded_by_user_id?: number;
     response_date?: Date;
+    is_read?: boolean;
 }
 
 export interface ClientConsultationFilters {
@@ -32,6 +34,7 @@ export interface ClientConsultationFilters {
     assigned_user_id?: number;
     start_date?: Date;
     end_date?: Date;
+    is_read?: boolean;
     limit?: number;
     offset?: number;
 }
@@ -45,9 +48,9 @@ export class ClientConsultationModel {
         const query = `
             INSERT INTO ${this.TABLE_NAME} (
                 client_id, property_id, consultation_type_id, assigned_user_id, 
-                consultation_date, message, response, responded_by_user_id, response_date
+                consultation_date, message, response, responded_by_user_id, response_date, is_read
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
             RETURNING *
         `;
         
@@ -61,6 +64,7 @@ export class ClientConsultationModel {
             consultationData.response || null,
             consultationData.responded_by_user_id || null,
             consultationData.response_date || null,
+            consultationData.is_read !== undefined ? consultationData.is_read : false,
         ]);
 
         return result.rows[0];
@@ -111,6 +115,10 @@ export class ClientConsultationModel {
             if (filters.end_date) {
                 conditions.push(`consultation_date <= $${paramIndex++}`);
                 values.push(filters.end_date);
+            }
+            if (filters.is_read !== undefined) {
+                conditions.push(`is_read = $${paramIndex++}`);
+                values.push(filters.is_read);
             }
         }
 
@@ -168,6 +176,10 @@ export class ClientConsultationModel {
             fields.push(`consultation_type_id = $${paramIndex++}`);
             values.push(updateData.consultation_type_id);
         }
+        if (updateData.is_read !== undefined) {
+            fields.push(`is_read = $${paramIndex++}`);
+            values.push(updateData.is_read);
+        }
 
         if (fields.length === 0) {
             return await this.findById(id);
@@ -191,6 +203,13 @@ export class ClientConsultationModel {
         const query = `DELETE FROM ${this.TABLE_NAME} WHERE id = $1`;
         const result = await client.query(query, [id]);
         return (result.rowCount ?? 0) > 0;
+    }
+
+    static async deleteMultiple(ids: number[]): Promise<number> {
+        const client = PostgresDatabase.getClient();
+        const query = `DELETE FROM ${this.TABLE_NAME} WHERE id = ANY($1)`;
+        const result = await client.query(query, [ids]);
+        return result.rowCount ?? 0;
     }
 }
 
