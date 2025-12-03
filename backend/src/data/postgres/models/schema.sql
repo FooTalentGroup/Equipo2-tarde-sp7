@@ -391,6 +391,14 @@ CREATE INDEX idx_client_consultations_property ON client_consultations(property_
 CREATE INDEX idx_client_consultations_date ON client_consultations(consultation_date);
 CREATE INDEX idx_client_consultations_responded_by ON client_consultations(responded_by_user_id);
 
+-- Add is_read column for tracking read/unread status
+ALTER TABLE client_consultations 
+ADD COLUMN IF NOT EXISTS is_read BOOLEAN DEFAULT false;
+
+-- Index for filtering unread consultations
+CREATE INDEX IF NOT EXISTS idx_client_consultations_is_read 
+ON client_consultations(is_read) WHERE is_read = false;
+
 -- CRM Interactions
 CREATE TABLE IF NOT EXISTS crm_interactions (
     id SERIAL PRIMARY KEY,
