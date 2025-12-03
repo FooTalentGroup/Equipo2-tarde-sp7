@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Button } from "@src/components/ui/button";
 import {
@@ -31,7 +31,6 @@ import {
 	SelectValue,
 } from "@src/components/ui/select";
 import { cn } from "@src/lib/utils";
-import { getClients } from "@src/modules/properties/services/property-service";
 import type { Client } from "@src/types/client";
 import type { PropertyForm } from "@src/types/property";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
@@ -39,30 +38,11 @@ import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
 	form: UseFormReturn<PropertyForm>;
+	clients: Client[];
 };
 
-export default function PropertyInfoForm({ form }: Props) {
-	const [clients, setClients] = useState<Client[]>([]);
-
+export default function PropertyBasicInfoForm({ form, clients }: Props) {
 	const [open, setOpen] = useState(false);
-
-	useEffect(() => {
-		async function fetchData() {
-			try {
-				const [clientsResponse] = await Promise.all([getClients()]);
-
-				if (clientsResponse?.clients) {
-					const owners = clientsResponse.clients.filter(
-						(client) => client.contact_category.name === "Propietario",
-					);
-					setClients(owners);
-				}
-			} catch (error) {
-				console.error("Error fetching data:", error);
-			}
-		}
-		fetchData();
-	}, []);
 
 	return (
 		<div className="grid grid-cols-2 gap-10 items-start">
@@ -246,12 +226,7 @@ export default function PropertyInfoForm({ form }: Props) {
 															clients.find(
 																(client) =>
 																	client.id.toString() === field.value,
-															)?.first_name
-														} ${
-															clients.find(
-																(client) =>
-																	client.id.toString() === field.value,
-															)?.last_name
+															)?.name
 														}`
 													: "Seleccionar propietario"
 												: "Seleccionar propietario"}
@@ -266,11 +241,7 @@ export default function PropertyInfoForm({ form }: Props) {
 												? `${
 														clients.find(
 															(client) => client.id.toString() === field.value,
-														)?.first_name
-													} ${
-														clients.find(
-															(client) => client.id.toString() === field.value,
-														)?.last_name
+														)?.name
 													}`
 												: undefined
 										}
@@ -284,7 +255,7 @@ export default function PropertyInfoForm({ form }: Props) {
 												{clients.map((client) => (
 													<CommandItem
 														className="justify-between"
-														value={`${client.first_name} ${client.last_name}`}
+														value={`${client.name}`}
 														key={client.id}
 														onSelect={() => {
 															form.setValue(
@@ -295,7 +266,7 @@ export default function PropertyInfoForm({ form }: Props) {
 															setOpen(false);
 														}}
 													>
-														{client.first_name} {client.last_name}
+														{client.name}
 														<CheckIcon
 															className={cn(
 																"mr-2 h-4 w-4",

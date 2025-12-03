@@ -11,6 +11,7 @@ import { Heading } from "@src/components/ui/heading";
 import { Separator } from "@src/components/ui/separator";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
+import type { Client } from "@src/types/client";
 import {
 	addressSchema,
 	basicSchema,
@@ -42,6 +43,7 @@ import PropertyValuesForm from "./property-values-form";
 
 type Props = {
 	defaultValues?: PropertyForm;
+	clients?: Client[];
 };
 
 const { useStepper, steps, utils } = defineStepper(
@@ -86,7 +88,7 @@ const { useStepper, steps, utils } = defineStepper(
 	},
 );
 
-export default function CreatePropertyForm({ defaultValues }: Props) {
+export default function CreatePropertyForm({ defaultValues, clients }: Props) {
 	const router = useRouter();
 
 	const stepper = useStepper();
@@ -308,7 +310,7 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 									<Heading variant="subtitle2" weight="semibold">
 										{title}
 									</Heading>
-									<PropertyBasicInfoForm form={form} />
+									<PropertyBasicInfoForm form={form} clients={clients ?? []} />
 								</div>
 							),
 							features: ({ title }) => (

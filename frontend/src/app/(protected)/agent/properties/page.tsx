@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function PropertiesPage() {
-	const data = await getProperties();
+	const propertyData = await getProperties();
 
 	return (
 		<>
@@ -25,21 +25,9 @@ export default async function PropertiesPage() {
 					>
 						<AdjustmentsHorizontalIcon className="size-6" /> Filtrar
 					</Button>
-					// <Button
-					// 	size="lg"
-					// 	variant="tertiary"
-					// 	asChild
-					// 	aria-label="Crear propiedad"
-					// >
-					// 	<Link href={paths.agent.properties.new()}>
-					// 		<Plus />
-					// 		Crear propiedad
-					// 	</Link>
-					// </Button>
 				}
 			/>
-			{/* <PropertyFilter /> */}
-			<PropertyList properties={data.properties} />
+			<PropertyList properties={propertyData.properties} />
 		</>
 	);
 }
