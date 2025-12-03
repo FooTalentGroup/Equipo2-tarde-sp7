@@ -1,59 +1,42 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import SectionHeading from "@src/components/section-heading/index";
-import { Button } from "@src/components/ui/button";
-import { Input } from "@src/components/ui/input";
 import { paths } from "@src/lib/paths";
-import { Plus, Search } from "lucide-react";
 
 interface ClientsLayoutProps {
 	children: ReactNode;
-	activeTab: "leads" | "inquilinos" | "propietarios";
 }
 
-export default function ClientsLayout({
-	children,
-	activeTab,
-}: ClientsLayoutProps) {
+export default function CreateClientLayout({ children }: ClientsLayoutProps) {
+	const pathname = usePathname() || "";
+	let activeTab: "leads" | "inquilinos" | "propietarios" = "leads";
+
+	if (pathname.includes("/agent/clients/create/inquilinos")) {
+		activeTab = "inquilinos";
+	} else if (pathname.includes("/agent/clients/create/leads")) {
+		activeTab = "leads";
+	} else if (
+		pathname.includes("/agent/clients/create/new/propietarios") ||
+		pathname.includes("/agent/clients/create/propietarios")
+	) {
+		activeTab = "propietarios";
+	}
 	return (
 		<div className="w-full mx-auto">
 			{/* Header */}
-			<SectionHeading
-				title="Clientes"
-				actions={
-					<Button
-						size="default"
-						variant="tertiary"
-						asChild
-						aria-label="Crear cliente"
-					>
-						<Link href={paths.agent.clients.newInquilinos()}>
-							<Plus />
-							Crear cliente
-						</Link>
-					</Button>
-				}
-			/>
+			<SectionHeading title="Nuevo cliente" />
 
 			{/* Search and Navigation Tabs */}
 			<div className="w-full">
 				<div className="flex items-center my-4">
-					<div className="w-full max-w-2/3">
-						<div className="relative">
-							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-							<Input
-								type="text"
-								placeholder="Buscar por nombre, DNI o dirección..."
-								className="pl-10 h-7"
-							/>
-						</div>
-					</div>
-
 					<div className="justify-start gap-2 rounded-none bg-transparent px-5 text-black flex">
 						<Link
-							href={paths.agent.clients.leads()}
+							href={paths.agent.clients.newLeads()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "leads"
 									? "bg-tertiary text-primary-foreground"
@@ -63,7 +46,7 @@ export default function ClientsLayout({
 							Leads
 						</Link>
 						<Link
-							href={paths.agent.clients.inquilinos()}
+							href={paths.agent.clients.newInquilinos()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "inquilinos"
 									? "bg-tertiary text-primary-foreground"
@@ -73,7 +56,7 @@ export default function ClientsLayout({
 							Inquilinos
 						</Link>
 						<Link
-							href={paths.agent.clients.propietarios()}
+							href={paths.agent.owners.new()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "propietarios"
 									? "bg-tertiary text-primary-foreground"

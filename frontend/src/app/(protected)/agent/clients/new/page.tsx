@@ -7,13 +7,6 @@ import {
 	TabsTrigger,
 } from "@src/components/ui/tabs";
 import TenantForm from "@src/modules/clients/components/tenant-form";
-/* import { Button } from "@src/components/ui/button";
-import { Input } from "@src/components/ui/input";
-import { LeadsCard } from "@src/modules/clients/ui/LeadsCard";
-import { PropertyOwnerCard } from "@src/modules/clients/ui/PropertyOwnerCard";
-import TenantCard from "@src/modules/clients/ui/TenantCard";
-import type { Client, Tenant } from "@src/types/client";
-import { Search } from "lucide-react"; */
 
 export default function page() {
 	return (

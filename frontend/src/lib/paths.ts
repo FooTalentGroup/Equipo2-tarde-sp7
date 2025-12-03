@@ -19,13 +19,15 @@ export const paths = {
 		dashboard: () => "/agent/dashboard",
 		clients: {
 			index: () => "/agent/clients",
-			new: () => "/agent/clients/create",
+			newLeads: () => "/agent/clients/create/leads",
+			newInquilinos: () => "/agent/clients/create/inquilinos",
 			leads: () => "/agent/clients/leads",
 			inquilinos: () => "/agent/clients/inquilinos",
 			propietarios: () => "/agent/clients/propietarios",
 			searchProperties: () => "/agent/clients/search",
 		},
 		owners: {
+			new: () => "/agent/clients/create/new/propietarios",
 			detail: (id: string) => `/agent/clients/propietarios/${id}`,
 		},
 		properties: {
