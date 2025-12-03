@@ -22,15 +22,13 @@ import type { PropertyForm } from "@src/types/property";
 import { Move, Plus, Trash2 } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
-interface PropertyCharacteristicsProps {
+type Props = {
 	form: UseFormReturn<PropertyForm>;
-}
+};
 
-const MAX_FILE_SIZE = 1 * 1024 * 1024;
+type FileWithId = File & { uniqueId?: string };
 
-export default function PropertyGalleryForm({
-	form,
-}: PropertyCharacteristicsProps) {
+export default function PropertyGalleryForm({ form }: Props) {
 	return (
 		<FormField
 			control={form.control}
@@ -40,30 +38,29 @@ export default function PropertyGalleryForm({
 					<FormControl>
 						<FileUpload
 							value={field.value}
-							onValueChange={field.onChange}
+							onValueChange={(newFiles) => {
+								const filesWithIds = newFiles.map((file) => {
+									const fileWithId = file as FileWithId;
+									if (!fileWithId.uniqueId) {
+										fileWithId.uniqueId = crypto.randomUUID();
+									}
+									return fileWithId;
+								});
+								field.onChange(filesWithIds);
+							}}
 							accept="image/png, image/jpeg, image/webp"
 							maxFiles={Infinity}
-							maxSize={MAX_FILE_SIZE}
-							onFileReject={(_, message) => {
-								let error = message;
-								if (message === "File too large") {
-									error =
-										"El archivo es demasiado grande. El tamaño máximo es 1MB.";
-								} else if (message === "File type not accepted") {
-									error = "Tipo de archivo no aceptado.";
-								}
-								form.setError("images.gallery", {
-									message: error,
-								});
-							}}
 							multiple
 						>
 							<Sortable.Root
 								value={field.value || []}
 								onValueChange={field.onChange}
 								getItemValue={(item) => {
-									const file = item as File;
-									return `${file.name}-${file.size}-${file.lastModified}`;
+									const file = item as File & { uniqueId?: string };
+									return (
+										file.uniqueId ||
+										`${file.name}-${file.size}-${file.lastModified}`
+									);
 								}}
 								orientation="mixed"
 							>
@@ -71,7 +68,10 @@ export default function PropertyGalleryForm({
 									<Sortable.Content asChild>
 										<FileUploadList className="contents">
 											{field.value?.map((file, index) => {
-												const fileId = `${file.name}-${file.size}-${file.lastModified}`;
+												const fileWithId = file as File & { uniqueId?: string };
+												const fileId =
+													fileWithId.uniqueId ||
+													`${file.name}-${file.size}-${file.lastModified}`;
 												return (
 													<Sortable.Item key={fileId} value={fileId} asChild>
 														<FileUploadItem
@@ -122,31 +122,35 @@ export default function PropertyGalleryForm({
 											})}
 										</FileUploadList>
 									</Sortable.Content>
-									<FileUploadDropzone className="aspect-square flex-col justify-center border-dashed bg-transparent p-0">
-										<FileUploadTrigger asChild>
-											<Button
-												variant="ghost"
-												className="size-full flex-col gap-2 hover:bg-transparent"
-											>
-												<Plus className="size-8 text-muted-foreground" />
-												<p className="font-normal text-xs">
-													<span className="text-tertiary font-semibold underline">
-														Click para subir
-													</span>
-													<br /> o arrastra y suelta
-												</p>
-												<span className="sr-only">Agregar imagen </span>
-											</Button>
-										</FileUploadTrigger>
-									</FileUploadDropzone>
+									{(field.value?.length || 0) < 10 && (
+										<FileUploadDropzone className="aspect-square flex-col justify-center border-dashed bg-transparent p-0">
+											<FileUploadTrigger asChild>
+												<Button
+													variant="ghost"
+													className="size-full flex-col gap-2 hover:bg-transparent"
+												>
+													<Plus className="size-8 text-muted-foreground" />
+													<p className="font-normal text-xs">
+														<span className="text-tertiary font-semibold underline">
+															Click para subir
+														</span>
+														<br /> o arrastra y suelta
+													</p>
+													<span className="sr-only">Agregar imagen </span>
+												</Button>
+											</FileUploadTrigger>
+										</FileUploadDropzone>
+									)}
 								</div>
 								<Sortable.Overlay>
 									{(params) => {
-										const file = field.value?.find(
-											(f) =>
-												`${f.name}-${f.size}-${f.lastModified}` ===
-												params.value,
-										);
+										const file = field.value?.find((f) => {
+											const fileWithId = f as File & { uniqueId?: string };
+											const id =
+												fileWithId.uniqueId ||
+												`${f.name}-${f.size}-${f.lastModified}`;
+											return id === params.value;
+										});
 										if (!file) return null;
 										return (
 											<FileUploadItem

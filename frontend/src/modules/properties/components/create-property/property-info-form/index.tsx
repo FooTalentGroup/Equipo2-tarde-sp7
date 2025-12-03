@@ -32,18 +32,30 @@ import {
 } from "@src/components/ui/select";
 import { cn } from "@src/lib/utils";
 import { PROPERTY_TYPE } from "@src/modules/properties/consts";
-import type { Client } from "@src/types/client";
+import type { Owner } from "@src/types/clients/owner";
 import type { PropertyForm } from "@src/types/property";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
 type Props = {
 	form: UseFormReturn<PropertyForm>;
-	clients: Client[];
+	clients: Owner[];
 };
 
 export default function PropertyBasicInfoForm({ form, clients }: Props) {
 	const [open, setOpen] = useState(false);
+
+	const getClientFullName = (clientId: string | undefined) => {
+		if (!clientId) return "Seleccionar propietario";
+
+		const client = clients.find((c) => c.id.toString() === clientId);
+
+		if (client) {
+			return `${client.first_name} ${client.last_name}`;
+		}
+
+		return "Seleccionar propietario";
+	};
 
 	return (
 		<div className="grid grid-cols-2 gap-10 items-start">
@@ -206,88 +218,80 @@ export default function PropertyBasicInfoForm({ form, clients }: Props) {
 				<FormField
 					control={form.control}
 					name="basic.owner_id"
-					render={({ field }) => (
-						<FormItem className="flex flex-col">
-							<FormLabel>Propietario asignado</FormLabel>
-							<Popover open={open} onOpenChange={setOpen}>
-								<PopoverTrigger asChild>
-									<FormControl>
-										<Button
-											variant="combobox"
-											role="combobox"
-											aria-expanded={open}
-											className={cn(
-												"w-full justify-between",
-												field.value && "text-input-foreground",
-											)}
-										>
-											{field.value
-												? clients.find(
-														(client) => client.id.toString() === field.value,
-													)
-													? `${
-															clients.find(
-																(client) =>
-																	client.id.toString() === field.value,
-															)?.name
-														}`
-													: "Seleccionar propietario"
-												: "Seleccionar propietario"}
-											<ChevronsUpDownIcon className="ml-2 size-5 shrink-0 text-input-foreground" />
-										</Button>
-									</FormControl>
-								</PopoverTrigger>
-								<PopoverContent className="w-full p-0">
-									<Command
-										defaultValue={
-											field.value
-												? `${
-														clients.find(
-															(client) => client.id.toString() === field.value,
-														)?.name
-													}`
-												: undefined
-										}
-									>
-										<CommandInput placeholder="Buscar propietario..." />
-										<CommandList>
-											<CommandEmpty>
-												No se encontraron propietarios.
-											</CommandEmpty>
-											<CommandGroup>
-												{clients.map((client) => (
-													<CommandItem
-														className="justify-between"
-														value={`${client.name}`}
-														key={client.id}
-														onSelect={() => {
-															form.setValue(
-																"basic.owner_id",
-																client.id.toString(),
-																{ shouldValidate: true },
-															);
-															setOpen(false);
-														}}
-													>
-														{client.name}
-														<CheckIcon
-															className={cn(
-																"mr-2 h-4 w-4",
-																client.id.toString() === field.value
-																	? "opacity-100"
-																	: "opacity-0",
-															)}
-														/>
-													</CommandItem>
-												))}
-											</CommandGroup>
-										</CommandList>
-									</Command>
-								</PopoverContent>
-							</Popover>
-							<FormMessage />
-						</FormItem>
-					)}
+					render={({ field }) => {
+						const selectedClient = clients.find(
+							(c) => c.id.toString() === field.value,
+						);
+
+						const buttonText = selectedClient
+							? `${selectedClient.first_name} ${selectedClient.last_name}`
+							: "Seleccionar propietario";
+
+						return (
+							<FormItem className="flex flex-col">
+								<FormLabel>Propietario asignado</FormLabel>
+								<Popover open={open} onOpenChange={setOpen}>
+									<PopoverTrigger asChild>
+										<FormControl>
+											<Button
+												variant="combobox"
+												role="combobox"
+												aria-expanded={open}
+												className={cn(
+													"w-full justify-between",
+													field.value && "text-input-foreground",
+												)}
+											>
+												{buttonText}
+												<ChevronsUpDownIcon className="ml-2 size-5 shrink-0 text-input-foreground" />
+											</Button>
+										</FormControl>
+									</PopoverTrigger>
+									<PopoverContent className="w-full p-0">
+										<Command>
+											<CommandInput placeholder="Buscar propietario..." />
+											<CommandList>
+												<CommandEmpty></CommandEmpty>
+
+												<CommandGroup>
+													{clients.map((client) => {
+														const clientFullName = `${client.first_name} ${client.last_name}`;
+
+														return (
+															<CommandItem
+																className="justify-between"
+																value={client.id.toString()}
+																key={client.id}
+																onSelect={(_currentValue) => {
+																	form.setValue(
+																		"basic.owner_id",
+																		client.id.toString(),
+																		{ shouldValidate: true },
+																	);
+																	setOpen(false);
+																}}
+															>
+																  {clientFullName} 
+																<CheckIcon
+																	className={cn(
+																		"mr-2 h-4 w-4",
+																		client.id.toString() === field.value
+																			? "opacity-100"
+																			: "opacity-0",
+																	)}
+																/>
+															</CommandItem>
+														);
+													})}
+												</CommandGroup>
+											</CommandList>
+										</Command>
+									</PopoverContent>
+								</Popover>
+								<FormMessage />
+							</FormItem>
+						);
+					}}
 				/>
 			</div>
 		</div>
