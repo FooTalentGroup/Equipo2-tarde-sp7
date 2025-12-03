@@ -9,6 +9,8 @@ export const metadata = {
 	description: "Gestión de propiedades inmobiliarias",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function PropertiesPage() {
 	const propertyData = await getProperties();
 
