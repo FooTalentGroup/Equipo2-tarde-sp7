@@ -25,6 +25,9 @@ export const paths = {
 			propietarios: () => "/agent/clients/propietarios",
 			searchProperties: () => "/agent/clients/search",
 		},
+		owners: {
+			detail: (id: string) => `/agent/clients/propietarios/${id}`,
+		},
 		properties: {
 			index: () => "/agent/properties",
 			detail: (id: string) => `/agent/properties/${id}`,

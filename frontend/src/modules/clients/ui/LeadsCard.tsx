@@ -49,7 +49,7 @@ export function LeadsCard({ client }: { client: Client }) {
 			</Card>
 
 			<Dialog open={isOpen} onOpenChange={setIsOpen}>
-				<DialogContent className="max-w-2xl bg-grey-fill">
+				<DialogContent className="max-w-2xl bg-white">
 					<DialogHeader>
 						<div className="flex items-center justify-between transition-colors border border-slate-200 rounded-lg p-4 mt-4">
 							<div className="flex items-center gap-4">
