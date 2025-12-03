@@ -14,21 +14,22 @@ export const VisibilityStatus = {
 } as const;
 
 export const visibilityStatusEnum = z.enum(["Publicado", "No Publicado"]);
-export type VisibilityStatusType = z.infer<typeof visibilityStatusEnum>;
 
-export const PropertyType = {
-	APARTMENT: "apartment",
-	HOUSE: "house",
-	PH: "ph",
-	LAND: "land",
-	COMMERCIAL: "commercial",
-	OFFICE: "office",
-} as const;
+export const propertyTypeEnum = z.enum([
+	"Casa",
+	"Departamento",
+	"PH",
+	"Local Comercial",
+	"Oficina",
+	"Terreno",
+	"Cochera",
+	"Depósito",
+]);
 
 export const basicSchema = z.object({
 	title: z.string().min(3, "El título es obligatorio"),
 	description: z.string().optional(),
-	property_type: z.string().min(1, "El tipo de propiedad es obligatorio"),
+	property_type: propertyTypeEnum,
 	property_status: z.string().optional(),
 	visibility_status: visibilityStatusEnum.optional(),
 	featured_web: z.boolean().optional(),
@@ -256,3 +257,6 @@ export type PropertyCharacteristics = z.infer<typeof characteristicsSchema>;
 export type PropertySurface = z.infer<typeof surfaceSchema>;
 export type PropertyServices = z.infer<typeof servicesSchema>;
 export type PropertyInternal = z.infer<typeof internalSchema>;
+
+export type PropertyType = z.infer<typeof propertyTypeEnum>;
+export type VisibilityStatusType = z.infer<typeof visibilityStatusEnum>;

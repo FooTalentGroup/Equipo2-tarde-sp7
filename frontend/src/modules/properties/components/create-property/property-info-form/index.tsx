@@ -31,6 +31,7 @@ import {
 	SelectValue,
 } from "@src/components/ui/select";
 import { cn } from "@src/lib/utils";
+import { PROPERTY_TYPE } from "@src/modules/properties/consts";
 import type { Client } from "@src/types/client";
 import type { PropertyForm } from "@src/types/property";
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
@@ -75,12 +76,14 @@ export default function PropertyBasicInfoForm({ form, clients }: Props) {
 								</FormControl>
 								<SelectContent>
 									<SelectGroup>
-										<SelectItem value="Casa">Casa</SelectItem>
-										{/* <SelectItem value="apartment">Departamento</SelectItem>
-										<SelectItem value="ph">PH</SelectItem>
-										<SelectItem value="land">Terreno</SelectItem>
-										<SelectItem value="commercial">Local comercial</SelectItem>
-										<SelectItem value="office">Oficina</SelectItem> */}
+										{PROPERTY_TYPE.map((type, index) => (
+											<SelectItem
+												key={`${type.label}-${index}`}
+												value={type.value}
+											>
+												{type.label}
+											</SelectItem>
+										))}
 									</SelectGroup>
 								</SelectContent>
 							</Select>
