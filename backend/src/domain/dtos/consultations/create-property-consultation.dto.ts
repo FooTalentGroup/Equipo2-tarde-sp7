@@ -63,7 +63,7 @@ export class CreatePropertyConsultationDto {
         return [
             undefined,
             new CreatePropertyConsultationDto(
-                property_id,
+                propertyIdNumber,
                 first_name.trim(),
                 last_name.trim(),
                 phone.trim(),
