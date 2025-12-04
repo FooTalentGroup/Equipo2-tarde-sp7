@@ -1,3 +1,5 @@
+import { normalizePhone } from '../../utils/phone-normalization.util';
+
 export class CreatePropertyConsultationDto {
     private constructor(
         public readonly property_id: number,
@@ -60,13 +62,16 @@ export class CreatePropertyConsultationDto {
             if (email.length > 255) return ['Email must be less than 255 characters'];
         }
 
+        // Normalizar teléfono para que quepa en la BD (máximo 15 caracteres)
+        const normalizedPhone = normalizePhone(phone.trim());
+
         return [
             undefined,
             new CreatePropertyConsultationDto(
                 propertyIdNumber,
                 first_name.trim(),
                 last_name.trim(),
-                phone.trim(),
+                normalizedPhone,
                 message.trim(),
                 email && email.trim() !== '' ? email.trim() : undefined
             )
