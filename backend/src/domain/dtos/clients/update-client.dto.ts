@@ -1,8 +1,15 @@
-import { regularExps } from '../../../config/regular-exp';
+import { 
+    validateFirstName, 
+    validateLastName, 
+    validatePhone, 
+    validateEmail, 
+    validateDni 
+} from '../../utils/client-validation.util';
 
 /**
  * DTO para actualizar un cliente
- * Todos los campos son opcionales
+ * Todos los campos son opcionales (PATCH)
+ * Usa validaciones compartidas para mantener consistencia
  */
 export class UpdateClientDto {
     constructor(
@@ -66,61 +73,37 @@ export class UpdateClientDto {
             return ['City ID must be a number', undefined];
         }
 
-        // Validar first_name si se proporciona
+        // Validar first_name si se proporciona (usando validación compartida)
         if (first_name !== undefined) {
             if (!first_name || first_name.trim().length === 0) {
                 return ['First name cannot be empty', undefined];
             }
-            if (first_name.trim().length < 2) {
-                return ['First name must be at least 2 characters', undefined];
-            }
-            if (first_name.trim().length > 100) {
-                return ['First name must be less than 100 characters', undefined];
-            }
+            const firstNameError = validateFirstName(first_name);
+            if (firstNameError[0]) return [firstNameError[0], undefined];
         }
 
-        // Validar last_name si se proporciona
+        // Validar last_name si se proporciona (usando validación compartida)
         if (last_name !== undefined) {
             if (!last_name || last_name.trim().length === 0) {
                 return ['Last name cannot be empty', undefined];
             }
-            if (last_name.trim().length < 2) {
-                return ['Last name must be at least 2 characters', undefined];
-            }
-            if (last_name.trim().length > 100) {
-                return ['Last name must be less than 100 characters', undefined];
-            }
+            const lastNameError = validateLastName(last_name);
+            if (lastNameError[0]) return [lastNameError[0], undefined];
         }
 
-        // Validar formato de teléfono si se proporciona (NO permite letras)
+        // Validar formato de teléfono si se proporciona (usando validación compartida)
         if (phone !== undefined && phone !== null) {
             if (phone.trim().length === 0) {
                 return ['Phone cannot be empty', undefined];
             }
-            const trimmedPhone = phone.trim();
-            const validCharsRegex = /^[\d\s\-\(\)\+\.]+$/;
-            if (!validCharsRegex.test(trimmedPhone)) {
-                return ['Invalid phone format: phone can only contain numbers, spaces, dashes, parentheses, plus sign, and dots', undefined];
-            }
-            const digitsOnly = trimmedPhone.replace(/\D/g, '');
-            if (digitsOnly.length < 10) {
-                return ['Invalid phone format: phone must contain at least 10 digits', undefined];
-            }
-            if (digitsOnly.length > 15) {
-                return ['Invalid phone format: phone must contain at most 15 digits', undefined];
-            }
+            const phoneError = validatePhone(phone);
+            if (phoneError[0]) return [phoneError[0], undefined];
         }
 
-        // Validar email si se proporciona
+        // Validar email si se proporciona (usando validación compartida)
         if (email !== undefined && email !== null) {
-            if (email.trim().length > 0) {
-                if (!regularExps.email.test(email.trim())) {
-                    return ['Invalid email format', undefined];
-                }
-                if (email.trim().length > 255) {
-                    return ['Email must be less than 255 characters', undefined];
-                }
-            }
+            const emailError = validateEmail(email, false);
+            if (emailError[0]) return [emailError[0], undefined];
         }
 
         // Validar property_interest_phone si se proporciona
@@ -141,19 +124,10 @@ export class UpdateClientDto {
             }
         }
 
-        // Validar DNI si se proporciona
+        // Validar DNI si se proporciona (usando validación compartida)
         if (dni !== undefined && dni !== null) {
-            if (dni.trim().length > 0) {
-                const trimmedDni = dni.trim();
-                const dniRegex = /^[\d\s\-]{7,}$/;
-                if (!dniRegex.test(trimmedDni)) {
-                    return ['Invalid DNI format: DNI can only contain numbers, spaces, and dashes', undefined];
-                }
-                const dniDigitsOnly = trimmedDni.replace(/\D/g, '');
-                if (dniDigitsOnly.length < 7 || dniDigitsOnly.length > 15) {
-                    return ['Invalid DNI format: DNI must contain between 7 and 15 digits', undefined];
-                }
-            }
+            const dniError = validateDni(dni);
+            if (dniError[0]) return [dniError[0], undefined];
         }
 
         // Validar que al menos un campo esté presente
