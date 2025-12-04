@@ -29,7 +29,7 @@ export default function ClientsLayout({
 						asChild
 						aria-label="Crear cliente"
 					>
-						<Link href={paths.agent.clients.new()}>
+						<Link href={paths.agent.clients.newLeads()}>
 							<Plus />
 							Crear cliente
 						</Link>
