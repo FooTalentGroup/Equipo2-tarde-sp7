@@ -12,9 +12,21 @@ export class CreatePropertyConsultationDto {
         const { property_id, first_name, last_name, phone, email, message } = object;
 
         // Validar property_id
-        if (!property_id) return ['Property ID is required'];
-        if (typeof property_id !== 'number') return ['Property ID must be a number'];
-        if (property_id <= 0) return ['Property ID must be greater than 0'];
+        if (!property_id && property_id !== 0) return ['Property ID is required'];
+        
+        let propertyIdNumber: number;
+        if (typeof property_id === 'number') {
+            propertyIdNumber = property_id;
+        } else if (typeof property_id === 'string') {
+            propertyIdNumber = parseInt(property_id, 10);
+            if (isNaN(propertyIdNumber)) {
+                return ['Property ID must be a valid number'];
+            }
+        } else {
+            return ['Property ID must be a number'];
+        }
+        
+        if (propertyIdNumber <= 0) return ['Property ID must be greater than 0'];
 
         // Validar first_name
         if (!first_name) return ['First name is required'];
