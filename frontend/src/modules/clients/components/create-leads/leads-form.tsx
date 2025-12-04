@@ -27,6 +27,8 @@ import {
 	type ContactFormData,
 	contactFormSchema,
 } from "../../schemas/contact-form.schema";
+import { createLeadServerAction } from "../../services/clients-service";
+import PropertySearchInput from "../PropertySearchInput";
 
 type ContactFormProps = {
 	onSubmit?: (data: ContactFormData) => Promise<void> | void;
@@ -41,7 +43,8 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 			last_name: "",
 			phone: "",
 			email: "",
-			consultation_type: "rental",
+			consultation_type_id: 1,
+
 			interest_zone: "",
 		},
 	});
@@ -60,22 +63,18 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 					email: data.email,
 					contact_category: "Lead",
 					interest_zone: data.interest_zone,
-					purchase_interest: data.consultation_type === "purchase",
-					rental_interest: data.consultation_type === "rental",
-					property_search_type: "", // Se completará en otro formulario
-					dni: "", // Se completará en otro formulario
-					city: "", // Se completará en otro formulario
-					province: "", // Se completará en otro formulario
-					country: "Argentina", // Valor por defecto
+					consultation_type_id: data.consultation_type_id,
+
 					notes: "",
 				};
 
 				// Aquí irá la llamada al backend
 				// const response = await axios.post('/api/leads', leadData);
-				console.log("Datos del formulario para backend:", leadData);
+				await createLeadServerAction(leadData as CreateLead);
+				/* console.log("Datos del formulario para backend:", leadData); */
 
 				// Simular delay de envío
-				await new Promise((resolve) => setTimeout(resolve, 1000));
+				/* await new Promise((resolve) => setTimeout(resolve, 1000)); */
 
 				toast.success("Contacto guardado exitosamente");
 				form.reset();
@@ -194,35 +193,14 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
-							name="interest_zone"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel className="text-secondary-dark font-semibold">
-										Zona de interés
-									</FormLabel>
-									<FormControl>
-										<Input
-											type="text"
-											placeholder="Palermo, Recoleta, Belgrano..."
-											className="text-base placeholder:text-grey-light border-input-border/70 focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-12 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
-											{...field}
-										/>
-									</FormControl>
-									<FormMessageWithIcon className="text-xs" />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="consultation_type"
+							name="consultation_type_id"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel className="text-secondary-dark font-semibold">
 										Tipo de consulta
 									</FormLabel>
 									<Select
-										onValueChange={field.onChange}
-										defaultValue={field.value}
+										onValueChange={(value) => field.onChange(Number(value))}
 									>
 										<FormControl>
 											<SelectTrigger className="w-full text-base placeholder:text-grey-light border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active shadow-input-border">
@@ -230,11 +208,34 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent className="bg-dropdown-background">
-											<SelectItem value="rental">Alquiler</SelectItem>
-											<SelectItem value="sale">Venta</SelectItem>
-											<SelectItem value="purchase">Compra</SelectItem>
+											<SelectItem value="1">Consulta General</SelectItem>
+											<SelectItem value="3">Consulta por Alquiler</SelectItem>
+											<SelectItem value="2">Consulta por Compra</SelectItem>
+											<SelectItem value="4">Consulta por Venta</SelectItem>
 										</SelectContent>
 									</Select>
+									<FormMessageWithIcon className="text-xs" />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name="interest_zone"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Propiedad de interés
+									</FormLabel>
+									<FormControl>
+										<PropertySearchInput
+											value={field.value}
+											onSelect={(property) => {
+												field.onChange(property.title);
+											}}
+											placeholder="Buscar propiedad disponible..."
+											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+										/>
+									</FormControl>
 									<FormMessageWithIcon className="text-xs" />
 								</FormItem>
 							)}

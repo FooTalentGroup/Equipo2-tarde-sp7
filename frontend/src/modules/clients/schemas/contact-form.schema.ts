@@ -32,11 +32,7 @@ export const contactFormSchema = z.object({
 		.max(100, "El email no puede exceder 100 caracteres")
 		.toLowerCase(),
 
-	consultation_type: z.enum(
-		["rental", "sale", "purchase"] as const,
-		"Seleccione un tipo de consulta",
-	),
-
+	consultation_type_id: z.number().int().positive(),
 	interest_zone: z
 		.string()
 		.min(2, "La zona de interés debe tener al menos 2 caracteres")
