@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import { ClientController } from './controller';
 import { ClientServices } from '../services/client.services';
+import { TenantServices } from '../services/tenant.services';
+import { OwnerServices } from '../services/owner.services';
+import { LeadServices } from '../services/lead.services';
 import { AuthMiddleware } from '../middlewares/auth.middleware';
 import { jwtAdapter } from '../../config';
 
@@ -9,14 +12,78 @@ export class ClientRoutes {
         const router = Router();
         
         const clientServices = new ClientServices();
-        const controller = new ClientController(clientServices);
+        const tenantServices = new TenantServices();
+        const ownerServices = new OwnerServices();
+        const leadServices = new LeadServices();
+        const controller = new ClientController(
+            clientServices,
+            tenantServices,
+            ownerServices,
+            leadServices
+        );
         const authMiddleware = new AuthMiddleware(jwtAdapter);
 
         /**
          * @swagger
-         * /api/clients:
+         * /api/clients/tenants:
          *   post:
-         *     summary: Create a new client
+         *     summary: Create a new tenant with property and rental contract
+         *     tags: [Clients]
+         *     security:
+         *       - bearerAuth: []
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateTenantDto'
+         *     responses:
+         *       201:
+         *         description: Tenant created successfully
+         *       400:
+         *         description: Bad request
+         *       401:
+         *         description: Unauthorized
+         */
+        router.post(
+            '/tenants',
+            authMiddleware.authenticate,
+            (req, res) => controller.createTenant(req, res)
+        );
+
+        /**
+         * @swagger
+         * /api/clients/owners:
+         *   post:
+         *     summary: Create a new owner with optional property association
+         *     tags: [Clients]
+         *     security:
+         *       - bearerAuth: []
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             $ref: '#/components/schemas/CreateOwnerDto'
+         *     responses:
+         *       201:
+         *         description: Owner created successfully
+         *       400:
+         *         description: Bad request
+         *       401:
+         *         description: Unauthorized
+         */
+        router.post(
+            '/owners',
+            authMiddleware.authenticate,
+            (req, res) => controller.createOwner(req, res)
+        );
+
+        /**
+         * @swagger
+         * /api/clients/leads:
+         *   post:
+         *     summary: Create a new lead with consultation and property of interest
          *     tags: [Clients]
          *     security:
          *       - bearerAuth: []
@@ -30,7 +97,7 @@ export class ClientRoutes {
          *               - first_name
          *               - last_name
          *               - phone
-         *               - contact_category
+         *               - email
          *             properties:
          *               first_name:
          *                 type: string
@@ -38,18 +105,28 @@ export class ClientRoutes {
          *                 type: string
          *               phone:
          *                 type: string
-         *               contact_category:
+         *               email:
          *                 type: string
+         *               notes:
+         *                 type: string
+         *               consultation_type_id:
+         *                 type: integer
+         *               consultation_type:
+         *                 type: string
+         *               property_id:
+         *                 type: integer
          *     responses:
          *       201:
-         *         description: Client created successfully
+         *         description: Lead created successfully
          *       400:
          *         description: Bad request
+         *       401:
+         *         description: Unauthorized
          */
         router.post(
-            '/',
+            '/leads',
             authMiddleware.authenticate,
-            (req, res) => controller.createClient(req, res)
+            (req, res) => controller.createLead(req, res)
         );
 
         /**
