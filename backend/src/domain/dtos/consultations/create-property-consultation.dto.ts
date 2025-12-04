@@ -1,3 +1,5 @@
+import { normalizePhone } from '../../utils/phone-normalization.util';
+
 export class CreatePropertyConsultationDto {
     private constructor(
         public readonly property_id: number,
@@ -12,9 +14,21 @@ export class CreatePropertyConsultationDto {
         const { property_id, first_name, last_name, phone, email, message } = object;
 
         // Validar property_id
-        if (!property_id) return ['Property ID is required'];
-        if (typeof property_id !== 'number') return ['Property ID must be a number'];
-        if (property_id <= 0) return ['Property ID must be greater than 0'];
+        if (!property_id && property_id !== 0) return ['Property ID is required'];
+        
+        let propertyIdNumber: number;
+        if (typeof property_id === 'number') {
+            propertyIdNumber = property_id;
+        } else if (typeof property_id === 'string') {
+            propertyIdNumber = parseInt(property_id, 10);
+            if (isNaN(propertyIdNumber)) {
+                return ['Property ID must be a valid number'];
+            }
+        } else {
+            return ['Property ID must be a number'];
+        }
+        
+        if (propertyIdNumber <= 0) return ['Property ID must be greater than 0'];
 
         // Validar first_name
         if (!first_name) return ['First name is required'];
@@ -48,13 +62,16 @@ export class CreatePropertyConsultationDto {
             if (email.length > 255) return ['Email must be less than 255 characters'];
         }
 
+        // Normalizar teléfono para que quepa en la BD (máximo 15 caracteres)
+        const normalizedPhone = normalizePhone(phone.trim());
+
         return [
             undefined,
             new CreatePropertyConsultationDto(
-                property_id,
+                propertyIdNumber,
                 first_name.trim(),
                 last_name.trim(),
-                phone.trim(),
+                normalizedPhone,
                 message.trim(),
                 email && email.trim() !== '' ? email.trim() : undefined
             )
