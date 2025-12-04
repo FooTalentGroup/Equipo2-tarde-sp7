@@ -30,13 +30,47 @@ export class Authroutes {
      *             properties:
      *               email:
      *                 type: string
+     *                 example: admin@example.com
      *               password:
      *                 type: string
+     *                 example: password123
      *     responses:
      *       200:
      *         description: Login successful
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Login successful
+     *                 token:
+     *                   type: string
+     *                   description: JWT token to use in Authorization header (Bearer token)
+     *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsInJvbGVfaWQiOjEsImlhdCI6MTY5OTk5OTk5OSwiZXhwIjoxNzAwMDg2Mzk5fQ.example_signature
+     *                 user:
+     *                   type: object
+     *                   properties:
+     *                     id:
+     *                       type: integer
+     *                       example: 1
+     *                     email:
+     *                       type: string
+     *                       example: admin@example.com
+     *                     first_name:
+     *                       type: string
+     *                       example: Admin
+     *                     last_name:
+     *                       type: string
+     *                       example: User
+     *                     role_id:
+     *                       type: integer
+     *                       example: 1
      *       400:
      *         description: Bad request
+     *       401:
+     *         description: Invalid credentials
      */
     router.post('/login', (req, res) => controller.loginUser(req, res));
 
@@ -91,6 +125,43 @@ export class Authroutes {
     router.get('/validate-email/:token', (req, res) => controller.validateEmail(req, res));
     
     // Rutas protegidas (requieren autenticación)
+    /**
+     * @swagger
+     * /api/auth/me:
+     *   get:
+     *     summary: Get current user profile
+     *     tags: [Auth]
+     *     security:
+     *       - bearerAuth: []
+     *     responses:
+     *       200:
+     *         description: User profile retrieved successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 id:
+     *                   type: integer
+     *                   example: 1
+     *                 email:
+     *                   type: string
+     *                   example: admin@example.com
+     *                 first_name:
+     *                   type: string
+     *                   example: Admin
+     *                 last_name:
+     *                   type: string
+     *                   example: User
+     *                 phone:
+     *                   type: string
+     *                   example: +541112345678
+     *                 role_id:
+     *                   type: integer
+     *                   example: 1
+     *       401:
+     *         description: Unauthorized - Invalid or missing token
+     */
     router.get('/me', authMiddleware.authenticate, (req, res) => controller.getProfile(req, res));
 
     return router;
