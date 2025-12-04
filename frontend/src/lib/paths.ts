@@ -44,11 +44,9 @@ export const paths = {
 	},
 
 	admin: {
-		dashboard: () => "/admin/dashboard",
+		dashboard: () => "/admin/users",
 		users: {
-			index: () => "/admin/users",
-			new: () => "/admin/users/new",
-			detail: (id: string) => `/admin/users/${id}`,
+			create: () => "/admin/users/create",
 		},
 	},
 } as const;

@@ -79,24 +79,14 @@ export const agentNavigation = [
 
 export const adminnavigation = [
 	{
-		title: "Panel principal",
-		href: paths.admin.dashboard(),
-		icon: House,
-	},
-	{
 		title: "Usuarios",
 		icon: Users,
-		isActive: false,
+		isActive: true,
 		items: [
 			{
 				title: "Lista de usuarios",
 				icon: List,
-				href: paths.admin.users.index(),
-			},
-			{
-				title: "Agregar usuario",
-				icon: Plus,
-				href: paths.admin.users.new(),
+				href: paths.admin.dashboard(),
 			},
 		],
 	},
