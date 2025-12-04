@@ -25,6 +25,93 @@ export class ClientEntity {
         public deleted?: boolean,
     ) {}
 
+    /**
+     * Creates a ClientEntity from database object WITHOUT format validation
+     * Use this when reading from database (data already validated on creation)
+     */
+    static fromDatabaseObject(object: { [key: string]: any }): ClientEntity {
+        const {
+            id,
+            first_name,
+            last_name,
+            phone,
+            contact_category_id,
+            email,
+            dni,
+            property_interest_phone,
+            address,
+            notes,
+            interest_zone,
+            purchase_interest,
+            rental_interest,
+            property_search_type_id,
+            city_id,
+            registered_at,
+            deleted,
+        } = object;
+
+        // Only validate that required fields exist (not their format)
+        // Format validation was done when the data was created/updated
+        if (!id) {
+            throw CustomError.badRequest('Client ID is required');
+        }
+
+        if (!first_name) {
+            throw CustomError.badRequest('First name is required');
+        }
+
+        if (!last_name) {
+            throw CustomError.badRequest('Last name is required');
+        }
+
+        if (!phone) {
+            throw CustomError.badRequest('Phone is required');
+        }
+
+        if (!contact_category_id) {
+            throw CustomError.badRequest('Contact category ID is required');
+        }
+
+        // Parse date if provided
+        let registeredDate: Date | undefined = undefined;
+        if (registered_at) {
+            registeredDate = registered_at instanceof Date 
+                ? registered_at 
+                : new Date(registered_at);
+            if (isNaN(registeredDate.getTime())) {
+                registeredDate = undefined; // Don't throw, just ignore invalid dates
+            }
+        }
+
+        return new ClientEntity(
+            Number(id),
+            String(first_name).trim(),
+            String(last_name).trim(),
+            String(phone).trim(),
+            Number(contact_category_id),
+            email ? String(email).trim() : undefined,
+            dni ? String(dni).trim() : undefined,
+            property_interest_phone ? String(property_interest_phone).trim() : undefined,
+            address ? String(address).trim() : undefined,
+            notes ? String(notes).trim() : undefined,
+            interest_zone ? String(interest_zone).trim() : undefined,
+            purchase_interest !== undefined ? Boolean(purchase_interest) : undefined,
+            rental_interest !== undefined ? Boolean(rental_interest) : undefined,
+            property_search_type_id !== undefined && property_search_type_id !== null 
+                ? Number(property_search_type_id) 
+                : undefined,
+            city_id !== undefined && city_id !== null 
+                ? Number(city_id) 
+                : undefined,
+            registeredDate,
+            deleted !== undefined ? Boolean(deleted) : false,
+        );
+    }
+
+    /**
+     * Creates a ClientEntity from an object WITH full validation
+     * Use this when creating or updating clients (input validation)
+     */
     static fromObject(object: { [key: string]: any }): ClientEntity {
         const {
             id,
@@ -55,8 +142,26 @@ export class ClientEntity {
             throw CustomError.badRequest('First name is required');
         }
 
+        // Validate first name length
+        if (first_name.trim().length < 2) {
+            throw CustomError.badRequest('First name must be at least 2 characters');
+        }
+
+        if (first_name.trim().length > 100) {
+            throw CustomError.badRequest('First name must be less than 100 characters');
+        }
+
         if (!last_name || last_name.trim().length === 0) {
             throw CustomError.badRequest('Last name is required');
+        }
+
+        // Validate last name length
+        if (last_name.trim().length < 2) {
+            throw CustomError.badRequest('Last name must be at least 2 characters');
+        }
+
+        if (last_name.trim().length > 100) {
+            throw CustomError.badRequest('Last name must be less than 100 characters');
         }
 
         if (!phone || phone.trim().length === 0) {
@@ -197,18 +302,40 @@ export class ClientEntity {
      * Validates email format
      */
     private static isValidEmail(email: string): boolean {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+        const trimmedEmail = email.trim();
+        // More strict email validation
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(trimmedEmail) && trimmedEmail.length <= 255;
     }
 
     /**
-     * Validates phone format (allows numbers, spaces, dashes, parentheses, plus sign)
+     * Validates phone format (allows ONLY numbers, spaces, dashes, parentheses, plus sign)
+     * NO letters allowed
      */
     private static isValidPhone(phone: string): boolean {
-        // Basic validation: at least 10 digits, allows common phone formats
-        const phoneRegex = /^[\d\s\-\(\)\+]{10,}$/;
-        const digitsOnly = phone.replace(/\D/g, '');
-        return phoneRegex.test(phone) && digitsOnly.length >= 10;
+        const trimmedPhone = phone.trim();
+        
+        // Must contain only valid characters: digits, spaces, dashes, parentheses, plus sign, dots
+        // NO letters allowed
+        const validCharsRegex = /^[\d\s\-\(\)\+\.]+$/;
+        if (!validCharsRegex.test(trimmedPhone)) {
+            return false;
+        }
+        
+        // Extract only digits
+        const digitsOnly = trimmedPhone.replace(/\D/g, '');
+        
+        // Must have at least 10 digits
+        if (digitsOnly.length < 10) {
+            return false;
+        }
+        
+        // Must have at most 15 digits (international standard)
+        if (digitsOnly.length > 15) {
+            return false;
+        }
+        
+        return true;
     }
 
     /**

@@ -13,18 +13,18 @@ import {
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
 	FormMessageWithIcon,
 } from "@src/components/ui/form";
 import { Heading } from "@src/components/ui/heading";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
+import { HeadingForm } from "@src/modules/auth/components/heading-form";
 import { ROLES } from "@src/types/user";
 import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { HeadingForm } from "@src/modules/auth/components/heading-form";
+
 import { registerAction } from "../actions/auth.actions";
 import { type RegisterFormData, registerSchema } from "../schemas/register";
 
@@ -113,7 +113,9 @@ export default function RegisterForm({
 							name="first_name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel className="text-secondary-dark font-semibold">Nombre *</FormLabel>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Nombre *
+									</FormLabel>
 									<FormControl>
 										<Input
 											type="text"

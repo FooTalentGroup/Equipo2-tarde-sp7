@@ -113,7 +113,7 @@ async function seedCatalogs() {
       { name: 'Consulta General' },
       { name: 'Consulta de Propiedad' },
       { name: 'Consulta de Alquiler' },
-      { name: 'Consulta de Venta' },
+      { name: 'Consulta de Compra' },
     ];
     for (const type of consultationTypes) {
       const result = await insertIfNotExists('consultation_types', type, 'name');

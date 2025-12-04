@@ -21,7 +21,7 @@ export class AppRoutes {
     // Rutas de propiedades
     apiRouter.use('/properties', PropertyRoutes.routes);
 
-    // Rutas de clientes
+    // Rutas de clientes (incluye tenants, owners, leads)
     apiRouter.use('/clients', ClientRoutes.routes);
 
     // Rutas de consultas (público)

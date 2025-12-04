@@ -98,10 +98,7 @@ function FormLabel({
 		<Label
 			data-slot="form-label"
 			data-error={!!error}
-			className={cn(
-				"data-[error=true]:text-inherit text-danger-normal font-semibold text-base",
-				className,
-			)}
+			className={cn("font-semibold text-base", className)}
 			htmlFor={formItemId}
 			{...props}
 		/>

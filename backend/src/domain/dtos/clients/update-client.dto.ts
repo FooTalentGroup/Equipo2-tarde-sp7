@@ -1,6 +1,15 @@
+import { 
+    validateFirstName, 
+    validateLastName, 
+    validatePhone, 
+    validateEmail, 
+    validateDni 
+} from '../../utils/client-validation.util';
+
 /**
  * DTO para actualizar un cliente
- * Todos los campos son opcionales
+ * Todos los campos son opcionales (PATCH)
+ * Usa validaciones compartidas para mantener consistencia
  */
 export class UpdateClientDto {
     constructor(
@@ -62,6 +71,63 @@ export class UpdateClientDto {
 
         if (city_id && isNaN(Number(city_id))) {
             return ['City ID must be a number', undefined];
+        }
+
+        // Validar first_name si se proporciona (usando validación compartida)
+        if (first_name !== undefined) {
+            if (!first_name || first_name.trim().length === 0) {
+                return ['First name cannot be empty', undefined];
+            }
+            const firstNameError = validateFirstName(first_name);
+            if (firstNameError[0]) return [firstNameError[0], undefined];
+        }
+
+        // Validar last_name si se proporciona (usando validación compartida)
+        if (last_name !== undefined) {
+            if (!last_name || last_name.trim().length === 0) {
+                return ['Last name cannot be empty', undefined];
+            }
+            const lastNameError = validateLastName(last_name);
+            if (lastNameError[0]) return [lastNameError[0], undefined];
+        }
+
+        // Validar formato de teléfono si se proporciona (usando validación compartida)
+        if (phone !== undefined && phone !== null) {
+            if (phone.trim().length === 0) {
+                return ['Phone cannot be empty', undefined];
+            }
+            const phoneError = validatePhone(phone);
+            if (phoneError[0]) return [phoneError[0], undefined];
+        }
+
+        // Validar email si se proporciona (usando validación compartida)
+        if (email !== undefined && email !== null) {
+            const emailError = validateEmail(email, false);
+            if (emailError[0]) return [emailError[0], undefined];
+        }
+
+        // Validar property_interest_phone si se proporciona
+        if (property_interest_phone !== undefined && property_interest_phone !== null) {
+            if (property_interest_phone.trim().length > 0) {
+                const trimmedInterestPhone = property_interest_phone.trim();
+                const validCharsRegex = /^[\d\s\-\(\)\+\.]+$/;
+                if (!validCharsRegex.test(trimmedInterestPhone)) {
+                    return ['Invalid property interest phone format: phone can only contain numbers, spaces, dashes, parentheses, plus sign, and dots', undefined];
+                }
+                const interestDigitsOnly = trimmedInterestPhone.replace(/\D/g, '');
+                if (interestDigitsOnly.length < 10) {
+                    return ['Invalid property interest phone format: phone must contain at least 10 digits', undefined];
+                }
+                if (interestDigitsOnly.length > 15) {
+                    return ['Invalid property interest phone format: phone must contain at most 15 digits', undefined];
+                }
+            }
+        }
+
+        // Validar DNI si se proporciona (usando validación compartida)
+        if (dni !== undefined && dni !== null) {
+            const dniError = validateDni(dni);
+            if (dniError[0]) return [dniError[0], undefined];
         }
 
         // Validar que al menos un campo esté presente

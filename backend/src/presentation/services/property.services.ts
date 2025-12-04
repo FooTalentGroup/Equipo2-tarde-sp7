@@ -21,7 +21,9 @@ import {
     PropertySituationModel,
     PropertyAgeModel,
     OrientationModel,
-    DispositionModel
+    DispositionModel,
+    RentalModel,
+    ClientRentalModel
 } from '../../data/postgres/models';
 import { CreatePropertyDto, CreatePropertyGroupedDto } from '../../domain/dtos/properties';
 import { CustomError } from '../../domain';
@@ -587,6 +589,78 @@ export class PropertyServices {
             })
         );
 
+        // Obtener inquilino activo (si existe)
+        // Un rental está activo si end_date es NULL o end_date >= fecha actual
+        let activeTenant = null;
+        
+        // Buscar el rental más reciente para esta propiedad
+        const recentRentals = await RentalModel.findAll({ property_id: id, limit: 1 });
+        if (recentRentals.length > 0) {
+            const rental = recentRentals[0];
+            
+            // Verificar si está activo: end_date es NULL o >= fecha actual
+            // Comparar solo las fechas (sin hora) para evitar problemas de zona horaria
+            const today = new Date();
+            const todayYear = today.getUTCFullYear();
+            const todayMonth = today.getUTCMonth();
+            const todayDay = today.getUTCDate();
+            
+            let isActive = false;
+            if (!rental.end_date) {
+                // Si no hay fecha de fin, está activo
+                isActive = true;
+            } else {
+                // Comparar solo año, mes y día usando UTC
+                const endDate = new Date(rental.end_date);
+                const endYear = endDate.getUTCFullYear();
+                const endMonth = endDate.getUTCMonth();
+                const endDay = endDate.getUTCDate();
+                
+                // Comparar fechas normalizadas (solo año, mes, día)
+                if (endYear > todayYear) {
+                    isActive = true;
+                } else if (endYear === todayYear) {
+                    if (endMonth > todayMonth) {
+                        isActive = true;
+                    } else if (endMonth === todayMonth) {
+                        isActive = endDay >= todayDay;
+                    }
+                }
+            }
+            
+            if (isActive && rental.client_rental_id) {
+                const clientRental = await ClientRentalModel.findById(rental.client_rental_id);
+                if (clientRental && clientRental.client_id) {
+                    const tenant = await ClientModel.findById(clientRental.client_id);
+                    if (tenant) {
+                        const rentalCurrency = await CurrencyTypeModel.findById(rental.currency_type_id);
+                        activeTenant = {
+                            id: tenant.id,
+                            first_name: tenant.first_name,
+                            last_name: tenant.last_name,
+                            name: `${tenant.first_name} ${tenant.last_name}`,
+                            email: tenant.email || null,
+                            phone: tenant.phone || null,
+                            dni: tenant.dni || null,
+                            rental: {
+                                id: rental.id,
+                                contract_start_date: clientRental.contract_start_date || null,
+                                contract_end_date: clientRental.contract_end_date || null,
+                                next_increase_date: rental.next_increase_date || null,
+                                monthly_amount: rental.monthly_amount,
+                                currency: rentalCurrency ? {
+                                    id: rentalCurrency.id,
+                                    name: rentalCurrency.name,
+                                    symbol: rentalCurrency.symbol
+                                } : null,
+                                external_reference: clientRental.external_reference || null
+                            }
+                        };
+                    }
+                }
+            }
+        }
+
         // Structure complete response with ALL fields (including nulls)
         // We include enriched objects, not just IDs
         return {
@@ -658,7 +732,9 @@ export class PropertyServices {
                 // Documentos
                 documents: documents,
                 // Expensas
-                expenses: enrichedExpenses
+                expenses: enrichedExpenses,
+                // Inquilino activo (si existe)
+                active_tenant: activeTenant
             }
         };
     }

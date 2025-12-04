@@ -18,57 +18,60 @@ import {
 } from "@src/components/ui/form";
 import * as Sortable from "@src/components/ui/sortable";
 import { cn } from "@src/lib/utils";
-import type { Property } from "@src/types/property";
+import type { PropertyForm } from "@src/types/property";
 import { Move, Plus, Trash2 } from "lucide-react";
 import type { UseFormReturn } from "react-hook-form";
 
-interface PropertyCharacteristicsProps {
-	form: UseFormReturn<Property>;
-}
+type Props = {
+	form: UseFormReturn<PropertyForm>;
+};
 
-export default function PropertyGalleryForm({
-	form,
-}: PropertyCharacteristicsProps) {
+type FileWithId = File & { uniqueId?: string };
+
+export default function PropertyGalleryForm({ form }: Props) {
 	return (
 		<FormField
 			control={form.control}
-			name="gallery"
+			name="images.gallery"
 			render={({ field }) => (
 				<FormItem>
 					<FormControl>
 						<FileUpload
 							value={field.value}
-							onValueChange={field.onChange}
-							accept="image/png, image/jpeg, image/avif"
-							maxFiles={Infinity}
-							maxSize={3 * 1024 * 1024}
-							onFileReject={(_, message) => {
-								let error = message;
-								if (message === "File too large") {
-									error =
-										"El archivo es demasiado grande. El tamaño máximo es 3MB.";
-								} else if (message === "File type not accepted") {
-									error = "Tipo de archivo no aceptado.";
-								}
-								form.setError("gallery", {
-									message: error,
+							onValueChange={(newFiles) => {
+								const filesWithIds = newFiles.map((file) => {
+									const fileWithId = file as FileWithId;
+									if (!fileWithId.uniqueId) {
+										fileWithId.uniqueId = crypto.randomUUID();
+									}
+									return fileWithId;
 								});
+								field.onChange(filesWithIds);
 							}}
+							accept="image/png, image/jpeg, image/webp"
+							maxFiles={Infinity}
 							multiple
 						>
 							<Sortable.Root
-								value={field.value}
+								value={field.value || []}
 								onValueChange={field.onChange}
-								getItemValue={(file) =>
-									`${file.name}-${file.size}-${file.lastModified}`
-								}
+								getItemValue={(item) => {
+									const file = item as File & { uniqueId?: string };
+									return (
+										file.uniqueId ||
+										`${file.name}-${file.size}-${file.lastModified}`
+									);
+								}}
 								orientation="mixed"
 							>
 								<div className="grid grid-cols-4 gap-4">
 									<Sortable.Content asChild>
 										<FileUploadList className="contents">
-											{field.value.map((file, index) => {
-												const fileId = `${file.name}-${file.size}-${file.lastModified}`;
+											{field.value?.map((file, index) => {
+												const fileWithId = file as File & { uniqueId?: string };
+												const fileId =
+													fileWithId.uniqueId ||
+													`${file.name}-${file.size}-${file.lastModified}`;
 												return (
 													<Sortable.Item key={fileId} value={fileId} asChild>
 														<FileUploadItem
@@ -119,31 +122,35 @@ export default function PropertyGalleryForm({
 											})}
 										</FileUploadList>
 									</Sortable.Content>
-									<FileUploadDropzone className="aspect-square flex-col justify-center border-dashed bg-transparent p-0">
-										<FileUploadTrigger asChild>
-											<Button
-												variant="ghost"
-												className="size-full flex-col gap-2 hover:bg-transparent"
-											>
-												<Plus className="size-8 text-muted-foreground" />
-												<p className="font-normal text-xs">
-													<span className="text-tertiary font-semibold underline">
-														Click para subir
-													</span>
-													<br /> o arrastra y suelta
-												</p>
-												<span className="sr-only">Agregar imagen </span>
-											</Button>
-										</FileUploadTrigger>
-									</FileUploadDropzone>
+									{(field.value?.length || 0) < 10 && (
+										<FileUploadDropzone className="aspect-square flex-col justify-center border-dashed bg-transparent p-0">
+											<FileUploadTrigger asChild>
+												<Button
+													variant="ghost"
+													className="size-full flex-col gap-2 hover:bg-transparent"
+												>
+													<Plus className="size-8 text-muted-foreground" />
+													<p className="font-normal text-xs">
+														<span className="text-tertiary font-semibold underline">
+															Click para subir
+														</span>
+														<br /> o arrastra y suelta
+													</p>
+													<span className="sr-only">Agregar imagen </span>
+												</Button>
+											</FileUploadTrigger>
+										</FileUploadDropzone>
+									)}
 								</div>
 								<Sortable.Overlay>
 									{(params) => {
-										const file = field.value.find(
-											(f) =>
-												`${f.name}-${f.size}-${f.lastModified}` ===
-												params.value,
-										);
+										const file = field.value?.find((f) => {
+											const fileWithId = f as File & { uniqueId?: string };
+											const id =
+												fileWithId.uniqueId ||
+												`${f.name}-${f.size}-${f.lastModified}`;
+											return id === params.value;
+										});
 										if (!file) return null;
 										return (
 											<FileUploadItem
@@ -159,8 +166,8 @@ export default function PropertyGalleryForm({
 						</FileUpload>
 					</FormControl>
 					<FormDescription>
-						Sube al menos 3 imágenes (PNG, JPG, AVIF) con un tamaño máximo de
-						3MB.
+						Sube al menos 3 imágenes (PNG, JPG, WEBP) con un tamaño máximo de
+						1MB.
 					</FormDescription>
 					<FormMessage />
 				</FormItem>

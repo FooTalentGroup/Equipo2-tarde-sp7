@@ -57,6 +57,12 @@ export class ConsultationRoutes {
          *           format: date
          *         description: Filter consultations until this date
          *         example: "2025-11-30"
+         *       - in: query
+         *         name: is_read
+         *         schema:
+         *           type: boolean
+         *         description: Filter by read status (true = read, false = unread)
+         *         example: false
          *     responses:
          *       200:
          *         description: List of consultations retrieved successfully
@@ -84,6 +90,9 @@ export class ConsultationRoutes {
          *                         type: string
          *                         format: date-time
          *                         nullable: true
+         *                       is_read:
+         *                         type: boolean
+         *                         description: Whether the consultation has been read
          *                       client:
          *                         type: object
          *                         properties:
@@ -281,6 +290,158 @@ export class ConsultationRoutes {
         router.post(
             '/property',
             (req, res) => controller.createPropertyConsultation(req, res)
+        );
+
+        /**
+         * @swagger
+         * /api/consultations/bulk:
+         *   delete:
+         *     summary: Delete multiple consultations
+         *     description: |
+         *       Protected endpoint to delete multiple consultations at once.
+         *       - Requires authentication
+         *       - Validates array of consultation IDs
+         *       - Maximum 100 consultations per request
+         *     tags: [Consultations]
+         *     security:
+         *       - bearerAuth: []
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - consultation_ids
+         *             properties:
+         *               consultation_ids:
+         *                 type: array
+         *                 items:
+         *                   type: integer
+         *                 minItems: 1
+         *                 maxItems: 100
+         *                 description: Array of consultation IDs to delete
+         *                 example: [1, 2, 3, 4, 5]
+         *     responses:
+         *       200:
+         *         description: Consultations deleted successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: "5 consultation(s) deleted successfully"
+         *                 deleted_count:
+         *                   type: integer
+         *                   example: 5
+         *       400:
+         *         description: Bad request - Invalid data
+         *       401:
+         *         description: Unauthorized - Authentication required
+         *       500:
+         *         description: Internal server error
+         */
+        router.delete(
+            '/bulk',
+            authMiddleware.authenticate,
+            (req, res) => controller.deleteMultipleConsultations(req, res)
+        );
+
+        /**
+         * @swagger
+         * /api/consultations/{id}/read:
+         *   patch:
+         *     summary: Mark a consultation as read
+         *     description: |
+         *       Protected endpoint to mark a consultation as read.
+         *       - Requires authentication
+         *       - Updates the is_read field to true
+         *     tags: [Consultations]
+         *     security:
+         *       - bearerAuth: []
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: integer
+         *         description: Consultation ID
+         *         example: 1
+         *     responses:
+         *       200:
+         *         description: Consultation marked as read successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: "Consultation marked as read"
+         *                 consultation:
+         *                   type: object
+         *                   description: Updated consultation object
+         *       400:
+         *         description: Bad request - Invalid consultation ID
+         *       401:
+         *         description: Unauthorized - Authentication required
+         *       404:
+         *         description: Consultation not found
+         *       500:
+         *         description: Internal server error
+         */
+        router.patch(
+            '/:id/read',
+            authMiddleware.authenticate,
+            (req, res) => controller.markAsRead(req, res)
+        );
+
+        /**
+         * @swagger
+         * /api/consultations/{id}:
+         *   delete:
+         *     summary: Delete a consultation
+         *     description: |
+         *       Protected endpoint to delete a single consultation.
+         *       - Requires authentication
+         *       - Verifies consultation exists before deletion
+         *     tags: [Consultations]
+         *     security:
+         *       - bearerAuth: []
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: integer
+         *         description: Consultation ID
+         *         example: 1
+         *     responses:
+         *       200:
+         *         description: Consultation deleted successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: "Consultation deleted successfully"
+         *       400:
+         *         description: Bad request - Invalid consultation ID
+         *       401:
+         *         description: Unauthorized - Authentication required
+         *       404:
+         *         description: Consultation not found
+         *       500:
+         *         description: Internal server error
+         */
+        router.delete(
+            '/:id',
+            authMiddleware.authenticate,
+            (req, res) => controller.deleteConsultation(req, res)
         );
 
         return router;
