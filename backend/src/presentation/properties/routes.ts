@@ -228,23 +228,103 @@ export class PropertyRoutes {
          *                 description: |
          *                   JSON array with document names corresponding to documents (optional).
          *                   Example: ["Escritura","Plano","Título"]
-         *     responses:
-         *       201:
-         *         description: Property created successfully with all relations
-         *         content:
-         *           application/json:
-         *             schema:
-         *               type: object
-         *               properties:
-         *                 message:
-         *                   type: string
-         *                 data:
-         *                   type: object
-         *       400:
-         *         description: Bad request (validation error)
-         *       401:
-         *         description: Unauthorized (missing or invalid token)
-         */
+     *     responses:
+     *       201:
+     *         description: Property created successfully with all relations
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Property created successfully
+     *                 data:
+     *                   type: object
+     *                   properties:
+     *                     id:
+     *                       type: integer
+     *                       example: 1
+     *                     title:
+     *                       type: string
+     *                       example: Casa en venta
+     *                     property_type:
+     *                       type: object
+     *                       properties:
+     *                         id:
+     *                           type: integer
+     *                         name:
+     *                           type: string
+     *                     property_status:
+     *                       type: object
+     *                       properties:
+     *                         id:
+     *                           type: integer
+     *                         name:
+     *                           type: string
+     *                     geography:
+     *                       type: object
+     *                       properties:
+     *                         country:
+     *                           type: string
+     *                           example: Argentina
+     *                         province:
+     *                           type: string
+     *                           example: Buenos Aires
+     *                         city:
+     *                           type: string
+     *                           example: La Plata
+     *                     address:
+     *                       type: object
+     *                       properties:
+     *                         street:
+     *                           type: string
+     *                           example: Calle 50
+     *                         number:
+     *                           type: string
+     *                           example: "1234"
+     *                     prices:
+     *                       type: array
+     *                       items:
+     *                         type: object
+     *                         properties:
+     *                           price:
+     *                             type: number
+     *                             example: 150000
+     *                           currency:
+     *                             type: object
+     *                             properties:
+     *                               symbol:
+     *                                 type: string
+     *                                 example: USD
+     *                           operation_type:
+     *                             type: string
+     *                             example: Venta
+     *       400:
+     *         description: Bad request (validation error)
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Validation error
+     *                 errors:
+     *                   type: array
+     *                   items:
+     *                     type: string
+     *       401:
+     *         description: Unauthorized (missing or invalid token)
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Authorization header is required
+     */
         router.post(
             '/grouped',
             authMiddleware.authenticate,

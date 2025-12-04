@@ -39,11 +39,31 @@ export class Server {
     this.app.use( express.static( this.publicPath ) );
 
     //* Swagger Documentation
-    const { swaggerSpec } = await import('../config/swagger');
+    const { swaggerSpec, generateSwaggerSpec } = await import('../config/swagger');
     const swaggerUi = await import('swagger-ui-express');
+    
+    // Opciones personalizadas para Swagger UI
+    const swaggerUiOptions = {
+      customCss: '.swagger-ui .topbar { display: none }',
+      customSiteTitle: "RedProp API Documentation",
+      swaggerOptions: {
+        persistAuthorization: true, // Persiste el token entre recargas de página
+        displayRequestDuration: true, // Muestra el tiempo de respuesta
+        filter: true, // Habilita el filtro de endpoints
+        tryItOutEnabled: true, // Habilita "Try it out" por defecto
+        docExpansion: 'list', // Expande solo los tags, no los endpoints
+      },
+    };
+    
+    // Setup Swagger UI con detección automática del servidor basado en el request
+    const swaggerSetup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+      const dynamicSpec = generateSwaggerSpec(req);
+      return swaggerUi.setup(dynamicSpec, swaggerUiOptions)(req, res, next);
+    };
+    
     // Setup Swagger UI at both /docs and /api-docs
-    this.app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-    this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    this.app.use('/docs', swaggerUi.serve, swaggerSetup);
+    this.app.use('/api-docs', swaggerUi.serve, swaggerSetup);
 
     //* Routes
     this.app.use( this.routes );
