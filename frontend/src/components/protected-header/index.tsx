@@ -22,6 +22,7 @@ export default async function ProtectedHeader() {
 						width={271}
 						height={64}
 						className="w-full object-contain"
+						loading="eager"
 					/>
 				</Link>
 			</Button>
