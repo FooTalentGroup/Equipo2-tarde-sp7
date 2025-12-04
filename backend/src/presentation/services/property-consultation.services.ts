@@ -83,7 +83,7 @@ export class PropertyConsultationServices {
                     const operationType = pricesResult.rows[0].operation_type_name;
                     
                     if (operationType === 'Venta') {
-                        consultationTypeName = 'Consulta de Venta';
+                        consultationTypeName = 'Consulta de Compra';
                     } else if (operationType === 'Alquiler' || operationType === 'Alquiler Temporal') {
                         consultationTypeName = 'Consulta de Alquiler';
                     }
