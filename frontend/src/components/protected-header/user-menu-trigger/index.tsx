@@ -47,7 +47,7 @@ export default function UserMenuTrigger({ user }: Props) {
 					<Avatar className="h-8 w-8 rounded-full">
 						<AvatarImage
 							className="aspect-square"
-							src="https://github.com/shadcn.png"
+							src="/images/admin-picture.png"
 							alt={`${user.first_name} ${user.last_name}`}
 						/>
 						<AvatarFallback className="rounded-lg">CN</AvatarFallback>
