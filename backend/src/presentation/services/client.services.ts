@@ -5,103 +5,18 @@ import {
 	CountryModel,
 	ProvinceModel,
 } from "../../data/postgres/models";
-import { ClientEntity, CustomError, hasValueChanged } from "../../domain";
-import type {
-	CreateClientDto,
-	UpdateClientDto,
-} from "../../domain/dtos/clients";
+import {
+	ClientEntity,
+	CustomError,
+	hasValueChanged,
+	normalizePhone,
+} from "../../domain";
+import type { UpdateClientDto } from "../../domain/dtos/clients";
 
 /**
  * Service para manejar operaciones de clientes
  */
 export class ClientServices {
-	/**
-	 * Crea un nuevo cliente
-	 */
-	async createClient(createClientDto: CreateClientDto) {
-		// Resolver contact_category_id si se envió nombre
-		let contactCategoryId: number;
-		if (createClientDto.contact_category_id) {
-			contactCategoryId = createClientDto.contact_category_id;
-		} else if (createClientDto.contact_category) {
-			const category = await ContactCategoryModel.findByName(
-				createClientDto.contact_category,
-			);
-			if (!category || !category.id) {
-				throw CustomError.badRequest(
-					`Contact category "${createClientDto.contact_category}" not found. Valid categories: Lead, Inquilino, Propietario`,
-				);
-			}
-			contactCategoryId = category.id;
-		} else {
-			throw CustomError.badRequest("Contact category is required");
-		}
-
-		// Resolver property_search_type_id si se envió nombre
-		let propertySearchTypeId: number | undefined;
-		if (createClientDto.property_search_type_id) {
-			propertySearchTypeId = createClientDto.property_search_type_id;
-		} else if (createClientDto.property_search_type) {
-			const { PropertySearchTypeModel } = await import(
-				"../../data/postgres/models/clients/property-search-type.model"
-			);
-			const searchType = await PropertySearchTypeModel.findByName(
-				createClientDto.property_search_type,
-			);
-			if (!searchType || !searchType.id) {
-				throw CustomError.badRequest(
-					`Property search type "${createClientDto.property_search_type}" not found`,
-				);
-			}
-			propertySearchTypeId = searchType.id;
-		}
-
-		// Resolver city_id si se proporcionó ciudad/nombre
-		let cityId: number | undefined = createClientDto.city_id;
-
-		if (
-			!cityId &&
-			(createClientDto.city ||
-				createClientDto.province ||
-				createClientDto.country)
-		) {
-			// Resolver geografía si se proporcionaron nombres
-			const geography = await this.resolveGeography({
-				country: createClientDto.country,
-				province: createClientDto.province,
-				city: createClientDto.city,
-			});
-			cityId = geography.cityId;
-		}
-
-		// Crear cliente
-		const client = await ClientModel.create({
-			first_name: createClientDto.first_name,
-			last_name: createClientDto.last_name,
-			phone: createClientDto.phone,
-			email: createClientDto.email,
-			dni: createClientDto.dni,
-			property_interest_phone: createClientDto.property_interest_phone,
-			address: createClientDto.address,
-			notes: createClientDto.notes,
-			contact_category_id: contactCategoryId,
-			interest_zone: createClientDto.interest_zone,
-			purchase_interest: createClientDto.purchase_interest,
-			rental_interest: createClientDto.rental_interest,
-			property_search_type_id: propertySearchTypeId,
-			city_id: cityId,
-		});
-
-		if (!client.id) {
-			throw CustomError.internalServerError("Failed to create client");
-		}
-
-		// Create entity from database object (data already validated before saving)
-		const clientEntity = ClientEntity.fromDatabaseObject(client);
-
-		return { client: clientEntity.toPublicObject() };
-	}
-
 	/**
 	 * Lista clientes con filtros opcionales
 	 */
@@ -299,7 +214,7 @@ export class ClientServices {
 			updateClientDto.phone !== undefined &&
 			hasValueChanged(updateClientDto.phone, existingClient.phone)
 		) {
-			updateData.phone = updateClientDto.phone;
+			updateData.phone = normalizePhone(updateClientDto.phone);
 		}
 		if (
 			updateClientDto.email !== undefined &&
@@ -320,8 +235,9 @@ export class ClientServices {
 				existingClient.property_interest_phone,
 			)
 		) {
-			updateData.property_interest_phone =
-				updateClientDto.property_interest_phone;
+			updateData.property_interest_phone = normalizePhone(
+				updateClientDto.property_interest_phone,
+			);
 		}
 		if (
 			updateClientDto.address !== undefined &&

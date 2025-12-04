@@ -1,36 +1,36 @@
-import { Router } from 'express';
-import { Authroutes } from './auth/routes';
-import { PropertyRoutes } from './properties/routes';
-import { ClientRoutes } from './clients/routes';
-import { UserRoutes } from './users/routes';
-import { ConsultationRoutes } from './consultations/routes';
+import { Router } from "express";
+
+import { Authroutes } from "./auth/routes";
+import { ClientRoutes } from "./clients/routes";
+import { ConsultationRoutes } from "./consultations/routes";
+import { PropertyRoutes } from "./properties/routes";
+import { UserRoutes } from "./users/routes";
 
 export class AppRoutes {
-  static get routes(): Router {
-    const router = Router();
-    
-    // Crear router para agrupar todas las rutas bajo /api
-    const apiRouter = Router();
-    
-    // Rutas de autenticación
-    apiRouter.use('/auth', Authroutes.routes);
+	static get routes(): Router {
+		const router = Router();
 
-    // Rutas de usuarios
-    apiRouter.use('/users', UserRoutes.routes);
+		// Crear router para agrupar todas las rutas bajo /api
+		const apiRouter = Router();
 
-    // Rutas de propiedades
-    apiRouter.use('/properties', PropertyRoutes.routes);
+		// Rutas de autenticación
+		apiRouter.use("/auth", Authroutes.routes);
 
-    // Rutas de clientes
-    apiRouter.use('/clients', ClientRoutes.routes);
+		// Rutas de usuarios
+		apiRouter.use("/users", UserRoutes.routes);
 
-    // Rutas de consultas (público)
-    apiRouter.use('/consultations', ConsultationRoutes.routes);
+		// Rutas de propiedades
+		apiRouter.use("/properties", PropertyRoutes.routes);
 
-    // Montar todas las rutas bajo /api
-    router.use('/api', apiRouter);
+		// Rutas de clientes (incluye tenants, owners, leads)
+		apiRouter.use("/clients", ClientRoutes.routes);
 
-    return router;
-  }
+		// Rutas de consultas (público)
+		apiRouter.use("/consultations", ConsultationRoutes.routes);
+
+		// Montar todas las rutas bajo /api
+		router.use("/api", apiRouter);
+
+		return router;
+	}
 }
-

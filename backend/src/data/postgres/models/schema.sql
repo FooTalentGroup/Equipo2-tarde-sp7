@@ -705,3 +705,11 @@ COMMENT ON INDEX idx_property_prices_operation_price IS 'Optimiza búsquedas por
 COMMENT ON INDEX idx_rentals_active IS 'Optimiza búsqueda de contratos de alquiler activos';
 COMMENT ON INDEX idx_clients_category_interests IS 'Optimiza segmentación de clientes por categoría e intereses';
 COMMENT ON INDEX idx_payments_pending IS 'Optimiza búsqueda de pagos pendientes o vencidos';
+
+-- ========================================================
+-- MIGRATIONS: Asegurar que owner_id sea opcional
+-- ========================================================
+
+-- Asegurar que owner_id en properties sea nullable (opcional)
+ALTER TABLE properties 
+ALTER COLUMN owner_id DROP NOT NULL;
