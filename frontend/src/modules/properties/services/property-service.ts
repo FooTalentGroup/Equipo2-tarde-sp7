@@ -8,6 +8,9 @@ import type {
 	PropertyForm,
 	PropertyResponse,
 } from "@src/types/property";
+import type { PropertyDetail } from "@src/types/property-detail";
+
+import { PROPERTY_TYPE } from "../consts";
 
 export async function getProperties(
 	filters?: Record<string, string | number | boolean | undefined | null>,
@@ -42,12 +45,20 @@ export async function getProperties(
 	return getCachedProperties();
 }
 
-export async function getPropertyBySlug(slug: string) {
-	const data = await api.get<Property>(`properties/${slug}`);
-	return data;
+export async function getPropertyById(id: number) {
+	try {
+		const data = await api.get<{ property: PropertyDetail }>(
+			`properties/${id}`,
+		);
+		return data;
+	} catch (error) {
+		if (error instanceof Error && error.message.includes("not found")) {
+			return null;
+		}
+		console.error("Error fetching property:", error);
+		return null;
+	}
 }
-
-import { PROPERTY_TYPE } from "../consts";
 
 export async function createProperty(data: PropertyForm) {
 	try {
@@ -83,8 +94,6 @@ export async function createProperty(data: PropertyForm) {
 			});
 		}
 
-		console.log("formData", formData);
-
 		const res = await api.post<Property>("properties/grouped", formData);
 		revalidateTag("properties", { expire: 0 });
 		return res;
@@ -94,5 +103,16 @@ export async function createProperty(data: PropertyForm) {
 			error:
 				error instanceof Error ? error.message : "Error al crear la propiedad",
 		};
+	}
+}
+
+export async function deleteProperty(id: number) {
+	try {
+		await api.delete(`properties/${id}`);
+		revalidateTag("properties", { expire: 0 });
+		return { success: true };
+	} catch (error) {
+		console.error("Error deleting property:", error);
+		return { success: false, error };
 	}
 }

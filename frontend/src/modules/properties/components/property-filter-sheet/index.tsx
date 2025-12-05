@@ -109,7 +109,6 @@ export default function PropertyFilterSheet() {
 		propertyTypeId,
 		minPrice,
 		maxPrice,
-		search,
 		//includeArchived,
 	].filter(Boolean).length;
 
