@@ -6,6 +6,7 @@ import { ClientConsultationModel } from '../../data/postgres/models/crm/client-c
 import { ContactCategoryModel } from '../../data/postgres/models/clients/contact-category.model';
 import { ConsultationTypeModel } from '../../data/postgres/models/crm/consultation-type.model';
 import { PostgresDatabase } from '../../data/postgres/database';
+import { ClientCreationHelper } from './helpers/client-creation.helper';
 
 export class PropertyConsultationServices {
     constructor() {}
@@ -13,8 +14,8 @@ export class PropertyConsultationServices {
     /**
      * Crea una consulta de propiedad desde la web pública
      * - Valida que la propiedad existe y está publicada
-     * - Busca o crea el cliente como Lead
-     * - Crea la consulta vinculada
+     * - Almacena datos del consultante SIN crear el cliente
+     * - El cliente (Lead) se creará cuando el admin apruebe la consulta
      */
     async createPropertyConsultation(dto: CreatePropertyConsultationDto) {
         try {
@@ -25,45 +26,7 @@ export class PropertyConsultationServices {
                 throw CustomError.notFound('Property not found or not available');
             }
 
-            // 2. Buscar o crear cliente
-            let client = null;
-
-            // Buscar clientes por teléfono
-            const clientsByPhone = await ClientModel.findByPhone(dto.phone);
-            
-            // Verificar si alguno coincide exactamente con nombre, apellido y teléfono
-            if (clientsByPhone && clientsByPhone.length > 0) {
-                client = clientsByPhone.find(c => 
-                    c.first_name === dto.first_name && 
-                    c.last_name === dto.last_name &&
-                    c.phone === dto.phone
-                ) || null;
-            }
-
-            // Si no existe un cliente con los 3 campos coincidentes, crear nuevo cliente con categoría "Lead"
-            if (!client) {
-                // Obtener ID de categoría "Lead"
-                const leadCategory = await ContactCategoryModel.findByName('Lead');
-                
-                if (!leadCategory || !leadCategory.id) {
-                    throw CustomError.internalServerError(
-                        'Lead category not configured. Please run database seeds.'
-                    );
-                }
-
-                // Crear nuevo cliente
-                client = await ClientModel.create({
-                    first_name: dto.first_name,
-                    last_name: dto.last_name,
-                    phone: dto.phone,
-                    email: dto.email,
-                    contact_category_id: leadCategory.id,
-                    purchase_interest: true, // Asumimos interés de compra por defecto
-                    rental_interest: false,
-                });
-            }
-
-            // 3. Determinar tipo de consulta basado en la operación de la propiedad
+            // 2. Determinar tipo de consulta basado en la operación de la propiedad
             let consultationTypeName = 'Consulta de Propiedad'; // Default genérico
             
             // Obtener los precios/operaciones de la propiedad
@@ -99,21 +62,27 @@ export class PropertyConsultationServices {
                 );
             }
 
-            // 4. Crear la consulta
+            // 3. Crear la consulta SIN crear el cliente
+            // Almacenar datos del consultante directamente en la consulta
             const consultation = await ClientConsultationModel.create({
-                client_id: client.id!,
+                client_id: undefined, // No hay cliente todavía
                 property_id: dto.property_id,
                 consultation_type_id: consultationType.id,
                 message: dto.message,
                 consultation_date: new Date(),
+                is_read: false,
+                // Almacenar datos del consultante
+                consultant_first_name: dto.first_name,
+                consultant_last_name: dto.last_name,
+                consultant_phone: dto.phone,
+                consultant_email: dto.email,
             });
 
-            // 5. Retornar respuesta
+            // 4. Retornar respuesta
             return {
                 message: 'Consultation submitted successfully',
                 consultation: {
                     id: consultation.id,
-                    client_id: consultation.client_id,
                     property_id: consultation.property_id,
                     message: consultation.message,
                     consultation_date: consultation.consultation_date,
@@ -122,11 +91,10 @@ export class PropertyConsultationServices {
                     id: property.id,
                     title: property.title,
                 },
-                client: {
-                    id: client.id,
-                    first_name: client.first_name,
-                    last_name: client.last_name,
-                    email: client.email,
+                consultant: {
+                    first_name: dto.first_name,
+                    last_name: dto.last_name,
+                    email: dto.email,
                 },
             };
         } catch (error) {
@@ -163,12 +131,17 @@ export class PropertyConsultationServices {
                     cc.response,
                     cc.response_date,
                     cc.is_read,
-                    -- Cliente
+                    -- Cliente (puede ser NULL si no se ha convertido)
                     c.id as client_id,
                     c.first_name as client_first_name,
                     c.last_name as client_last_name,
                     c.email as client_email,
                     c.phone as client_phone,
+                    -- Datos del consultante (para consultas sin cliente)
+                    cc.consultant_first_name,
+                    cc.consultant_last_name,
+                    cc.consultant_email,
+                    cc.consultant_phone,
                     -- Propiedad
                     p.id as property_id,
                     p.title as property_title,
@@ -176,7 +149,7 @@ export class PropertyConsultationServices {
                     ct.id as consultation_type_id,
                     ct.name as consultation_type_name
                 FROM client_consultations cc
-                INNER JOIN clients c ON cc.client_id = c.id
+                LEFT JOIN clients c ON cc.client_id = c.id
                 LEFT JOIN properties p ON cc.property_id = p.id
                 INNER JOIN consultation_types ct ON cc.consultation_type_id = ct.id
             `;
@@ -228,13 +201,21 @@ export class PropertyConsultationServices {
                 response: row.response,
                 response_date: row.response_date,
                 is_read: row.is_read,
-                client: {
+                // Si tiene client_id, mostrar datos del cliente
+                // Si no, mostrar datos del consultante
+                client: row.client_id ? {
                     id: row.client_id,
                     first_name: row.client_first_name,
                     last_name: row.client_last_name,
                     email: row.client_email,
                     phone: row.client_phone,
-                },
+                } : null,
+                consultant: !row.client_id ? {
+                    first_name: row.consultant_first_name,
+                    last_name: row.consultant_last_name,
+                    email: row.consultant_email,
+                    phone: row.consultant_phone,
+                } : null,
                 property: row.property_id ? {
                     id: row.property_id,
                     title: row.property_title,
@@ -352,6 +333,104 @@ export class PropertyConsultationServices {
             }
             console.error('Error marking consultation as read:', error);
             throw CustomError.internalServerError('Error updating consultation');
+        }
+    }
+
+    /**
+     * Convierte una consulta en un lead
+     * - Verifica que la consulta existe y no tiene cliente asociado
+     * - Busca cliente existente por email (previene duplicados)
+     * - Crea nuevo lead si no existe usando ClientCreationHelper
+     * - Asocia la consulta al cliente
+     */
+    async convertConsultationToLead(consultationId: number, assignedUserId?: number) {
+        try {
+            // 1. Obtener la consulta
+            const consultation = await ClientConsultationModel.findById(consultationId);
+            
+            if (!consultation) {
+                throw CustomError.notFound('Consultation not found');
+            }
+
+            // 2. Verificar que no tenga cliente asociado ya
+            if (consultation.client_id) {
+                throw CustomError.badRequest('Consultation already has an associated client');
+            }
+
+            // 3. Verificar que tenga datos del consultante
+            if (!consultation.consultant_first_name || 
+                !consultation.consultant_last_name || 
+                !consultation.consultant_phone) {
+                throw CustomError.badRequest('Consultation is missing consultant information');
+            }
+
+            let client = null;
+            let wasNewLead = false;
+
+            // 4. PRIORIDAD 1: Buscar por email si está disponible (previene duplicados)
+            if (consultation.consultant_email) {
+                client = await ClientModel.findByEmail(consultation.consultant_email);
+                
+                if (client) {
+                    console.log(`Using existing client with email: ${consultation.consultant_email}`);
+                }
+            }
+
+            // 5. PRIORIDAD 2: Si no se encontró por email, buscar por teléfono + nombre + apellido
+            if (!client) {
+                const clientsByPhone = await ClientModel.findByPhone(consultation.consultant_phone);
+                
+                if (clientsByPhone && clientsByPhone.length > 0) {
+                    client = clientsByPhone.find(c => 
+                        c.first_name === consultation.consultant_first_name && 
+                        c.last_name === consultation.consultant_last_name &&
+                        c.phone === consultation.consultant_phone
+                    ) || null;
+                }
+            }
+
+            // 6. PRIORIDAD 3: Si no existe, crear nuevo lead usando helper compartido
+            if (!client) {
+                // Resolver contact_category_id para "Lead"
+                const categoryId = await ClientCreationHelper.resolveContactCategory('Lead');
+
+                // Crear nuevo cliente usando helper (reutiliza validación de email único)
+                client = await ClientCreationHelper.createBaseClient({
+                    first_name: consultation.consultant_first_name,
+                    last_name: consultation.consultant_last_name,
+                    phone: consultation.consultant_phone,
+                    email: consultation.consultant_email,
+                    notes: `Converted from consultation #${consultationId}`,
+                }, categoryId);
+
+                wasNewLead = true;
+                console.log(`Created new lead with ID: ${client.id}`);
+            }
+
+            // 7. Asociar la consulta al cliente
+            const updatedConsultation = await ClientConsultationModel.update(consultationId, {
+                client_id: client.id!,
+                assigned_user_id: assignedUserId,
+            });
+
+            return {
+                message: 'Consultation converted to lead successfully',
+                consultation: updatedConsultation,
+                client: {
+                    id: client.id,
+                    first_name: client.first_name,
+                    last_name: client.last_name,
+                    email: client.email,
+                    phone: client.phone,
+                },
+                was_new_lead: wasNewLead,
+            };
+        } catch (error) {
+            if (error instanceof CustomError) {
+                throw error;
+            }
+            console.error('Error converting consultation to lead:', error);
+            throw CustomError.internalServerError('Error converting consultation to lead');
         }
     }
 }

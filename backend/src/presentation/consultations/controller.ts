@@ -172,4 +172,39 @@ export class ConsultationController {
             this.handleError(error, res);
         }
     }
+
+    /**
+     * Convert a consultation to a lead
+     * Requires authentication
+     */
+    convertConsultationToLead = async (req: Request, res: Response) => {
+        try {
+            // Verificar que el usuario esté autenticado
+            const user = (req as any).user;
+            if (!user || !user.id) {
+                return res.status(401).json({
+                    message: 'User not authenticated'
+                });
+            }
+
+            const { id } = req.params;
+            const consultationId = parseInt(id);
+
+            // Validar que el ID sea un número válido
+            if (isNaN(consultationId) || consultationId <= 0) {
+                return res.status(400).json({
+                    message: 'Invalid consultation ID'
+                });
+            }
+
+            const result = await this.consultationServices.convertConsultationToLead(
+                consultationId,
+                Number(user.id)
+            );
+            
+            return res.status(200).json(result);
+        } catch (error) {
+            this.handleError(error, res);
+        }
+    }
 }
