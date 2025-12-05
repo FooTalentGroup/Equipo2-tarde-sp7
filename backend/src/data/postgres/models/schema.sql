@@ -713,3 +713,50 @@ COMMENT ON INDEX idx_payments_pending IS 'Optimiza búsqueda de pagos pendientes
 -- Asegurar que owner_id en properties sea nullable (opcional)
 ALTER TABLE properties 
 ALTER COLUMN owner_id DROP NOT NULL;
+
+-- ========================================================
+-- MIGRATION: Modify client_consultations table
+-- Date: 2025-12-05
+-- Description: Allow consultations without associated client
+--              Store consultant information directly in consultation
+-- ========================================================
+
+-- 1. Make client_id nullable (allow consultations without client)
+ALTER TABLE client_consultations 
+ALTER COLUMN client_id DROP NOT NULL;
+
+-- 2. Add columns to store consultant information
+ALTER TABLE client_consultations 
+ADD COLUMN IF NOT EXISTS consultant_first_name VARCHAR(100),
+ADD COLUMN IF NOT EXISTS consultant_last_name VARCHAR(100),
+ADD COLUMN IF NOT EXISTS consultant_phone VARCHAR(15),
+ADD COLUMN IF NOT EXISTS consultant_email VARCHAR(100);
+
+-- 3. Create index for searching by consultant email
+CREATE INDEX IF NOT EXISTS idx_client_consultations_consultant_email 
+ON client_consultations(consultant_email) 
+WHERE consultant_email IS NOT NULL;
+
+-- 4. Add constraint: must have either client_id OR consultant data
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'chk_client_or_consultant'
+    ) THEN
+        ALTER TABLE client_consultations
+        ADD CONSTRAINT chk_client_or_consultant CHECK (
+            client_id IS NOT NULL OR 
+            (consultant_first_name IS NOT NULL AND 
+             consultant_last_name IS NOT NULL AND 
+             consultant_phone IS NOT NULL)
+        );
+    END IF;
+END $$;
+
+-- 5. Add comments for documentation
+COMMENT ON COLUMN client_consultations.client_id IS 'Client ID (NULL if not yet converted to lead)';
+COMMENT ON COLUMN client_consultations.consultant_first_name IS 'Consultant first name (temporary until conversion to lead)';
+COMMENT ON COLUMN client_consultations.consultant_last_name IS 'Consultant last name (temporary until conversion to lead)';
+COMMENT ON COLUMN client_consultations.consultant_phone IS 'Consultant phone (temporary until conversion to lead)';
+COMMENT ON COLUMN client_consultations.consultant_email IS 'Consultant email (temporary until conversion to lead)';

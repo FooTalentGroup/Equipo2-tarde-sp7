@@ -444,6 +444,89 @@ export class ConsultationRoutes {
             (req, res) => controller.deleteConsultation(req, res)
         );
 
+        /**
+         * @swagger
+         * /api/consultations/{id}/convert-to-lead:
+         *   post:
+         *     summary: Convert a consultation to a lead
+         *     description: |
+         *       Protected endpoint to convert a consultation into a client lead.
+         *       - Requires authentication
+         *       - Verifies consultation exists and has no associated client
+         *       - Checks for existing clients by email to prevent duplicates
+         *       - Creates a new lead if no existing client is found
+         *       - Associates the consultation with the client
+         *       - Assigns the consultation to the authenticated user
+         *     tags: [Consultations]
+         *     security:
+         *       - bearerAuth: []
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: integer
+         *         description: Consultation ID
+         *         example: 1
+         *     responses:
+         *       200:
+         *         description: Consultation converted to lead successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: "Consultation converted to lead successfully"
+         *                 consultation:
+         *                   type: object
+         *                   description: Updated consultation with client_id
+         *                 client:
+         *                   type: object
+         *                   properties:
+         *                     id:
+         *                       type: integer
+         *                       example: 5
+         *                     first_name:
+         *                       type: string
+         *                       example: "Juan"
+         *                     last_name:
+         *                       type: string
+         *                       example: "Pérez"
+         *                     email:
+         *                       type: string
+         *                       example: "juan.perez@example.com"
+         *                     phone:
+         *                       type: string
+         *                       example: "+54 221 123-4567"
+         *                 was_new_lead:
+         *                   type: boolean
+         *                   description: True if a new lead was created, false if existing client was used
+         *                   example: true
+         *       400:
+         *         description: Bad request - Consultation already has client or missing data
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: "Consultation already has an associated client"
+         *       401:
+         *         description: Unauthorized - Authentication required
+         *       404:
+         *         description: Consultation not found
+         *       500:
+         *         description: Internal server error
+         */
+        router.post(
+            '/:id/convert-to-lead',
+            authMiddleware.authenticate,
+            (req, res) => controller.convertConsultationToLead(req, res)
+        );
+
         return router;
     }
 }
