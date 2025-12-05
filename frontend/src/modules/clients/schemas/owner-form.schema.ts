@@ -41,7 +41,7 @@ export const ownerFormSchema = z.object({
 		.min(5, "La dirección debe tener al menos 5 caracteres")
 		.max(200, "La dirección no puede exceder 200 caracteres"),
 
-	assigned_property_id: z.string().min(1, "Debe seleccionar una propiedad"),
+	property_id: z.string().min(1, "Debe seleccionar una propiedad"),
 
 	notes: z
 		.string()

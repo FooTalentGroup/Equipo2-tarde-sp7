@@ -11,19 +11,8 @@ import {
 	FormMessageWithIcon,
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@src/components/ui/select";
 import { Spinner } from "@src/components/ui/spinner";
 import { Textarea } from "@src/components/ui/textarea";
-import {
-	formatPropertyAddress,
-	getPropertiesWithoutOwner,
-} from "@src/data/properties.data";
 import type { CreateOwner } from "@src/types/clients/owner";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -32,6 +21,10 @@ import {
 	type OwnerFormData,
 	ownerFormSchema,
 } from "../../schemas/owner-form.schema";
+import { createClientServerAction } from "../../services/clients-service";
+import { ClientType } from "../../services/types";
+/* import PropertySearchInput from "../PropertySearchInput"; */
+import PropertyCombobox from "../PropertySearchInput";
 
 type OwnerFormProps = {
 	onSubmit?: (data: OwnerFormData) => Promise<void> | void;
@@ -39,7 +32,7 @@ type OwnerFormProps = {
 };
 
 export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
-	const availableProperties = getPropertiesWithoutOwner();
+	/* const availableProperties = getPropertiesWithoutOwner(); */
 
 	const form = useForm<OwnerFormData>({
 		resolver: zodResolver(ownerFormSchema),
@@ -50,7 +43,7 @@ export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
 			phone: "",
 			email: "",
 			address: "",
-			assigned_property_id: "",
+			property_id: "",
 			notes: "",
 		},
 	});
@@ -61,6 +54,11 @@ export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
 				await onSubmit(data);
 			} else {
 				// Preparar datos para el backend
+				const propertyId =
+					data.property_id && data.property_id !== ""
+						? Number(data.property_id)
+						: undefined;
+
 				const ownerData: Partial<CreateOwner> = {
 					first_name: data.first_name,
 					last_name: data.last_name,
@@ -69,10 +67,8 @@ export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
 					dni: data.dni,
 					contact_category: "Propietario",
 					address: data.address,
-					city: "", // Se completará en otro formulario
-					province: "", // Se completará en otro formulario
-					country: "Argentina", // Valor por defecto
 					notes: data.notes || "",
+					...(propertyId !== undefined ? { property_id: propertyId } : {}),
 				};
 
 				// Aquí irá la llamada al backend
@@ -80,13 +76,17 @@ export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
 				//   ...ownerData,
 				//   property_id: data.assigned_property_id
 				// });
-				console.log("Datos del propietario para backend:", {
+				await createClientServerAction(
+					ClientType.OWNER,
+					ownerData as CreateOwner,
+				);
+				/* console.log("Datos del propietario para backend:", {
 					...ownerData,
-					property_id: data.assigned_property_id,
+					property_id: data.property_id,
 				});
 
 				// Simular delay de envío
-				await new Promise((resolve) => setTimeout(resolve, 1000));
+				await new Promise((resolve) => setTimeout(resolve, 1000)); */
 
 				toast.success("Propietario guardado exitosamente");
 				form.reset();
@@ -253,39 +253,25 @@ export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
 					<div className="w-1/2 pr-4">
 						<FormField
 							control={form.control}
-							name="assigned_property_id"
+							name="property_id"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel className="text-secondary-dark font-semibold">
-										Propiedad Asociada{" "}
-										<span className="text-danger-normal">*</span>
+										Propiedad de interés
 									</FormLabel>
-									<Select
-										onValueChange={field.onChange}
-										defaultValue={field.value}
-									>
-										<FormControl>
-											<SelectTrigger className="w-full placeholder:text-grey-light text-base border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active h-10 py-2 shadow-input-border">
-												<SelectValue placeholder="Seleccione una propiedad" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent className="bg-dropdown-background">
-											{availableProperties.length === 0 ? (
-												<SelectItem value="no-properties" disabled>
-													No hay propiedades disponibles
-												</SelectItem>
-											) : (
-												availableProperties.map((property) => (
-													<SelectItem
-														key={property.id}
-														value={property.id.toString()}
-													>
-														{formatPropertyAddress(property)}
-													</SelectItem>
-												))
-											)}
-										</SelectContent>
-									</Select>
+									<FormControl>
+										<PropertyCombobox
+											value={field.value}
+											onSelect={(propertyId, property) => {
+												field.onChange(propertyId);
+												// Opcional: guardar también la dirección en interest_zone
+												// form.setValue('interest_zone', property.main_address?.full_address || '');
+												console.log("Propiedad seleccionada:", property);
+											}}
+											placeholder="Seleccione o busque una propiedad"
+											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+										/>
+									</FormControl>
 									<FormMessageWithIcon className="text-xs" />
 								</FormItem>
 							)}

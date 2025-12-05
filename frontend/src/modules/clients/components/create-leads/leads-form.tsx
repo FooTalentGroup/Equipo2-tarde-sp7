@@ -27,8 +27,10 @@ import {
 	type ContactFormData,
 	contactFormSchema,
 } from "../../schemas/contact-form.schema";
-import { createLeadServerAction } from "../../services/clients-service";
-import PropertySearchInput from "../PropertySearchInput";
+import { createClientServerAction } from "../../services/clients-service";
+import { ClientType } from "../../services/types";
+/* import PropertySearchInput from "../PropertySearchInput"; */
+import PropertyCombobox from "../PropertySearchInput";
 
 type ContactFormProps = {
 	onSubmit?: (data: ContactFormData) => Promise<void> | void;
@@ -68,13 +70,7 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 					notes: "",
 				};
 
-				// Aquí irá la llamada al backend
-				// const response = await axios.post('/api/leads', leadData);
-				await createLeadServerAction(leadData as CreateLead);
-				/* console.log("Datos del formulario para backend:", leadData); */
-
-				// Simular delay de envío
-				/* await new Promise((resolve) => setTimeout(resolve, 1000)); */
+				await createClientServerAction(ClientType.LEAD, leadData as CreateLead);
 
 				toast.success("Contacto guardado exitosamente");
 				form.reset();
@@ -227,12 +223,15 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 										Propiedad de interés
 									</FormLabel>
 									<FormControl>
-										<PropertySearchInput
+										<PropertyCombobox
 											value={field.value}
-											onSelect={(property) => {
-												field.onChange(property.title);
+											onSelect={(propertyId, property) => {
+												field.onChange(propertyId);
+												// Opcional: guardar también la dirección en interest_zone
+												// form.setValue('interest_zone', property.main_address?.full_address || '');
+												console.log("Propiedad seleccionada:", property);
 											}}
-											placeholder="Buscar propiedad disponible..."
+											placeholder="Seleccione o busque una propiedad"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										/>
 									</FormControl>
