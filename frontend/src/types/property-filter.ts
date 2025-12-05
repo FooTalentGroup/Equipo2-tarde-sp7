@@ -1,11 +1,7 @@
 export type PropertyFilterForm = {
-	operationType: string;
-	propertyType: string;
-	priceFrom: string;
-	priceTo: string;
-	currency: string;
-	location: string;
-	available: boolean;
-	unavailable: boolean;
-	disabled: boolean;
+	property_type_id?: string;
+	min_price?: string;
+	max_price?: string;
+	search?: string;
+	includeArchived?: boolean;
 };

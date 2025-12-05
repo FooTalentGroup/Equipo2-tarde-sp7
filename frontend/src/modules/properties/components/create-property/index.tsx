@@ -11,7 +11,6 @@ import { Heading } from "@src/components/ui/heading";
 import { Separator } from "@src/components/ui/separator";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
-import type { Owner } from "@src/types/clients/owner";
 import {
 	addressSchema,
 	basicSchema,
@@ -42,7 +41,6 @@ import PropertyValuesForm from "./property-values-form";
 
 type Props = {
 	defaultValues?: PropertyForm;
-	clients?: Owner[];
 };
 
 const { useStepper, steps, utils } = defineStepper(
@@ -87,7 +85,7 @@ const { useStepper, steps, utils } = defineStepper(
 	},
 );
 
-export default function CreatePropertyForm({ defaultValues, clients }: Props) {
+export default function CreatePropertyForm({ defaultValues }: Props) {
 	const router = useRouter();
 
 	const stepper = useStepper();
@@ -100,7 +98,7 @@ export default function CreatePropertyForm({ defaultValues, clients }: Props) {
 		defaultValues: {
 			basic: {
 				title: defaultValues?.basic?.title || "",
-				property_type: defaultValues?.basic?.property_type || "Casa",
+				property_type: defaultValues?.basic?.property_type || "1",
 				description: defaultValues?.basic?.description || "",
 				property_status: defaultValues?.basic?.property_status || "Disponible",
 				visibility_status:
@@ -263,7 +261,7 @@ export default function CreatePropertyForm({ defaultValues, clients }: Props) {
 									<Heading variant="subtitle2" weight="semibold">
 										{title}
 									</Heading>
-									<PropertyBasicInfoForm form={form} clients={clients ?? []} />
+									<PropertyBasicInfoForm form={form} />
 								</div>
 							),
 							features: ({ title }) => (

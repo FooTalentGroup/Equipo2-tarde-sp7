@@ -17,14 +17,14 @@ export const VisibilityStatus = {
 export const visibilityStatusEnum = z.enum(["Publicado", "No Publicado"]);
 
 export const propertyTypeEnum = z.enum([
-	"Casa",
-	"Departamento",
-	"PH",
-	"Local Comercial",
-	"Oficina",
-	"Terreno",
-	"Cochera",
-	"Depósito",
+	"1", // Casa
+	"2", // Departamento
+	"3", // PH
+	"4", // Local Comercial
+	"5", // Oficina
+	"6", // Terreno
+	"7", // Cochera
+	"8", // Depósito
 ]);
 
 export const basicSchema = z.object({
@@ -142,8 +142,8 @@ export const internalSchema = z.object({
 export const imagesSchema = z.object({
 	gallery: z
 		.array(z.any())
+		.min(3, "Debes subir al menos 3 imágenes")
 		.max(10, "Solo se permiten un máximo de 10 imágenes")
-		.optional()
 		.refine(
 			(files) => {
 				if (!files) return true;

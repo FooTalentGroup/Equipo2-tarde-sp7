@@ -1,8 +1,10 @@
-import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
+import { Suspense } from "react";
+
 import SectionHeading from "@src/components/section-heading";
-import { Button } from "@src/components/ui/button";
-import PropertyList from "@src/modules/properties/components/property-list";
-import { getProperties } from "@src/modules/properties/services/property-service";
+import PropertiesSkeleton from "@src/modules/properties/components/properties-skeleton";
+import PropertyFilterSheet from "@src/modules/properties/components/property-filter-sheet";
+import PropertyResults from "@src/modules/properties/components/property-results";
+import PropertySearch from "@src/modules/properties/components/property-search";
 
 export const metadata = {
 	title: "Propiedades",
@@ -11,25 +13,33 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function PropertiesPage() {
-	const propertyData = await getProperties();
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+type Props = {
+	searchParams: Promise<SearchParams>;
+};
+
+export default async function PropertiesPage({ searchParams }: Props) {
+	const resolvedSearchParams = await searchParams;
+
+	const filters = {
+		property_type_id: resolvedSearchParams.property_type_id as string,
+		min_price: resolvedSearchParams.min_price as string,
+		max_price: resolvedSearchParams.max_price as string,
+		search: resolvedSearchParams.search as string,
+		includeArchived: resolvedSearchParams.includeArchived === "true",
+	};
 
 	return (
 		<>
-			<SectionHeading
-				title="Propiedades"
-				actions={
-					<Button
-						type="submit"
-						size="lg"
-						variant="outline"
-						className="w-[140px]"
-					>
-						<AdjustmentsHorizontalIcon className="size-6" /> Filtrar
-					</Button>
-				}
-			/>
-			<PropertyList properties={propertyData.properties} />
+			<SectionHeading title="Propiedades" />
+			<div className="flex justify-between items-center gap-4">
+				<PropertySearch className="max-w-[400px]" />
+				<PropertyFilterSheet />
+			</div>
+			<Suspense key={JSON.stringify(filters)} fallback={<PropertiesSkeleton />}>
+				<PropertyResults filters={filters} />
+			</Suspense>
 		</>
 	);
 }
