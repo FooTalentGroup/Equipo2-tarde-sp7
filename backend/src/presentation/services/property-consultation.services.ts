@@ -131,12 +131,17 @@ export class PropertyConsultationServices {
                     cc.response,
                     cc.response_date,
                     cc.is_read,
-                    -- Cliente
+                    -- Cliente (puede ser NULL si no se ha convertido)
                     c.id as client_id,
                     c.first_name as client_first_name,
                     c.last_name as client_last_name,
                     c.email as client_email,
                     c.phone as client_phone,
+                    -- Datos del consultante (para consultas sin cliente)
+                    cc.consultant_first_name,
+                    cc.consultant_last_name,
+                    cc.consultant_email,
+                    cc.consultant_phone,
                     -- Propiedad
                     p.id as property_id,
                     p.title as property_title,
@@ -144,7 +149,7 @@ export class PropertyConsultationServices {
                     ct.id as consultation_type_id,
                     ct.name as consultation_type_name
                 FROM client_consultations cc
-                INNER JOIN clients c ON cc.client_id = c.id
+                LEFT JOIN clients c ON cc.client_id = c.id
                 LEFT JOIN properties p ON cc.property_id = p.id
                 INNER JOIN consultation_types ct ON cc.consultation_type_id = ct.id
             `;
@@ -196,13 +201,21 @@ export class PropertyConsultationServices {
                 response: row.response,
                 response_date: row.response_date,
                 is_read: row.is_read,
-                client: {
+                // Si tiene client_id, mostrar datos del cliente
+                // Si no, mostrar datos del consultante
+                client: row.client_id ? {
                     id: row.client_id,
                     first_name: row.client_first_name,
                     last_name: row.client_last_name,
                     email: row.client_email,
                     phone: row.client_phone,
-                },
+                } : null,
+                consultant: !row.client_id ? {
+                    first_name: row.consultant_first_name,
+                    last_name: row.consultant_last_name,
+                    email: row.consultant_email,
+                    phone: row.consultant_phone,
+                } : null,
                 property: row.property_id ? {
                     id: row.property_id,
                     title: row.property_title,
