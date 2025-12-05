@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidateTag, unstable_cache } from "next/cache";
+
 import { api } from "@src/lib/axios";
 import type {
 	Property,
@@ -9,11 +11,35 @@ import type {
 
 export async function getProperties(
 	filters?: Record<string, string | number | boolean | undefined | null>,
+	token?: string,
 ) {
-	const data = await api.get<PropertyResponse>("properties", {
-		params: filters,
-	});
-	return data;
+	const getCachedProperties = unstable_cache(
+		async () => {
+			try {
+				const headers: Record<string, string> = token
+					? { Authorization: `Bearer ${token}` }
+					: {};
+				const data = await api.get<PropertyResponse>("properties", {
+					params: filters,
+					headers,
+				});
+				return data;
+			} catch (error) {
+				console.error("Error fetching properties:", error);
+				return {
+					count: 0,
+					properties: [],
+				};
+			}
+		},
+		["properties", JSON.stringify(filters)],
+		{
+			tags: ["properties"],
+			revalidate: 60,
+		},
+	);
+
+	return getCachedProperties();
 }
 
 export async function getPropertyBySlug(slug: string) {
@@ -21,11 +47,22 @@ export async function getPropertyBySlug(slug: string) {
 	return data;
 }
 
+import { PROPERTY_TYPE } from "../consts";
+
 export async function createProperty(data: PropertyForm) {
 	try {
 		const formData = new FormData();
 
-		formData.append("basic", JSON.stringify(data.basic));
+		const propertyTypeLabel =
+			PROPERTY_TYPE.find((t) => t.value === data.basic.property_type)?.label ||
+			data.basic.property_type;
+
+		const basicData = {
+			...data.basic,
+			property_type: propertyTypeLabel,
+		};
+
+		formData.append("basic", JSON.stringify(basicData));
 		formData.append("geography", JSON.stringify(data.geography));
 		formData.append("address", JSON.stringify(data.address));
 		formData.append("values", JSON.stringify(data.values));
@@ -46,7 +83,10 @@ export async function createProperty(data: PropertyForm) {
 			});
 		}
 
+		console.log("formData", formData);
+
 		const res = await api.post<Property>("properties/grouped", formData);
+		revalidateTag("properties", { expire: 0 });
 		return res;
 	} catch (error) {
 		console.log("error", error);
@@ -55,9 +95,4 @@ export async function createProperty(data: PropertyForm) {
 				error instanceof Error ? error.message : "Error al crear la propiedad",
 		};
 	}
-}
-
-export async function getPropertyTypes() {
-	const data = await api.get<{ id: string; title: string }[]>("property-types");
-	return data;
 }

@@ -54,20 +54,21 @@ async function fetchApi<T>(
 		next,
 	} = options;
 
-	const token = await getAuthToken();
-
 	const defaultHeaders: Record<string, string> = {
 		Accept: "application/json",
 	};
+
+	if (!headers.Authorization) {
+		const token = await getAuthToken();
+		if (token) {
+			defaultHeaders.Authorization = `Bearer ${token}`;
+		}
+	}
 
 	const isFormData = body instanceof FormData;
 
 	if (!isFormData) {
 		defaultHeaders["Content-Type"] = "application/json";
-	}
-
-	if (token) {
-		defaultHeaders.Authorization = `Bearer ${token}`;
 	}
 
 	const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
