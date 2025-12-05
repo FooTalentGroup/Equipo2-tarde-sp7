@@ -3,6 +3,7 @@ import type { BaseContact } from "./base";
 export interface CreateOwner extends BaseContact {
 	contact_category: "Propietario";
 	address: string;
+	property_id: number;
 }
 
 export interface Owner extends CreateOwner {
