@@ -18,6 +18,7 @@ const owners: Owner[] = [
 		id: "1",
 		created_at: "",
 		updated_at: "",
+		property_id: 12,
 	},
 	{
 		first_name: "Carlos",
@@ -35,6 +36,7 @@ const owners: Owner[] = [
 		id: "2",
 		created_at: "",
 		updated_at: "",
+		property_id: 55,
 	},
 	{
 		first_name: "María",
@@ -52,6 +54,7 @@ const owners: Owner[] = [
 		id: "3",
 		created_at: "",
 		updated_at: "",
+		property_id: 101,
 	},
 ];
 
