@@ -738,21 +738,17 @@ ON client_consultations(consultant_email)
 WHERE consultant_email IS NOT NULL;
 
 -- 4. Add constraint: must have either client_id OR consultant data
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint 
-        WHERE conname = 'chk_client_or_consultant'
-    ) THEN
-        ALTER TABLE client_consultations
-        ADD CONSTRAINT chk_client_or_consultant CHECK (
-            client_id IS NOT NULL OR 
-            (consultant_first_name IS NOT NULL AND 
-             consultant_last_name IS NOT NULL AND 
-             consultant_phone IS NOT NULL)
-        );
-    END IF;
-END $$;
+-- Note: Using a simple ALTER TABLE to avoid parsing issues with DO blocks
+ALTER TABLE client_consultations
+DROP CONSTRAINT IF EXISTS chk_client_or_consultant;
+
+ALTER TABLE client_consultations
+ADD CONSTRAINT chk_client_or_consultant CHECK (
+    client_id IS NOT NULL OR 
+    (consultant_first_name IS NOT NULL AND 
+     consultant_last_name IS NOT NULL AND 
+     consultant_phone IS NOT NULL)
+);
 
 -- 5. Add comments for documentation
 COMMENT ON COLUMN client_consultations.client_id IS 'Client ID (NULL if not yet converted to lead)';
