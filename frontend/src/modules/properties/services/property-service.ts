@@ -116,3 +116,25 @@ export async function deleteProperty(id: number) {
 		return { success: false, error };
 	}
 }
+
+export async function archiveProperty(id: number) {
+	try {
+		await api.post(`properties/${id}/archive`);
+		revalidateTag("properties", { expire: 0 });
+		return { success: true };
+	} catch (error) {
+		console.error("Error archiving property:", error);
+		return { success: false, error };
+	}
+}
+
+export async function unarchiveProperty(id: number) {
+	try {
+		await api.post(`properties/${id}/unarchive`);
+		revalidateTag("properties", { expire: 0 });
+		return { success: true };
+	} catch (error) {
+		console.error("Error unarchiving property:", error);
+		return { success: false, error };
+	}
+}
