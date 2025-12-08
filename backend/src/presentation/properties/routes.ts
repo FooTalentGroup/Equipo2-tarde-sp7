@@ -425,6 +425,63 @@ export class PropertyRoutes {
 
         /**
          * @swagger
+         * /api/properties/{id}/toggle-featured:
+         *   patch:
+         *     summary: Publish/unpublish property on landing page
+         *     description: |
+         *       Toggle the featured_web status to control if a property appears on the landing page.
+         *       Only authenticated users (admin) can publish/unpublish properties.
+         *     tags: [Properties]
+         *     security:
+         *       - bearerAuth: []
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: integer
+         *         description: Property ID
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - featured_web
+         *             properties:
+         *               featured_web:
+         *                 type: boolean
+         *                 description: true to publish on landing page, false to unpublish
+         *                 example: true
+         *     responses:
+         *       200:
+         *         description: Property featured status updated successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: Property publicada en la landing page exitosamente
+         *                 data:
+         *                   type: object
+         *       400:
+         *         description: Invalid request (bad property ID or featured_web value)
+         *       401:
+         *         description: Unauthorized
+         *       404:
+         *         description: Property not found
+         */
+        router.patch(
+            '/:id/toggle-featured',
+            authMiddleware.authenticate,
+            (req, res) => controller.toggleFeaturedWeb(req, res)
+        );
+
+        /**
+         * @swagger
          * /api/properties/{id}:
          *   delete:
          *     summary: Delete a property (hard delete)

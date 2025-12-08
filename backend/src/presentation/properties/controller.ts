@@ -244,6 +244,42 @@ export class PropertyController {
     }
 
     /**
+     * Toggle featured_web status (publish/unpublish on landing page)
+     * Only admin can publish/unpublish properties on the landing page
+     */
+    toggleFeaturedWeb = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const { featured_web } = req.body;
+
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({
+                    message: 'Invalid property ID'
+                });
+            }
+
+            if (typeof featured_web !== 'boolean') {
+                return res.status(400).json({
+                    message: 'featured_web must be a boolean value (true or false)'
+                });
+            }
+
+            // Update only the featured_web field
+            const result = await this.propertyServices.updateProperty(Number(id), {
+                featured_web
+            });
+
+            const action = featured_web ? 'publicada en' : 'despublicada de';
+            return res.json({
+                message: `Property ${action} la landing page exitosamente`,
+                data: result
+            });
+        } catch (error) {
+            this.handleError(error, res);
+        }
+    }
+
+    /**
      * Elimina físicamente una propiedad (hard delete)
      */
     deleteProperty = async (req: Request, res: Response) => {

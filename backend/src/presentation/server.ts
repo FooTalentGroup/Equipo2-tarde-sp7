@@ -31,6 +31,9 @@ export class Server {
     this.app.use( express.json() ); // raw
     this.app.use( express.urlencoded({ extended: true }) ); // x-www-form-urlencoded
 
+    //* Security: Ocultar información del servidor
+    this.app.disable('x-powered-by'); // Oculta "X-Powered-By: Express"
+
     //* CORS (configurar según necesidades)
     const { CorsMiddleware } = await import('./middlewares/cors.middleware');
     this.app.use(CorsMiddleware.configure(['*'])); // Permitir todos los orígenes en desarrollo
