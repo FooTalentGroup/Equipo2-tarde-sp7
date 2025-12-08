@@ -13,19 +13,14 @@ type Props = {
 export default function PropertyDetailView({ property }: Props) {
 	return (
 		<div className="grid gap-5">
-			<div className="grid grid-cols-1 gap-20 lg:grid-cols-4">
+			<div className="grid grid-cols-1 gap-10 lg:grid-cols-4">
 				<div className="lg:col-span-3">
 					<PropertyGallery images={property.images} />
 				</div>
 				<div className="lg:col-span-1">
 					<PropertySidebar
 						propertyId={property.id}
-						isFeatured={property.featured_web}
-						onEdit={() => console.log("Edit")}
-						onPublish={() => console.log("Publish")}
-						onToggleFeatured={(checked) =>
-							console.log("Toggle featured", checked)
-						}
+						isEnabled={property.featured_web}
 					/>
 				</div>
 			</div>

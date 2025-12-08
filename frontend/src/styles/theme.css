@@ -9,6 +9,7 @@
   --color-grey-dark-active: var(--grey-dark-active);
   --color-heading: var(--heading);
   --color-tertiary-light: var(--tertiary-light);
+  --color-blue-normal: var(--blue-normal);
 
   /* Fonts */
   --font-sans: var(--font-inter);
@@ -120,6 +121,7 @@
   --heading: #1a3d64;
   --foreground: #364153;
   --grey-dark-active: #3a3a3a;
+  --blue-normal: #3b82f6;
 
   /* Card & Popover */
   --card: #ffffff;

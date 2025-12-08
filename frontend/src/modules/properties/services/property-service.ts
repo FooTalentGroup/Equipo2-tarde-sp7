@@ -106,6 +106,66 @@ export async function createProperty(data: PropertyForm) {
 	}
 }
 
+export async function updateProperty(id: number | string, data: PropertyForm) {
+	try {
+		const formData = new FormData();
+
+		const propertyTypeLabel =
+			PROPERTY_TYPE.find((t) => t.value === data.basic.property_type)?.label ||
+			data.basic.property_type;
+
+		const basicData = {
+			...data.basic,
+			property_type: propertyTypeLabel,
+		};
+
+		formData.append("basic", JSON.stringify(basicData));
+		formData.append("geography", JSON.stringify(data.geography));
+		formData.append("address", JSON.stringify(data.address));
+		formData.append("values", JSON.stringify(data.values));
+		formData.append("characteristics", JSON.stringify(data.characteristics));
+		formData.append("surface", JSON.stringify(data.surface));
+		formData.append("services", JSON.stringify(data.services));
+		formData.append("internal", JSON.stringify(data.internal));
+
+		if (data.images?.gallery && data.images.gallery.length > 0) {
+			data.images.gallery.forEach((file: any) => {
+				if (file instanceof File && !(file as any).id) {
+					formData.append("images", file);
+				}
+			});
+		}
+
+		const existingImageIds = data.images?.gallery
+			?.filter((f: any) => f.id)
+			.map((f: any) => f.id);
+
+		if (existingImageIds && existingImageIds.length > 0) {
+			formData.append("existing_images", JSON.stringify(existingImageIds));
+		}
+
+		if (data.documents?.files && data.documents.files.length > 0) {
+			data.documents.files.forEach((file: any) => {
+				if (file instanceof File) {
+					formData.append("documents", file);
+				}
+			});
+		}
+
+		const res = await api.put<Property>(`properties/${id}`, formData);
+		revalidateTag("properties", { expire: 0 });
+		return res;
+	} catch (error) {
+		console.log("error", error);
+		return {
+			error:
+				error instanceof Error
+					? error.message
+					: "Error al actualizar la propiedad",
+		};
+	}
+}
+
 export async function deleteProperty(id: number) {
 	try {
 		await api.delete(`properties/${id}`);
@@ -113,6 +173,28 @@ export async function deleteProperty(id: number) {
 		return { success: true };
 	} catch (error) {
 		console.error("Error deleting property:", error);
+		return { success: false, error };
+	}
+}
+
+export async function archiveProperty(id: number) {
+	try {
+		await api.post(`properties/${id}/archive`);
+		revalidateTag("properties", { expire: 0 });
+		return { success: true };
+	} catch (error) {
+		console.error("Error archiving property:", error);
+		return { success: false, error };
+	}
+}
+
+export async function unarchiveProperty(id: number) {
+	try {
+		await api.post(`properties/${id}/unarchive`);
+		revalidateTag("properties", { expire: 0 });
+		return { success: true };
+	} catch (error) {
+		console.error("Error unarchiving property:", error);
 		return { success: false, error };
 	}
 }
