@@ -1,40 +1,40 @@
-import { Router } from 'express';
-import { Authroutes } from './auth/routes';
-import { PropertyRoutes } from './properties/routes';
-import { ClientRoutes } from './clients/routes';
-import { UserRoutes } from './users/routes';
-import { ConsultationRoutes } from './consultations/routes';
-import { CompanyRoutes } from './company/routes';
+import { Router } from "express";
+
+import { Authroutes } from "./auth/routes";
+import { ClientRoutes } from "./clients/routes";
+import { CompanyRoutes } from "./company/routes";
+import { ConsultationRoutes } from "./consultations/routes";
+import { PropertyRoutes } from "./properties/routes";
+import { UserRoutes } from "./users/routes";
 
 export class AppRoutes {
-  static get routes(): Router {
-    const router = Router();
-    
-    // Crear router para agrupar todas las rutas bajo /api
-    const apiRouter = Router();
-    
-    // Rutas de autenticación
-    apiRouter.use('/auth', Authroutes.routes);
+	static get routes(): Router {
+		const router = Router();
 
-    // Rutas de usuarios
-    apiRouter.use('/users', UserRoutes.routes);
+		// Crear router para agrupar todas las rutas bajo /api
+		const apiRouter = Router();
 
-    // Rutas de propiedades
-    apiRouter.use('/properties', PropertyRoutes.routes);
+		// Rutas de autenticación
+		apiRouter.use("/auth", Authroutes.routes);
 
-    // Rutas de clientes (incluye tenants, owners, leads)
-    apiRouter.use('/clients', ClientRoutes.routes);
+		// Rutas de usuarios
+		apiRouter.use("/users", UserRoutes.routes);
 
-    // Rutas de consultas (público)
-    apiRouter.use('/consultations', ConsultationRoutes.routes);
+		// Rutas de propiedades
+		apiRouter.use("/properties", PropertyRoutes.routes);
 
-    // Rutas de configuración de la empresa (logo, etc.)
-    apiRouter.use('/company', CompanyRoutes.routes);
+		// Rutas de clientes (incluye tenants, owners, leads)
+		apiRouter.use("/clients", ClientRoutes.routes);
 
-    // Montar todas las rutas bajo /api
-    router.use('/api', apiRouter);
+		// Rutas de consultas (público)
+		apiRouter.use("/consultations", ConsultationRoutes.routes);
 
-    return router;
-  }
+		// Rutas de configuración de la empresa (logo, etc.)
+		apiRouter.use("/company", CompanyRoutes.routes);
+
+		// Montar todas las rutas bajo /api
+		router.use("/api", apiRouter);
+
+		return router;
+	}
 }
-
