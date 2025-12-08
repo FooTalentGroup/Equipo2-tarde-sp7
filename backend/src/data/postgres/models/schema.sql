@@ -756,3 +756,32 @@ COMMENT ON COLUMN client_consultations.consultant_first_name IS 'Consultant firs
 COMMENT ON COLUMN client_consultations.consultant_last_name IS 'Consultant last name (temporary until conversion to lead)';
 COMMENT ON COLUMN client_consultations.consultant_phone IS 'Consultant phone (temporary until conversion to lead)';
 COMMENT ON COLUMN client_consultations.consultant_email IS 'Consultant email (temporary until conversion to lead)';
+
+-- ========================================================
+-- COMPANY SETTINGS
+-- Global company configuration (logo, name, etc.)
+-- ========================================================
+
+CREATE TABLE IF NOT EXISTS company_settings (
+    id INTEGER PRIMARY KEY DEFAULT 1,
+    logo_url VARCHAR(500),
+    company_name VARCHAR(255) DEFAULT 'Inmobiliaria',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT single_row CHECK (id = 1)
+);
+
+COMMENT ON TABLE company_settings IS 'Global company configuration (logo, name, etc.). Only one record allowed (id=1)';
+COMMENT ON COLUMN company_settings.logo_url IS 'URL of company logo stored in Cloudinary';
+COMMENT ON COLUMN company_settings.company_name IS 'Name of the real estate company';
+COMMENT ON COLUMN company_settings.updated_by_user_id IS 'User (admin) who last updated the settings';
+COMMENT ON CONSTRAINT single_row ON company_settings IS 'Ensures only one configuration record exists';
+
+-- Insert default record
+INSERT INTO company_settings (id, logo_url, company_name) 
+VALUES (1, NULL, 'Inmobiliaria')
+ON CONFLICT (id) DO NOTHING;
+
+-- Create index for faster lookups
+CREATE INDEX IF NOT EXISTS idx_company_settings_updated_by 
+ON company_settings(updated_by_user_id);

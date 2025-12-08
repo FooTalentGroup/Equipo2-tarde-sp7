@@ -4,6 +4,7 @@ import { PropertyRoutes } from './properties/routes';
 import { ClientRoutes } from './clients/routes';
 import { UserRoutes } from './users/routes';
 import { ConsultationRoutes } from './consultations/routes';
+import { CompanyRoutes } from './company/routes';
 
 export class AppRoutes {
   static get routes(): Router {
@@ -26,6 +27,9 @@ export class AppRoutes {
 
     // Rutas de consultas (público)
     apiRouter.use('/consultations', ConsultationRoutes.routes);
+
+    // Rutas de configuración de la empresa (logo, etc.)
+    apiRouter.use('/company', CompanyRoutes.routes);
 
     // Montar todas las rutas bajo /api
     router.use('/api', apiRouter);
