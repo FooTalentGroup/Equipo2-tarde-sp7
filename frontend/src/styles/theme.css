@@ -9,6 +9,7 @@
   --color-grey-dark-active: var(--grey-dark-active);
   --color-heading: var(--heading);
   --color-tertiary-light: var(--tertiary-light);
+  --color-blue-normal: var(--blue-normal);
 
   /* Fonts */
   --font-sans: var(--font-inter);
@@ -49,6 +50,14 @@
   --color-destructive: var(--destructive);
   --color-destructive-border: var(--destructive-border);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-danger-light: var(--danger-light);
+  --color-danger-dark: var(--danger-dark);
+  --color-danger-normal: var(--danger-normal);
+
+  /* Attention */
+  --color-attention: var(--attention);
+  --color-attention-light: var(--attention-light);
+  --color-attention-dark: var(--attention-dark);
 
   /* Accent / Muted */
   --color-accent-foreground: var(--accent-foreground);
@@ -94,6 +103,7 @@
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-success-border: var(--success-border);
+  --color-success-normal: var(--success-normal);
 
   --color-grey-light: var(--grey-light);
   --color-dropdown-background: var(--dropdown-background);
@@ -120,6 +130,7 @@
   --heading: #1a3d64;
   --foreground: #364153;
   --grey-dark-active: #3a3a3a;
+  --blue-normal: #3b82f6;
 
   /* Card & Popover */
   --card: #ffffff;
@@ -169,12 +180,20 @@
   --success: #e6f8f3;
   --success-border: #b0e9db;
   --success-foreground: #008a68;
+  --success-normal: #00b88a;
 
   /* Danger / Destructive */
   --danger-normal: #f8222d;
+  --danger-light: #fee9ea;
+  --danger-dark: #ba1a22;
   --destructive: #fff3f6;
   --destructive-border: #f8222d;
   --destructive-foreground: #f8222d;
+
+  /* Attention */
+  --attention: #feb938;
+  --attention-light: #fff8eb;
+  --attention-dark: #bf8b2a;
 
   /* Borders / Inputs */
   --border: #e6e6e6;

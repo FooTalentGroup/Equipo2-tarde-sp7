@@ -883,6 +883,7 @@ export class PropertyServices {
             property_type_id?: number;
             property_status_id?: number;
             visibility_status_id?: number;
+            featured_web?: boolean;
             bedrooms_count?: number;
             bathrooms_count?: number;
             rooms_count?: number;

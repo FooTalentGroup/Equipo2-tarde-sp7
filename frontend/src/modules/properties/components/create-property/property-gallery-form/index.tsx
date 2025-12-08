@@ -83,7 +83,24 @@ export default function PropertyGalleryForm({ form }: Props) {
 																	: "border",
 															)}
 														>
-															<FileUploadItemPreview className="size-full rounded-none border-0 bg-transparent" />
+															<FileUploadItemPreview
+																className="size-full rounded-none border-0 bg-transparent"
+																render={(file, fallback) => {
+																	const customFile = file as File & {
+																		preview?: string;
+																	};
+																	if (customFile.preview) {
+																		return (
+																			<img
+																				src={customFile.preview}
+																				alt={file.name}
+																				className="size-full object-cover"
+																			/>
+																		);
+																	}
+																	return fallback();
+																}}
+															/>
 															{index === 0 && (
 																<Badge
 																	variant="tertiary"
@@ -157,7 +174,24 @@ export default function PropertyGalleryForm({ form }: Props) {
 												value={file}
 												className="relative aspect-square size-full overflow-hidden rounded-lg border p-0"
 											>
-												<FileUploadItemPreview className="size-full rounded-none border-0 bg-transparent" />
+												<FileUploadItemPreview
+													className="size-full rounded-none border-0 bg-transparent"
+													render={(file, fallback) => {
+														const customFile = file as File & {
+															preview?: string;
+														};
+														if (customFile.preview) {
+															return (
+																<img
+																	src={customFile.preview}
+																	alt={file.name}
+																	className="size-full object-cover"
+																/>
+															);
+														}
+														return fallback();
+													}}
+												/>
 											</FileUploadItem>
 										);
 									}}

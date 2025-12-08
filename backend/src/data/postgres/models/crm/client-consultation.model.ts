@@ -2,7 +2,7 @@ import { PostgresDatabase } from '../../database';
 
 export interface ClientConsultation {
     id?: number;
-    client_id: number;
+    client_id?: number; // Optional - null until converted to lead
     property_id?: number;
     consultation_date?: Date;
     consultation_type_id: number;
@@ -12,10 +12,15 @@ export interface ClientConsultation {
     responded_by_user_id?: number;
     response_date?: Date;
     is_read?: boolean;
+    // Consultant information (temporary until conversion to lead)
+    consultant_first_name?: string;
+    consultant_last_name?: string;
+    consultant_phone?: string;
+    consultant_email?: string;
 }
 
 export interface CreateClientConsultationDto {
-    client_id: number;
+    client_id?: number; // Optional - null until converted to lead
     property_id?: number;
     consultation_type_id: number;
     assigned_user_id?: number;
@@ -25,6 +30,11 @@ export interface CreateClientConsultationDto {
     responded_by_user_id?: number;
     response_date?: Date;
     is_read?: boolean;
+    // Consultant information (temporary until conversion to lead)
+    consultant_first_name?: string;
+    consultant_last_name?: string;
+    consultant_phone?: string;
+    consultant_email?: string;
 }
 
 export interface ClientConsultationFilters {
@@ -48,14 +58,15 @@ export class ClientConsultationModel {
         const query = `
             INSERT INTO ${this.TABLE_NAME} (
                 client_id, property_id, consultation_type_id, assigned_user_id, 
-                consultation_date, message, response, responded_by_user_id, response_date, is_read
+                consultation_date, message, response, responded_by_user_id, response_date, is_read,
+                consultant_first_name, consultant_last_name, consultant_phone, consultant_email
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             RETURNING *
         `;
         
         const result = await client.query(query, [
-            consultationData.client_id,
+            consultationData.client_id || null,
             consultationData.property_id || null,
             consultationData.consultation_type_id,
             consultationData.assigned_user_id || null,
@@ -65,6 +76,10 @@ export class ClientConsultationModel {
             consultationData.responded_by_user_id || null,
             consultationData.response_date || null,
             consultationData.is_read !== undefined ? consultationData.is_read : false,
+            consultationData.consultant_first_name || null,
+            consultationData.consultant_last_name || null,
+            consultationData.consultant_phone || null,
+            consultationData.consultant_email || null,
         ]);
 
         return result.rows[0];
@@ -179,6 +194,10 @@ export class ClientConsultationModel {
         if (updateData.is_read !== undefined) {
             fields.push(`is_read = $${paramIndex++}`);
             values.push(updateData.is_read);
+        }
+        if (updateData.client_id !== undefined) {
+            fields.push(`client_id = $${paramIndex++}`);
+            values.push(updateData.client_id || null);
         }
 
         if (fields.length === 0) {

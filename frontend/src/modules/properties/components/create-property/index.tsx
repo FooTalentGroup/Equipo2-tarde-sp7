@@ -30,7 +30,10 @@ import { type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { createProperty } from "../../services/property-service";
+import {
+	createProperty,
+	updateProperty,
+} from "../../services/property-service";
 import PropertyDocumentsForm from "./property-documents-form";
 import PropertyFeaturesForm from "./property-features-form";
 import PropertyGalleryForm from "./property-gallery-form";
@@ -41,6 +44,7 @@ import PropertyValuesForm from "./property-values-form";
 
 type Props = {
 	defaultValues?: PropertyForm;
+	propertyId?: number | string;
 };
 
 const { useStepper, steps, utils } = defineStepper(
@@ -85,7 +89,10 @@ const { useStepper, steps, utils } = defineStepper(
 	},
 );
 
-export default function CreatePropertyForm({ defaultValues }: Props) {
+export default function CreatePropertyForm({
+	defaultValues,
+	propertyId,
+}: Props) {
 	const router = useRouter();
 
 	const stepper = useStepper();
@@ -190,13 +197,25 @@ export default function CreatePropertyForm({ defaultValues }: Props) {
 		if (stepper.isLast) {
 			try {
 				const allData = form.getValues();
-				const result = await createProperty(allData);
+				let result:
+					| Awaited<ReturnType<typeof createProperty>>
+					| Awaited<ReturnType<typeof updateProperty>>;
+
+				if (propertyId) {
+					result = await updateProperty(propertyId, allData);
+				} else {
+					result = await createProperty(allData);
+				}
 
 				if (result && typeof result === "object" && "error" in result) {
 					throw new Error((result as { error: string }).error);
 				}
 
-				toast.success("Propiedad guardada exitosamente");
+				toast.success(
+					propertyId
+						? "Propiedad actualizada exitosamente"
+						: "Propiedad guardada exitosamente",
+				);
 
 				router.push(paths.agent.properties.index());
 			} catch (error) {

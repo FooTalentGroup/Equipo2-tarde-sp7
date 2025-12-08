@@ -8,3 +8,4 @@ export * from './rentals';
 export * from './sales';
 export * from './crm';
 export * from './shared';
+export * from './company';

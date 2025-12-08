@@ -33,6 +33,7 @@ export const paths = {
 		properties: {
 			index: () => "/agent/properties",
 			detail: (id: string) => `/agent/properties/${id}`,
+			edit: (id: string | number) => `/agent/properties/${id}/edit`,
 			new: () => "/agent/properties/new",
 		},
 		reports: {
