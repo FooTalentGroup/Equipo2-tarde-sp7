@@ -71,34 +71,81 @@ export class PropertyRoutes {
          *         name: property_type_id
          *         schema:
          *           type: integer
+         *         description: Filter by property type
          *       - in: query
          *         name: property_status_id
          *         schema:
          *           type: integer
+         *         description: Filter by property status
+         *       - in: query
+         *         name: visibility_status_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by visibility status
+         *       - in: query
+         *         name: owner_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by owner (client) ID
+         *       - in: query
+         *         name: captured_by_user_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by user who captured the property
          *       - in: query
          *         name: city_id
          *         schema:
          *           type: integer
+         *         description: Filter by city
          *       - in: query
          *         name: min_price
          *         schema:
          *           type: number
+         *         description: Minimum price filter
          *       - in: query
          *         name: max_price
          *         schema:
          *           type: number
+         *         description: Maximum price filter
+         *       - in: query
+         *         name: operation_type_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by operation type (e.g., 1 for Venta, 2 for Alquiler)
+         *         example: 1
+         *       - in: query
+         *         name: currency_type_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by currency type
+         *       - in: query
+         *         name: featured_web
+         *         schema:
+         *           type: boolean
+         *         description: Filter by featured on landing page (true/false)
+         *         example: true
          *       - in: query
          *         name: search
          *         schema:
          *           type: string
+         *         description: Search in title and description
+         *       - in: query
+         *         name: includeArchived
+         *         schema:
+         *           type: boolean
+         *         description: Include archived properties (default false)
          *       - in: query
          *         name: limit
          *         schema:
          *           type: integer
+         *         description: Number of results per page
+         *         example: 20
          *       - in: query
          *         name: offset
          *         schema:
          *           type: integer
+         *         description: Pagination offset
+         *         example: 0
          *     responses:
          *       200:
          *         description: List of properties
@@ -421,6 +468,63 @@ export class PropertyRoutes {
             '/:id/unarchive',
             authMiddleware.authenticate,
             (req, res) => controller.unarchiveProperty(req, res)
+        );
+
+        /**
+         * @swagger
+         * /api/properties/{id}/toggle-featured:
+         *   patch:
+         *     summary: Publish/unpublish property on landing page
+         *     description: |
+         *       Toggle the featured_web status to control if a property appears on the landing page.
+         *       Only authenticated users (admin) can publish/unpublish properties.
+         *     tags: [Properties]
+         *     security:
+         *       - bearerAuth: []
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: integer
+         *         description: Property ID
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - featured_web
+         *             properties:
+         *               featured_web:
+         *                 type: boolean
+         *                 description: true to publish on landing page, false to unpublish
+         *                 example: true
+         *     responses:
+         *       200:
+         *         description: Property featured status updated successfully
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *                   example: Property publicada en la landing page exitosamente
+         *                 data:
+         *                   type: object
+         *       400:
+         *         description: Invalid request (bad property ID or featured_web value)
+         *       401:
+         *         description: Unauthorized
+         *       404:
+         *         description: Property not found
+         */
+        router.patch(
+            '/:id/toggle-featured',
+            authMiddleware.authenticate,
+            (req, res) => controller.toggleFeaturedWeb(req, res)
         );
 
         /**
