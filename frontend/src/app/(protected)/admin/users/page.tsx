@@ -2,6 +2,8 @@ import { api } from "@src/lib/axios";
 import { UserHeader, UserList } from "@src/modules/admin/components";
 import type { ListUserProps } from "@src/modules/admin/types";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminUsersPage() {
 	try {
 		const { users } = await api.get<ListUserProps>("/users");
