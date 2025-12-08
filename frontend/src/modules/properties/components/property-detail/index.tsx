@@ -21,7 +21,6 @@ export default function PropertyDetailView({ property }: Props) {
 					<PropertySidebar
 						propertyId={property.id}
 						isEnabled={property.featured_web}
-						onEdit={() => console.log("Edit")}
 					/>
 				</div>
 			</div>
