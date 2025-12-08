@@ -71,34 +71,81 @@ export class PropertyRoutes {
          *         name: property_type_id
          *         schema:
          *           type: integer
+         *         description: Filter by property type
          *       - in: query
          *         name: property_status_id
          *         schema:
          *           type: integer
+         *         description: Filter by property status
+         *       - in: query
+         *         name: visibility_status_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by visibility status
+         *       - in: query
+         *         name: owner_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by owner (client) ID
+         *       - in: query
+         *         name: captured_by_user_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by user who captured the property
          *       - in: query
          *         name: city_id
          *         schema:
          *           type: integer
+         *         description: Filter by city
          *       - in: query
          *         name: min_price
          *         schema:
          *           type: number
+         *         description: Minimum price filter
          *       - in: query
          *         name: max_price
          *         schema:
          *           type: number
+         *         description: Maximum price filter
+         *       - in: query
+         *         name: operation_type_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by operation type (e.g., 1 for Venta, 2 for Alquiler)
+         *         example: 1
+         *       - in: query
+         *         name: currency_type_id
+         *         schema:
+         *           type: integer
+         *         description: Filter by currency type
+         *       - in: query
+         *         name: featured_web
+         *         schema:
+         *           type: boolean
+         *         description: Filter by featured on landing page (true/false)
+         *         example: true
          *       - in: query
          *         name: search
          *         schema:
          *           type: string
+         *         description: Search in title and description
+         *       - in: query
+         *         name: includeArchived
+         *         schema:
+         *           type: boolean
+         *         description: Include archived properties (default false)
          *       - in: query
          *         name: limit
          *         schema:
          *           type: integer
+         *         description: Number of results per page
+         *         example: 20
          *       - in: query
          *         name: offset
          *         schema:
          *           type: integer
+         *         description: Pagination offset
+         *         example: 0
          *     responses:
          *       200:
          *         description: List of properties
