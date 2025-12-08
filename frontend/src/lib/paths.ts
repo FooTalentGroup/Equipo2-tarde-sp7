@@ -39,7 +39,7 @@ export const paths = {
 			index: () => "/agent/reports",
 		},
 		inquiries: {
-			index: () => "/agent/inquiries",
+			index: () => "/agent/consultations",
 		},
 	},
 

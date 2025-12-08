@@ -1,0 +1,111 @@
+"use client";
+
+import { useState } from "react";
+
+import { ConsultationDetailSheet } from "@src/modules/consultations/components/ConsultationDetailSheet";
+import { ConsultationCard } from "@src/modules/consultations/ui/ConsultationCard";
+import type { Consultation } from "@src/types/consultations";
+
+import { markConsultationAsRead } from "../service/consultation-service";
+
+type Props = {
+	consultationsData: Consultation[];
+};
+export default function ListConsultations({ consultationsData }: Props) {
+	const [consultations, setConsultations] = useState<Consultation[]>(
+		consultationsData || [],
+	);
+	const [selectedConsultation, setSelectedConsultation] =
+		useState<Consultation | null>(null);
+	const [dialogOpen, setDialogOpen] = useState(false);
+
+	const handleCardClick = (consultation: Consultation) => {
+		setSelectedConsultation(consultation);
+		setDialogOpen(true);
+
+		// Marcar como leído al abrir
+		if (!consultation.is_read) {
+			handleMarkAsRead(consultation.id);
+		}
+	};
+
+	const handleMarkAsRead = async (id: number) => {
+		setConsultations((prev) =>
+			prev.map((c) => (c.id === id ? { ...c, is_read: true } : c)),
+		);
+		await markConsultationAsRead(id).catch((error) => {
+			console.error("Error marking consultation as read:", error);
+		});
+	};
+
+	const handleSendResponse = async (
+		consultationId: number,
+		response: string,
+	) => {
+		// TODO: Llamar al backend para enviar respuesta
+		console.log("Send response to:", consultationId, response);
+
+		setConsultations((prev) =>
+			prev.map((c) =>
+				c.id === consultationId
+					? {
+							...c,
+							response,
+							response_date: new Date().toISOString(),
+						}
+					: c,
+			),
+		);
+	};
+
+	const handleAddContact = (consultation: Consultation) => {
+		// TODO: Implementar lógica para agregar contacto
+		console.log("Add contact:", consultation.client);
+	};
+
+	const handleDelete = (id: number) => {
+		if (confirm("¿Estás seguro de que quieres eliminar esta consulta?")) {
+			setConsultations((prev) => prev.filter((c) => c.id !== id));
+			// TODO: Llamar al backend para eliminar
+			console.log("Delete:", id);
+		}
+	};
+
+	/* const handleDeleteAll = () => {
+		if (confirm("¿Estás seguro de que quieres eliminar todas las consultas?")) {
+			setConsultations([]);
+			// TODO: Llamar al backend para eliminar todas
+			console.log("Delete all consultations");
+		}
+	}; */
+
+	return (
+		<div className="w-full">
+			<div className="space-y-4">
+				{consultations.length === 0 ? (
+					<div className="text-center py-12">
+						<p className="text-gray-500">No hay consultas para mostrar</p>
+					</div>
+				) : (
+					consultations.map((consultation) => (
+						<ConsultationCard
+							key={consultation.id}
+							consultation={consultation}
+							onMarkAsRead={handleMarkAsRead}
+							onDelete={handleDelete}
+							onClick={() => handleCardClick(consultation)}
+						/>
+					))
+				)}
+			</div>
+
+			<ConsultationDetailSheet
+				consultation={selectedConsultation}
+				open={dialogOpen}
+				onOpenChange={setDialogOpen}
+				onSendResponse={handleSendResponse}
+				onAddContact={handleAddContact}
+			/>
+		</div>
+	);
+}

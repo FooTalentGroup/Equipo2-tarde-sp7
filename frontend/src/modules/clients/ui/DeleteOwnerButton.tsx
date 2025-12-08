@@ -26,7 +26,7 @@ interface DeleteOwnerButtonProps {
 }
 
 export function DeleteOwnerButton({
-	ownerId,
+	/* ownerId, */
 	ownerName,
 }: DeleteOwnerButtonProps) {
 	const [isDeleting, setIsDeleting] = useState(false);
