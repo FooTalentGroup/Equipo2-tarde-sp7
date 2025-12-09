@@ -3,7 +3,11 @@ import { notFound } from "next/navigation";
 import SectionHeading from "@src/components/section-heading";
 import CreatePropertyForm from "@src/modules/properties/components/create-property";
 import { getPropertyById } from "@src/modules/properties/services/property-service";
-import type { PropertyForm } from "@src/types/property";
+import type {
+	PropertyForm,
+	PropertyType,
+	VisibilityStatusType,
+} from "@src/types/property";
 
 type Props = {
 	params: Promise<{ id?: string }>;
@@ -25,11 +29,10 @@ export default async function EditPropertyPage({ params }: Props) {
 		basic: {
 			title: property.title,
 			description: property.description || "",
-			// @ts-expect-error
-			property_type: property.property_type.id.toString(),
+			property_type: property.property_type.id.toString() as PropertyType,
 			property_status: property.property_status.name,
-			// @ts-expect-error
-			visibility_status: property.visibility_status.name,
+			visibility_status: property.visibility_status
+				.name as VisibilityStatusType,
 			featured_web: property.featured_web,
 			publication_date: property.publication_date,
 			owner_id: property.owner_id.toString(),
@@ -120,12 +123,10 @@ export default async function EditPropertyPage({ params }: Props) {
 	return (
 		<>
 			<SectionHeading title="Editar propiedad" />
-			<section>
-				<CreatePropertyForm
-					defaultValues={defaultValues}
-					propertyId={property.id}
-				/>
-			</section>
+			<CreatePropertyForm
+				defaultValues={defaultValues}
+				propertyId={property.id}
+			/>
 		</>
 	);
 }

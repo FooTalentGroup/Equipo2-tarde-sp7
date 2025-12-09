@@ -18,8 +18,12 @@ const buttonVariants = cva(
 					"border bg-transparent text-secondary shadow-xs border-secondary hover:bg-outline-hover hover:text-secondary",
 				"outline-blue":
 					"border bg-transparent text-tertiary shadow-xs border-tertiary hover:bg-outline-hover hover:text-tertiary",
+				"outline-gray": "border bg-card text-foreground border-border",
 				"outline-destructive":
 					"border bg-transparent text-destructive-foreground shadow-xs border-destructive-foreground hover:bg-destructive-foreground hover:text-destructive",
+				"outline-blue-normal":
+					"border bg-card text-foreground shadow-xs border-blue-normal hover:bg-outline-hover hover:text-blue-normal",
+				"blue-normal": "border bg-blue-normal text-white border-blue-normal",
 				secondary:
 					"bg-secondary text-secondary-foreground hover:bg-secondary-hover",
 				tertiary:

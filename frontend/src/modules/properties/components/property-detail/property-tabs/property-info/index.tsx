@@ -37,7 +37,7 @@ export default function PropertyInfo({ property }: Props) {
 
 	return (
 		<>
-			<section className="grid grid-cols-1 md:grid-cols-[1fr_0.6fr] gap-[46px]">
+			<section className="grid grid-cols-1 md:grid-cols-[1fr_0.6fr] gap-4">
 				<Card>
 					<CardContent className="grid grid-cols-1 flex-col gap-6 md:grid-cols-2 gap-y-8 gap-x-">
 						<div className="flex items-start gap-3">
@@ -120,8 +120,8 @@ export default function PropertyInfo({ property }: Props) {
 				</Card>
 				<PropertyValueCard prices={property.prices} className="lg:col-span-1" />
 			</section>
-			<section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-				<div className="lg:col-span-2 space-y-6">
+			<section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+				<div className="lg:col-span-3 grid gap-4">
 					<Section title="Información básica">
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
 							<div className="space-y-2">

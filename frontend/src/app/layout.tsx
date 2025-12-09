@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 
+import NextTopLoader from "nextjs-toploader";
+
 import "@src/styles/index.css";
 
 import type { ReactNode } from "react";
@@ -32,6 +34,12 @@ export default function RootLayout({
 	return (
 		<html lang="es">
 			<body className={`${montserrat.variable} ${inter.variable} antialiased`}>
+				<NextTopLoader
+					color="#083fb3"
+					showSpinner={false}
+					height={5}
+					shadow={false}
+				/>
 				{children}
 				<Toaster />
 			</body>

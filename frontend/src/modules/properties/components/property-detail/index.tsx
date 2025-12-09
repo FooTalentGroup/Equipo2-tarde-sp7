@@ -34,7 +34,7 @@ export default function PropertyDetailView({ property }: Props) {
 				<div className="lg:col-span-1">
 					<PropertySidebar
 						propertyId={property.id}
-						isEnabled={property.featured_web}
+						isFeatured={property.featured_web}
 					/>
 				</div>
 			</div>
