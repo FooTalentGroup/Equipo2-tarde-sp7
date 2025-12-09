@@ -466,7 +466,7 @@ export class PropertyConsultationServices {
 					await ClientCreationHelper.resolveContactCategory("Lead");
 
 				// Crear nuevo cliente usando helper (reutiliza validación de email único)
-				client = await ClientCreationHelper.createBaseClient(
+				const result = await ClientCreationHelper.createBaseClient(
 					{
 						first_name: consultation.consultant_first_name,
 						last_name: consultation.consultant_last_name,
@@ -477,11 +477,12 @@ export class PropertyConsultationServices {
 					categoryId,
 				);
 
-				wasNewLead = true;
+				client = result.client;
+				wasNewLead = result.wasCreated;
 				console.log(`Created new lead with ID: ${client.id}`);
 			}
 
-			// 7. Asociar la consulta al cliente
+			// 6. Asociar la consulta al cliente
 			const updatedConsultation = await ClientConsultationModel.update(
 				consultationId,
 				{

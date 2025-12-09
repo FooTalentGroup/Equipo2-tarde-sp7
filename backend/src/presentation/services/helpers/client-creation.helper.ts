@@ -46,9 +46,14 @@ export class ClientCreationHelper {
 
     /**
      * Crea un cliente básico con los datos proporcionados
+     * Implementa detección de duplicados antes de crear:
+     * 1. Verifica por email (si se proporciona)
+     * 2. Verifica por DNI (si se proporciona)
+     * 3. Verifica por teléfono + nombre + apellido
+     * 
      * @param clientData - Datos básicos del cliente
      * @param categoryId - ID de la categoría de contacto
-     * @returns Cliente creado
+     * @returns Objeto con el cliente y flag indicando si fue creado o ya existía
      * @throws CustomError si falla la creación
      */
     static async createBaseClient(
@@ -64,10 +69,42 @@ export class ClientCreationHelper {
             purchase_interest?: boolean;
         },
         categoryId: number
-    ) {
-        // Normalizar el teléfono antes de guardarlo
+    ): Promise<{ client: any; wasCreated: boolean }> {
+        // 1. PRIORIDAD 1: Verificar duplicado por email (si se proporciona)
+        if (clientData.email) {
+            const existingByEmail = await ClientModel.findByEmail(clientData.email);
+            if (existingByEmail) {
+                console.log(`Duplicate detected: Client found by email ${clientData.email}`);
+                return { client: existingByEmail, wasCreated: false };
+            }
+        }
+
+        // 2. PRIORIDAD 1.5: Verificar duplicado por DNI (si se proporciona)
+        if (clientData.dni) {
+            const existingByDni = await ClientModel.findByDni(clientData.dni);
+            if (existingByDni) {
+                console.log(`Duplicate detected: Client found by DNI ${clientData.dni}`);
+                return { client: existingByDni, wasCreated: false };
+            }
+        }
+
+        // 3. PRIORIDAD 2: Verificar duplicado por teléfono + nombre + apellido
         const normalizedPhone = normalizePhone(clientData.phone);
+        const clientsByPhone = await ClientModel.findByPhone(normalizedPhone);
         
+        if (clientsByPhone && clientsByPhone.length > 0) {
+            const exactMatch = clientsByPhone.find(c =>
+                c.first_name === clientData.first_name &&
+                c.last_name === clientData.last_name
+            );
+            
+            if (exactMatch) {
+                console.log(`Duplicate detected: Client found by phone ${normalizedPhone} and name ${clientData.first_name} ${clientData.last_name}`);
+                return { client: exactMatch, wasCreated: false };
+            }
+        }
+
+        // 3. No se encontró duplicado, crear nuevo cliente
         const newClient = await ClientModel.create({
             first_name: clientData.first_name,
             last_name: clientData.last_name,
@@ -85,7 +122,8 @@ export class ClientCreationHelper {
             throw CustomError.internalServerError('Failed to create client');
         }
 
-        return newClient;
+        console.log(`New client created with ID: ${newClient.id}`);
+        return { client: newClient, wasCreated: true };
     }
 }
 

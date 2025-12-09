@@ -45,7 +45,7 @@ export class LeadServices {
             }
 
             // 3. Crear el cliente (Lead) usando helper
-            const newClient = await ClientCreationHelper.createBaseClient({
+            const { client: newClient, wasCreated } = await ClientCreationHelper.createBaseClient({
                 first_name: createLeadDto.first_name,
                 last_name: createLeadDto.last_name,
                 phone: createLeadDto.phone,
@@ -71,6 +71,7 @@ export class LeadServices {
 
             return {
                 client: clientEntity.toPublicObject(),
+                was_existing_client: !wasCreated,
                 consultation: consultation ? {
                     id: consultation.id,
                     consultation_type_id: consultation.consultation_type_id,

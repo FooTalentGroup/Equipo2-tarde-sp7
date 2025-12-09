@@ -55,7 +55,7 @@ export class TenantServices {
             }
 
             // 3. Crear el cliente (inquilino) usando helper
-            const newClient = await ClientCreationHelper.createBaseClient({
+            const { client: newClient, wasCreated } = await ClientCreationHelper.createBaseClient({
                 first_name: createTenantDto.first_name,
                 last_name: createTenantDto.last_name,
                 phone: createTenantDto.phone,
@@ -131,6 +131,7 @@ export class TenantServices {
 
             return {
                 client: clientEntity.toPublicObject(),
+                was_existing_client: !wasCreated,
                 client_rental: clientRental ? {
                     id: clientRental.id,
                     property_id: clientRental.property_id,
