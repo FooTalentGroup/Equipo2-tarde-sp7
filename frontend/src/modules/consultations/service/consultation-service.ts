@@ -6,6 +6,7 @@ import { api } from "@src/lib/axios";
 import type { Consultation } from "@src/types/consultations";
 
 import type { ConsultationFilterForm } from "../types/consultation-filter";
+import type { ConvertToLeadResponse } from "../types/convert-to-lead";
 
 export async function getConsultations(filters: ConsultationFilterForm) {
 	const params = new URLSearchParams();
@@ -44,6 +45,11 @@ export async function markConsultationAsRead(id: number) {
 	revalidatePath("/consultations");
 }
 
+export async function markConsultationAsUnread(id: number) {
+	await api.patch(`/consultations/${id}/unread`, null);
+	revalidatePath("/consultations");
+}
+
 export async function deleteConsultation(id: number) {
 	const result = await api.delete<{ message: string }>(`/consultations/${id}`);
 	revalidatePath("/consultations");
@@ -52,4 +58,34 @@ export async function deleteConsultation(id: number) {
 export async function deleteAllConsultations() {
 	await api.delete(`/consultations`);
 	revalidatePath("/consultations");
+}
+
+export async function convertConsultationToLead(
+	consultationId: number,
+): Promise<ConvertToLeadResponse> {
+	const result = await api.post<ConvertToLeadResponse>(
+		`/consultations/${consultationId}/convert-to-lead`,
+	);
+	revalidatePath("/consultations");
+	return result;
+}
+
+export async function getConsultationsForPolling() {
+	try {
+		const response = await api.get<{
+			consultations: Consultation[];
+			pagination: {
+				total: number;
+				limit: number;
+				offset: number;
+				hasMore: boolean;
+			};
+		}>("/consultations");
+
+		const consultations = response.consultations || [];
+		return consultations;
+	} catch (error) {
+		console.error("Error fetching consultations for polling:", error);
+		return [];
+	}
 }

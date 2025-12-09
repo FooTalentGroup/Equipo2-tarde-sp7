@@ -27,3 +27,18 @@ export async function createClientServerAction<T extends ClientResponse>(
 		throw new Error(`${config.errorMessage}. Detalle: ${message}`);
 	}
 }
+
+export async function getClients<T = ClientResponse>(
+	endpoint: string = "clients",
+	filters?: Record<string, string | number | boolean | undefined | null>,
+) {
+	try {
+		const data = await api.get<{ clients: T[]; count: number }>(endpoint, {
+			params: filters,
+		});
+		return data;
+	} catch (error) {
+		console.error(`Error fetching clients from ${endpoint}:`, error);
+		return { clients: [] as T[], count: 0 };
+	}
+}
