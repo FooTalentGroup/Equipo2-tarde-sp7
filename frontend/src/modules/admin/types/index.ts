@@ -36,6 +36,22 @@ export type ListUserProps = {
 	users: CardUserProps[];
 };
 
-export type DeleteUserProps = {
+type OpenProps = {
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+};
+
+export interface DeleteUserProps extends OpenProps {
 	id: number;
+}
+
+export interface EditUserModalProps extends OpenProps {
+	user: CardUserProps;
+	onUserUpdated?: () => void;
+}
+
+export type DropdownProps = {
+	id: number;
+	user: CardUserProps;
+	onUserUpdated?: () => void;
 };
