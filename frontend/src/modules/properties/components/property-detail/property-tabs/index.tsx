@@ -28,7 +28,7 @@ export default function PropertyTabs({ property }: Props) {
 					ARCHIVO
 				</TabsTrigger>
 			</TabsList>
-			<TabsContent value="details" className="px-8 grid gap-8">
+			<TabsContent value="details" className="px-4 grid gap-8">
 				<PropertyInfo property={property} />
 			</TabsContent>
 			<TabsContent value="multimedia">

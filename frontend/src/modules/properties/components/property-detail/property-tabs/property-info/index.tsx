@@ -24,7 +24,7 @@ export default function PropertyInfo({ property }: Props) {
 
 	return (
 		<>
-			<section className="grid grid-cols-1 md:grid-cols-[1fr_0.6fr] gap-12">
+			<section className="grid grid-cols-1 md:grid-cols-[1fr_0.6fr] gap-[46px]">
 				<Card>
 					<CardContent className="grid grid-cols-1 flex-col gap-6 md:grid-cols-2 gap-y-8 gap-x-">
 						<div className="flex items-start gap-3">

@@ -1,14 +1,13 @@
 "use client";
 
-import { Button } from "@src/components/ui/button";
 import {
 	Card,
 	CardContent,
 	CardHeader,
 	CardTitle,
 } from "@src/components/ui/card";
-import { Checkbox } from "@src/components/ui/checkbox";
-import { cn } from "@src/lib/utils";
+import { Separator } from "@src/components/ui/separator";
+import { cn, formatPrice } from "@src/lib/utils";
 import type { Price } from "@src/types/property-detail";
 
 type Props = {
@@ -20,41 +19,34 @@ export default function PropertyValueCard({ prices, className }: Props) {
 	const salePrice = prices.find((p) => p.operation_type.name === "Venta");
 	const rentPrice = prices.find((p) => p.operation_type.name === "Alquiler");
 
+	if (!salePrice && !rentPrice) return null;
+
 	return (
-		<Card className={cn("", className)}>
-			<CardHeader>
-				<CardTitle className="text-lg font-medium text-blue-900">
+		<Card className={cn("gap-0 py-0", className)}>
+			<CardHeader className="px-4 py-3 gap-0">
+				<CardTitle className="text-secondary text-base font-semibold">
 					Valor de propiedad
 				</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-6">
-				<div className="space-y-2">
-					<div className="flex items-center justify-between">
-						<span className="font-medium text-gray-700">Venta</span>
-						<Checkbox checked={!!salePrice} />
+			<Separator />
+			<CardContent className="space-y-6 py-6 px-4">
+				{salePrice && (
+					<div className="grid gap-3">
+						<span className="font-medium text-secondary">Venta</span>
+						<div className="flex items-center justify-center rounded-md text-secondary bg-muted py-3 text-xl font-bold ">
+							{formatPrice(salePrice.price, salePrice.currency)}
+						</div>
 					</div>
-					<div className="flex items-center justify-center rounded-md bg-gray-100 py-3 text-xl font-bold text-gray-800">
-						{salePrice
-							? `${salePrice.currency.symbol} ${salePrice.price}`
-							: "$ -"}
-					</div>
-				</div>
+				)}
 
-				<div className="space-y-2">
-					<div className="flex items-center justify-between">
-						<span className="font-medium text-gray-700">Alquiler</span>
-						<Checkbox checked={!!rentPrice} />
+				{rentPrice && (
+					<div className="space-y-2">
+						<span className="font-medium">Alquiler</span>
+						<div className="flex items-center justify-center rounded-md  py-3 text-xl font-bold ">
+							{formatPrice(rentPrice.price, rentPrice.currency)}
+						</div>
 					</div>
-					<div className="flex items-center justify-center rounded-md bg-gray-100 py-3 text-xl font-bold text-gray-800">
-						{rentPrice
-							? `${rentPrice.currency.symbol} ${rentPrice.price}`
-							: "$ -"}
-					</div>
-				</div>
-
-				<Button className="w-full bg-blue-700 hover:bg-blue-800">
-					Editar valores
-				</Button>
+				)}
 			</CardContent>
 		</Card>
 	);
