@@ -19,15 +19,15 @@ export interface ConsultationType {
 }
 
 export interface Consultation {
-	consultant?: ConsultationClient;
 	id: number;
 	consultation_date: string;
 	message: string;
 	response: string | null;
 	response_date: string | null;
 	is_read: boolean;
-	client: ConsultationClient;
-	property: ConsultationProperty;
+	client: ConsultationClient | null;
+	consultant: ConsultationClient | null;
+	property: ConsultationProperty | null;
 	consultation_type: ConsultationType;
 }
 

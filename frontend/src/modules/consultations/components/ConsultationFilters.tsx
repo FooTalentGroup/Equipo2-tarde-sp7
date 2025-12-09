@@ -1,10 +1,18 @@
 "use client";
 
+import { Badge } from "@src/components/ui/badge";
 import { Button } from "@src/components/ui/button";
-import { Funnel, Mail, Trash2 } from "lucide-react";
+import { Funnel, Mail } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 
-export default function ConsultationFilters() {
+import { deleteAllConsultations } from "../service/consultation-service";
+import { DeleteAllConsultationsAction } from "../ui/DeleteAllConsultationsAction";
+
+interface Props {
+	unreadCount: number;
+}
+
+export default function ConsultationFilters({ unreadCount }: Props) {
 	const [startDate, setStartDate] = useQueryState(
 		"start_date",
 		parseAsString.withDefault("").withOptions({ shallow: false }),
@@ -45,18 +53,17 @@ export default function ConsultationFilters() {
 	const activeFilter =
 		isRead === "false" ? "unread" : startDate && endDate ? "last7" : "all";
 
-	// Este lo dejamos para después cuando tengas el endpoint
-	const handleDeleteAll = () => {
-		console.log("TODO: Implementar delete all");
+	const handleDeleteAll = async () => {
+		await deleteAllConsultations();
 	};
 
 	return (
-		<div className="flex items-center gap-3 mb-3">
+		<div className="flex items-center gap-3 mt-2">
 			{/* Últimos 7 días */}
 			<Button
 				variant={activeFilter === "last7" ? "tertiary" : "outline"}
 				onClick={handleLast7Days}
-				className="flex items-center gap-2"
+				className="flex items-center gap-2 border-gray-300"
 			>
 				<Funnel className="size-4" />
 				Últimos 7 días
@@ -66,30 +73,28 @@ export default function ConsultationFilters() {
 			<Button
 				variant={activeFilter === "unread" ? "tertiary" : "outline"}
 				onClick={handleUnread}
-				className="flex items-center gap-2"
+				className="flex items-center gap-2 border-gray-300"
 			>
 				<Mail className="size-4" />
 				No leídos
-				{/* El contador lo obtendremos del server component */}
+				{unreadCount > 0 && (
+					<Badge className="ml-1 bg-[#3B82F6] rounded-full text-white px-1.5 py-1 text-xs">
+						{unreadCount}
+					</Badge>
+				)}
 			</Button>
 
 			{/* Todos */}
 			<Button
 				variant={activeFilter === "all" ? "tertiary" : "outline"}
 				onClick={handleAll}
+				className="border-gray-300"
 			>
 				Todas
 			</Button>
 
 			{/* Borrar todas */}
-			<Button
-				variant="outline"
-				className="ml-auto flex items-center gap-2 border-red-600 text-red-600 hover:bg-red-50 hover:text-red-500"
-				onClick={handleDeleteAll}
-			>
-				<Trash2 className="size-4" />
-				Borrar todas
-			</Button>
+			<DeleteAllConsultationsAction onDeleteAll={handleDeleteAll} />
 		</div>
 	);
 }

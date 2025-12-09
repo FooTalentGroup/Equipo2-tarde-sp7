@@ -41,6 +41,14 @@ export function ConsultationDetailSheet({
 		{ locale: es },
 	);
 
+	// Obtener el contacto disponible (client o consultant)
+	const contact = consultation.client || consultation.consultant;
+	const contactName = contact
+		? `${contact.first_name} ${contact.last_name}`
+		: "Contacto desconocido";
+	const contactPhone = contact?.phone || "No disponible";
+	const contactEmail = contact?.email || "No disponible";
+
 	const handleSendResponse = async () => {
 		if (!response.trim() || !onSendResponse) return;
 
@@ -79,9 +87,7 @@ export function ConsultationDetailSheet({
 				<div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
 					{/* Cliente Info */}
 					<div>
-						<h3 className="font-semibold text-base mb-2">
-							{consultation.client?.first_name} {consultation.client?.last_name}
-						</h3>
+						<h3 className="font-semibold text-base mb-2">{contactName}</h3>
 						{consultation.property && (
 							<p className="text-sm text-slate-600 mb-3">
 								{consultation.property.title}
@@ -89,16 +95,16 @@ export function ConsultationDetailSheet({
 						)}
 
 						<div className="space-y-2">
-							{consultation.client?.email && (
+							{contactEmail !== "No disponible" && (
 								<div className="flex items-center gap-2 text-sm text-slate-700">
 									<MailIcon className="h-4 w-4 text-slate-400" />
-									<span>{consultation.client.email}</span>
+									<span>{contactEmail}</span>
 								</div>
 							)}
-							{consultation.client?.phone && (
+							{contactPhone !== "No disponible" && (
 								<div className="flex items-center gap-2 text-sm text-slate-700">
 									<PhoneIcon className="h-4 w-4 text-slate-400" />
-									<span>{consultation.client.phone}</span>
+									<span>{contactPhone}</span>
 								</div>
 							)}
 						</div>
