@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import { api } from "@src/lib/axios";
 import { ConsultationDetailSheet } from "@src/modules/consultations/components/consultation-detail/ConsultationDetailSheet";
 import { ConsultationCard } from "@src/modules/consultations/ui/ConsultationCard";
 import type { Consultation } from "@src/types/consultations";
@@ -10,6 +9,7 @@ import { toast } from "sonner";
 
 import {
 	convertConsultationToLead,
+	getConsultationsForPolling,
 	markConsultationAsRead,
 	markConsultationAsUnread,
 } from "../service/consultation-service";
@@ -32,25 +32,23 @@ export default function ListConsultations({ consultationsData }: Props) {
 
 		const fetchConsultations = async () => {
 			try {
-				const res = await api.get<{
-					consultations: Consultation[];
-				}>("/consultations");
+				const newConsultations = await getConsultationsForPolling();
 
 				if (!isActive) return;
 
 				setConsultations((prev) => {
 					// Si la cantidad o IDs cambiaron, reemplazamos; si no, mantenemos para evitar renders innecesarios
 					const prevIds = new Set(prev.map((c) => c.id));
-					const next = res.consultations || [];
 					const changed =
-						next.length !== prev.length || next.some((c) => !prevIds.has(c.id));
-					return changed ? next : prev;
+						newConsultations.length !== prev.length ||
+						newConsultations.some((c) => !prevIds.has(c.id));
+					return changed ? newConsultations : prev;
 				});
 
 				// Si la consulta seleccionada está abierta, sincronizamos sus datos
 				setSelectedConsultation((prev) => {
 					if (!prev) return prev;
-					const updated = res.consultations?.find((c) => c.id === prev.id);
+					const updated = newConsultations.find((c) => c.id === prev.id);
 					return updated ? updated : prev;
 				});
 			} catch (error) {
@@ -59,7 +57,7 @@ export default function ListConsultations({ consultationsData }: Props) {
 		};
 
 		fetchConsultations();
-		const intervalId = setInterval(fetchConsultations, 60000); // 60s
+		const intervalId = setInterval(fetchConsultations, 30000); // 30s
 
 		return () => {
 			isActive = false;

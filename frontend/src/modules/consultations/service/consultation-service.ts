@@ -69,3 +69,23 @@ export async function convertConsultationToLead(
 	revalidatePath("/consultations");
 	return result;
 }
+
+export async function getConsultationsForPolling() {
+	try {
+		const response = await api.get<{
+			consultations: Consultation[];
+			pagination: {
+				total: number;
+				limit: number;
+				offset: number;
+				hasMore: boolean;
+			};
+		}>("/consultations");
+
+		const consultations = response.consultations || [];
+		return consultations;
+	} catch (error) {
+		console.error("Error fetching consultations for polling:", error);
+		return [];
+	}
+}
