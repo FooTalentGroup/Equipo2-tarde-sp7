@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@src/components/ui/button";
 import { Textarea } from "@src/components/ui/textarea";
+import { useContactManager } from "@src/hooks/useContactManager";
 import { useWhatsAppSender } from "@src/hooks/useWspSender";
 import type { Consultation } from "@src/types/consultations";
 import { CopyIcon, UserPlusIcon } from "lucide-react";
@@ -14,7 +15,6 @@ interface ConsultationActionsProps {
 	onSendResponse?: (consultationId: number, response: string) => Promise<void>;
 	onAddContact?: (consultation: Consultation) => void;
 	onOpenChange: (open: boolean) => void;
-	existingContact?: { id: string } | null; // lo vamos a usar después
 }
 
 export function ConsultationActions({
@@ -22,7 +22,6 @@ export function ConsultationActions({
 	onSendResponse,
 	onAddContact,
 	onOpenChange,
-	existingContact,
 }: ConsultationActionsProps) {
 	const [response, setResponse] = useState("");
 
@@ -70,14 +69,10 @@ export function ConsultationActions({
     }
   }; */
 
-	const handleAddOrView = () => {
-		if (existingContact) {
-			// después conectamos router.push
-			console.log("Ver contacto:", existingContact.id);
-			return;
-		}
-		onAddContact?.(consultation);
-	};
+	const { existingContact, isProcessing, handleAddOrView } = useContactManager({
+		contact,
+		onAddContact: onAddContact ? () => onAddContact(consultation) : undefined,
+	});
 
 	return (
 		<div className="space-y-3 border-t bg-slate-50 px-6 py-4">
@@ -125,11 +120,16 @@ export function ConsultationActions({
 			<Button
 				variant="outline"
 				onClick={handleAddOrView}
+				disabled={isProcessing}
 				className="w-full"
 				size="lg"
 			>
 				<UserPlusIcon className="h-4 w-4 mr-2" />
-				{existingContact ? "Ver Contacto" : "Agregar Contacto"}
+				{isProcessing
+					? "Procesando..."
+					: existingContact
+						? "Ver Contacto"
+						: "Agregar Contacto"}
 			</Button>
 		</div>
 	);
