@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidateTag, unstable_cache } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 import { api } from "@src/lib/axios";
 import type {
@@ -8,7 +8,11 @@ import type {
 	PropertyForm,
 	PropertyResponse,
 } from "@src/types/property";
-import type { PropertyDetail } from "@src/types/property-detail";
+import type {
+	PropertyDetail,
+	PropertyDocument,
+	PropertyImage,
+} from "@src/types/property-detail";
 
 import { PROPERTY_TYPE } from "../consts";
 
@@ -45,10 +49,13 @@ export async function getProperties(
 	return getCachedProperties();
 }
 
-export async function getPropertyById(id: number) {
+export async function getPropertyById(id: number, includeArchived = true) {
 	try {
 		const data = await api.get<{ property: PropertyDetail }>(
 			`properties/${id}`,
+			{
+				params: { includeArchived },
+			},
 		);
 		return data;
 	} catch (error) {
@@ -83,19 +90,24 @@ export async function createProperty(data: PropertyForm) {
 		formData.append("internal", JSON.stringify(data.internal));
 
 		if (data.images?.gallery && data.images.gallery.length > 0) {
-			data.images.gallery.forEach((file: File) => {
-				formData.append("images", file);
+			data.images.gallery.forEach((file: File | PropertyImage) => {
+				if (file instanceof File && !("id" in file)) {
+					formData.append("images", file);
+				}
 			});
 		}
 
 		if (data.documents?.files && data.documents.files.length > 0) {
-			data.documents.files.forEach((file: File) => {
-				formData.append("documents", file);
+			data.documents.files.forEach((file: File | PropertyDocument) => {
+				if (file instanceof File) {
+					formData.append("documents", file);
+				}
 			});
 		}
 
 		const res = await api.post<Property>("properties/grouped", formData);
 		revalidateTag("properties", { expire: 0 });
+		revalidatePath("/agent/properties");
 		return res;
 	} catch (error) {
 		console.log("error", error);
@@ -129,31 +141,36 @@ export async function updateProperty(id: number | string, data: PropertyForm) {
 		formData.append("internal", JSON.stringify(data.internal));
 
 		if (data.images?.gallery && data.images.gallery.length > 0) {
-			data.images.gallery.forEach((file: any) => {
-				if (file instanceof File && !(file as any).id) {
+			data.images.gallery.forEach((file: File | PropertyImage) => {
+				if (file instanceof File && !("id" in file)) {
 					formData.append("images", file);
 				}
 			});
 		}
 
 		const existingImageIds = data.images?.gallery
-			?.filter((f: any) => f.id)
-			.map((f: any) => f.id);
+			?.filter((f: File | PropertyImage): f is PropertyImage => "id" in f)
+			.map((f) => f.id);
 
 		if (existingImageIds && existingImageIds.length > 0) {
 			formData.append("existing_images", JSON.stringify(existingImageIds));
 		}
 
 		if (data.documents?.files && data.documents.files.length > 0) {
-			data.documents.files.forEach((file: any) => {
+			data.documents.files.forEach((file: File | PropertyDocument) => {
 				if (file instanceof File) {
 					formData.append("documents", file);
 				}
 			});
 		}
 
+		console.log("formData", formData);
+
 		const res = await api.put<Property>(`properties/${id}`, formData);
 		revalidateTag("properties", { expire: 0 });
+		revalidatePath(`/agent/properties/${id}`);
+		revalidatePath(`/agent/properties/${id}/edit`);
+		revalidatePath("/agent/properties");
 		return res;
 	} catch (error) {
 		console.log("error", error);
@@ -170,6 +187,7 @@ export async function deleteProperty(id: number) {
 	try {
 		await api.delete(`properties/${id}`);
 		revalidateTag("properties", { expire: 0 });
+		revalidatePath("/agent/properties");
 		return { success: true };
 	} catch (error) {
 		console.error("Error deleting property:", error);
@@ -179,8 +197,10 @@ export async function deleteProperty(id: number) {
 
 export async function archiveProperty(id: number) {
 	try {
-		await api.post(`properties/${id}/archive`);
+		await api.post(`properties/${id}/archive`, {});
 		revalidateTag("properties", { expire: 0 });
+		revalidatePath(`/agent/properties/${id}`);
+		revalidatePath("/agent/properties");
 		return { success: true };
 	} catch (error) {
 		console.error("Error archiving property:", error);
@@ -190,11 +210,29 @@ export async function archiveProperty(id: number) {
 
 export async function unarchiveProperty(id: number) {
 	try {
-		await api.post(`properties/${id}/unarchive`);
+		await api.post(`properties/${id}/unarchive`, {});
 		revalidateTag("properties", { expire: 0 });
+		revalidatePath(`/agent/properties/${id}`);
+		revalidatePath("/agent/properties");
 		return { success: true };
 	} catch (error) {
 		console.error("Error unarchiving property:", error);
+		return { success: false, error };
+	}
+}
+
+export async function toggleFeaturedProperty(
+	id: number,
+	featured_web: boolean,
+) {
+	try {
+		await api.patch(`properties/${id}/toggle-featured`, { featured_web });
+		revalidateTag("properties", { expire: 0 });
+		revalidatePath(`/agent/properties/${id}`);
+		revalidatePath("/agent/properties");
+		return { success: true };
+	} catch (error) {
+		console.error("Error toggling featured property:", error);
 		return { success: false, error };
 	}
 }

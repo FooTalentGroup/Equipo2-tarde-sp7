@@ -6,12 +6,10 @@ import {
 	FormItem,
 	FormLabel,
 } from "@src/components/ui/form";
+import { Spinner } from "@src/components/ui/spinner";
 import { Switch } from "@src/components/ui/switch";
 import { cn } from "@src/lib/utils";
-import {
-	archiveProperty,
-	unarchiveProperty,
-} from "@src/modules/properties/services/property-service";
+import { toggleFeaturedProperty } from "@src/modules/properties/services/property-service";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -19,37 +17,38 @@ import { type ArchiveProperty, ArchivePropertySchema } from "./schema";
 
 type Props = {
 	propertyId: number;
-	isEnabled: boolean;
+	isFeatured: boolean;
 };
-export default function PropertyArchiveAction({
+
+export default function PropertyFeaturedAction({
 	propertyId,
-	isEnabled: initialIsEnabled,
+	isFeatured: initialIsFeatured,
 }: Props) {
 	const form = useForm<ArchiveProperty>({
 		resolver: zodResolver(ArchivePropertySchema),
 		defaultValues: {
-			isEnabled: initialIsEnabled,
+			isFeatured: initialIsFeatured,
 		},
 	});
 
 	const onSubmit = async (data: ArchiveProperty) => {
 		try {
-			const result = data.isEnabled
-				? await unarchiveProperty(propertyId)
-				: await archiveProperty(propertyId);
+			const result = await toggleFeaturedProperty(propertyId, data.isFeatured);
 
 			if (result.success) {
 				toast.success(
-					data.isEnabled ? "Propiedad habilitada" : "Propiedad deshabilitada",
+					data.isFeatured
+						? "Propiedad destacada en web"
+						: "Propiedad quitada de destacados en web",
 				);
 			} else {
-				form.setValue("isEnabled", !data.isEnabled);
-				toast.error("Error al actualizar el estado de la propiedad");
+				form.setValue("isFeatured", !data.isFeatured);
+				toast.error("Error al actualizar el estado destacado");
 			}
 		} catch (error) {
 			console.error(error);
-			form.setValue("isEnabled", !data.isEnabled);
-			toast.error("Error al actualizar el estado de la propiedad");
+			form.setValue("isFeatured", !data.isFeatured);
+			toast.error("Error al actualizar el estado destacado");
 		}
 	};
 
@@ -57,29 +56,30 @@ export default function PropertyArchiveAction({
 		<Form {...form}>
 			<FormField
 				control={form.control}
-				name="isEnabled"
+				name="isFeatured"
 				render={({ field }) => (
 					<FormItem
 						className={cn(
 							"border-tertiary text-tertiary relative flex w-full items-center rounded-md border shadow-xs h-12 space-y-0",
-							form.formState.isSubmitting && "opacity-50",
 						)}
 					>
 						<FormLabel className="flex items-center text-base h-12 justify-between w-full gap-2 px-3 py-3 cursor-pointer font-normal m-0">
 							<span>
-								{field.value ? "Deshabilitar propiedad" : "Habilitar propiedad"}
+								{field.value ? "Destacada en web" : "Destacar en web"}
 							</span>
-							<FormControl>
-								<Switch
-									className="ml-auto"
-									checked={field.value}
-									onCheckedChange={async (checked) => {
-										field.onChange(checked);
-										await form.handleSubmit(onSubmit)();
-									}}
-									disabled={form.formState.isSubmitting}
-								/>
-							</FormControl>
+							<div className="ml-auto flex items-center gap-2">
+								{form.formState.isSubmitting && <Spinner />}
+								<FormControl>
+									<Switch
+										checked={field.value}
+										onCheckedChange={async (checked) => {
+											field.onChange(checked);
+											await form.handleSubmit(onSubmit)();
+										}}
+										disabled={form.formState.isSubmitting}
+									/>
+								</FormControl>
+							</div>
 						</FormLabel>
 					</FormItem>
 				)}

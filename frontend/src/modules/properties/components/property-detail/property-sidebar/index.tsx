@@ -6,15 +6,15 @@ import { PencilIcon } from "@heroicons/react/24/outline";
 import { Button } from "@src/components/ui/button";
 import { paths } from "@src/lib/paths";
 
-import PropertyArchiveAction from "./property-archive-action";
 import PropertyDeleteAction from "./property-delete-action";
+import PropertyFeaturedAction from "./property-featured-action";
 
 type Props = {
 	propertyId: number;
-	isEnabled: boolean;
+	isFeatured: boolean;
 };
 
-export default function PropertySidebar({ propertyId, isEnabled }: Props) {
+export default function PropertySidebar({ propertyId, isFeatured }: Props) {
 	return (
 		<div className="flex flex-col gap-4">
 			<Button className="w-full" variant="tertiary" size="lg" asChild>
@@ -24,7 +24,7 @@ export default function PropertySidebar({ propertyId, isEnabled }: Props) {
 				</Link>
 			</Button>
 
-			<PropertyArchiveAction propertyId={propertyId} isEnabled={isEnabled} />
+			<PropertyFeaturedAction propertyId={propertyId} isFeatured={isFeatured} />
 			<PropertyDeleteAction propertyId={propertyId} />
 		</div>
 	);

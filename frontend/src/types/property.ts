@@ -11,10 +11,10 @@ export type PropertyStatusType = z.infer<typeof propertyStatusEnum>;
 
 export const VisibilityStatus = {
 	PUBLISHED: "Publicado",
-	NOT_PUBLISHED: "No Publicado",
+	ARCHIVED: "Archivada",
 } as const;
 
-export const visibilityStatusEnum = z.enum(["Publicado", "No Publicado"]);
+export const visibilityStatusEnum = z.enum(["Publicado", "Archivada"]);
 
 export const propertyTypeEnum = z.enum([
 	"1", // Casa
