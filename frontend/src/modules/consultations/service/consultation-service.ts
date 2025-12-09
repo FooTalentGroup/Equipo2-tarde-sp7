@@ -44,6 +44,11 @@ export async function markConsultationAsRead(id: number) {
 	revalidatePath("/consultations");
 }
 
+export async function markConsultationAsUnread(id: number) {
+	await api.patch(`/consultations/${id}/unread`, null);
+	revalidatePath("/consultations");
+}
+
 export async function deleteConsultation(id: number) {
 	const result = await api.delete<{ message: string }>(`/consultations/${id}`);
 	revalidatePath("/consultations");
@@ -52,4 +57,12 @@ export async function deleteConsultation(id: number) {
 export async function deleteAllConsultations() {
 	await api.delete(`/consultations`);
 	revalidatePath("/consultations");
+}
+
+export async function convertConsultationToLead(consultationId: number) {
+	const result = await api.post<{ message: string; lead_id: number }>(
+		`/consultations/${consultationId}/convert-to-lead`,
+	);
+	revalidatePath("/consultations");
+	return result;
 }
