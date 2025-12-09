@@ -394,6 +394,53 @@ export class ConsultationRoutes {
 
 		/**
 		 * @swagger
+		 * /api/consultations/{id}/unread:
+		 *   patch:
+		 *     summary: Mark a consultation as unread
+		 *     description: |
+		 *       Protected endpoint to mark a consultation as unread.
+		 *       - Requires authentication
+		 *       - Updates the is_read field to false
+		 *     tags: [Consultations]
+		 *     security:
+		 *       - bearerAuth: []
+		 *     parameters:
+		 *       - in: path
+		 *         name: id
+		 *         required: true
+		 *         schema:
+		 *           type: integer
+		 *         description: Consultation ID
+		 *         example: 1
+		 *     responses:
+		 *       200:
+		 *         description: Consultation marked as unread successfully
+		 *         content:
+		 *           application/json:
+		 *             schema:
+		 *               type: object
+		 *               properties:
+		 *                 message:
+		 *                   type: string
+		 *                   example: "Consultation marked as unread"
+		 *                 consultation:
+		 *                   type: object
+		 *                   description: Updated consultation object
+		 *       400:
+		 *         description: Bad request - Invalid consultation ID
+		 *       401:
+		 *         description: Unauthorized - Authentication required
+		 *       404:
+		 *         description: Consultation not found
+		 *       500:
+		 *         description: Internal server error
+		 */
+		router.patch("/:id/unread", authMiddleware.authenticate, (req, res) =>
+			controller.markAsUnread(req, res),
+		);
+
+		/**
+		 * @swagger
 		 * /api/consultations/{id}:
 		 *   delete:
 		 *     summary: Delete a consultation
