@@ -1,42 +1,44 @@
-/* // @src/services/clients-service.ts
-import { api } from "@src/lib/axios";
-import type { CreateLead, Lead } from "@src/types/clients/lead";
-
-const BASE_URL = "clients";
-
-export async function createLead(data: CreateLead): Promise<Lead> {
-  try {
-    return await api.post<Lead>(BASE_URL, data);
-  } catch (error) {
-    console.error("Error creating lead:", error);
-    throw new Error("No se pudo crear el lead.");
-  }
-}
- */
-
-// ✔ 1) Hacemos que este archivo sea un SERVER ACTION puro
 "use server";
 
 import { api } from "@src/lib/axios";
 import { getToken } from "@src/modules/auth/lib/session";
-import type { CreateLead, Lead } from "@src/types/clients/lead";
 
-const BASE_URL = "clients/leads";
+import type { ClientData, ClientResponse } from "./types";
+import { CLIENT_TYPE_CONFIG, type ClientType } from "./types";
 
-// Server Action: enviar petición al endpoint actualizado
-export async function createLeadServerAction(data: CreateLead): Promise<Lead> {
+export async function createClientServerAction<T extends ClientResponse>(
+	clientType: ClientType,
+	data: ClientData,
+): Promise<T> {
 	const token = await getToken();
 
 	if (!token) {
-		throw new Error("No autenticado. Inicia sesión para crear leads.");
+		throw new Error("No autenticado. Inicia sesión para crear clientes.");
 	}
 
+	const config = CLIENT_TYPE_CONFIG[clientType];
+
 	try {
-		return await api.post<Lead>(BASE_URL, data, {
+		return await api.post<T>(config.url, data, {
 			headers: { Authorization: `Bearer ${token}` },
 		});
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
-		throw new Error(`No se pudo crear el lead. Detalle: ${message}`);
+		throw new Error(`${config.errorMessage}. Detalle: ${message}`);
+	}
+}
+
+export async function getClients<T = ClientResponse>(
+	endpoint: string = "clients",
+	filters?: Record<string, string | number | boolean | undefined | null>,
+) {
+	try {
+		const data = await api.get<{ clients: T[]; count: number }>(endpoint, {
+			params: filters,
+		});
+		return data;
+	} catch (error) {
+		console.error(`Error fetching clients from ${endpoint}:`, error);
+		return { clients: [] as T[], count: 0 };
 	}
 }
