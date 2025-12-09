@@ -353,6 +353,44 @@ export class PropertyConsultationServices {
 	}
 
 	/**
+	 * Marcar una consulta como NO leída
+	 * - Verifica que la consulta existe
+	 * - Actualiza el campo is_read a false
+	 */
+	async markAsUnread(id: number) {
+		try {
+			// Verificar que la consulta existe
+			const consultation = await ClientConsultationModel.findById(id);
+
+			if (!consultation) {
+				throw CustomError.notFound("Consultation not found");
+			}
+
+			// Marcar como NO leída
+			const updated = await ClientConsultationModel.update(id, {
+				is_read: false,
+			});
+
+			if (!updated) {
+				throw CustomError.internalServerError(
+					"Failed to mark consultation as unread",
+				);
+			}
+
+			return {
+				message: "Consultation marked as unread",
+				consultation: updated,
+			};
+		} catch (error) {
+			if (error instanceof CustomError) {
+				throw error;
+			}
+			console.error("Error marking consultation as unread:", error);
+			throw CustomError.internalServerError("Error updating consultation");
+		}
+	}
+
+	/**
 	 * Convierte una consulta en un lead
 	 * - Verifica que la consulta existe y no tiene cliente asociado
 	 * - Busca cliente existente por email (previene duplicados)
