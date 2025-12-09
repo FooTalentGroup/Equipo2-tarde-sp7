@@ -67,7 +67,7 @@ export function ConsultationDetailSheet({
 
 		// Si no empieza con 54 (código de Argentina), agregarlo
 		if (!cleanPhone.startsWith("54")) {
-			cleanPhone = "549" + cleanPhone;
+			cleanPhone = `549${cleanPhone}`;
 		}
 
 		// Validar que sea un número válido
