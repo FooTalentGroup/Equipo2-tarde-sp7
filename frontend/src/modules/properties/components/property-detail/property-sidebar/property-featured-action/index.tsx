@@ -68,16 +68,20 @@ export default function PropertyFeaturedAction({
 								{field.value ? "Destacada en web" : "Destacar en web"}
 							</span>
 							<div className="ml-auto flex items-center gap-2">
-								{form.formState.isSubmitting && <Spinner />}
 								<FormControl>
-									<Switch
-										checked={field.value}
-										onCheckedChange={async (checked) => {
-											field.onChange(checked);
-											await form.handleSubmit(onSubmit)();
-										}}
-										disabled={form.formState.isSubmitting}
-									/>
+									{form.formState.isSubmitting ? (
+										<Spinner />
+									) : (
+										<Switch
+											size="sm"
+											checked={field.value}
+											onCheckedChange={async (checked) => {
+												field.onChange(checked);
+												await form.handleSubmit(onSubmit)();
+											}}
+											disabled={form.formState.isSubmitting}
+										/>
+									)}
 								</FormControl>
 							</div>
 						</FormLabel>

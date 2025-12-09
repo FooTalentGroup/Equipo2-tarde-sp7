@@ -128,9 +128,7 @@ export default function PropertyDocumentsForm({ form }: Props) {
 								Destacar en la web
 							</FormLabel>
 							<FormDescription className="text-base">
-								{field.value
-									? "La propiedad aparecerá en la sección de destacados"
-									: "La propiedad aparecerá en el listado general"}
+								La propiedad aparecerá en la landing page
 							</FormDescription>
 						</div>
 						<FormControl>
