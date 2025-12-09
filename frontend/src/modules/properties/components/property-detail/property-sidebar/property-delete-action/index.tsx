@@ -63,7 +63,7 @@ export default function PropertyDeleteAction({ propertyId }: Props) {
 			<AlertDialogTrigger asChild>
 				<Button variant="outline-destructive" size="lg" className="w-full">
 					<TrashIcon className="mr-2 h-4 w-4" />
-					Eliminar
+					Eliminar propiedad
 				</Button>
 			</AlertDialogTrigger>
 			<AlertDialogContent>

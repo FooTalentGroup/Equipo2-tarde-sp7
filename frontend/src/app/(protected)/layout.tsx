@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { redirect } from "next/navigation";
 
+import MainLayout from "@src/components/layouts/main-layout";
 import ProtectedHeader from "@src/components/protected-header";
 import ProtectedSidebar from "@src/components/sidebars/protected-sidebar";
 import { SidebarInset, SidebarProvider } from "@src/components/ui/sidebar";
@@ -27,8 +28,10 @@ export default async function AdminLayout({ children }: Props) {
 	return (
 		<SidebarProvider header={<ProtectedHeader />}>
 			<ProtectedSidebar role={user.role} />
-			<SidebarInset className="w-full rounded-l-2xl border-t border-l border-tertiary bg-card flex flex-1 flex-col gap-8 p-8">
-				{children}
+			<SidebarInset className="w-full rounded-l-2xl border-t border-l border-tertiary bg-card  p-8">
+				<MainLayout size="lg" className="flex flex-1 flex-col gap-8">
+					{children}
+				</MainLayout>
 			</SidebarInset>
 		</SidebarProvider>
 	);

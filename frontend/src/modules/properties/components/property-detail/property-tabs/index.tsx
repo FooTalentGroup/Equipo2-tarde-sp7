@@ -8,7 +8,9 @@ import {
 } from "@src/components/ui/tabs";
 import type { PropertyDetail } from "@src/types/property-detail";
 
+import PropertyDocuments from "./property-documents";
 import PropertyInfo from "./property-info";
+import PropertyMultimedia from "./property-multimedia";
 
 type Props = {
 	property: PropertyDetail;
@@ -24,18 +26,18 @@ export default function PropertyTabs({ property }: Props) {
 				<TabsTrigger value="multimedia" variant="blue" size="lg">
 					MULTIMEDIA
 				</TabsTrigger>
-				<TabsTrigger value="archive" variant="blue" size="lg">
-					ARCHIVO
+				<TabsTrigger value="documents" variant="blue" size="lg">
+					DOCUMENTACIÓN
 				</TabsTrigger>
 			</TabsList>
 			<TabsContent value="details" className="px-4 grid gap-8">
 				<PropertyInfo property={property} />
 			</TabsContent>
-			<TabsContent value="multimedia">
-				<div className="p-6">Multimedia content here</div>
+			<TabsContent value="multimedia" className="px-4">
+				<PropertyMultimedia property={property} />
 			</TabsContent>
-			<TabsContent value="archive">
-				<div className="p-6">Archive content here</div>
+			<TabsContent value="documents" className="px-4">
+				<PropertyDocuments property={property} />
 			</TabsContent>
 		</Tabs>
 	);

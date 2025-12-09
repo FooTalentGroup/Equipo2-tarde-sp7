@@ -48,7 +48,7 @@ export interface PropertyDetail {
 	disposition: NamedItem;
 	situation: NamedItem;
 	services: NamedItem[];
-	documents: unknown[];
+	documents: PropertyDocument[];
 	expenses: Expense[];
 	active_tenant: unknown | null;
 }
@@ -96,6 +96,15 @@ export interface PropertyImage {
 	file_path: string;
 	media_type: string;
 	is_primary: boolean;
+}
+
+export interface PropertyDocument {
+	id: number;
+	property_id: number;
+	client_id: number;
+	document_name: string;
+	file_path: string;
+	uploaded_at: string;
 }
 
 export interface NamedItem {
