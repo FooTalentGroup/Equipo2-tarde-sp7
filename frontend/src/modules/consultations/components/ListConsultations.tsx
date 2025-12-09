@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { ConsultationDetailSheet } from "@src/modules/consultations/components/ConsultationDetailSheet";
+import { ConsultationDetailSheet } from "@src/modules/consultations/components/consultation-detail/ConsultationDetailSheet";
 import { ConsultationCard } from "@src/modules/consultations/ui/ConsultationCard";
 import type { Consultation } from "@src/types/consultations";
 
