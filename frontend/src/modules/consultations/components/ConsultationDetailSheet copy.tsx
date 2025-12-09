@@ -13,8 +13,7 @@ import { Textarea } from "@src/components/ui/textarea";
 import type { Consultation } from "@src/types/consultations";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { CopyIcon, MailIcon, PhoneIcon, UserPlusIcon } from "lucide-react";
-import { toast } from "sonner";
+import { MailIcon, PhoneIcon, SendIcon, UserPlusIcon } from "lucide-react";
 
 interface ConsultationDetailSheetProps {
 	consultation: Consultation | null;
@@ -24,7 +23,7 @@ interface ConsultationDetailSheetProps {
 	onAddContact?: (consultation: Consultation) => void;
 }
 
-export function ConsultationDetailSheet({
+export function ConsultationDetailSheet2({
 	consultation,
 	open,
 	onOpenChange,
@@ -49,63 +48,6 @@ export function ConsultationDetailSheet({
 		: "Contacto desconocido";
 	const contactPhone = contact?.phone || "No disponible";
 	const contactEmail = contact?.email || "No disponible";
-
-	// Función para limpiar y formatear el número de teléfono
-	const formatPhoneForWhatsApp = (phone: string): string | null => {
-		if (!phone || phone === "No disponible") return null;
-
-		// Limpiar el número (quitar espacios, guiones, paréntesis, etc)
-		let cleanPhone = phone.replace(/[\s\-()]/g, "");
-
-		// Quitar el símbolo + si existe
-		cleanPhone = cleanPhone.replace(/^\+/, "");
-
-		// Si empieza con 0, quitarlo
-		if (cleanPhone.startsWith("0")) {
-			cleanPhone = cleanPhone.substring(1);
-		}
-
-		// Si no empieza con 54 (código de Argentina), agregarlo
-		if (!cleanPhone.startsWith("54")) {
-			cleanPhone = "549" + cleanPhone;
-		}
-
-		// Validar que sea un número válido
-		if (!/^[0-9]{10,15}$/.test(cleanPhone)) {
-			return null;
-		}
-
-		return cleanPhone;
-	};
-
-	// Función para enviar respuesta por WhatsApp
-	const handleSendWhatsAppResponse = () => {
-		if (!response.trim()) {
-			alert("Por favor escribe un mensaje");
-			return;
-		}
-
-		const formattedPhone = formatPhoneForWhatsApp(contactPhone);
-
-		if (!formattedPhone) {
-			alert("El número de teléfono del contacto no es válido");
-			return;
-		}
-
-		// Codificar el mensaje para la URL
-		const encodedMessage = encodeURIComponent(response);
-
-		// Crear el link de WhatsApp
-		const whatsappUrl = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodedMessage}`;
-
-		// Abrir WhatsApp en una nueva pestaña
-		window.open(whatsappUrl, "_blank");
-
-		// Opcional: Si también querés guardar la respuesta en tu base de datos
-		if (onSendResponse) {
-			handleSendResponse();
-		}
-	};
 
 	const handleSendResponse = async () => {
 		if (!response.trim() || !onSendResponse) return;
@@ -132,7 +74,7 @@ export function ConsultationDetailSheet({
 		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="right"
-				className="w-full sm:max-w-md p-0 flex flex-col border-none rounded-none"
+				className="w-full sm:max-w-md p-0 flex flex-colborder-none rounded-none"
 			>
 				{/* Header */}
 				<SheetHeader className="px-6 py-4 border-b">
@@ -220,22 +162,10 @@ export function ConsultationDetailSheet({
 									variant="ghost"
 									size="icon"
 									className="absolute bottom-2 right-2 h-8 w-8"
-									onClick={() => {
-										if (!response.trim()) {
-											alert("Escribe primero un mensaje");
-											return;
-										}
-										const greeting = `Hola ${contact?.first_name || ""}! Gracias por comunicarte con nuestra inmobiliaria!\n\n`;
-										const fullMessage = greeting + response;
-										navigator.clipboard.writeText(fullMessage);
-										toast.success("Mensaje copiado al portapapeles!", {
-											duration: 2000,
-										});
-									}}
-									disabled={!response.trim()}
-									title="Copiar mensaje"
+									onClick={handleSendResponse}
+									disabled={!response.trim() || isSending}
 								>
-									<CopyIcon className="h-4 w-4" />
+									<SendIcon className="h-4 w-4" />
 								</Button>
 							</div>
 						</div>
@@ -246,12 +176,12 @@ export function ConsultationDetailSheet({
 				<div className="px-6 py-4 space-y-3 border-t bg-slate-50">
 					{!consultation.response && (
 						<Button
-							onClick={handleSendWhatsAppResponse}
+							onClick={handleSendResponse}
 							disabled={!response.trim() || isSending}
 							className="w-full"
 							size="lg"
 						>
-							{isSending ? "Enviando..." : "Enviar por WhatsApp"}
+							{isSending ? "Enviando..." : "Enviar Respuesta"}
 						</Button>
 					)}
 
