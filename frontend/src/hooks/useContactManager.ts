@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { useRouter } from "next/navigation";
+/* import { useRouter } from "next/navigation"; */
 
 import { getClients } from "@src/modules/clients/services/clients-service";
 import type { BaseContact, BaseContactWithId } from "@src/types/clients/base";
@@ -28,7 +28,7 @@ export function useContactManager({
 	contact,
 	onAddContact,
 }: UseContactManagerProps) {
-	const router = useRouter();
+	/* const router = useRouter(); */
 	const [existingContact, setExistingContact] =
 		useState<BaseContactWithId | null>(null);
 	const [isChecking, setIsChecking] = useState(false);
