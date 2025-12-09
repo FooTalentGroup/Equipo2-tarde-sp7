@@ -5,8 +5,13 @@ import { useState } from "react";
 import { ConsultationDetailSheet } from "@src/modules/consultations/components/consultation-detail/ConsultationDetailSheet";
 import { ConsultationCard } from "@src/modules/consultations/ui/ConsultationCard";
 import type { Consultation } from "@src/types/consultations";
+import { toast } from "sonner";
 
-import { markConsultationAsRead } from "../service/consultation-service";
+import {
+	convertConsultationToLead,
+	markConsultationAsRead,
+	markConsultationAsUnread,
+} from "../service/consultation-service";
 
 type Props = {
 	consultationsData: Consultation[];
@@ -43,10 +48,10 @@ export default function ListConsultations({ consultationsData }: Props) {
 		setConsultations((prev) =>
 			prev.map((c) => (c.id === id ? { ...c, is_read: false } : c)),
 		);
-		// TODO: Llamar al backend para marcar como no leído
-		// await markConsultationAsUnread(id).catch((error) => {
-		// 	console.error("Error marking consultation as unread:", error);
-		// });
+
+		await markConsultationAsUnread(id).catch((error) => {
+			console.error("Error marking consultation as unread:", error);
+		});
 	};
 
 	const handleSendResponse = async (
@@ -69,9 +74,33 @@ export default function ListConsultations({ consultationsData }: Props) {
 		);
 	};
 
-	const handleAddContact = (consultation: Consultation) => {
-		// TODO: Implementar lógica para agregar contacto
-		console.log("Add contact:", consultation.client);
+	const handleAddContact = async (consultation: Consultation) => {
+		try {
+			const result = await convertConsultationToLead(consultation.id);
+
+			setConsultations((prev) =>
+				prev.map((c) =>
+					c.id === consultation.id
+						? {
+								...c,
+								client: result.client,
+								consultant: null,
+							}
+						: c,
+				),
+			);
+
+			setSelectedConsultation((prev) =>
+				prev && prev.id === consultation.id
+					? { ...prev, client: result.client, consultant: null }
+					: prev,
+			);
+
+			toast.success(result.message || "Consulta convertida a lead");
+		} catch (error) {
+			console.error("Error converting consultation to lead:", error);
+			toast.error("No se pudo convertir la consulta a lead");
+		}
 	};
 
 	const handleDelete = (id: number) => {

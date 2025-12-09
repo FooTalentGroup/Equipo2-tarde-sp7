@@ -6,6 +6,7 @@ import { api } from "@src/lib/axios";
 import type { Consultation } from "@src/types/consultations";
 
 import type { ConsultationFilterForm } from "../types/consultation-filter";
+import type { ConvertToLeadResponse } from "../types/convert-to-lead";
 
 export async function getConsultations(filters: ConsultationFilterForm) {
 	const params = new URLSearchParams();
@@ -59,8 +60,10 @@ export async function deleteAllConsultations() {
 	revalidatePath("/consultations");
 }
 
-export async function convertConsultationToLead(consultationId: number) {
-	const result = await api.post<{ message: string; lead_id: number }>(
+export async function convertConsultationToLead(
+	consultationId: number,
+): Promise<ConvertToLeadResponse> {
+	const result = await api.post<ConvertToLeadResponse>(
 		`/consultations/${consultationId}/convert-to-lead`,
 	);
 	revalidatePath("/consultations");

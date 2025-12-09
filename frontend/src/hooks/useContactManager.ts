@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
@@ -21,7 +21,7 @@ type ContactInput =
 
 interface UseContactManagerProps {
 	contact: ContactInput;
-	onAddContact?: (contact: ContactInput) => void | Promise<void>;
+	onAddContact?: () => void | Promise<void>;
 }
 
 export function useContactManager({
@@ -34,59 +34,59 @@ export function useContactManager({
 	const [isChecking, setIsChecking] = useState(false);
 	const [isProcessing, setIsProcessing] = useState(false);
 
+	const checkExistingContact = useCallback(async () => {
+		if (!contact) {
+			setExistingContact(null);
+			return;
+		}
+
+		// Si el contacto ya tiene ID, asumimos que existe
+		if ("id" in contact && contact.id) {
+			setExistingContact(contact as BaseContactWithId);
+			return;
+		}
+
+		setIsChecking(true);
+
+		try {
+			// Buscar primero por teléfono
+			if (contact.phone) {
+				const phoneResult = await getClients<BaseContactWithId>("clients", {
+					search: contact.phone,
+				});
+
+				if (phoneResult.clients && phoneResult.clients.length > 0) {
+					setExistingContact(phoneResult.clients[0]);
+					return;
+				}
+			}
+
+			// Si no se encontró por teléfono, buscar por email
+			if (contact.email) {
+				const emailResult = await getClients<BaseContactWithId>("clients", {
+					search: contact.email,
+				});
+
+				if (emailResult.clients && emailResult.clients.length > 0) {
+					setExistingContact(emailResult.clients[0]);
+					return;
+				}
+			}
+
+			// No se encontró el contacto
+			setExistingContact(null);
+		} catch (error) {
+			console.error("Error checking contact:", error);
+			setExistingContact(null);
+		} finally {
+			setIsChecking(false);
+		}
+	}, [contact]);
+
 	// Verificar si el contacto ya existe
 	useEffect(() => {
-		const checkIfContactExists = async () => {
-			if (!contact) {
-				setExistingContact(null);
-				return;
-			}
-
-			// Si el contacto ya tiene ID, asumimos que existe
-			if ("id" in contact && contact.id) {
-				setExistingContact(contact as BaseContactWithId);
-				return;
-			}
-
-			setIsChecking(true);
-
-			try {
-				// Buscar primero por teléfono
-				if (contact.phone) {
-					const phoneResult = await getClients<BaseContactWithId>("clients", {
-						search: contact.phone,
-					});
-
-					if (phoneResult.clients && phoneResult.clients.length > 0) {
-						setExistingContact(phoneResult.clients[0]);
-						return;
-					}
-				}
-
-				// Si no se encontró por teléfono, buscar por email
-				if (contact.email) {
-					const emailResult = await getClients<BaseContactWithId>("clients", {
-						search: contact.email,
-					});
-
-					if (emailResult.clients && emailResult.clients.length > 0) {
-						setExistingContact(emailResult.clients[0]);
-						return;
-					}
-				}
-
-				// No se encontró el contacto
-				setExistingContact(null);
-			} catch (error) {
-				console.error("Error checking contact:", error);
-				setExistingContact(null);
-			} finally {
-				setIsChecking(false);
-			}
-		};
-
-		checkIfContactExists();
-	}, [contact]);
+		checkExistingContact();
+	}, [checkExistingContact]);
 
 	// Agregar nuevo contacto
 	const addContact = async () => {
@@ -96,7 +96,7 @@ export function useContactManager({
 
 		try {
 			if (onAddContact) {
-				await onAddContact(contact);
+				await onAddContact();
 			}
 
 			return true;
@@ -128,9 +128,8 @@ export function useContactManager({
 			const success = await addContact();
 			if (success) {
 				toast.success("Contacto agregado exitosamente");
-
-				// Opcional: Volver a verificar si ahora existe para actualizar el estado
-				// Esto es útil si onAddContact no retorna el nuevo contacto con ID
+				// Re-verifica para refrescar el estado con el contacto ya persistido
+				await checkExistingContact();
 			}
 		}
 	};
