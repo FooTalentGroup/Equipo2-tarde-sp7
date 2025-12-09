@@ -9,10 +9,7 @@ import { Card, CardContent } from "@src/components/ui/card";
 import { Heading } from "@src/components/ui/heading";
 import type { PropertyDetail } from "@src/types/property-detail";
 
-import OwnerCard from "./owner-card";
 import PropertyValueCard from "./property-value-card";
-import RecentActivityCard from "./recent-activity-card";
-import RelatedInquiriesCard from "./related-inquiries-card";
 import { Section } from "./section";
 
 type Props = {
@@ -20,11 +17,27 @@ type Props = {
 };
 
 export default function PropertyInfo({ property }: Props) {
+	if (!property) {
+		return (
+			<div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-16 text-center bg-card">
+				<div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted text-muted-foreground">
+					<HomeIcon className="h-8 w-8" />
+				</div>
+				<h3 className="mb-1 text-lg font-medium text-foreground">
+					Sin información de la propiedad
+				</h3>
+				<p className="text-sm text-muted-foreground max-w-sm">
+					No se ha podido cargar la información detallada de esta propiedad.
+				</p>
+			</div>
+		);
+	}
+
 	const address = property.addresses[0];
 
 	return (
 		<>
-			<section className="grid grid-cols-1 md:grid-cols-[1fr_0.6fr] gap-12">
+			<section className="grid grid-cols-1 md:grid-cols-[1fr_0.6fr] gap-[46px]">
 				<Card>
 					<CardContent className="grid grid-cols-1 flex-col gap-6 md:grid-cols-2 gap-y-8 gap-x-">
 						<div className="flex items-start gap-3">
@@ -190,11 +203,11 @@ export default function PropertyInfo({ property }: Props) {
 						</div>
 					</Section>
 				</div>
-				<div className="space-y-6">
+				{/* <div className="space-y-6">
 					<OwnerCard owner={property.owner} />
 					<RelatedInquiriesCard />
 					<RecentActivityCard />
-				</div>
+				</div> */}
 			</section>
 		</>
 	);

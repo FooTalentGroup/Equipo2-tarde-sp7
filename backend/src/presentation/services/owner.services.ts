@@ -41,7 +41,7 @@ export class OwnerServices {
             }
 
             // 3. Crear el cliente (propietario) usando helper
-            const newClient = await ClientCreationHelper.createBaseClient({
+            const { client: newClient, wasCreated } = await ClientCreationHelper.createBaseClient({
                 first_name: createOwnerDto.first_name,
                 last_name: createOwnerDto.last_name,
                 phone: createOwnerDto.phone,

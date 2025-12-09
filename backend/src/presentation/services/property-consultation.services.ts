@@ -353,6 +353,44 @@ export class PropertyConsultationServices {
 	}
 
 	/**
+	 * Marcar una consulta como NO leída
+	 * - Verifica que la consulta existe
+	 * - Actualiza el campo is_read a false
+	 */
+	async markAsUnread(id: number) {
+		try {
+			// Verificar que la consulta existe
+			const consultation = await ClientConsultationModel.findById(id);
+
+			if (!consultation) {
+				throw CustomError.notFound("Consultation not found");
+			}
+
+			// Marcar como NO leída
+			const updated = await ClientConsultationModel.update(id, {
+				is_read: false,
+			});
+
+			if (!updated) {
+				throw CustomError.internalServerError(
+					"Failed to mark consultation as unread",
+				);
+			}
+
+			return {
+				message: "Consultation marked as unread",
+				consultation: updated,
+			};
+		} catch (error) {
+			if (error instanceof CustomError) {
+				throw error;
+			}
+			console.error("Error marking consultation as unread:", error);
+			throw CustomError.internalServerError("Error updating consultation");
+		}
+	}
+
+	/**
 	 * Convierte una consulta en un lead
 	 * - Verifica que la consulta existe y no tiene cliente asociado
 	 * - Busca cliente existente por email (previene duplicados)
@@ -428,7 +466,7 @@ export class PropertyConsultationServices {
 					await ClientCreationHelper.resolveContactCategory("Lead");
 
 				// Crear nuevo cliente usando helper (reutiliza validación de email único)
-				client = await ClientCreationHelper.createBaseClient(
+				const result = await ClientCreationHelper.createBaseClient(
 					{
 						first_name: consultation.consultant_first_name,
 						last_name: consultation.consultant_last_name,
@@ -439,11 +477,12 @@ export class PropertyConsultationServices {
 					categoryId,
 				);
 
-				wasNewLead = true;
+				client = result.client;
+				wasNewLead = result.wasCreated;
 				console.log(`Created new lead with ID: ${client.id}`);
 			}
 
-			// 7. Asociar la consulta al cliente
+			// 6. Asociar la consulta al cliente
 			const updatedConsultation = await ClientConsultationModel.update(
 				consultationId,
 				{
