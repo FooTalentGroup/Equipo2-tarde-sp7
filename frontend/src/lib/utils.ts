@@ -75,3 +75,27 @@ function useComposedRefs<T>(...refs: PossibleRef<T>[]): React.RefCallback<T> {
 }
 
 export { composeRefs, useComposedRefs };
+
+export function formatPrice(
+	price: string | number,
+	currency: { symbol: string; name: string },
+) {
+	const value = typeof price === "string" ? parseFloat(price) : price;
+
+	if (Number.isNaN(value)) {
+		return `${currency.symbol} -`;
+	}
+
+	const isPeso =
+		currency.name.toLowerCase().includes("peso") ||
+		currency.name.toLowerCase() === "ars";
+
+	const locale = isPeso ? "es-AR" : "en-US";
+
+	const formatter = new Intl.NumberFormat(locale, {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 2,
+	});
+
+	return `${currency.symbol} ${formatter.format(value)}`;
+}
