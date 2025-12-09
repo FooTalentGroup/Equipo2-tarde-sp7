@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { api } from "@src/lib/axios";
 import { ConsultationDetailSheet } from "@src/modules/consultations/components/consultation-detail/ConsultationDetailSheet";
 import { ConsultationCard } from "@src/modules/consultations/ui/ConsultationCard";
 import type { Consultation } from "@src/types/consultations";
@@ -24,6 +25,47 @@ export default function ListConsultations({ consultationsData }: Props) {
 	const [selectedConsultation, setSelectedConsultation] =
 		useState<Consultation | null>(null);
 	const [dialogOpen, setDialogOpen] = useState(false);
+
+	// Polling ligero para detectar nuevas consultas sin recargar la página
+	useEffect(() => {
+		let isActive = true;
+
+		const fetchConsultations = async () => {
+			try {
+				const res = await api.get<{
+					consultations: Consultation[];
+				}>("/consultations");
+
+				if (!isActive) return;
+
+				setConsultations((prev) => {
+					// Si la cantidad o IDs cambiaron, reemplazamos; si no, mantenemos para evitar renders innecesarios
+					const prevIds = new Set(prev.map((c) => c.id));
+					const next = res.consultations || [];
+					const changed =
+						next.length !== prev.length || next.some((c) => !prevIds.has(c.id));
+					return changed ? next : prev;
+				});
+
+				// Si la consulta seleccionada está abierta, sincronizamos sus datos
+				setSelectedConsultation((prev) => {
+					if (!prev) return prev;
+					const updated = res.consultations?.find((c) => c.id === prev.id);
+					return updated ? updated : prev;
+				});
+			} catch (error) {
+				console.error("Error fetching consultations:", error);
+			}
+		};
+
+		fetchConsultations();
+		const intervalId = setInterval(fetchConsultations, 60000); // 60s
+
+		return () => {
+			isActive = false;
+			clearInterval(intervalId);
+		};
+	}, []);
 
 	const handleCardClick = (consultation: Consultation) => {
 		setSelectedConsultation(consultation);
