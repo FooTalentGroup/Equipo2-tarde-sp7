@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { api } from "@src/lib/axios";
 import type { Consultation } from "@src/types/consultations";
 
@@ -36,24 +38,18 @@ export async function getConsultations(filters: ConsultationFilterForm) {
 
 	return { data: consultations, total };
 }
-/* export async function markConsultationAsRead(id: number, token?: string) {
-	return api.patch(`/consultations/${id}/read`, null, {
-		headers: { Authorization: `Bearer ${token}` },
-	});
-} */
 
 export async function markConsultationAsRead(id: number) {
-	return api.patch(`/consultations/${id}/read`, null);
+	await api.patch(`/consultations/${id}/read`, null);
+	revalidatePath("/consultations");
 }
 
-export async function deleteConsultation(id: number, token?: string) {
-	return api.delete(`/consultations/${id}`, {
-		headers: { Authorization: `Bearer ${token}` },
-	});
+export async function deleteConsultation(id: number) {
+	const result = await api.delete<{ message: string }>(`/consultations/${id}`);
+	revalidatePath("/consultations");
+	return result;
 }
-
-export async function deleteAllConsultations(token?: string) {
-	return api.delete(`/consultations`, {
-		headers: { Authorization: `Bearer ${token}` },
-	});
+export async function deleteAllConsultations() {
+	await api.delete(`/consultations`);
+	revalidatePath("/consultations");
 }

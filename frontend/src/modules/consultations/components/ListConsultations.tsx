@@ -11,6 +11,7 @@ import { markConsultationAsRead } from "../service/consultation-service";
 type Props = {
 	consultationsData: Consultation[];
 };
+
 export default function ListConsultations({ consultationsData }: Props) {
 	const [consultations, setConsultations] = useState<Consultation[]>(
 		consultationsData || [],
@@ -36,6 +37,16 @@ export default function ListConsultations({ consultationsData }: Props) {
 		await markConsultationAsRead(id).catch((error) => {
 			console.error("Error marking consultation as read:", error);
 		});
+	};
+
+	const handleMarkAsUnread = async (id: number) => {
+		setConsultations((prev) =>
+			prev.map((c) => (c.id === id ? { ...c, is_read: false } : c)),
+		);
+		// TODO: Llamar al backend para marcar como no leído
+		// await markConsultationAsUnread(id).catch((error) => {
+		// 	console.error("Error marking consultation as unread:", error);
+		// });
 	};
 
 	const handleSendResponse = async (
@@ -64,20 +75,8 @@ export default function ListConsultations({ consultationsData }: Props) {
 	};
 
 	const handleDelete = (id: number) => {
-		if (confirm("¿Estás seguro de que quieres eliminar esta consulta?")) {
-			setConsultations((prev) => prev.filter((c) => c.id !== id));
-			// TODO: Llamar al backend para eliminar
-			console.log("Delete:", id);
-		}
+		setConsultations((prev) => prev.filter((c) => c.id !== id));
 	};
-
-	/* const handleDeleteAll = () => {
-		if (confirm("¿Estás seguro de que quieres eliminar todas las consultas?")) {
-			setConsultations([]);
-			// TODO: Llamar al backend para eliminar todas
-			console.log("Delete all consultations");
-		}
-	}; */
 
 	return (
 		<div className="w-full">
@@ -92,6 +91,7 @@ export default function ListConsultations({ consultationsData }: Props) {
 							key={consultation.id}
 							consultation={consultation}
 							onMarkAsRead={handleMarkAsRead}
+							onMarkAsUnread={handleMarkAsUnread}
 							onDelete={handleDelete}
 							onClick={() => handleCardClick(consultation)}
 						/>

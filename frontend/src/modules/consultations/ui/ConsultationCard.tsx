@@ -13,9 +13,12 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Clock, MailIcon, MoreHorizontal, PhoneIcon } from "lucide-react";
 
+import { ConsultationDeleteAction } from "../components/ConsultationDeleteAction";
+
 interface ConsultationCardProps {
 	consultation: Consultation;
 	onMarkAsRead?: (id: number) => void;
+	onMarkAsUnread?: (id: number) => void;
 	onDelete?: (id: number) => void;
 	onClick?: () => void;
 }
@@ -23,6 +26,7 @@ interface ConsultationCardProps {
 export function ConsultationCard({
 	consultation,
 	onMarkAsRead,
+	onMarkAsUnread,
 	onDelete,
 	onClick,
 }: ConsultationCardProps) {
@@ -32,6 +36,14 @@ export function ConsultationCard({
 		{ locale: es },
 	);
 
+	// Obtener el contacto disponible (client o consultant)
+	const contact = consultation.client || consultation.consultant;
+	const contactName = contact
+		? `${contact.first_name} ${contact.last_name}`
+		: "Contacto desconocido";
+	const contactPhone = contact?.phone || "No disponible";
+	const contactEmail = contact?.email || "No disponible";
+
 	const handleMarkAsRead = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		if (onMarkAsRead) {
@@ -39,10 +51,10 @@ export function ConsultationCard({
 		}
 	};
 
-	const handleDelete = (e: React.MouseEvent) => {
+	const handleMarkAsUnread = (e: React.MouseEvent) => {
 		e.stopPropagation();
-		if (onDelete) {
-			onDelete(consultation.id);
+		if (onMarkAsUnread) {
+			onMarkAsUnread(consultation.id);
 		}
 	};
 
@@ -52,43 +64,55 @@ export function ConsultationCard({
 			onClick={onClick}
 		>
 			<CardContent className="p-0 w-full">
-				<div className="flex items-start justify-between px-4 py-3">
+				<div className="flex items-start justify-between px-4 py-1">
 					<div className="flex items-center gap-4 flex-1">
 						{/* Información principal */}
 						<div className="text-left flex-1 min-w-0">
 							{/* Nombre */}
 							<div className="flex items-center gap-2 mb-1">
-								<span className="font-semibold text-slate-900">
-									{consultation.client?.first_name}{" "}
-									{consultation.client?.last_name}
+								<span className="font-semibold text-slate-900 text-lg">
+									{contactName}
 								</span>
 							</div>
-							{/* Propiedad */}
-							{consultation.property && (
-								<div className="text-sm text-slate-600 mb-2">
-									{consultation.property.title}
-								</div>
-							)}
-							{/* Tipo de consulta */}
-							{consultation.consultation_type && (
-								<div className="text-xs text-slate-600 mb-2 font-medium">
-									{consultation.consultation_type.name}
-								</div>
-							)}
-							{/* Contacto */}
-							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-600 mb-1">
 								<div className="flex items-center gap-1">
-									<PhoneIcon className="h-3.5 w-3.5" />
-									<span>{consultation.client?.phone || "No disponible"}</span>
+									{consultation.consultation_type && (
+										<div className="font-medium">
+											{consultation.consultation_type.name}
+										</div>
+									)}
 								</div>
 								<span className="text-slate-300">·</span>
 								<div className="flex items-center gap-1">
-									<MailIcon className="h-3.5 w-3.5" />
-									<span className="truncate">
-										{consultation.client?.email || "No disponible"}
-									</span>
+									{consultation.property && (
+										<div>{consultation.property.title}</div>
+									)}
 								</div>
-							</div>{" "}
+							</div>
+							{/* Propiedad */}
+							{/* {consultation.property && (
+								<div className="text-sm text-slate-600 mb-2">
+									{consultation.property.title}
+								</div>
+							)} */}
+							{/* Tipo de consulta */}
+							{/* {consultation.consultation_type && (
+								<div className="text-xs text-slate-600 mb-2 font-medium">
+									{consultation.consultation_type.name}
+								</div>
+							)} */}
+							{/* Contacto */}
+							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+								<div className="flex items-center gap-1">
+									<MailIcon className="h-3.5 w-3.5" />
+									<span className="truncate">{contactEmail}</span>
+								</div>
+								<span className="text-slate-300">·</span>
+								<div className="flex items-center gap-1">
+									<PhoneIcon className="h-3.5 w-3.5" />
+									<span>{contactPhone}</span>
+								</div>
+							</div>
 							{/* Fecha */}
 							<div className="flex items-center gap-1 text-xs text-slate-400 mt-2">
 								<Clock className="h-3 w-3" />
@@ -111,19 +135,25 @@ export function ConsultationCard({
 									<MoreHorizontal className="h-4 w-4 text-slate-500" />
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
+							<DropdownMenuContent
+								align="end"
+								onClick={(e) => e.stopPropagation()}
+							>
 								{!consultation.is_read && onMarkAsRead && (
 									<DropdownMenuItem onClick={handleMarkAsRead}>
 										Marcar como leído
 									</DropdownMenuItem>
 								)}
-								{onDelete && (
-									<DropdownMenuItem
-										onClick={handleDelete}
-										className="text-red-600"
-									>
-										Eliminar
+								{consultation.is_read && onMarkAsUnread && (
+									<DropdownMenuItem onClick={handleMarkAsUnread}>
+										Marcar como no leído
 									</DropdownMenuItem>
+								)}
+								{onDelete && (
+									<ConsultationDeleteAction
+										consultationId={consultation.id}
+										onDelete={onDelete}
+									/>
 								)}
 							</DropdownMenuContent>
 						</DropdownMenu>
