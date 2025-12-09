@@ -18,19 +18,13 @@ type Props = {
 
 export default function PropertyTabs({ property }: Props) {
 	return (
-		<Tabs defaultValue="details" className="w-full grid gap-8">
-			<TabsList className="w-full justify-start" size="lg" variant="blue">
-				<TabsTrigger value="details" variant="blue" size="lg">
-					DETALLES
-				</TabsTrigger>
-				<TabsTrigger value="multimedia" variant="blue" size="lg">
-					MULTIMEDIA
-				</TabsTrigger>
-				<TabsTrigger value="documents" variant="blue" size="lg">
-					DOCUMENTACIÓN
-				</TabsTrigger>
+		<Tabs defaultValue="details" className="w-full grid gap-4">
+			<TabsList className="w-full justify-start">
+				<TabsTrigger value="details">Detalles</TabsTrigger>
+				<TabsTrigger value="multimedia">Multimedia</TabsTrigger>
+				<TabsTrigger value="documents">Documentación</TabsTrigger>
 			</TabsList>
-			<TabsContent value="details" className="px-4 grid gap-8">
+			<TabsContent value="details" className=" grid gap-4">
 				<PropertyInfo property={property} />
 			</TabsContent>
 			<TabsContent value="multimedia" className="px-4">

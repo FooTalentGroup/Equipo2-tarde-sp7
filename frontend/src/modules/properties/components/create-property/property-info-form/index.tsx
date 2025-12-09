@@ -14,6 +14,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@src/components/ui/select";
+import { Textarea } from "@src/components/ui/textarea";
 import { PROPERTY_TYPE } from "@src/modules/properties/consts";
 import type { PropertyForm } from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
@@ -108,6 +109,24 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 							<FormLabel>Código postal</FormLabel>
 							<FormControl>
 								<Input placeholder="Juan Perez" {...field} />
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="basic.description"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Descripción</FormLabel>
+							<FormControl>
+								<Textarea
+									placeholder="Descripción de la propiedad"
+									className="resize-none"
+									{...field}
+								/>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
