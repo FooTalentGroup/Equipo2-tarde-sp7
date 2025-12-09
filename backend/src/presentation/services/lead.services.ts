@@ -71,7 +71,6 @@ export class LeadServices {
 
             return {
                 client: clientEntity.toPublicObject(),
-                was_existing_client: !wasCreated,
                 consultation: consultation ? {
                     id: consultation.id,
                     consultation_type_id: consultation.consultation_type_id,

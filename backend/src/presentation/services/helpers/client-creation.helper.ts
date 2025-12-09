@@ -74,8 +74,9 @@ export class ClientCreationHelper {
         if (clientData.email) {
             const existingByEmail = await ClientModel.findByEmail(clientData.email);
             if (existingByEmail) {
-                console.log(`Duplicate detected: Client found by email ${clientData.email}`);
-                return { client: existingByEmail, wasCreated: false };
+                throw CustomError.conflict(
+                    `El cliente con email ${clientData.email} ya existe. No se permiten duplicados.`
+                );
             }
         }
 
@@ -83,8 +84,9 @@ export class ClientCreationHelper {
         if (clientData.dni) {
             const existingByDni = await ClientModel.findByDni(clientData.dni);
             if (existingByDni) {
-                console.log(`Duplicate detected: Client found by DNI ${clientData.dni}`);
-                return { client: existingByDni, wasCreated: false };
+                throw CustomError.conflict(
+                    `El cliente con DNI ${clientData.dni} ya existe. No se permiten duplicados.`
+                );
             }
         }
 
@@ -99,12 +101,13 @@ export class ClientCreationHelper {
             );
             
             if (exactMatch) {
-                console.log(`Duplicate detected: Client found by phone ${normalizedPhone} and name ${clientData.first_name} ${clientData.last_name}`);
-                return { client: exactMatch, wasCreated: false };
+                throw CustomError.conflict(
+                    `El cliente ${clientData.first_name} ${clientData.last_name} con teléfono ${normalizedPhone} ya existe. No se permiten duplicados.`
+                );
             }
         }
 
-        // 3. No se encontró duplicado, crear nuevo cliente
+        // 4. No se encontró duplicado, crear nuevo cliente
         const newClient = await ClientModel.create({
             first_name: clientData.first_name,
             last_name: clientData.last_name,

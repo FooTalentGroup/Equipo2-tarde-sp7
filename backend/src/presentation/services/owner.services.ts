@@ -68,7 +68,6 @@ export class OwnerServices {
 
             return {
                 client: clientEntity.toPublicObject(),
-                was_existing_client: !wasCreated,
                 property: property ? {
                     id: property.id,
                     title: property.title,

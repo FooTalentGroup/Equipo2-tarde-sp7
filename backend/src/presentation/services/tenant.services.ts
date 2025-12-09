@@ -131,7 +131,6 @@ export class TenantServices {
 
             return {
                 client: clientEntity.toPublicObject(),
-                was_existing_client: !wasCreated,
                 client_rental: clientRental ? {
                     id: clientRental.id,
                     property_id: clientRental.property_id,
