@@ -1,5 +1,6 @@
 import { PostgresDatabase } from "../../data/postgres/database";
 import { ClientModel } from "../../data/postgres/models/clients/client.model";
+import { ClientPropertyInterestModel } from "../../data/postgres/models/clients/client-property-interest.model";
 import { ClientConsultationModel } from "../../data/postgres/models/crm/client-consultation.model";
 import { ConsultationTypeModel } from "../../data/postgres/models/crm/consultation-type.model";
 import { PropertyModel } from "../../data/postgres/models/properties/property.model";
@@ -491,6 +492,24 @@ export class PropertyConsultationServices {
 				},
 			);
 
+			// 7. Si la consulta tiene property_id, guardar la propiedad de interés en client_property_interests
+			let propertyInterestCreated = false;
+			if (consultation.property_id) {
+				try {
+					await ClientPropertyInterestModel.create({
+						client_id: client.id!,
+						property_id: consultation.property_id,
+						notes: `Converted from consultation #${consultationId}`,
+					});
+					propertyInterestCreated = true;
+				} catch (error) {
+					// Si ya existe la relación, no es un error crítico
+					console.log(
+						`Property interest already exists for client ${client.id} and property ${consultation.property_id}`,
+					);
+				}
+			}
+
 			return {
 				message: "Consultation converted to lead successfully",
 				consultation: updatedConsultation,
@@ -502,6 +521,7 @@ export class PropertyConsultationServices {
 					phone: client.phone,
 				},
 				was_new_lead: wasNewLead,
+				property_interest_created: propertyInterestCreated,
 			};
 		} catch (error) {
 			if (error instanceof CustomError) {

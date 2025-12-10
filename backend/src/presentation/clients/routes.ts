@@ -642,6 +642,89 @@ export class ClientRoutes {
             (req, res) => controller.restoreClient(req, res)
         );
 
+        /**
+         * @swagger
+         * /api/clients/{id}/properties-of-interest:
+         *   post:
+         *     summary: Add a property of interest to a client (Lead or Tenant)
+         *     tags: [Clients]
+         *     security:
+         *       - bearerAuth: []
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: integer
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - property_id
+         *             properties:
+         *               property_id:
+         *                 type: integer
+         *                 example: 123
+         *               notes:
+         *                 type: string
+         *                 example: Cliente interesado en esta propiedad
+         *     responses:
+         *       201:
+         *         description: Property of interest added successfully
+         *       400:
+         *         description: Bad request
+         *       404:
+         *         description: Client or property not found
+         */
+        router.post(
+            '/:id/properties-of-interest',
+            authMiddleware.authenticate,
+            (req, res) => controller.addPropertyOfInterest(req, res)
+        );
+
+        /**
+         * @swagger
+         * /api/clients/{id}/owned-properties:
+         *   post:
+         *     summary: Associate a property to an Owner
+         *     tags: [Clients]
+         *     security:
+         *       - bearerAuth: []
+         *     parameters:
+         *       - in: path
+         *         name: id
+         *         required: true
+         *         schema:
+         *           type: integer
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             required:
+         *               - property_id
+         *             properties:
+         *               property_id:
+         *                 type: integer
+         *                 example: 123
+         *     responses:
+         *       200:
+         *         description: Property associated with owner successfully
+         *       400:
+         *         description: Bad request
+         *       404:
+         *         description: Client or property not found
+         */
+        router.post(
+            '/:id/owned-properties',
+            authMiddleware.authenticate,
+            (req, res) => controller.addOwnedProperty(req, res)
+        );
+
         return router;
     }
 }

@@ -76,13 +76,10 @@ export class ClientController {
     }
 
     /**
-     * Crea un nuevo Lead con consulta y propiedad de interés si se proporciona
+     * Crea un nuevo Lead con propiedad de interés si se proporciona
      */
     createLead = async (req: Request, res: Response) => {
         try {
-            const user = (req as any).user;
-            const assignedUserId = user && user.id ? Number(user.id) : undefined;
-
             const [error, createLeadDto] = CreateLeadDto.create(req.body);
 
             if (error || !createLeadDto) {
@@ -92,8 +89,7 @@ export class ClientController {
             }
 
             const result = await this.leadServices.createLeadWithConsultation(
-                createLeadDto,
-                assignedUserId
+                createLeadDto
             );
 
             return res.status(201).json({
@@ -225,6 +221,75 @@ export class ClientController {
 
             const result = await this.clientServices.restoreClient(Number(id));
             return res.json(result);
+        } catch (error) {
+            ErrorHandlerUtil.handleError(error, res, 'Client');
+        }
+    }
+
+    /**
+     * Agrega una propiedad de interés a un cliente
+     */
+    addPropertyOfInterest = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const { property_id, notes } = req.body;
+
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({
+                    message: 'Invalid client ID'
+                });
+            }
+
+            if (!property_id || isNaN(Number(property_id))) {
+                return res.status(400).json({
+                    message: 'property_id is required and must be a valid number'
+                });
+            }
+
+            const result = await this.clientServices.addPropertyOfInterest(
+                Number(id),
+                Number(property_id),
+                notes
+            );
+
+            return res.status(201).json({
+                message: 'Property of interest added successfully',
+                data: result
+            });
+        } catch (error) {
+            ErrorHandlerUtil.handleError(error, res, 'Client');
+        }
+    }
+
+    /**
+     * Asocia una propiedad a un Owner
+     */
+    addOwnedProperty = async (req: Request, res: Response) => {
+        try {
+            const { id } = req.params;
+            const { property_id } = req.body;
+
+            if (!id || isNaN(Number(id))) {
+                return res.status(400).json({
+                    message: 'Invalid client ID'
+                });
+            }
+
+            if (!property_id || isNaN(Number(property_id))) {
+                return res.status(400).json({
+                    message: 'property_id is required and must be a valid number'
+                });
+            }
+
+            const result = await this.clientServices.addOwnedProperty(
+                Number(id),
+                Number(property_id)
+            );
+
+            return res.status(200).json({
+                message: 'Property associated with owner successfully',
+                data: result
+            });
         } catch (error) {
             ErrorHandlerUtil.handleError(error, res, 'Client');
         }

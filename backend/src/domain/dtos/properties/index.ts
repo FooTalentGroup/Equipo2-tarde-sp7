@@ -13,4 +13,5 @@ export * from './create-property-values.dto';
 export * from './create-property-documents.dto';
 export * from './create-property-internal.dto';
 export * from './create-property-grouped.dto';
+export * from './update-property-grouped.dto';
 
