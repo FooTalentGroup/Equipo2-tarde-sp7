@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { Badge } from "@src/components/ui/badge";
 import { Button } from "@src/components/ui/button";
 import {
@@ -91,10 +93,12 @@ export default function PropertyGalleryForm({ form }: Props) {
 																	};
 																	if (customFile.preview) {
 																		return (
-																			<img
+																			<Image
 																				src={customFile.preview}
 																				alt={file.name}
-																				className="size-full object-cover"
+																				fill
+																				unoptimized
+																				className="object-cover"
 																			/>
 																		);
 																	}
@@ -182,10 +186,12 @@ export default function PropertyGalleryForm({ form }: Props) {
 														};
 														if (customFile.preview) {
 															return (
-																<img
+																<Image
 																	src={customFile.preview}
 																	alt={file.name}
-																	className="size-full object-cover"
+																	fill
+																	unoptimized
+																	className="object-cover"
 																/>
 															);
 														}

@@ -13,15 +13,11 @@ type Props = {
 
 export default function PropertyDocuments({ property }: Props) {
 	const { documents } = property;
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery] = useState("");
 
 	const filteredDocuments = documents?.filter((doc) =>
 		(doc.document_name || "").toLowerCase().includes(searchQuery.toLowerCase()),
 	);
-
-	const getFileExtension = (filename: string) => {
-		return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
-	};
 
 	const formatDate = (dateString: string) => {
 		if (!dateString) return "Fecha desconocida";
