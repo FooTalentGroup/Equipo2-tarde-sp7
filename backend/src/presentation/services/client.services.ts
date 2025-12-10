@@ -1,6 +1,8 @@
 import { 
     ClientModel, 
+    ClientPropertyInterestModel,
     ContactCategoryModel,
+    PropertyModel,
     CityModel,
     ProvinceModel,
     CountryModel
@@ -101,6 +103,158 @@ export class ClientServices {
             }
         }
 
+        // Obtener propiedades relacionadas según el tipo de cliente
+        const { PropertyModel } = await import('../../data/postgres/models/properties/property.model');
+        const { PropertyTypeModel } = await import('../../data/postgres/models/properties/property-type.model');
+        const { PropertyStatusModel } = await import('../../data/postgres/models/properties/property-status.model');
+        const { ClientRentalModel } = await import('../../data/postgres/models/rentals/client-rental.model');
+        const { RentalModel } = await import('../../data/postgres/models/rentals/rental.model');
+        const { CurrencyTypeModel } = await import('../../data/postgres/models/payments/currency-type.model');
+
+        let propertiesOfInterest: any[] = [];
+        let ownedProperties: any[] = [];
+        let rentedProperty: any = null;
+
+        const categoryName = category?.name;
+
+        // Para Leads: obtener propiedades de interés desde client_property_interests
+        if (categoryName === 'Lead') {
+            const interests = await ClientPropertyInterestModel.findByClientId(id);
+            
+            if (interests.length > 0) {
+                propertiesOfInterest = await Promise.all(
+                    interests.map(async (interest) => {
+                        const property = await PropertyModel.findById(interest.property_id);
+                        if (!property) return null;
+                        
+                        const [propertyType, propertyStatus] = await Promise.all([
+                            PropertyTypeModel.findById(property.property_type_id),
+                            PropertyStatusModel.findById(property.property_status_id)
+                        ]);
+
+                        return {
+                            id: property.id,
+                            title: property.title,
+                            property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
+                            property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
+                            interest_created_at: interest.created_at,
+                            interest_notes: interest.notes
+                        };
+                    })
+                );
+                propertiesOfInterest = propertiesOfInterest.filter(p => p !== null);
+            }
+        }
+
+        // Para Owners: obtener propiedades propias desde properties donde owner_id = client.id
+        if (categoryName === 'Propietario') {
+            const properties = await PropertyModel.findAll({ owner_id: id });
+            
+            ownedProperties = await Promise.all(
+                properties.map(async (property: any) => {
+                    const [propertyType, propertyStatus] = await Promise.all([
+                        PropertyTypeModel.findById(property.property_type_id),
+                        PropertyStatusModel.findById(property.property_status_id)
+                    ]);
+
+                    return {
+                        id: property.id,
+                        title: property.title,
+                        property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
+                        property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
+                        publication_date: property.publication_date
+                    };
+                })
+            );
+        }
+
+        // Para Inquilinos: obtener propiedad alquilada activa desde client_rentals
+        if (categoryName === 'Inquilino') {
+            const clientRentals = await ClientRentalModel.findByClientId(id);
+            
+            if (clientRentals.length > 0) {
+                // Ordenar por fecha de inicio (más reciente primero)
+                const sortedRentals = clientRentals.sort((a, b) => {
+                    const dateA = a.contract_start_date ? new Date(a.contract_start_date).getTime() : 0;
+                    const dateB = b.contract_start_date ? new Date(b.contract_start_date).getTime() : 0;
+                    return dateB - dateA;
+                });
+
+                // Buscar el alquiler activo (contract_end_date IS NULL o >= fecha actual)
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const activeRental = sortedRentals.find((rental) => {
+                    if (!rental.contract_end_date) return true; // Sin fecha de fin = activo
+                    const endDate = new Date(rental.contract_end_date);
+                    endDate.setHours(0, 0, 0, 0);
+                    return endDate >= today;
+                });
+
+                if (activeRental && activeRental.property_id) {
+                    const property = await PropertyModel.findById(activeRental.property_id);
+                    if (property) {
+                        const [propertyType, propertyStatus] = await Promise.all([
+                            PropertyTypeModel.findById(property.property_type_id),
+                            PropertyStatusModel.findById(property.property_status_id)
+                        ]);
+
+                        // Obtener información del alquiler desde rentals
+                        const rentals = await RentalModel.findAll({ property_id: activeRental.property_id });
+                        const rentalInfo = rentals.find((r: any) => r.client_rental_id === activeRental.id);
+
+                        let currency = null;
+                        if (rentalInfo?.currency_type_id) {
+                            currency = await CurrencyTypeModel.findById(rentalInfo.currency_type_id);
+                        }
+
+                        rentedProperty = {
+                            id: property.id,
+                            title: property.title,
+                            property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
+                            property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
+                            rental: {
+                                id: activeRental.id,
+                                contract_start_date: activeRental.contract_start_date,
+                                contract_end_date: activeRental.contract_end_date,
+                                next_increase_date: activeRental.next_increase_date,
+                                monthly_amount: rentalInfo?.monthly_amount || null,
+                                currency: currency ? { id: currency.id, name: currency.name, symbol: currency.symbol } : null,
+                                external_reference: activeRental.external_reference || null
+                            }
+                        };
+                    }
+                }
+            }
+
+            // También obtener propiedades de interés para Inquilinos (pueden tener múltiples)
+            const interests = await ClientPropertyInterestModel.findByClientId(id);
+            
+            if (interests.length > 0) {
+                propertiesOfInterest = await Promise.all(
+                    interests.map(async (interest) => {
+                        const property = await PropertyModel.findById(interest.property_id);
+                        if (!property) return null;
+                        
+                        const [propertyType, propertyStatus] = await Promise.all([
+                            PropertyTypeModel.findById(property.property_type_id),
+                            PropertyStatusModel.findById(property.property_status_id)
+                        ]);
+
+                        return {
+                            id: property.id,
+                            title: property.title,
+                            property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
+                            property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
+                            interest_created_at: interest.created_at,
+                            interest_notes: interest.notes
+                        };
+                    })
+                );
+                propertiesOfInterest = propertiesOfInterest.filter(p => p !== null);
+            }
+        }
+
         return {
             client: {
                 ...clientEntity.toPublicObject(),
@@ -113,7 +267,10 @@ export class ClientServices {
                     name: propertySearchType.name
                 } : null,
                 city: city
-            }
+            },
+            properties_of_interest: propertiesOfInterest, // Para Leads e Inquilinos
+            owned_properties: ownedProperties, // Para Owners
+            rented_property: rentedProperty // Para Inquilinos (solo la activa)
         };
     }
 
@@ -294,6 +451,109 @@ export class ClientServices {
         }
 
         return { cityId: city.id! };
+    }
+
+    /**
+     * Agrega una propiedad de interés a un cliente (Lead o Inquilino)
+     */
+    async addPropertyOfInterest(clientId: number, propertyId: number, notes?: string) {
+        // Verificar que el cliente existe
+        const client = await ClientModel.findById(clientId);
+        if (!client) {
+            throw CustomError.notFound(`Client with ID ${clientId} not found`);
+        }
+
+        // Verificar que la propiedad existe
+        const property = await PropertyModel.findById(propertyId);
+        if (!property) {
+            throw CustomError.notFound(`Property with ID ${propertyId} not found`);
+        }
+
+        // Crear la relación en client_property_interests
+        const propertyInterest = await ClientPropertyInterestModel.create({
+            client_id: clientId,
+            property_id: propertyId,
+            notes: notes || undefined,
+        });
+
+        // Obtener información enriquecida de la propiedad
+        const { PropertyTypeModel } = await import('../../data/postgres/models/properties/property-type.model');
+        const { PropertyStatusModel } = await import('../../data/postgres/models/properties/property-status.model');
+        
+        const [propertyType, propertyStatus] = await Promise.all([
+            PropertyTypeModel.findById(property.property_type_id),
+            PropertyStatusModel.findById(property.property_status_id)
+        ]);
+
+        return {
+            property_interest: {
+                id: propertyInterest.id,
+                client_id: propertyInterest.client_id,
+                property_id: propertyInterest.property_id,
+                created_at: propertyInterest.created_at,
+                notes: propertyInterest.notes,
+            },
+            property: {
+                id: property.id,
+                title: property.title,
+                property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
+                property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
+            }
+        };
+    }
+
+    /**
+     * Asocia una propiedad a un Owner (actualiza owner_id en la propiedad)
+     */
+    async addOwnedProperty(clientId: number, propertyId: number) {
+        // Verificar que el cliente existe y es Owner
+        const client = await ClientModel.findById(clientId);
+        if (!client) {
+            throw CustomError.notFound(`Client with ID ${clientId} not found`);
+        }
+
+        // Verificar que es Owner
+        const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
+        const category = await ContactCategoryModel.findById(client.contact_category_id);
+        
+        if (!category || category.name !== 'Propietario') {
+            throw CustomError.badRequest('Client must be an Owner to associate properties');
+        }
+
+        // Verificar que la propiedad existe
+        const property = await PropertyModel.findById(propertyId);
+        if (!property) {
+            throw CustomError.notFound(`Property with ID ${propertyId} not found`);
+        }
+
+        // Actualizar el owner_id de la propiedad
+        const updatedProperty = await PropertyModel.update(propertyId, {
+            owner_id: clientId
+        });
+
+        if (!updatedProperty) {
+            throw CustomError.internalServerError('Failed to associate property with owner');
+        }
+
+        // Obtener información enriquecida de la propiedad
+        const { PropertyTypeModel } = await import('../../data/postgres/models/properties/property-type.model');
+        const { PropertyStatusModel } = await import('../../data/postgres/models/properties/property-status.model');
+        
+        const [propertyType, propertyStatus] = await Promise.all([
+            PropertyTypeModel.findById(updatedProperty.property_type_id),
+            PropertyStatusModel.findById(updatedProperty.property_status_id)
+        ]);
+
+        return {
+            property: {
+                id: updatedProperty.id,
+                title: updatedProperty.title,
+                owner_id: updatedProperty.owner_id,
+                property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
+                property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
+                publication_date: updatedProperty.publication_date
+            }
+        };
     }
 }
 

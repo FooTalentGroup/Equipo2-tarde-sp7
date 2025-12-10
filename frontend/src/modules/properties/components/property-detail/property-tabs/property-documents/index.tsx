@@ -80,20 +80,16 @@ export default function PropertyDocuments({ property }: Props) {
 								<Separator />
 								<div className="flex w-full gap-2 p-6">
 									<Button
-										asChild
 										variant="tertiary"
 										size="sm"
 										className="w-full"
+										onClick={() => {
+											const downloadUrl = `${doc.file_path}?fl_attachment`;
+											window.open(downloadUrl, "_blank");
+										}}
 									>
-										<a
-											href={doc.file_path}
-											target="_blank"
-											rel="noopener noreferrer"
-											download
-										>
-											<Download className="mr-2 h-3 w-3" />
-											Descargar
-										</a>
+										<Download className="mr-2 h-3 w-3" />
+										Descargar
 									</Button>
 								</div>
 							</div>

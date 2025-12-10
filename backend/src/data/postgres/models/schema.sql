@@ -204,6 +204,23 @@ CREATE INDEX idx_clients_dni ON clients(dni);
 CREATE INDEX idx_clients_contact_category ON clients(contact_category_id);
 CREATE INDEX idx_clients_city ON clients(city_id);
 
+-- Client Property Interests (Properties of interest for Leads)
+CREATE TABLE IF NOT EXISTS client_property_interests (
+    id SERIAL PRIMARY KEY,
+    client_id INTEGER NOT NULL,
+    property_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    CONSTRAINT fk_client_property_interests_client FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
+    CONSTRAINT fk_client_property_interests_property FOREIGN KEY (property_id) REFERENCES properties(id) ON DELETE CASCADE,
+    CONSTRAINT uk_client_property_interest UNIQUE (client_id, property_id)
+);
+
+CREATE INDEX idx_client_property_interests_client ON client_property_interests(client_id);
+CREATE INDEX idx_client_property_interests_property ON client_property_interests(property_id);
+
+COMMENT ON TABLE client_property_interests IS 'Properties of interest for Lead clients (many-to-many relationship)';
+
 -- ========================================================
 -- 3. PROPERTIES (MANAGEMENT AND DATA)
 -- ========================================================
@@ -211,6 +228,8 @@ CREATE INDEX idx_clients_city ON clients(city_id);
 -- Address
 CREATE TABLE IF NOT EXISTS addresses (
     id SERIAL PRIMARY KEY,
+    street VARCHAR(255) NOT NULL,
+    number VARCHAR(50),
     full_address VARCHAR(500) NOT NULL,
     neighborhood VARCHAR(150),
     postal_code VARCHAR(10),
@@ -220,9 +239,12 @@ CREATE TABLE IF NOT EXISTS addresses (
     CONSTRAINT fk_addresses_city FOREIGN KEY (city_id) REFERENCES cities(id) ON DELETE RESTRICT
 );
 
-COMMENT ON COLUMN addresses.full_address IS 'Street, number, floor and/or unit in a single string';
+COMMENT ON COLUMN addresses.street IS 'Street name without number';
+COMMENT ON COLUMN addresses.number IS 'Street number, can include floor/unit (e.g., "1234", "1234 4B")';
+COMMENT ON COLUMN addresses.full_address IS 'Complete address string for display (street + number + neighborhood)';
 
 CREATE INDEX idx_addresses_city ON addresses(city_id);
+CREATE INDEX idx_addresses_street ON addresses(street);
 CREATE INDEX idx_addresses_coordinates ON addresses(latitude, longitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
 
 -- Properties

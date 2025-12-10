@@ -7,9 +7,7 @@ export default function NewPropertyPage() {
 	return (
 		<>
 			<SectionHeading title="Nueva propiedad" />
-			<section>
-				<CreatePropertyForm />
-			</section>
+			<CreatePropertyForm />
 		</>
 	);
 }

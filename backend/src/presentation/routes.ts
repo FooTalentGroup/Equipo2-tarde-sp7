@@ -4,6 +4,7 @@ import { Authroutes } from "./auth/routes";
 import { ClientRoutes } from "./clients/routes";
 import { CompanyRoutes } from "./company/routes";
 import { ConsultationRoutes } from "./consultations/routes";
+import { DashboardRoutes } from "./dashboard/routes";
 import { PropertyRoutes } from "./properties/routes";
 import { UserRoutes } from "./users/routes";
 
@@ -28,6 +29,9 @@ export class AppRoutes {
 
 		// Rutas de consultas (público)
 		apiRouter.use("/consultations", ConsultationRoutes.routes);
+
+		// Rutas de dashboard
+		apiRouter.use("/dashboard", DashboardRoutes.routes);
 
 		// Rutas de configuración de la empresa (logo, etc.)
 		apiRouter.use("/company", CompanyRoutes.routes);

@@ -66,17 +66,15 @@ export default function PropertyDeleteAction({ propertyId }: Props) {
 					Eliminar propiedad
 				</Button>
 			</AlertDialogTrigger>
-			<AlertDialogContent>
+			<AlertDialogContent variant="destructive">
 				<Form {...form}>
-					<form
-						onSubmit={form.handleSubmit(onSubmit)}
-						className="flex flex-col gap-4"
-					>
+					<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
 						<AlertDialogHeader>
-							<AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+							<AlertDialogTitle>Eliminar propiedad</AlertDialogTitle>
 							<AlertDialogDescription>
-								Esta acción no se puede deshacer. Esto eliminará permanentemente
-								la propiedad.
+								Si eliminás esta propiedad, se perderá toda su información
+								asociada. <br />
+								¿Deseás continuar?
 							</AlertDialogDescription>
 						</AlertDialogHeader>
 						<AlertDialogFooter>
