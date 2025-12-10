@@ -7,6 +7,7 @@ type RequestOptions = {
 	params?: Record<string, string | number | boolean | undefined | null>;
 	cache?: RequestCache;
 	next?: NextFetchRequestConfig;
+	skipAuth?: boolean;
 };
 
 function buildUrlWithParams(
@@ -52,13 +53,14 @@ async function fetchApi<T>(
 		params,
 		cache = "no-store",
 		next,
+		skipAuth = false,
 	} = options;
 
 	const defaultHeaders: Record<string, string> = {
 		Accept: "application/json",
 	};
 
-	if (!headers.Authorization) {
+	if (!headers.Authorization && !skipAuth) {
 		const token = await getAuthToken();
 		if (token) {
 			defaultHeaders.Authorization = `Bearer ${token}`;

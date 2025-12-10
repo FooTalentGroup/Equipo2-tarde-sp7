@@ -30,9 +30,11 @@ import {
 	SheetTitle,
 	SheetTrigger,
 } from "@src/components/ui/sheet";
+import { Switch } from "@src/components/ui/switch";
 import { PROPERTY_TYPE } from "@src/modules/properties/consts";
+import { OperationType, OperationTypeLabel } from "@src/types/property";
 import type { PropertyFilterForm } from "@src/types/property-filter";
-import { parseAsString, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 
 export default function PropertyFilterSheet() {
@@ -54,10 +56,19 @@ export default function PropertyFilterSheet() {
 		"search",
 		parseAsString.withDefault("").withOptions({ shallow: false }),
 	);
+
+	const [operationTypeId, setOperationTypeId] = useQueryState(
+		"operation_type_id",
+		parseAsString.withDefault("").withOptions({ shallow: false }),
+	);
 	// const [includeArchived, setIncludeArchived] = useQueryState(
 	// 	"includeArchived",
 	// 	parseAsBoolean.withDefault(false).withOptions({ shallow: false }),
 	// );
+	const [featuredWeb, setFeaturedWeb] = useQueryState(
+		"featured_web",
+		parseAsBoolean.withDefault(false).withOptions({ shallow: false }),
+	);
 
 	const form = useForm<PropertyFilterForm>({
 		defaultValues: {
@@ -65,7 +76,9 @@ export default function PropertyFilterSheet() {
 			min_price: minPrice,
 			max_price: maxPrice,
 			search: search,
+			operation_type_id: operationTypeId,
 			// includeArchived: includeArchived,
+			featured_web: featuredWeb,
 		},
 	});
 
@@ -75,9 +88,19 @@ export default function PropertyFilterSheet() {
 			min_price: minPrice,
 			max_price: maxPrice,
 			search: search,
+			operation_type_id: operationTypeId,
 			// includeArchived: includeArchived,
+			featured_web: featuredWeb,
 		});
-	}, [propertyTypeId, minPrice, maxPrice, search, form]);
+	}, [
+		propertyTypeId,
+		minPrice,
+		maxPrice,
+		search,
+		operationTypeId,
+		featuredWeb,
+		form,
+	]);
 
 	async function onSubmit(data: PropertyFilterForm) {
 		try {
@@ -86,7 +109,9 @@ export default function PropertyFilterSheet() {
 				setMinPrice(data.min_price || null),
 				setMaxPrice(data.max_price || null),
 				setSearch(data.search || null),
+				setOperationTypeId(data.operation_type_id || null),
 				// setIncludeArchived(data.includeArchived || null),
+				setFeaturedWeb(data.featured_web || null),
 			]);
 			setSheetOpen(false);
 		} catch (error) {
@@ -101,7 +126,9 @@ export default function PropertyFilterSheet() {
 			setMinPrice(null),
 			setMaxPrice(null),
 			setSearch(null),
+			setOperationTypeId(null),
 			// setIncludeArchived(null),
+			setFeaturedWeb(null),
 		]);
 	}
 
@@ -109,7 +136,9 @@ export default function PropertyFilterSheet() {
 		propertyTypeId,
 		minPrice,
 		maxPrice,
+		operationTypeId,
 		//includeArchived,
+		featuredWeb,
 	].filter(Boolean).length;
 
 	return (
@@ -214,6 +243,55 @@ export default function PropertyFilterSheet() {
 											</FormItem>
 										)}
 									/> */}
+									<FormField
+										control={form.control}
+										name="operation_type_id"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Tipo de operación</FormLabel>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}
+												>
+													<FormControl>
+														<SelectTrigger className="w-full">
+															<SelectValue placeholder="Seleccionar" />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														<SelectGroup>
+															<SelectItem value={OperationType.SALE.toString()}>
+																{OperationTypeLabel[OperationType.SALE]}
+															</SelectItem>
+															<SelectItem value={OperationType.RENT.toString()}>
+																{OperationTypeLabel[OperationType.RENT]}
+															</SelectItem>
+														</SelectGroup>
+													</SelectContent>
+												</Select>
+											</FormItem>
+										)}
+									/>
+
+									<FormField
+										control={form.control}
+										name="featured_web"
+										render={({ field }) => (
+											<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+												<div className="space-y-0.5">
+													<FormLabel className="text-base">
+														Destacado en web
+													</FormLabel>
+												</div>
+												<FormControl>
+													<Switch
+														checked={field.value}
+														onCheckedChange={field.onChange}
+													/>
+												</FormControl>
+											</FormItem>
+										)}
+									/>
 								</div>
 							</form>
 						</Form>

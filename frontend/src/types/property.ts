@@ -27,6 +27,16 @@ export const propertyTypeEnum = z.enum([
 	"8", // Depósito
 ]);
 
+export const OperationType = {
+	SALE: 1, //Venta
+	RENT: 2, //Alquilar
+} as const;
+
+export const OperationTypeLabel: Record<number, string> = {
+	[OperationType.SALE]: "Venta",
+	[OperationType.RENT]: "Alquiler",
+};
+
 export const basicSchema = z.object({
 	title: z.string().min(3, "El título es obligatorio"),
 	description: z.string().optional(),
