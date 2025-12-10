@@ -4,6 +4,8 @@ import LeadsForm from "@src/modules/clients/components/create-leads/leads-form";
 import TipAlert from "@src/modules/clients/ui/TipAlert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 
+export const dynamic = "force-dynamic";
+
 async function Page() {
 	// Cargar propiedades en el servidor con autenticación
 	const cookieStore = await cookies();
