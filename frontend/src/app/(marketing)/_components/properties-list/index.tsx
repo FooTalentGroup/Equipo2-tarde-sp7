@@ -56,7 +56,7 @@ export default async function PropertiesList() {
 								<PropertyCard
 									key={property.id}
 									property={property}
-									layout="default"
+									layout="public"
 									href={paths.public.property(property.id.toString())}
 								/>
 							))}
@@ -76,7 +76,7 @@ export default async function PropertiesList() {
 								<PropertyCard
 									key={property.id}
 									property={property}
-									layout="default"
+									layout="public"
 									href={paths.public.property(property.id.toString())}
 								/>
 							))}
