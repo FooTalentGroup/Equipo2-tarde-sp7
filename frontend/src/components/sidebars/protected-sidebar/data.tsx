@@ -1,7 +1,6 @@
 import { paths } from "@src/lib/paths";
 import {
 	Building2Icon,
-	ChartColumnIncreasing,
 	House,
 	HouseIcon,
 	List,
@@ -65,11 +64,11 @@ export const agentNavigation = [
 			},
 		],
 	},
-	{
-		title: "Reportes",
-		href: paths.agent.reports.index(),
-		icon: ChartColumnIncreasing,
-	},
+	// {
+	// 	title: "Reportes",
+	// 	href: paths.agent.reports.index(),
+	// 	icon: ChartColumnIncreasing,
+	// },
 	{
 		title: "Consultas",
 		href: paths.agent.inquiries.index(),

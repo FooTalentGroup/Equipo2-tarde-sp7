@@ -57,7 +57,6 @@ export const geographySchema = z.object({
 export const addressSchema = z.object({
 	street: z.string().min(1, "La calle es obligatoria"),
 	number: z.string().optional(),
-	floor: z.string().min(1, "El piso es obligatorio").optional(),
 	neighborhood: z.string().optional(),
 	postal_code: z.string().min(1, "El código postal es obligatorio"),
 	latitude: z.number().optional(),

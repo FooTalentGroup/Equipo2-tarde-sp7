@@ -48,8 +48,7 @@ export default async function EditPropertyPage({ params }: Props) {
 		},
 		address: {
 			street: property.addresses[0]?.full_address || "",
-			number: "",
-			floor: "",
+			number: property.addresses[0]?.number || "",
 			postal_code: property.addresses[0]?.postal_code || "",
 			neighborhood: property.addresses[0]?.neighborhood || "",
 			latitude: property.addresses[0]?.latitude || 0,

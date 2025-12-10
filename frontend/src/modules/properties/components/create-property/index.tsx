@@ -129,7 +129,6 @@ export default function CreatePropertyForm({
 			address: {
 				street: defaultValues?.address?.street || "",
 				number: defaultValues?.address?.number || "",
-				floor: defaultValues?.address?.floor || "",
 				postal_code: defaultValues?.address?.postal_code || "",
 				neighborhood: defaultValues?.address?.neighborhood || "",
 				latitude: defaultValues?.address?.latitude || 0,

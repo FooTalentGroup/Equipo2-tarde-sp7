@@ -205,7 +205,7 @@ export async function updateProperty(id: number | string, data: PropertyForm) {
 			});
 		}
 
-		const res = await api.put<Property>(`properties/${id}`, formData);
+		const res = await api.patch<Property>(`properties/${id}/grouped`, formData);
 		revalidateTag("properties", { expire: 0 });
 		revalidatePath(`/agent/properties/${id}`);
 		revalidatePath(`/agent/properties/${id}/edit`);
