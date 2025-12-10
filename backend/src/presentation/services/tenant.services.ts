@@ -2,7 +2,11 @@ import { TransactionHelper } from '../../data/postgres/transaction.helper';
 import { 
     ClientRentalModel,
     RentalModel,
-    CurrencyTypeModel
+    CurrencyTypeModel,
+    PropertyModel,
+    PropertyTypeModel,
+    PropertyStatusModel,
+    ClientPropertyInterestModel
 } from '../../data/postgres/models';
 import { CreateTenantDto } from '../../domain/dtos/clients/create-tenant.dto';
 import { CustomError, ClientEntity } from '../../domain';
@@ -129,8 +133,86 @@ export class TenantServices {
             // 5. Crear entity del cliente para retornar
             const clientEntity = ClientEntity.fromDatabaseObject(newClient);
 
+            // 6. Obtener información completa de la propiedad alquilada si existe
+            let rentedProperty = null;
+            if (clientRental && propertyId) {
+                const property = await PropertyModel.findById(propertyId);
+                if (property) {
+                    const [propertyType, propertyStatus] = await Promise.all([
+                        PropertyTypeModel.findById(property.property_type_id),
+                        PropertyStatusModel.findById(property.property_status_id)
+                    ]);
+
+                    let currency = null;
+                    if (rental?.currency_type_id) {
+                        currency = await CurrencyTypeModel.findById(rental.currency_type_id);
+                    }
+
+                    rentedProperty = {
+                        id: property.id,
+                        title: property.title,
+                        description: property.description,
+                        property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
+                        property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
+                        rental: {
+                            id: clientRental.id,
+                            contract_start_date: clientRental.contract_start_date,
+                            contract_end_date: clientRental.contract_end_date,
+                            next_increase_date: clientRental.next_increase_date,
+                            monthly_amount: rental?.monthly_amount || null,
+                            currency: currency ? { id: currency.id, name: currency.name, symbol: currency.symbol } : null,
+                            external_reference: clientRental.external_reference || null
+                        }
+                    };
+                }
+            }
+
+            // 7. Obtener propiedades de interés si existen
+            let propertiesOfInterest: Array<{
+                id: number;
+                title: string;
+                property_type: { id: number; name: string } | null;
+                property_status: { id: number; name: string } | null;
+                interest_created_at: Date | undefined;
+                interest_notes: string | undefined;
+            }> = [];
+            if (newClient.id) {
+                const interests = await ClientPropertyInterestModel.findByClientId(newClient.id);
+                if (interests.length > 0) {
+                    const properties = await Promise.all(
+                        interests.map(async (interest) => {
+                            const property = await PropertyModel.findById(interest.property_id);
+                            if (!property || !property.id) return null;
+                            
+                            const [propertyType, propertyStatus] = await Promise.all([
+                                PropertyTypeModel.findById(property.property_type_id),
+                                PropertyStatusModel.findById(property.property_status_id)
+                            ]);
+
+                            return {
+                                id: property.id,
+                                title: property.title,
+                                property_type: propertyType && propertyType.id ? { id: propertyType.id, name: propertyType.name } : null,
+                                property_status: propertyStatus && propertyStatus.id ? { id: propertyStatus.id, name: propertyStatus.name } : null,
+                                interest_created_at: interest.created_at,
+                                interest_notes: interest.notes
+                            };
+                        })
+                    );
+                    propertiesOfInterest = properties.filter((p): p is NonNullable<typeof p> => p !== null);
+                }
+            }
+
+            // Construir objeto público del cliente sin campos obsoletos
+            const clientPublic = clientEntity.toPublicObject();
+            // Eliminar campos que ya no se usan
+            delete (clientPublic as any).property_interest_phone;
+            delete (clientPublic as any).property_search_type_id;
+
             return {
-                client: clientEntity.toPublicObject(),
+                client: clientPublic,
+                rented_property: rentedProperty, // Propiedad que está alquilando actualmente
+                properties_of_interest: propertiesOfInterest, // Propiedades de interés (puede tener múltiples)
                 client_rental: clientRental ? {
                     id: clientRental.id,
                     property_id: clientRental.property_id,

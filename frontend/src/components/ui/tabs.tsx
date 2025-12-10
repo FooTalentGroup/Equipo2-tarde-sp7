@@ -37,12 +37,12 @@ const tabsListVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: "bg-muted text-muted-foreground p-1",
+				default: "bg-muted text-muted-foreground",
 				blue: "bg-transparent px-0",
 			},
 			size: {
-				default: "h-10 w-fit",
-				lg: "h-12 w-fit",
+				default: "h-10 w-fit p-1",
+				lg: "h-full w-fit p-2",
 			},
 		},
 		defaultVariants: {
@@ -78,7 +78,7 @@ const tabsTriggerVariants = cva(
 				blue: "bg-tertiary text-tertiary-foreground rounded-none border border-transparent data-[state=active]:border-b-card border-b-2 border-b-transparent first:rounded-tl-lg last:rounded-tr-lg",
 			},
 			size: {
-				default: "h-[calc(100%-1px)] flex-1 px-2 py-1",
+				default: "h-full flex-1 px-2 py-1",
 				lg: "h-12 flex-1 px-2 py-1",
 			},
 		},

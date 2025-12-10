@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Client } from 'pg';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { get } from 'env-var';
 
@@ -119,13 +119,61 @@ async function migrateDatabase() {
       }
     }
 
-    console.log(`\n📊 Resumen:`);
+    console.log(`\n📊 Resumen del schema:`);
     console.log(`   ✅ Exitosas: ${successCount}`);
     if (skippedCount > 0) console.log(`   ⚠️  Omitidas (ya existían): ${skippedCount}`);
     if (errorCount > 0) console.log(`   ❌ Errores: ${errorCount}`);
 
+    const migrationsPath = join(process.cwd(), 'src/data/postgres/migrations');
+    let migrationFiles: string[] = [];
+    
+    try {
+      migrationFiles = readdirSync(migrationsPath)
+        .filter(file => file.endsWith('.sql'))
+        .sort();
+    } catch (error) {
+      console.log('\n⚠️  No se encontró la carpeta de migraciones, continuando...\n');
+    }
+
+    if (migrationFiles.length > 0) {
+      console.log(`\n📦 Ejecutando ${migrationFiles.length} migración(es) adicional(es)...\n`);
+      
+      let migrationSuccess = 0;
+      let migrationSkipped = 0;
+      let migrationErrors = 0;
+
+      for (const migrationFile of migrationFiles) {
+        try {
+          const migrationPath = join(migrationsPath, migrationFile);
+          console.log(`📄 Ejecutando: ${migrationFile}`);
+          const migrationSql = readFileSync(migrationPath, 'utf-8');
+          
+          await client.query(migrationSql);
+          migrationSuccess++;
+          console.log(`   ✅ ${migrationFile} ejecutada correctamente\n`);
+        } catch (err: any) {
+          const errorMessage = err.message.toLowerCase();
+          if (errorMessage.includes('already exists') || 
+              errorMessage.includes('does not exist') ||
+              errorMessage.includes('duplicate')) {
+            migrationSkipped++;
+            console.log(`   ⚠️  ${migrationFile} - Ya aplicada (se ignora)\n`);
+          } else {
+            migrationErrors++;
+            console.error(`   ❌ Error en ${migrationFile}:`, err.message);
+            throw err;
+          }
+        }
+      }
+
+      console.log(`📊 Resumen de migraciones:`);
+      console.log(`   ✅ Exitosas: ${migrationSuccess}`);
+      if (migrationSkipped > 0) console.log(`   ⚠️  Omitidas: ${migrationSkipped}`);
+      if (migrationErrors > 0) console.log(`   ❌ Errores: ${migrationErrors}`);
+    }
+
     console.log('\n✅ Base de datos montada correctamente!');
-    console.log('🎉 Todas las tablas han sido creadas.\n');
+    console.log('🎉 Todas las tablas y migraciones han sido aplicadas.\n');
 
   } catch (error: any) {
     console.error('\n❌ Error al montar la base de datos:');

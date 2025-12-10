@@ -25,7 +25,7 @@ import {
 	valuesSchema,
 } from "@src/types/property";
 import { defineStepper } from "@stepperize/react";
-import { Info, InfoIcon } from "lucide-react";
+import { Check, Info, InfoIcon } from "lucide-react";
 import { type Resolver, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -51,6 +51,7 @@ const { useStepper, steps, utils } = defineStepper(
 	{
 		id: "info",
 		title: "Información básica",
+		subtitle: "Datos",
 		schema: z.object({
 			basic: basicSchema,
 			geography: geographySchema,
@@ -60,31 +61,37 @@ const { useStepper, steps, utils } = defineStepper(
 	{
 		id: "features",
 		title: "Característica de la propiedad",
+		subtitle: "Características",
 		schema: z.object({ characteristics: characteristicsSchema }),
 	},
 	{
 		id: "surfaces",
 		title: "Superficies",
+		subtitle: "Superficies",
 		schema: z.object({ surface: surfaceSchema }),
 	},
 	{
 		id: "values",
 		title: "Valores de la propiedad",
+		subtitle: "Valores",
 		schema: z.object({ values: valuesSchema }),
 	},
 	{
 		id: "services",
 		title: "Servicios",
+		subtitle: "Servicios",
 		schema: z.object({ services: servicesSchema }),
 	},
 	{
 		id: "gallery",
 		title: "Galería",
+		subtitle: "Galería",
 		schema: z.object({ images: imagesSchema }),
 	},
 	{
 		id: "documents",
 		title: "Documentación",
+		subtitle: "Docs",
 		schema: z.object({ documents: documentsSchema }),
 	},
 );
@@ -235,40 +242,56 @@ export default function CreatePropertyForm({
 		<section className="grid lg:grid-cols-[1fr_auto_275px] xl:grid-cols-[1fr_auto_375px] gap-4">
 			<div className="flex flex-col gap-8 ">
 				<nav aria-label="Progress" className="w-full">
-					<ol className="flex items-center justify-between w-full">
+					<ol className="flex w-full items-start">
 						{stepper.all.map((step, index, _array) => (
-							<div key={step.id} className="flex items-center w-full">
-								<li className="flex items-center ">
-									<Button
-										type="button"
-										role="tab"
-										variant={index <= currentIndex ? "default" : "outline"}
-										aria-current={
-											stepper.current.id === step.id ? "step" : undefined
-										}
-										aria-posinset={index + 1}
-										aria-setsize={steps.length}
-										aria-selected={stepper.current.id === step.id}
-										className="flex size-10 items-center justify-center rounded-full"
-										onClick={async () => {
-											const valid = await form.trigger();
-											if (!valid) return;
+							<li
+								key={step.id}
+								className={`${
+									index === _array.length - 1 ? "" : "flex-1"
+								} grid grid-cols-[2.5rem_1fr] grid-rows-[auto_auto] gap-y-2`}
+							>
+								<span className="col-start-1 row-start-1 flex w-10 justify-center overflow-visible whitespace-nowrap text-center text-sm font-medium">
+									{step.subtitle}
+								</span>
+								<Button
+									type="button"
+									role="tab"
+									variant={
+										index === currentIndex
+											? "outline-blue-normal"
+											: index < currentIndex
+												? "blue-normal"
+												: "outline-gray"
+									}
+									aria-current={
+										stepper.current.id === step.id ? "step" : undefined
+									}
+									aria-posinset={index + 1}
+									aria-setsize={steps.length}
+									aria-selected={stepper.current.id === step.id}
+									className="col-start-1 row-start-2 z-10 flex size-10 border-2! items-center justify-center rounded-full"
+									onClick={async () => {
+										const valid = await form.trigger();
+										if (!valid) return;
 
-											if (index - currentIndex > 1) return;
-											stepper.goTo(step.id);
-										}}
-									>
-										{index + 1}
-									</Button>
-								</li>
+										if (index - currentIndex > 1) return;
+										stepper.goTo(step.id);
+									}}
+								>
+									{index < currentIndex ? (
+										<Check className="size-5" />
+									) : (
+										index + 1
+									)}
+								</Button>
 								{index < _array.length - 1 && (
 									<Separator
-										className={`flex-1 ${
-											index < currentIndex ? "bg-primary" : "bg-muted"
+										className={`col-start-2 row-start-2 h-0.5! w-full self-center ${
+											index < currentIndex ? "bg-tertiary" : "bg-border"
 										}`}
 									/>
 								)}
-							</div>
+							</li>
 						))}
 					</ol>
 				</nav>
@@ -332,11 +355,8 @@ export default function CreatePropertyForm({
 									<PropertyGalleryForm form={form} />
 								</div>
 							),
-							documents: ({ title }) => (
+							documents: () => (
 								<div className="grid gap-6">
-									<Heading variant="subtitle2" weight="semibold">
-										{title}
-									</Heading>
 									<PropertyDocumentsForm form={form} />
 								</div>
 							),
@@ -354,7 +374,7 @@ export default function CreatePropertyForm({
 								}
 								disabled={form.formState.isSubmitting}
 							>
-								{stepper.isFirst ? "Cancelar" : "Anterior"}
+								{stepper.isFirst ? "Cancelar" : "Atrás"}
 							</Button>
 
 							<Button
@@ -366,12 +386,10 @@ export default function CreatePropertyForm({
 								{stepper.isLast ? (
 									<>
 										{form.formState.isSubmitting && <Spinner />}
-										{form.formState.isSubmitting
-											? "Guardando..."
-											: "Guardar Propiedad"}
+										{form.formState.isSubmitting ? "Guardando..." : "Guardar"}
 									</>
 								) : (
-									"Siguiente"
+									"Cotinuar"
 								)}
 							</Button>
 						</div>

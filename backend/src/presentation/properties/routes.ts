@@ -421,7 +421,7 @@ export class PropertyRoutes {
 		 * @swagger
 		 * /api/properties/{id}/archive:
 		 *   post:
-		 *     summary: Archive a property
+		 *     summary: Archive a property (simple archive)
 		 *     tags: [Properties]
 		 *     security:
 		 *       - bearerAuth: []
@@ -439,6 +439,87 @@ export class PropertyRoutes {
 		 */
 		router.post("/:id/archive", authMiddleware.authenticate, (req, res) =>
 			controller.archiveProperty(req, res),
+		);
+
+		/**
+		 * @swagger
+		 * /api/properties/{id}/archive/grouped:
+		 *   patch:
+		 *     summary: Archive a property using grouped structure (allows additional updates)
+		 *     description: |
+		 *       Archives a property and optionally updates other fields at the same time.
+		 *       The property will be archived (visibility_status set to "Archivada") and any
+		 *       additional fields provided will also be updated.
+		 *     tags: [Properties]
+		 *     security:
+		 *       - bearerAuth: []
+		 *     parameters:
+		 *       - in: path
+		 *         name: id
+		 *         required: true
+		 *         schema:
+		 *           type: integer
+		 *     requestBody:
+		 *       required: false
+		 *       content:
+		 *         multipart/form-data:
+		 *           schema:
+		 *             type: object
+		 *             properties:
+		 *               basic:
+		 *                 type: string
+		 *                 description: JSON string with basic information (optional - property will be archived regardless)
+		 *               geography:
+		 *                 type: string
+		 *                 description: JSON string with {country, province, city} (optional)
+		 *               address:
+		 *                 type: string
+		 *                 description: JSON string with address details (optional)
+		 *               values:
+		 *                 type: string
+		 *                 description: JSON string with prices and expenses (optional)
+		 *               characteristics:
+		 *                 type: string
+		 *                 description: JSON string with characteristics (optional)
+		 *               surface:
+		 *                 type: string
+		 *                 description: JSON string with surface data (optional)
+		 *               services:
+		 *                 type: string
+		 *                 description: JSON string with services array (optional)
+		 *               internal:
+		 *                 type: string
+		 *                 description: JSON string with internal info (optional)
+		 *               images:
+		 *                 type: array
+		 *                 items:
+		 *                   type: string
+		 *                   format: binary
+		 *               documents:
+		 *                 type: array
+		 *                 items:
+		 *                   type: string
+		 *                   format: binary
+		 *     responses:
+		 *       200:
+		 *         description: Property archived and updated successfully
+		 *       400:
+		 *         description: Bad request
+		 *       404:
+		 *         description: Property not found
+		 */
+		router.patch(
+			"/:id/archive/grouped",
+			authMiddleware.authenticate,
+			UploadMiddleware.imagesAndDocuments({
+				imageField: "images",
+				documentField: "documents",
+				maxImages: 10,
+				maxDocuments: 10,
+				maxImageSize: 5 * 1024 * 1024, // 5MB
+				maxDocumentSize: 10 * 1024 * 1024, // 10MB for PDFs
+			}),
+			(req, res) => controller.archivePropertyGrouped(req, res),
 		);
 
 		/**
@@ -520,6 +601,83 @@ export class PropertyRoutes {
 			"/:id/toggle-featured",
 			authMiddleware.authenticate,
 			(req, res) => controller.toggleFeaturedWeb(req, res),
+		);
+
+		/**
+		 * @swagger
+		 * /api/properties/{id}/grouped:
+		 *   patch:
+		 *     summary: Update a property using grouped structure
+		 *     tags: [Properties]
+		 *     security:
+		 *       - bearerAuth: []
+		 *     parameters:
+		 *       - in: path
+		 *         name: id
+		 *         required: true
+		 *         schema:
+		 *           type: integer
+		 *     requestBody:
+		 *       required: true
+		 *       content:
+		 *         multipart/form-data:
+		 *           schema:
+		 *             type: object
+		 *             properties:
+		 *               basic:
+		 *                 type: string
+		 *                 description: JSON string with basic information (optional)
+		 *               geography:
+		 *                 type: string
+		 *                 description: JSON string with {country, province, city} (optional)
+		 *               address:
+		 *                 type: string
+		 *                 description: JSON string with address details (optional)
+		 *               values:
+		 *                 type: string
+		 *                 description: JSON string with prices and expenses (optional)
+		 *               characteristics:
+		 *                 type: string
+		 *                 description: JSON string with characteristics (optional)
+		 *               surface:
+		 *                 type: string
+		 *                 description: JSON string with surface data (optional)
+		 *               services:
+		 *                 type: string
+		 *                 description: JSON string with services array (optional)
+		 *               internal:
+		 *                 type: string
+		 *                 description: JSON string with internal info (optional)
+		 *               images:
+		 *                 type: array
+		 *                 items:
+		 *                   type: string
+		 *                   format: binary
+		 *               documents:
+		 *                 type: array
+		 *                 items:
+		 *                   type: string
+		 *                   format: binary
+		 *     responses:
+		 *       200:
+		 *         description: Property updated successfully
+		 *       400:
+		 *         description: Bad request
+		 *       404:
+		 *         description: Property not found
+		 */
+		router.patch(
+			"/:id/grouped",
+			authMiddleware.authenticate,
+			UploadMiddleware.imagesAndDocuments({
+				imageField: "images",
+				documentField: "documents",
+				maxImages: 10,
+				maxDocuments: 10,
+				maxImageSize: 5 * 1024 * 1024, // 5MB
+				maxDocumentSize: 10 * 1024 * 1024, // 10MB for PDFs
+			}),
+			(req, res) => controller.updatePropertyGrouped(req, res),
 		);
 
 		/**
