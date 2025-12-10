@@ -16,7 +16,11 @@ import {
 } from "@src/components/ui/select";
 import { Textarea } from "@src/components/ui/textarea";
 import { PROPERTY_TYPE } from "@src/modules/properties/consts";
-import type { PropertyForm } from "@src/types/property";
+import {
+	OperationType,
+	OperationTypeLabel,
+	type PropertyForm,
+} from "@src/types/property";
 import type { UseFormReturn } from "react-hook-form";
 
 import OwnerSelect from "./owner-select";
@@ -38,6 +42,34 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 							<FormControl>
 								<Input placeholder="Nombre y Apellido" {...field} />
 							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					control={form.control}
+					name="values.prices.0.operation_type"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Tipo de operación</FormLabel>
+							<Select onValueChange={field.onChange} value={field.value}>
+								<FormControl>
+									<SelectTrigger className="w-full">
+										<SelectValue placeholder="Seleccionar operación" />
+									</SelectTrigger>
+								</FormControl>
+								<SelectContent>
+									<SelectGroup>
+										<SelectItem value={OperationTypeLabel[OperationType.SALE]}>
+											{OperationTypeLabel[OperationType.SALE]}
+										</SelectItem>
+										<SelectItem value={OperationTypeLabel[OperationType.RENT]}>
+											{OperationTypeLabel[OperationType.RENT]}
+										</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
 							<FormMessage />
 						</FormItem>
 					)}

@@ -17,18 +17,49 @@ import type {
 import { PROPERTY_TYPE } from "../consts";
 
 export async function getProperties(
-	filters?: Record<string, string | number | boolean | undefined | null>,
-	token?: string,
+	options: {
+		includeArchived?: boolean;
+		token?: string;
+		property_type_id?: string;
+		min_price?: string;
+		max_price?: string;
+		search?: string;
+		operation_type_id?: string;
+		featured_web?: boolean;
+	} = {},
 ) {
+	const {
+		includeArchived = false,
+		token,
+		property_type_id,
+		min_price,
+		max_price,
+		search,
+		operation_type_id,
+		featured_web,
+	} = options;
+
+	const filters = {
+		...(includeArchived && { includeArchived: "true" }),
+		...(property_type_id && { property_type_id }),
+		...(min_price && { min_price }),
+		...(max_price && { max_price }),
+		...(search && { search }),
+		...(operation_type_id && { operation_type_id }),
+		...(featured_web && { featured_web: "true" }),
+	};
+
 	const getCachedProperties = unstable_cache(
 		async () => {
 			try {
 				const headers: Record<string, string> = token
 					? { Authorization: `Bearer ${token}` }
 					: {};
+
 				const data = await api.get<PropertyResponse>("properties", {
 					params: filters,
 					headers,
+					skipAuth: !token,
 				});
 				return data;
 			} catch (error) {
@@ -49,12 +80,22 @@ export async function getProperties(
 	return getCachedProperties();
 }
 
-export async function getPropertyById(id: number, includeArchived = true) {
+export async function getPropertyById(
+	id: number,
+	options: { includeArchived?: boolean; token?: string } = {},
+) {
+	const { includeArchived = true, token } = options;
 	try {
+		const headers: Record<string, string> = token
+			? { Authorization: `Bearer ${token}` }
+			: {};
+
 		const data = await api.get<{ property: PropertyDetail }>(
 			`properties/${id}`,
 			{
 				params: { includeArchived },
+				headers,
+				skipAuth: !token,
 			},
 		);
 		return data;

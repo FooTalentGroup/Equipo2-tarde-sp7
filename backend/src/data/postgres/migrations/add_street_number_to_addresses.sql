@@ -23,8 +23,11 @@ BEGIN
             END IF;
             
             UPDATE addresses
-            SET street = parsed_street,
-                number = CASE WHEN parsed_number IS NULL OR parsed_number = '' THEN NULL ELSE parsed_number END
+            SET street = SUBSTRING(parsed_street FROM 1 FOR 255),
+                number = CASE 
+                    WHEN parsed_number IS NULL OR parsed_number = '' THEN NULL 
+                    ELSE SUBSTRING(parsed_number FROM 1 FOR 50) 
+                END
             WHERE id = addr_record.id;
         END IF;
     END LOOP;

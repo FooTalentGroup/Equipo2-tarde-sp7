@@ -175,19 +175,6 @@ export default function LoginForm({
 					</Button>
 				</form>
 			</Form>
-			<p className="text-center text-secondary">
-				¿No tienes cuenta?
-				<Button
-					asChild
-					className="font-semibold text-primary px-2!"
-					variant="link"
-					size="lg"
-				>
-					<Link className="font-semibold" href={paths.auth.register()}>
-						Registrate
-					</Link>
-				</Button>
-			</p>
 		</div>
 	);
 }
