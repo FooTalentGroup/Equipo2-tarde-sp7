@@ -40,6 +40,10 @@ export const contactFormSchema = z.object({
 		.min(2, "La zona de interés debe tener al menos 2 caracteres")
 		.max(200, "La zona de interés no puede exceder 200 caracteres"),
 	property_id: z.string().optional(),
+	notes: z
+		.string()
+		.max(300, "Las notas no pueden exceder 300 caracteres")
+		.optional(),
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;

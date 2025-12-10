@@ -196,7 +196,7 @@ export default function TenantForm({
 											defaultCountry="AR"
 											countries={["AR", "UY", "CL", "BR", "PY"]}
 											placeholder="Ingresá un número de teléfono"
-											className="text-base"
+											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
 											{...field}
 										/>
 									</FormControl>
@@ -312,7 +312,7 @@ export default function TenantForm({
 								<DatePickerField
 									value={field.value || ""}
 									onChange={field.onChange}
-									label="Fecha del próximo asdfsdf"
+									label="Fecha del próximo"
 								/>
 							)}
 						/>

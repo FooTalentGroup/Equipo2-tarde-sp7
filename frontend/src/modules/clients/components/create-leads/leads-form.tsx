@@ -20,6 +20,7 @@ import {
 	SelectValue,
 } from "@src/components/ui/select";
 import { Spinner } from "@src/components/ui/spinner";
+import { Textarea } from "@src/components/ui/textarea";
 import type { CreateLead } from "@src/types/clients/lead";
 import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
@@ -54,6 +55,7 @@ export default function LeadsForm({
 			consultation_type_id: 1,
 
 			interest_zone: "",
+			notes: "",
 		},
 	});
 
@@ -161,7 +163,7 @@ export default function LeadsForm({
 											defaultCountry="AR"
 											countries={["AR", "UY", "CL", "BR", "PY"]}
 											placeholder="Ingresá un número de teléfono"
-											className="text-base"
+											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
 											{...field}
 										/>
 									</FormControl>
@@ -205,7 +207,7 @@ export default function LeadsForm({
 										onValueChange={(value) => field.onChange(Number(value))}
 									>
 										<FormControl>
-											<SelectTrigger className="w-full text-base placeholder:text-grey-light border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active shadow-input-border">
+											<SelectTrigger className="w-full text-base data-placeholder:text-grey-light border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active h-12 shadow-input-border">
 												<SelectValue placeholder="Seleccione tipo de consulta" />
 											</SelectTrigger>
 										</FormControl>
@@ -231,9 +233,8 @@ export default function LeadsForm({
 									<FormControl>
 										<PropertySelect
 											value={field.value}
-											onChange={(propertyId, property) => {
+											onChange={(propertyId) => {
 												field.onChange(propertyId);
-												console.log("Propiedad seleccionada:", property);
 											}}
 											availableProperties={availableProperties}
 											placeholder="Seleccione o busque una propiedad"
@@ -241,6 +242,35 @@ export default function LeadsForm({
 										/>
 									</FormControl>
 									<FormMessageWithIcon className="text-xs" />
+								</FormItem>
+							)}
+						/>
+					</div>
+
+					{/* Notas */}
+					<div className="border-t border-t-grey-light pt-4">
+						<FormField
+							control={form.control}
+							name="notes"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Agregar nota (opcional)
+									</FormLabel>
+									<FormControl>
+										<Textarea
+											placeholder="Agregar notas adicionales..."
+											className="text-base border-input-border/70 placeholder:text-grey-light focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active py-4 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal resize-none min-h-[100px]"
+											maxLength={300}
+											{...field}
+										/>
+									</FormControl>
+									<div className="flex justify-between items-center">
+										<FormMessageWithIcon className="text-xs" />
+										<span className="text-sm text-gray-500">
+											{field.value?.length || 0}/300
+										</span>
+									</div>
 								</FormItem>
 							)}
 						/>

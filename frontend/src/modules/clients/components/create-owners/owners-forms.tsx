@@ -11,9 +11,11 @@ import {
 	FormMessageWithIcon,
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
+import { PhoneInput } from "@src/components/ui/phone-input";
 import { Spinner } from "@src/components/ui/spinner";
 import { Textarea } from "@src/components/ui/textarea";
 import type { CreateOwner } from "@src/types/clients/owner";
+import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -23,15 +25,19 @@ import {
 } from "../../schemas/owner-form.schema";
 import { createClientServerAction } from "../../services/clients-service";
 import { ClientType } from "../../services/types";
-/* import PropertySearchInput from "../PropertySearchInput"; */
-import PropertyCombobox from "../PropertySearchInput";
+import PropertySelect from "../PropertySelect";
 
 type OwnerFormProps = {
+	availableProperties: Property[];
 	onSubmit?: (data: OwnerFormData) => Promise<void> | void;
 	onCancel?: () => void;
 };
 
-export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
+export default function OwnerForm({
+	availableProperties,
+	onSubmit,
+	onCancel,
+}: OwnerFormProps) {
 	/* const availableProperties = getPropertiesWithoutOwner(); */
 
 	const form = useForm<OwnerFormData>({
@@ -190,10 +196,11 @@ export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
 										Teléfono <span className="text-danger-normal">*</span>
 									</FormLabel>
 									<FormControl>
-										<Input
-											type="tel"
-											placeholder="+54 11 0000-0000"
-											className="text-base placeholder:text-grey-light border-input-border/70 focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-12 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+										<PhoneInput
+											defaultCountry="AR"
+											countries={["AR", "UY", "CL", "BR", "PY"]}
+											placeholder="Ingresá un número de teléfono"
+											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
 											{...field}
 										/>
 									</FormControl>
@@ -260,14 +267,14 @@ export default function OwnerForm({ onSubmit, onCancel }: OwnerFormProps) {
 										Propiedad de interés
 									</FormLabel>
 									<FormControl>
-										<PropertyCombobox
+										<PropertySelect
 											value={field.value}
-											onSelect={(propertyId, property) => {
+											onChange={(propertyId, property) => {
 												field.onChange(propertyId);
-												// Opcional: guardar también la dirección en interest_zone
-												// form.setValue('interest_zone', property.main_address?.full_address || '');
 												console.log("Propiedad seleccionada:", property);
 											}}
+											availableProperties={availableProperties}
+											operationTypes={[1]}
 											placeholder="Seleccione o busque una propiedad"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										/>
