@@ -37,6 +37,7 @@ export default async function PropertiesList() {
 						value="sales"
 						size="lg"
 						className="font-medium"
+						suppressHydrationWarning
 					>
 						Ventas
 					</TabsTrigger>
@@ -45,11 +46,12 @@ export default async function PropertiesList() {
 						value="rent"
 						size="lg"
 						className="font-medium"
+						suppressHydrationWarning
 					>
 						Alquiler
 					</TabsTrigger>
 				</TabsList>
-				<TabsContent value="sales">
+				<TabsContent value="sales" suppressHydrationWarning>
 					{salesProperties.length > 0 ? (
 						<section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 							{salesProperties.map((property) => (
@@ -69,7 +71,7 @@ export default async function PropertiesList() {
 						</div>
 					)}
 				</TabsContent>
-				<TabsContent value="rent">
+				<TabsContent value="rent" suppressHydrationWarning>
 					{rentProperties.length > 0 ? (
 						<section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 							{rentProperties.map((property) => (

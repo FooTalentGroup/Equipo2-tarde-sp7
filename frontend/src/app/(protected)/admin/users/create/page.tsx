@@ -43,7 +43,7 @@ export default function CreateUserPage() {
 							<p>Volver a la lista de usuarios</p>
 						</div>
 					</Link>
-					<h1 className="text-secondary text-3xl font-bold">Crear agente</h1>
+					<h1 className="text-secondary text-3xl font-bold">Nuevo agente</h1>
 				</div>
 
 				{/* Formulario */}
