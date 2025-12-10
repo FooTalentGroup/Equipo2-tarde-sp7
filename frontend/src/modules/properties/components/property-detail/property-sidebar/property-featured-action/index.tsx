@@ -60,10 +60,10 @@ export default function PropertyFeaturedAction({
 				render={({ field }) => (
 					<FormItem
 						className={cn(
-							"border-tertiary text-tertiary relative flex w-full items-center rounded-md border shadow-xs h-12 space-y-0",
+							"border-tertiary text-tertiary justify-center relative flex w-full items-center rounded-md border shadow-xs h-12 space-y-0",
 						)}
 					>
-						<FormLabel className="flex items-center text-base h-12 justify-between w-full gap-2 px-3 py-3 cursor-pointer font-normal m-0">
+						<FormLabel className="flex items-center text-base h-12 justify-center w-fit mx-auto gap-4 px-3 py-3 cursor-pointer font-normal m-0">
 							<span>Publicar</span>
 							<div className="ml-auto flex items-center gap-2">
 								<FormControl>

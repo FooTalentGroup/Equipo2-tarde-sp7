@@ -111,5 +111,12 @@ export class PropertyPriceModel {
         const result = await client.query(query, [id]);
         return (result.rowCount ?? 0) > 0;
     }
+
+    static async deleteByPropertyId(propertyId: number): Promise<number> {
+        const client = PostgresDatabase.getClient();
+        const query = `DELETE FROM ${this.TABLE_NAME} WHERE property_id = $1`;
+        const result = await client.query(query, [propertyId]);
+        return result.rowCount ?? 0;
+    }
 }
 
