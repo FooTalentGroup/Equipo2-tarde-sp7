@@ -38,17 +38,17 @@ export default function PropertyFeaturedAction({
 			if (result.success) {
 				toast.success(
 					data.isFeatured
-						? "Propiedad destacada en web"
-						: "Propiedad quitada de destacados en web",
+						? "Propiedad publicada en web"
+						: "Propiedad removida de la web",
 				);
 			} else {
 				form.setValue("isFeatured", !data.isFeatured);
-				toast.error("Error al actualizar el estado destacado");
+				toast.error("Error al actualizar el estado publicación");
 			}
 		} catch (error) {
 			console.error(error);
 			form.setValue("isFeatured", !data.isFeatured);
-			toast.error("Error al actualizar el estado destacado");
+			toast.error("Error al actualizar el estado publicación");
 		}
 	};
 
@@ -64,9 +64,7 @@ export default function PropertyFeaturedAction({
 						)}
 					>
 						<FormLabel className="flex items-center text-base h-12 justify-between w-full gap-2 px-3 py-3 cursor-pointer font-normal m-0">
-							<span>
-								{field.value ? "Destacada en web" : "Destacar en web"}
-							</span>
+							<span>Publicar</span>
 							<div className="ml-auto flex items-center gap-2">
 								<FormControl>
 									{form.formState.isSubmitting ? (

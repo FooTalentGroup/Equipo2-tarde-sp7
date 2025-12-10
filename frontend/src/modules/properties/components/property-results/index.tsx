@@ -13,7 +13,7 @@ export default async function PropertyResults({
 }: PropertyResultsProps) {
 	const cookieStore = await cookies();
 	const token = cookieStore.get("auth_token")?.value;
-	const propertyData = await getProperties(filters, token);
+	const { properties } = await getProperties({ ...filters, token });
 
-	return <PropertyList properties={propertyData.properties} />;
+	return <PropertyList properties={properties} />;
 }

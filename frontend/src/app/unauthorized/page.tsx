@@ -51,7 +51,7 @@ export default async function UnauthorizedPage() {
 						</Link>
 					</Button>
 					<Button asChild variant="outline" className="w-full">
-						<Link href={paths.public.home()}>Ir al Inicio</Link>
+						<Link href={paths.public.landing()}>Ir al Inicio</Link>
 					</Button>
 				</CardFooter>
 			</Card>

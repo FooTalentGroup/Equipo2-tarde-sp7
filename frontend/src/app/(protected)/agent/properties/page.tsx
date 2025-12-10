@@ -27,7 +27,15 @@ export default async function PropertiesPage({ searchParams }: Props) {
 		min_price: resolvedSearchParams.min_price as string,
 		max_price: resolvedSearchParams.max_price as string,
 		search: resolvedSearchParams.search as string,
-		includeArchived: resolvedSearchParams.includeArchived === "true",
+		includeArchived: resolvedSearchParams.includeArchived
+			? resolvedSearchParams.includeArchived === "true"
+			: undefined,
+		operation_type_id: resolvedSearchParams.operation_type_id as string,
+		featured_web: resolvedSearchParams.featured_web
+			? resolvedSearchParams.featured_web === "true"
+			: undefined,
+		limit: Number(resolvedSearchParams.limit) || 20,
+		offset: Number(resolvedSearchParams.offset) || 0,
 	};
 
 	return (

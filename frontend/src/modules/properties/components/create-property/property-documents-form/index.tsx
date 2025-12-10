@@ -125,7 +125,7 @@ export default function PropertyDocumentsForm({ form }: Props) {
 					<FormItem className="flex flex-row items-center justify-between">
 						<div className="space-y-1">
 							<FormLabel className="text-xl font-semibold text-primary">
-								Destacar en la web
+								Publicar en la web
 							</FormLabel>
 							<FormDescription className="text-base">
 								La propiedad aparecerá en la landing page
