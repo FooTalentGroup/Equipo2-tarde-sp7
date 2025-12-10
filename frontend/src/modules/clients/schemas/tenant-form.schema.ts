@@ -1,3 +1,4 @@
+import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
 export const tenantFormSchema = z
@@ -5,7 +6,12 @@ export const tenantFormSchema = z
 		first_name: z.string().min(1, "El nombre es requerido"),
 		last_name: z.string().min(1, "El apellido es requerido"),
 		dni: z.string().min(7, "El DNI debe tener al menos 7 caracteres"),
-		phone: z.string().min(10, "El teléfono debe tener al menos 10 caracteres"),
+		phone: z
+			.string()
+			.min(1, "El teléfono es requerido")
+			.refine(isValidPhoneNumber, {
+				message: "Número de teléfono inválido",
+			}),
 		email: z.string().email("Email inválido"),
 		property_id: z.string().optional(),
 		contract_start_date: z.string().min(1, "La fecha de inicio es requerida"),

@@ -11,6 +11,7 @@ import {
 	FormMessageWithIcon,
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
+import { PhoneInput } from "@src/components/ui/phone-input";
 import { Spinner } from "@src/components/ui/spinner";
 import { Textarea } from "@src/components/ui/textarea";
 import type { CreateTenant } from "@src/types/clients/tenant";
@@ -191,10 +192,11 @@ export default function TenantForm({
 										Teléfono <span className="text-danger-normal">*</span>
 									</FormLabel>
 									<FormControl>
-										<Input
-											type="tel"
-											placeholder="+54 11 0000-0000"
-											className="text-base placeholder:text-grey-light border-input-border/70 focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-12 py-4 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+										<PhoneInput
+											defaultCountry="AR"
+											countries={["AR", "UY", "CL", "BR", "PY"]}
+											placeholder="Ingresá un número de teléfono"
+											className="text-base"
 											{...field}
 										/>
 									</FormControl>
