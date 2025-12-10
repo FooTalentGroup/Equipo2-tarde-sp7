@@ -14,7 +14,7 @@ import {
 	PopoverTrigger,
 } from "@src/components/ui/popover";
 import { cn } from "@src/lib/utils";
-import { format } from "date-fns";
+import { format, formatISO, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 
@@ -49,7 +49,7 @@ export default function DatePickerField({
 							)}
 						>
 							{value ? (
-								format(new Date(value), "dd/MM/yyyy", { locale: es })
+								format(parseISO(value), "dd/MM/yyyy", { locale: es })
 							) : (
 								<span>{placeholder}</span>
 							)}
@@ -60,9 +60,9 @@ export default function DatePickerField({
 				<PopoverContent className="w-full p-0 flex justify-center" align="end">
 					<Calendar
 						mode="single"
-						selected={value ? new Date(value) : undefined}
+						selected={value ? parseISO(value) : undefined}
 						onSelect={(date) =>
-							onChange(date ? format(date, "yyyy-MM-dd") : "")
+							onChange(date ? formatISO(date, { representation: "date" }) : "")
 						}
 						locale={es}
 						initialFocus
