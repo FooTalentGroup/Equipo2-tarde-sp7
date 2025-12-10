@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { ConsultationDetailSheet } from "@src/modules/consultations/components/consultation-detail/ConsultationDetailSheet";
 import { ConsultationCard } from "@src/modules/consultations/ui/ConsultationCard";
@@ -9,7 +9,6 @@ import { toast } from "sonner";
 
 import {
 	convertConsultationToLead,
-	getConsultationsForPolling,
 	markConsultationAsRead,
 	markConsultationAsUnread,
 } from "../service/consultation-service";
@@ -27,7 +26,7 @@ export default function ListConsultations({ consultationsData }: Props) {
 	const [dialogOpen, setDialogOpen] = useState(false);
 
 	// Polling ligero para detectar nuevas consultas sin recargar la página
-	useEffect(() => {
+	/* 	useEffect(() => {
 		let isActive = true;
 
 		const fetchConsultations = async () => {
@@ -63,7 +62,7 @@ export default function ListConsultations({ consultationsData }: Props) {
 			isActive = false;
 			clearInterval(intervalId);
 		};
-	}, []);
+	}, []); */
 
 	const handleCardClick = (consultation: Consultation) => {
 		setSelectedConsultation(consultation);
