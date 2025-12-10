@@ -698,14 +698,19 @@ export class PropertyController {
 				});
 			}
 
-			// Update property (all in transaction)
-			const result = await this.propertyServices.updatePropertyGrouped(
-				Number(id),
-				updatePropertyGroupedDto,
-				images.length > 0 ? images : undefined,
-				documents.length > 0 ? documents : undefined,
-				documentNames.length > 0 ? documentNames : undefined,
-			);
+			// Get user from token for price history tracking
+		const user = (req as any).user;
+		const userId = user?.id ? parseInt(user.id, 10) : undefined;
+
+		// Update property (all in transaction)
+		const result = await this.propertyServices.updatePropertyGrouped(
+			Number(id),
+			updatePropertyGroupedDto,
+			images.length > 0 ? images : undefined,
+			documents.length > 0 ? documents : undefined,
+			documentNames.length > 0 ? documentNames : undefined,
+			userId,
+		);
 
 			return res.status(200).json({
 				message: "Property updated successfully",
