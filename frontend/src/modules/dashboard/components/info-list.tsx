@@ -28,7 +28,7 @@ export const InfoList = async () => {
 				<InfoAgentsCard
 					icon={MessageSquare}
 					title={data?.unanswered_consultations || 0}
-					description="Consultas sin responder"
+					description="Consultas no leídas"
 					className="[&>svg]:text-blue-normal [&>svg]:bg-success"
 				/>
 			</li>

@@ -28,12 +28,7 @@ export default async function DashboardPage({ searchParams }: Props) {
 			: undefined,
 		start_date: resolvedSearchParams.start_date as string,
 		end_date: resolvedSearchParams.end_date as string,
-		is_read:
-			resolvedSearchParams.is_read === "true"
-				? true
-				: resolvedSearchParams.is_read === "false"
-					? false
-					: undefined,
+		is_read: false,
 		limit: 5,
 		offset: 0,
 	};
@@ -47,7 +42,7 @@ export default async function DashboardPage({ searchParams }: Props) {
 						weight="medium"
 						className="text-secondary-dark-active mb-2"
 					>
-						Consultas
+						Nuevas Consultas
 					</Heading>
 					<Link href={paths.agent.inquiries.index()} className="text-secondary">
 						Ver todas
