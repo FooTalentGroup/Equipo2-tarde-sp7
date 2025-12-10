@@ -121,7 +121,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 
 				<FormField
 					control={form.control}
-					name="address.floor"
+					name="address.number"
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Piso/Unidad</FormLabel>

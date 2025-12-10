@@ -56,6 +56,7 @@ export interface PropertyDetail {
 export interface Address {
 	id: number;
 	full_address: string;
+	number: string | null;
 	neighborhood: string | null;
 	postal_code: string;
 	latitude: number | null;
