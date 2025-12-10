@@ -7,7 +7,7 @@ export const InfoList = async () => {
 	const data = await getDashboardInfo();
 
 	return (
-		<ul className="flex gap-6">
+		<ul className="flex gap-6 justify-center">
 			<li>
 				<InfoAgentsCard
 					icon={House}
