@@ -35,6 +35,14 @@ export class TenantServices {
             if (createTenantDto.property_id) {
                 await ClientCreationHelper.validatePropertyExists(createTenantDto.property_id);
                 propertyId = createTenantDto.property_id;
+
+                // Verificar si la propiedad ya tiene un alquiler activo
+                const activeRental = await RentalModel.findActiveByPropertyId(propertyId);
+                if (activeRental) {
+                    throw CustomError.badRequest(
+                        'La propiedad ya está alquilada a otro inquilino. No se puede crear un nuevo alquiler.'
+                    );
+                }
             }
 
             // 3. Resolver currency_type_id si se proporciona nombre o símbolo
@@ -126,6 +134,11 @@ export class TenantServices {
                         created_by_user_id: createdByUserId,
                         remind_increase: createTenantDto.remind_increase ?? false,
                         remind_contract_end: createTenantDto.remind_contract_end ?? false,
+                    });
+
+                    // Actualizar estado de la propiedad a "Alquilada" (ID: 3)
+                    await PropertyModel.update(propertyId, {
+                        property_status_id: 3
                     });
                 }
             }
