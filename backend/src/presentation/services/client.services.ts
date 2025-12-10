@@ -42,19 +42,25 @@ export class ClientServices {
             );
         }
 
-        // Enriquecer con nombres de catálogos y usar entities
+        // Enriquecer con nombres de catálogos, propiedades y usar entities
         const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
         const enrichedClients = await Promise.all(
             clients.map(async (client) => {
                 // Create entity from database object (no format validation needed for reading)
                 const clientEntity = ClientEntity.fromDatabaseObject(client);
                 const category = await ContactCategoryModel.findById(clientEntity.contact_category_id);
+                
+                // Obtener propiedades asociadas usando el helper
+                const categoryName = category?.name || null;
+                const properties = await this.enrichClientWithProperties(clientEntity.id, categoryName);
+                
                 return {
                     ...clientEntity.toPublicObject(),
                     contact_category: category ? {
                         id: category.id,
                         name: category.name
-                    } : null
+                    } : null,
+                    ...properties
                 };
             })
         );
@@ -103,6 +109,39 @@ export class ClientServices {
             }
         }
 
+        // Obtener propiedades relacionadas usando el helper
+        const categoryName = category?.name;
+        const properties = await this.enrichClientWithProperties(clientEntity.id, categoryName || null);
+
+        return {
+            client: {
+                ...clientEntity.toPublicObject(),
+                contact_category: category ? {
+                    id: category.id,
+                    name: category.name
+                } : null,
+                property_search_type: propertySearchType ? {
+                    id: propertySearchType.id,
+                    name: propertySearchType.name
+                } : null,
+                city: city
+            },
+            ...properties
+        };
+    }
+
+    /**
+     * Helper privado: Enriquece un cliente con sus propiedades asociadas
+     * según su categoría (Lead, Propietario, Inquilino)
+     */
+    private async enrichClientWithProperties(
+        clientId: number,
+        categoryName: string | null
+    ): Promise<{
+        properties_of_interest: any[];
+        owned_properties: any[];
+        rented_property: any | null;
+    }> {
         // Obtener propiedades relacionadas según el tipo de cliente
         const { PropertyModel } = await import('../../data/postgres/models/properties/property.model');
         const { PropertyTypeModel } = await import('../../data/postgres/models/properties/property-type.model');
@@ -115,11 +154,9 @@ export class ClientServices {
         let ownedProperties: any[] = [];
         let rentedProperty: any = null;
 
-        const categoryName = category?.name;
-
         // Para Leads: obtener propiedades de interés desde client_property_interests
         if (categoryName === 'Lead') {
-            const interests = await ClientPropertyInterestModel.findByClientId(id);
+            const interests = await ClientPropertyInterestModel.findByClientId(clientId);
             
             if (interests.length > 0) {
                 propertiesOfInterest = await Promise.all(
@@ -148,7 +185,7 @@ export class ClientServices {
 
         // Para Owners: obtener propiedades propias desde properties donde owner_id = client.id
         if (categoryName === 'Propietario') {
-            const properties = await PropertyModel.findAll({ owner_id: id });
+            const properties = await PropertyModel.findAll({ owner_id: clientId });
             
             ownedProperties = await Promise.all(
                 properties.map(async (property: any) => {
@@ -170,7 +207,7 @@ export class ClientServices {
 
         // Para Inquilinos: obtener propiedad alquilada activa desde client_rentals
         if (categoryName === 'Inquilino') {
-            const clientRentals = await ClientRentalModel.findByClientId(id);
+            const clientRentals = await ClientRentalModel.findByClientId(clientId);
             
             if (clientRentals.length > 0) {
                 // Ordenar por fecha de inicio (más reciente primero)
@@ -228,7 +265,7 @@ export class ClientServices {
             }
 
             // También obtener propiedades de interés para Inquilinos (pueden tener múltiples)
-            const interests = await ClientPropertyInterestModel.findByClientId(id);
+            const interests = await ClientPropertyInterestModel.findByClientId(clientId);
             
             if (interests.length > 0) {
                 propertiesOfInterest = await Promise.all(
@@ -256,18 +293,6 @@ export class ClientServices {
         }
 
         return {
-            client: {
-                ...clientEntity.toPublicObject(),
-                contact_category: category ? {
-                    id: category.id,
-                    name: category.name
-                } : null,
-                property_search_type: propertySearchType ? {
-                    id: propertySearchType.id,
-                    name: propertySearchType.name
-                } : null,
-                city: city
-            },
             properties_of_interest: propertiesOfInterest, // Para Leads e Inquilinos
             owned_properties: ownedProperties, // Para Owners
             rented_property: rentedProperty // Para Inquilinos (solo la activa)
