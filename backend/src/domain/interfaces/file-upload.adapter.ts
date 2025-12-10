@@ -17,6 +17,7 @@ export interface FileUploadAdapter {
             folder?: string;
             publicId?: string;
             resourceType?: 'image' | 'video' | 'raw' | 'auto';
+            mimeType?: string;
         }
     ): Promise<string>;
 

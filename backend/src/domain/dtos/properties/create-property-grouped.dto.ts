@@ -103,6 +103,8 @@ export class CreatePropertyGroupedDto {
                 return [basicError, undefined];
             }
             basic = basicParsed || {};
+            console.log('[CreatePropertyGroupedDto] basic after parsing:', JSON.stringify(basic));
+            console.log('[CreatePropertyGroupedDto] basic.owner_id:', basic.owner_id, 'type:', typeof basic.owner_id);
 
             // Validate required fields in basic
             if (!basic.title || !basic.title.trim()) {

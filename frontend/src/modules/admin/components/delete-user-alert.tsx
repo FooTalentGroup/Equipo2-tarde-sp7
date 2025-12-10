@@ -13,22 +13,22 @@ import {
 	AlertDialogFooter,
 	AlertDialogHeader,
 	AlertDialogTitle,
-	AlertDialogTrigger,
 } from "@src/components/ui/alert-dialog";
-import { Button } from "@src/components/ui/button";
-import { Trash } from "lucide-react";
 import { toast } from "sonner";
 
 import type { DeleteUserProps } from "../types";
 
-export const DeleteUserAlert = ({ id }: DeleteUserProps) => {
+export const DeleteUserAlert = ({
+	id,
+	open,
+	onOpenChange,
+}: DeleteUserProps) => {
 	const router = useRouter();
 	const [isDeleting, setIsDeleting] = useState(false);
 
 	const handleDelete = async () => {
 		try {
 			setIsDeleting(true);
-			// Use Next.js API route instead of direct backend call
 			const response = await fetch(`/api/users/${id}`, {
 				method: "DELETE",
 			});
@@ -38,6 +38,7 @@ export const DeleteUserAlert = ({ id }: DeleteUserProps) => {
 			}
 
 			toast.success("Usuario eliminado exitosamente");
+			onOpenChange?.(false);
 			router.refresh();
 		} catch (error) {
 			console.error("Error deleting user:", error);
@@ -48,15 +49,7 @@ export const DeleteUserAlert = ({ id }: DeleteUserProps) => {
 	};
 
 	return (
-		<AlertDialog>
-			<AlertDialogTrigger asChild>
-				<Button
-					variant="outline"
-					className="hover:text-white hover:bg-destructive-foreground border-destructive-foreground border text-destructive-foreground cursor-pointer transition-colors duration-300"
-				>
-					<Trash />
-				</Button>
-			</AlertDialogTrigger>
+		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle className="text-secondary text-xl">

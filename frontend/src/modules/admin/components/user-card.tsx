@@ -4,7 +4,7 @@ import { Heading } from "@src/components/ui/heading";
 import { Text } from "@src/components/ui/text";
 
 import type { UserProp } from "../types";
-import { DeleteUserAlert, EditUserModal } from "./";
+import { Dropdown } from "./dropdown";
 
 export const UserCard = ({ user }: UserProp) => {
 	const handleUserUpdated = () => {
@@ -40,10 +40,9 @@ export const UserCard = ({ user }: UserProp) => {
 					<Text variant="small">· {user.email}</Text>
 				</div>
 			</div>
-			{/* Delete button */}
-			<div className="flex gap-2">
-				<EditUserModal user={user} onUserUpdated={handleUserUpdated} />
-				<DeleteUserAlert id={user.id} />
+			{/* Options */}
+			<div className="flex items-center">
+				<Dropdown id={user.id} user={user} onUserUpdated={handleUserUpdated} />
 			</div>
 		</div>
 	);

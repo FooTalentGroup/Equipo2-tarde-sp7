@@ -1,4 +1,3 @@
-// modules/admin/components/EditUserModal.tsx
 "use client";
 
 import { useState } from "react";
@@ -12,7 +11,6 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@src/components/ui/dialog";
 import {
 	Form,
@@ -24,27 +22,26 @@ import {
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
-import { Eye, EyeOff, Pencil } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { useEditUserForm } from "../hooks/useEditUserForm";
 import type { EditUserFormData } from "../schemas/edit-user";
-import type { CardUserProps } from "../types";
+import type { EditUserModalProps } from "../types";
 
-type EditUserModalProps = {
-	user: CardUserProps;
-	onUserUpdated?: () => void;
-};
-
-export const EditUserModal = ({ user, onUserUpdated }: EditUserModalProps) => {
+export const EditUserModal = ({
+	user,
+	onUserUpdated,
+	open,
+	onOpenChange,
+}: EditUserModalProps) => {
 	const [showPassword, setShowPassword] = useState(false);
-	const [open, setOpen] = useState(false);
 	const { form, handleSubmit, isSubmitting, error, isAdmin } =
 		useEditUserForm(user);
 
 	const onSubmit = async (data: EditUserFormData) => {
 		const result = await handleSubmit(data);
 		if (result.success) {
-			setOpen(false);
+			onOpenChange?.(false);
 			if (onUserUpdated) {
 				onUserUpdated();
 			}
@@ -52,12 +49,7 @@ export const EditUserModal = ({ user, onUserUpdated }: EditUserModalProps) => {
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Button variant="outline" size="icon">
-					<Pencil className="h-4 w-4" />
-				</Button>
-			</DialogTrigger>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-2xl bg-white">
 				<DialogHeader>
 					<DialogTitle className="text-secondary text-3xl">
@@ -287,7 +279,7 @@ export const EditUserModal = ({ user, onUserUpdated }: EditUserModalProps) => {
 							<Button
 								type="button"
 								variant="outline"
-								onClick={() => setOpen(false)}
+								onClick={() => onOpenChange?.(false)}
 								disabled={isSubmitting}
 							>
 								Cancelar
