@@ -20,6 +20,7 @@ import {
 } from "@src/components/ui/select";
 import { Spinner } from "@src/components/ui/spinner";
 import type { CreateLead } from "@src/types/clients/lead";
+import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -29,15 +30,19 @@ import {
 } from "../../schemas/contact-form.schema";
 import { createClientServerAction } from "../../services/clients-service";
 import { ClientType } from "../../services/types";
-/* import PropertySearchInput from "../PropertySearchInput"; */
-import PropertyCombobox from "../PropertySearchInput";
+import PropertySelect from "../PropertySelect";
 
 type ContactFormProps = {
+	availableProperties: Property[];
 	onSubmit?: (data: ContactFormData) => Promise<void> | void;
 	onCancel?: () => void;
 };
 
-export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
+export default function LeadsForm({
+	availableProperties,
+	onSubmit,
+	onCancel,
+}: ContactFormProps) {
 	const form = useForm<ContactFormData>({
 		resolver: zodResolver(contactFormSchema),
 		defaultValues: {
@@ -223,14 +228,13 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 										Propiedad de interés
 									</FormLabel>
 									<FormControl>
-										<PropertyCombobox
+										<PropertySelect
 											value={field.value}
-											onSelect={(propertyId, property) => {
+											onChange={(propertyId, property) => {
 												field.onChange(propertyId);
-												// Opcional: guardar también la dirección en interest_zone
-												// form.setValue('interest_zone', property.main_address?.full_address || '');
 												console.log("Propiedad seleccionada:", property);
 											}}
+											availableProperties={availableProperties}
 											placeholder="Seleccione o busque una propiedad"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										/>
