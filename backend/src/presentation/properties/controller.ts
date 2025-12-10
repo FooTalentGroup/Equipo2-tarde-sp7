@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import {
 	CreatePropertyDto,
 	CreatePropertyGroupedDto,
+	UpdatePropertyGroupedDto,
 	CustomError,
 } from "../../domain";
 import type { PropertyServices } from "../services/property.services";
@@ -233,6 +234,185 @@ export class PropertyController {
 	};
 
 	/**
+	 * Archives a property using grouped structure (allows additional updates)
+	 */
+	archivePropertyGrouped = async (req: Request, res: Response) => {
+		try {
+			const { id } = req.params;
+
+			if (!id || isNaN(Number(id))) {
+				return res.status(400).json({
+					message: "Invalid property ID",
+				});
+			}
+
+			// Get images
+			const images: Express.Multer.File[] = [];
+			if (req.files) {
+				if (typeof req.files === "object" && !Array.isArray(req.files)) {
+					const filesObj = req.files as {
+						[fieldname: string]: Express.Multer.File[];
+					};
+					if (filesObj.images) {
+						const files = Array.isArray(filesObj.images)
+							? filesObj.images
+							: [filesObj.images];
+						images.push(...files);
+					}
+				} else if (Array.isArray(req.files)) {
+					images.push(...req.files);
+				}
+			}
+
+			// Get PDF documents
+			const documents: Express.Multer.File[] = [];
+			let documentNames: string[] = [];
+
+			if (req.files && typeof req.files === "object") {
+				const filesObj = req.files as {
+					[fieldname: string]: Express.Multer.File[];
+				};
+				if (filesObj.documents) {
+					const files = Array.isArray(filesObj.documents)
+						? filesObj.documents
+						: [filesObj.documents];
+					documents.push(...files);
+				}
+			}
+
+			// Get document names if provided
+			if (req.body.documentNames) {
+				try {
+					if (typeof req.body.documentNames === "string") {
+						documentNames = JSON.parse(req.body.documentNames);
+					} else if (Array.isArray(req.body.documentNames)) {
+						documentNames = req.body.documentNames;
+					}
+				} catch (error) {
+					console.warn("Could not parse documentNames, using defaults");
+				}
+			}
+
+			// Prepare body data for DTO creation, ensuring visibility_status is "Archivada"
+			const bodyWithArchive: any = { ...req.body };
+			
+			// Parse and merge basic data if it exists, or create new
+			let basicData: any = { visibility_status: "Archivada" };
+			if (bodyWithArchive.basic) {
+				try {
+					const parsedBasic = typeof bodyWithArchive.basic === 'string' 
+						? JSON.parse(bodyWithArchive.basic) 
+						: bodyWithArchive.basic;
+					basicData = { ...parsedBasic, visibility_status: "Archivada" };
+				} catch (error) {
+					// If parsing fails, use default with archive status
+					basicData = { visibility_status: "Archivada" };
+				}
+			}
+			bodyWithArchive.basic = JSON.stringify(basicData);
+
+			// Validate and create grouped DTO
+			const [error, initialDto] = UpdatePropertyGroupedDto.create(
+				bodyWithArchive,
+			);
+			
+			let updatePropertyGroupedDto = initialDto;
+
+			if (error || !initialDto) {
+				// If validation fails because no fields provided, create minimal DTO for archiving
+				if (!req.body.basic && !req.body.geography && !req.body.address &&
+					!req.body.values && !req.body.characteristics && !req.body.surface &&
+					!req.body.services && !req.body.internal) {
+					// No fields provided, create minimal DTO just for archiving
+					const [archiveError, archiveDto] = UpdatePropertyGroupedDto.create({
+						basic: JSON.stringify({ visibility_status: "Archivada" })
+					});
+					
+					if (archiveError || !archiveDto) {
+						return res.status(400).json({
+							message: "Failed to create archive DTO",
+						});
+					}
+					
+					// Use the archive DTO
+					const result = await this.propertyServices.updatePropertyGrouped(
+						Number(id),
+						archiveDto,
+						images.length > 0 ? images : undefined,
+						documents.length > 0 ? documents : undefined,
+						documentNames.length > 0 ? documentNames : undefined,
+					);
+
+					return res.status(200).json({
+						message: "Property archived successfully",
+						data: result,
+					});
+				}
+				
+				return res.status(400).json({
+					message: error || "Invalid property update data",
+				});
+			}
+
+			// At this point, updatePropertyGroupedDto is guaranteed to be defined
+			if (!updatePropertyGroupedDto) {
+				return res.status(400).json({
+					message: "Failed to create update DTO",
+				});
+			}
+
+			// Ensure visibility_status is always "Archivada" (create new basic object if needed)
+			if (!updatePropertyGroupedDto.basic || Object.keys(updatePropertyGroupedDto.basic).length === 0) {
+				// Create a new DTO with basic field set
+				const newDto = new UpdatePropertyGroupedDto(
+					{ visibility_status: "Archivada" },
+					updatePropertyGroupedDto.geography,
+					updatePropertyGroupedDto.address,
+					updatePropertyGroupedDto.values,
+					updatePropertyGroupedDto.characteristics,
+					updatePropertyGroupedDto.surface,
+					updatePropertyGroupedDto.services,
+					updatePropertyGroupedDto.internal,
+				);
+				updatePropertyGroupedDto = newDto;
+			} else {
+				// Create new DTO with merged basic data that includes visibility_status
+				const mergedBasic = { 
+					...updatePropertyGroupedDto.basic, 
+					visibility_status: "Archivada" 
+				};
+				const newDto = new UpdatePropertyGroupedDto(
+					mergedBasic,
+					updatePropertyGroupedDto.geography,
+					updatePropertyGroupedDto.address,
+					updatePropertyGroupedDto.values,
+					updatePropertyGroupedDto.characteristics,
+					updatePropertyGroupedDto.surface,
+					updatePropertyGroupedDto.services,
+					updatePropertyGroupedDto.internal,
+				);
+				updatePropertyGroupedDto = newDto;
+			}
+
+			// Archive and update property (all in transaction)
+			const result = await this.propertyServices.updatePropertyGrouped(
+				Number(id),
+				updatePropertyGroupedDto,
+				images.length > 0 ? images : undefined,
+				documents.length > 0 ? documents : undefined,
+				documentNames.length > 0 ? documentNames : undefined,
+			);
+
+			return res.status(200).json({
+				message: "Property archived successfully",
+				data: result,
+			});
+		} catch (error) {
+			this.handleError(error, res);
+		}
+	};
+
+	/**
 	 * Restaura una propiedad archivada
 	 */
 	unarchiveProperty = async (req: Request, res: Response) => {
@@ -406,6 +586,18 @@ export class PropertyController {
 				}
 			}
 
+			// Debug: Log the raw body to see what's being received
+			console.log('[PropertyController] req.body.basic (raw):', req.body.basic);
+			if (req.body.basic && typeof req.body.basic === 'string') {
+				try {
+					const parsed = JSON.parse(req.body.basic);
+					console.log('[PropertyController] req.body.basic (parsed):', parsed);
+					console.log('[PropertyController] parsed.owner_id:', parsed.owner_id, 'type:', typeof parsed.owner_id);
+				} catch (e) {
+					console.error('[PropertyController] Error parsing basic JSON:', e);
+				}
+			}
+
 			// Validate and create grouped DTO
 			const [error, createPropertyGroupedDto] = CreatePropertyGroupedDto.create(
 				req.body,
@@ -428,6 +620,95 @@ export class PropertyController {
 
 			return res.status(201).json({
 				message: "Property created successfully",
+				data: result,
+			});
+		} catch (error) {
+			this.handleError(error, res);
+		}
+	};
+
+	/**
+	 * Updates a property using grouped structure
+	 */
+	updatePropertyGrouped = async (req: Request, res: Response) => {
+		try {
+			const { id } = req.params;
+
+			if (!id || isNaN(Number(id))) {
+				return res.status(400).json({
+					message: "Invalid property ID",
+				});
+			}
+
+			// Get images
+			const images: Express.Multer.File[] = [];
+			if (req.files) {
+				if (typeof req.files === "object" && !Array.isArray(req.files)) {
+					const filesObj = req.files as {
+						[fieldname: string]: Express.Multer.File[];
+					};
+					if (filesObj.images) {
+						const files = Array.isArray(filesObj.images)
+							? filesObj.images
+							: [filesObj.images];
+						images.push(...files);
+					}
+				} else if (Array.isArray(req.files)) {
+					images.push(...req.files);
+				}
+			}
+
+			// Get PDF documents
+			const documents: Express.Multer.File[] = [];
+			let documentNames: string[] = [];
+
+			if (req.files && typeof req.files === "object") {
+				const filesObj = req.files as {
+					[fieldname: string]: Express.Multer.File[];
+				};
+				if (filesObj.documents) {
+					const files = Array.isArray(filesObj.documents)
+						? filesObj.documents
+						: [filesObj.documents];
+					documents.push(...files);
+				}
+			}
+
+			// Get document names if provided
+			if (req.body.documentNames) {
+				try {
+					if (typeof req.body.documentNames === "string") {
+						documentNames = JSON.parse(req.body.documentNames);
+					} else if (Array.isArray(req.body.documentNames)) {
+						documentNames = req.body.documentNames;
+					}
+				} catch (error) {
+					console.warn("Could not parse documentNames, using defaults");
+				}
+			}
+
+			// Validate and create grouped DTO
+			const [error, updatePropertyGroupedDto] = UpdatePropertyGroupedDto.create(
+				req.body,
+			);
+
+			if (error || !updatePropertyGroupedDto) {
+				return res.status(400).json({
+					message: error || "Invalid property update data",
+				});
+			}
+
+			// Update property (all in transaction)
+			const result = await this.propertyServices.updatePropertyGrouped(
+				Number(id),
+				updatePropertyGroupedDto,
+				images.length > 0 ? images : undefined,
+				documents.length > 0 ? documents : undefined,
+				documentNames.length > 0 ? documentNames : undefined,
+			);
+
+			return res.status(200).json({
+				message: "Property updated successfully",
 				data: result,
 			});
 		} catch (error) {

@@ -44,9 +44,9 @@ export class CloudinaryAdapter implements FileUploadAdapter {
             folder?: string;
             publicId?: string;
             resourceType?: 'image' | 'video' | 'raw' | 'auto';
+            mimeType?: string;
         }
     ): Promise<string> {
-        // Validar configuración antes de intentar subir
         this.validateConfig();
         
         try {
@@ -58,6 +58,12 @@ export class CloudinaryAdapter implements FileUploadAdapter {
                 uploadOptions.folder = options.folder;
             }
 
+            if (options?.resourceType === 'raw' && options?.mimeType === 'application/pdf') {
+                if (!options.publicId || !options.publicId.endsWith('.pdf')) {
+                    uploadOptions.format = 'pdf';
+                }
+            }
+
             if (options?.publicId) {
                 uploadOptions.public_id = options.publicId;
             }
@@ -65,19 +71,17 @@ export class CloudinaryAdapter implements FileUploadAdapter {
             let uploadResult;
             
             if (typeof file === 'string') {
-                // Si es base64 o URL
                 uploadResult = await cloudinary.uploader.upload(file, uploadOptions);
             } else {
-                // Si es Buffer, convertir a base64 con el tipo MIME correcto
                 const base64 = file.toString('base64');
                 const resourceType = options?.resourceType || 'auto';
                 
                 let dataUri: string;
-                if (resourceType === 'raw' || resourceType === 'auto') {
-                    // Para PDFs y otros archivos raw, usar formato genérico
+                if (resourceType === 'raw' && options?.mimeType === 'application/pdf') {
+                    dataUri = `data:application/pdf;base64,${base64}`;
+                } else if (resourceType === 'raw' || resourceType === 'auto') {
                     dataUri = `data:application/octet-stream;base64,${base64}`;
                 } else {
-                    // Para imágenes, usar formato específico
                     const mimeType = resourceType === 'image' ? 'image/jpeg' : `application/${resourceType}`;
                     dataUri = `data:${mimeType};base64,${base64}`;
                 }

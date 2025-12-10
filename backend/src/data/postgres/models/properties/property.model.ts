@@ -130,10 +130,14 @@ export class PropertyModel {
         placeholders.push(`$${paramIndex++}`);
 
         // Campos opcionales - solo agregar si tienen valores
+        console.log('[PropertyModel] propertyData.owner_id:', propertyData.owner_id, 'type:', typeof propertyData.owner_id);
         if (propertyData.owner_id !== undefined && propertyData.owner_id !== null) {
+            console.log('[PropertyModel] Adding owner_id to INSERT:', propertyData.owner_id);
             fields.push('owner_id');
             values.push(propertyData.owner_id);
             placeholders.push(`$${paramIndex++}`);
+        } else {
+            console.log('[PropertyModel] owner_id is undefined or null, NOT adding to INSERT');
         }
 
         // Campos opcionales - solo agregar si tienen valores
