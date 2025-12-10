@@ -9,6 +9,7 @@ import {
 	DispositionModel,
 	ExpenseModel,
 	OrientationModel,
+	PriceHistoryModel,
 	PropertyAddressModel,
 	PropertyAgeModel,
 	PropertyDocumentModel,
@@ -1789,6 +1790,7 @@ export class PropertyServices {
 		images?: Express.Multer.File[],
 		documents?: Express.Multer.File[],
 		documentNames?: string[],
+		userId?: number,
 	) {
 		return await TransactionHelper.executeInTransaction(async () => {
 			// Verify that the property exists
@@ -2013,32 +2015,58 @@ export class PropertyServices {
 				property = updated;
 			}
 
-			// 6. Add new prices if provided (prices are historical, we add new ones)
-			const newPrices = [];
-			if (values?.prices && values.prices.length > 0) {
-				for (const priceDto of values.prices) {
-					let currencyTypeId = priceDto.currency_type_id;
-					if (!currencyTypeId && priceDto.currency_symbol) {
-						const currencyType = await CurrencyTypeModel.findBySymbol(priceDto.currency_symbol);
-						if (!currencyType || !currencyType.id) {
-							throw CustomError.badRequest(`Currency symbol "${priceDto.currency_symbol}" not found`);
-						}
-						currencyTypeId = currencyType.id;
+			// 6. Actualizar precios (reemplazar existentes + guardar en historial)
+		const newPrices = [];
+		if (values?.prices && values.prices.length > 0) {
+			for (const priceDto of values.prices) {
+				let currencyTypeId = priceDto.currency_type_id;
+				if (!currencyTypeId && priceDto.currency_symbol) {
+					const currencyType = await CurrencyTypeModel.findBySymbol(priceDto.currency_symbol);
+					if (!currencyType || !currencyType.id) {
+						throw CustomError.badRequest(`Currency symbol "${priceDto.currency_symbol}" not found`);
+					}
+					currencyTypeId = currencyType.id;
+				}
+
+				let operationTypeId = priceDto.operation_type_id;
+				if (!operationTypeId && priceDto.operation_type) {
+					const operationType = await PropertyOperationTypeModel.findByName(priceDto.operation_type);
+					if (!operationType || !operationType.id) {
+						throw CustomError.badRequest(`Operation type "${priceDto.operation_type}" not found`);
+					}
+					operationTypeId = operationType.id;
+				}
+
+				if (!currencyTypeId || !operationTypeId) {
+					throw CustomError.badRequest("Failed to resolve currency or operation type");
+				}
+
+				// Verificar si ya existe un precio para este tipo de operación
+				const existingPrice = await PropertyPriceModel.findCurrentByPropertyAndOperation(
+					id,
+					operationTypeId
+				);
+
+				if (existingPrice && existingPrice.id) {
+					// El precio existe → Guardar en historial y actualizar
+					if (userId && existingPrice.price !== priceDto.price) {
+						await PriceHistoryModel.create({
+							property_id: id,
+							previous_price: existingPrice.price,
+							new_price: priceDto.price,
+							currency_type_id: currencyTypeId,
+							operation_type_id: operationTypeId,
+							responsible_user_id: userId,
+						});
 					}
 
-					let operationTypeId = priceDto.operation_type_id;
-					if (!operationTypeId && priceDto.operation_type) {
-						const operationType = await PropertyOperationTypeModel.findByName(priceDto.operation_type);
-						if (!operationType || !operationType.id) {
-							throw CustomError.badRequest(`Operation type "${priceDto.operation_type}" not found`);
-						}
-						operationTypeId = operationType.id;
-					}
-
-					if (!currencyTypeId || !operationTypeId) {
-						throw CustomError.badRequest("Failed to resolve currency or operation type");
-					}
-
+					const updatedPrice = await PropertyPriceModel.update(existingPrice.id, {
+						price: priceDto.price,
+						currency_type_id: currencyTypeId,
+					});
+					newPrices.push(updatedPrice);
+				} else {
+					// El precio no existe → Crear nuevo
 					const price = await PropertyPriceModel.create({
 						property_id: id,
 						price: priceDto.price,
@@ -2046,8 +2074,21 @@ export class PropertyServices {
 						operation_type_id: operationTypeId,
 					});
 					newPrices.push(price);
+
+					// Opcionalmente guardar precio inicial en historial
+					if (userId) {
+						await PriceHistoryModel.create({
+							property_id: id,
+							previous_price: undefined,
+							new_price: priceDto.price,
+							currency_type_id: currencyTypeId,
+							operation_type_id: operationTypeId,
+							responsible_user_id: userId,
+						});
+					}
 				}
 			}
+		}
 
 			// 7. Add new expenses if provided
 			const newExpenses = [];
