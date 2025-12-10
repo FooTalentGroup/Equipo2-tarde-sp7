@@ -154,63 +154,65 @@ export default function ProtectedSidebar({ role }: Props) {
 							className="object-cover aspect-video w-full h-full"
 						/>
 					)}
-					<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-						<DialogTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="absolute top-0 right-0 hover:bg-transparent hover:text-tertiary hover:cursor-pointer z-50"
-							>
-								<SquarePen className="h-4 w-4" />
-							</Button>
-						</DialogTrigger>
-						<DialogContent>
-							<DialogHeader>
-								<DialogTitle>Editar Logo de la Compañía</DialogTitle>
-							</DialogHeader>
-
-							<FileUpload
-								value={selectedFile ? [selectedFile] : []}
-								onValueChange={(files) => setSelectedFile(files[0] || null)}
-								accept="image/jpeg, image/png"
-								maxFiles={1}
-								maxSize={2 * 1024 * 1024}
-							>
-								<FileUploadDropzone className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg">
-									<FileUploadTrigger asChild>
-										<Button variant="outline" type="button">
-											<Upload className="mr-2 h-4 w-4" />
-											Seleccionar Imagen
-										</Button>
-									</FileUploadTrigger>
-									<p className="text-sm text-muted-foreground mt-2">
-										JPG o PNG, máximo 2MB
-									</p>
-									{selectedFile && (
-										<p className="text-sm font-medium mt-2">
-											{selectedFile.name}
-										</p>
-									)}
-								</FileUploadDropzone>
-							</FileUpload>
-
-							<DialogFooter>
-								<DialogClose asChild>
-									<Button variant="outline" type="button">
-										Cancelar
-									</Button>
-								</DialogClose>
+					{role === ROLES.ADMIN && (
+						<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+							<DialogTrigger asChild>
 								<Button
-									onClick={handleLogoUpload}
-									disabled={!selectedFile || isUploading}
-									className="bg-tertiary"
-									type="button"
+									variant="ghost"
+									size="icon"
+									className="absolute top-0 right-0 hover:bg-transparent hover:text-tertiary hover:cursor-pointer z-50"
 								>
-									{isUploading ? "Subiendo..." : "Guardar cambios"}
+									<SquarePen className="h-4 w-4" />
 								</Button>
-							</DialogFooter>
-						</DialogContent>
-					</Dialog>
+							</DialogTrigger>
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>Editar Logo de la Compañía</DialogTitle>
+								</DialogHeader>
+
+								<FileUpload
+									value={selectedFile ? [selectedFile] : []}
+									onValueChange={(files) => setSelectedFile(files[0] || null)}
+									accept="image/jpeg, image/png"
+									maxFiles={1}
+									maxSize={2 * 1024 * 1024}
+								>
+									<FileUploadDropzone className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg">
+										<FileUploadTrigger asChild>
+											<Button variant="outline" type="button">
+												<Upload className="mr-2 h-4 w-4" />
+												Seleccionar Imagen
+											</Button>
+										</FileUploadTrigger>
+										<p className="text-sm text-muted-foreground mt-2">
+											JPG o PNG, máximo 2MB
+										</p>
+										{selectedFile && (
+											<p className="text-sm font-medium mt-2">
+												{selectedFile.name}
+											</p>
+										)}
+									</FileUploadDropzone>
+								</FileUpload>
+
+								<DialogFooter>
+									<DialogClose asChild>
+										<Button variant="outline" type="button">
+											Cancelar
+										</Button>
+									</DialogClose>
+									<Button
+										onClick={handleLogoUpload}
+										disabled={!selectedFile || isUploading}
+										className="bg-tertiary"
+										type="button"
+									>
+										{isUploading ? "Subiendo..." : "Guardar cambios"}
+									</Button>
+								</DialogFooter>
+							</DialogContent>
+						</Dialog>
+					)}
 					<AvatarFallback>{companyName.charAt(0)}</AvatarFallback>
 				</Avatar>
 			</SidebarHeader>
