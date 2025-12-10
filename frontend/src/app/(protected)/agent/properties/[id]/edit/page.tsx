@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 
 import SectionHeading from "@src/components/section-heading";
@@ -19,7 +20,10 @@ export default async function EditPropertyPage({ params }: Props) {
 
 	if (!id) return notFound();
 
-	const data = await getPropertyById(Number(id));
+	const cookieStore = await cookies();
+	const token = cookieStore.get("auth_token")?.value;
+
+	const data = await getPropertyById(Number(id), { token });
 
 	if (!data) return notFound();
 

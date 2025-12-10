@@ -5,8 +5,9 @@
 
 export const paths = {
 	public: {
-		home: () => "/",
+		landing: () => "/",
 		properties: () => "/properties",
+		property: (id: string) => `/properties/${id}`,
 		unauthorized: () => "/unauthorized",
 	},
 
