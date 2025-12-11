@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { JwtAdapter } from '../../domain';
 import { CustomError } from '../../domain';
 import { ProfileModel, RoleModel } from '../../data/postgres/models';
+import { RevokedTokenModel } from '../../data/postgres/models/revoked-token.model';
 
 /**
  * Middleware de autenticación JWT
@@ -40,6 +41,17 @@ export class AuthMiddleware {
                 return res.status(401).json({
                     message: 'Invalid or expired token'
                 });
+            }
+            
+            // Check if token has been revoked (blacklist)
+            if (payload.jti) {
+                const isRevoked = await RevokedTokenModel.isRevoked(payload.jti);
+                
+                if (isRevoked) {
+                    return res.status(401).json({
+                        message: 'Token has been revoked. Please login again.'
+                    });
+                }
             }
             
             // Agregar información del usuario al request

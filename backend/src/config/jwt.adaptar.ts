@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 import { envs } from "./envs";
 import { JwtAdapter } from '../domain/interfaces/jwt.adapter';
 
@@ -8,10 +9,15 @@ const secret = envs.JWT_SECRET as string;
 export class JwtAdapterImpl implements JwtAdapter {
     async generateToken(payload: { [key: string]: any }, duration: string = '24h'): Promise<string> {
         return new Promise((resolve, reject) => {
+            // Generate unique JWT ID for blacklist tracking
+            const jti = uuidv4();
             
             // @ts-ignore - jsonwebtoken types issue with expiresIn
             jwt.sign(
-                payload,
+                { 
+                    ...payload,
+                    jti  // Add unique identifier for token revocation
+                },
                 secret,
                 { expiresIn: duration },
                 (err, token) => {

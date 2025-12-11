@@ -164,6 +164,33 @@ export class Authroutes {
      */
     router.get('/me', authMiddleware.authenticate, (req, res) => controller.getProfile(req, res));
 
+    /**
+     * @swagger
+     * /api/auth/logout:
+     *   post:
+     *     summary: Logout and revoke current token
+     *     description: Revokes the current JWT token by adding it to the blacklist. The token will no longer be valid for authentication.
+     *     tags: [Auth]
+     *     security:
+     *       - bearerAuth: []
+     *     responses:
+     *       200:
+     *         description: Logged out successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Logged out successfully
+     *       400:
+     *         description: Bad request - Token is required or invalid
+     *       401:
+     *         description: Unauthorized - Invalid or missing token
+     */
+    router.post('/logout', authMiddleware.authenticate, (req, res) => controller.logout(req, res));
+
     return router;
   }
 }
