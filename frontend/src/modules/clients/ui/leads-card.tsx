@@ -11,6 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@src/components/ui/dropdown-menu";
 import { StatusBadge } from "@src/components/ui/status-badge";
+import { paths } from "@src/lib/paths";
 import type { Lead } from "@src/types/clients/lead";
 import { Mail, MoreHorizontal, Phone } from "lucide-react";
 
@@ -26,7 +27,7 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 	const leadName = `${lead.first_name} ${lead.last_name}`;
 
 	const handleCardClick = () => {
-		router.push(`/admin/clients/leads/${lead.id}`);
+		router.push(paths.agent.clients.leads.detail(lead.id.toString()));
 	};
 
 	const handleEdit = (e: React.MouseEvent) => {

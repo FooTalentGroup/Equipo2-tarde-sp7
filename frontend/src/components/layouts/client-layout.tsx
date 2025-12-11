@@ -37,7 +37,7 @@ export default function ClientsLayout({
 
 					<div className="justify-start gap-2 rounded-none bg-transparent px-5 text-black flex">
 						<Link
-							href={paths.agent.clients.leads()}
+							href={paths.agent.clients.leads.index()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "leads"
 									? "bg-tertiary text-primary-foreground"
@@ -47,7 +47,7 @@ export default function ClientsLayout({
 							Leads
 						</Link>
 						<Link
-							href={paths.agent.clients.inquilinos()}
+							href={paths.agent.clients.inquilinos.index()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "inquilinos"
 									? "bg-tertiary text-primary-foreground"
@@ -57,7 +57,7 @@ export default function ClientsLayout({
 							Inquilinos
 						</Link>
 						<Link
-							href={paths.agent.clients.propietarios()}
+							href={paths.agent.clients.owners.index()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "propietarios"
 									? "bg-tertiary text-primary-foreground"

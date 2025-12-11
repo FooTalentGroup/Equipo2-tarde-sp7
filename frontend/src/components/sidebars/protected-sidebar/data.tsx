@@ -47,25 +47,25 @@ export const agentNavigation = [
 		icon: Users,
 		isActive: false,
 		items: [
-      {
+			{
 				title: "Agregar cliente",
 				icon: Plus,
-				href: paths.agent.clients.newLeads(),
+				href: paths.agent.clients.leads.new(),
 			},
 			{
 				title: "Leads",
 				icon: UserCheck,
-				href: paths.agent.clients.leads(),
+				href: paths.agent.clients.leads.index(),
 			},
 			{
 				title: "Inquilinos",
 				icon: Users,
-				href: paths.agent.clients.inquilinos(),
+				href: paths.agent.clients.inquilinos.index(),
 			},
 			{
-				title: "Propiedades",
+				title: "Propietarios",
 				icon: HouseIcon,
-				href: paths.agent.clients.propietarios(),
+				href: paths.agent.clients.owners.index(),
 			},
 		],
 	},
