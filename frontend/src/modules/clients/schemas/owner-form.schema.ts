@@ -1,3 +1,4 @@
+import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
 // Schema para el formulario de propietarios
@@ -25,9 +26,10 @@ export const ownerFormSchema = z.object({
 
 	phone: z
 		.string()
-		.min(10, "El teléfono debe tener al menos 10 dígitos")
-		.max(15, "El teléfono no puede exceder 15 dígitos")
-		.regex(/^[0-9]+$/, "El teléfono solo puede contener números"),
+		.min(1, "El teléfono es requerido")
+		.refine(isValidPhoneNumber, {
+			message: "Número de teléfono inválido",
+		}),
 
 	email: z
 		.string()

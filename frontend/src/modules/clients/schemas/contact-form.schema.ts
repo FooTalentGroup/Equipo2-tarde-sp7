@@ -1,3 +1,4 @@
+import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
 // Schema para el formulario de contacto inicial
@@ -21,9 +22,10 @@ export const contactFormSchema = z.object({
 
 	phone: z
 		.string()
-		.min(10, "El teléfono debe tener al menos 10 dígitos")
-		.max(15, "El teléfono no puede exceder 15 dígitos")
-		.regex(/^[0-9]+$/, "El teléfono solo puede contener números"),
+		.min(1, "El teléfono es requerido")
+		.refine(isValidPhoneNumber, {
+			message: "Número de teléfono inválido",
+		}),
 
 	email: z
 		.string()
@@ -38,6 +40,10 @@ export const contactFormSchema = z.object({
 		.min(2, "La zona de interés debe tener al menos 2 caracteres")
 		.max(200, "La zona de interés no puede exceder 200 caracteres"),
 	property_id: z.string().optional(),
+	notes: z
+		.string()
+		.max(300, "Las notas no pueden exceder 300 caracteres")
+		.optional(),
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;

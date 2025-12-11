@@ -11,6 +11,7 @@ import {
 	FormMessageWithIcon,
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
+import { PhoneInput } from "@src/components/ui/phone-input";
 import {
 	Select,
 	SelectContent,
@@ -19,7 +20,9 @@ import {
 	SelectValue,
 } from "@src/components/ui/select";
 import { Spinner } from "@src/components/ui/spinner";
+import { Textarea } from "@src/components/ui/textarea";
 import type { CreateLead } from "@src/types/clients/lead";
+import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -29,15 +32,19 @@ import {
 } from "../../schemas/contact-form.schema";
 import { createClientServerAction } from "../../services/clients-service";
 import { ClientType } from "../../services/types";
-/* import PropertySearchInput from "../PropertySearchInput"; */
-import PropertyCombobox from "../PropertySearchInput";
+import PropertySelect from "../PropertySelect";
 
 type ContactFormProps = {
+	availableProperties: Property[];
 	onSubmit?: (data: ContactFormData) => Promise<void> | void;
 	onCancel?: () => void;
 };
 
-export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
+export default function LeadsForm({
+	availableProperties,
+	onSubmit,
+	onCancel,
+}: ContactFormProps) {
 	const form = useForm<ContactFormData>({
 		resolver: zodResolver(contactFormSchema),
 		defaultValues: {
@@ -48,6 +55,7 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 			consultation_type_id: 1,
 
 			interest_zone: "",
+			notes: "",
 		},
 	});
 
@@ -151,18 +159,18 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 										Teléfono <span className="text-danger-normal">*</span>
 									</FormLabel>
 									<FormControl>
-										<Input
-											type="tel"
-											placeholder="+54 11 0000-0000"
-											className="text-base placeholder:text-grey-light border-input-border/70 focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-12 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+										<PhoneInput
+											defaultCountry="AR"
+											countries={["AR", "UY", "CL", "BR", "PY"]}
+											placeholder="Ingresá un número de teléfono"
+											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
 											{...field}
 										/>
 									</FormControl>
 									<FormMessageWithIcon className="text-xs" />
 								</FormItem>
 							)}
-						/>
-
+						/>{" "}
 						<FormField
 							control={form.control}
 							name="email"
@@ -199,7 +207,7 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 										onValueChange={(value) => field.onChange(Number(value))}
 									>
 										<FormControl>
-											<SelectTrigger className="w-full text-base placeholder:text-grey-light border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active shadow-input-border">
+											<SelectTrigger className="w-full text-base data-placeholder:text-grey-light border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active h-12 shadow-input-border">
 												<SelectValue placeholder="Seleccione tipo de consulta" />
 											</SelectTrigger>
 										</FormControl>
@@ -223,19 +231,46 @@ export default function LeadsForm({ onSubmit, onCancel }: ContactFormProps) {
 										Propiedad de interés
 									</FormLabel>
 									<FormControl>
-										<PropertyCombobox
+										<PropertySelect
 											value={field.value}
-											onSelect={(propertyId, property) => {
+											onChange={(propertyId) => {
 												field.onChange(propertyId);
-												// Opcional: guardar también la dirección en interest_zone
-												// form.setValue('interest_zone', property.main_address?.full_address || '');
-												console.log("Propiedad seleccionada:", property);
 											}}
+											availableProperties={availableProperties}
 											placeholder="Seleccione o busque una propiedad"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										/>
 									</FormControl>
 									<FormMessageWithIcon className="text-xs" />
+								</FormItem>
+							)}
+						/>
+					</div>
+
+					{/* Notas */}
+					<div className="border-t border-t-grey-light pt-4">
+						<FormField
+							control={form.control}
+							name="notes"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Agregar nota (opcional)
+									</FormLabel>
+									<FormControl>
+										<Textarea
+											placeholder="Agregar notas adicionales..."
+											className="text-base border-input-border/70 placeholder:text-grey-light focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active py-4 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal resize-none min-h-[100px]"
+											maxLength={300}
+											{...field}
+										/>
+									</FormControl>
+									<div className="flex justify-between items-center">
+										<FormMessageWithIcon className="text-xs" />
+										<span className="text-sm text-gray-500">
+											{field.value?.length || 0}/300
+										</span>
+									</div>
 								</FormItem>
 							)}
 						/>

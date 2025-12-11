@@ -31,16 +31,6 @@ export function useWhatsAppSender({
 		// Quitar el símbolo + si existe
 		cleanPhone = cleanPhone.replace(/^\+/, "");
 
-		// Si empieza con 0, quitarlo
-		if (cleanPhone.startsWith("0")) {
-			cleanPhone = cleanPhone.substring(1);
-		}
-
-		// Si no empieza con 54 (código de Argentina), agregarlo
-		if (!cleanPhone.startsWith("54")) {
-			cleanPhone = `549${cleanPhone}`;
-		}
-
 		// Validar que sea un número válido
 		if (!/^[0-9]{10,15}$/.test(cleanPhone)) {
 			return null;
