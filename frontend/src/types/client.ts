@@ -1,13 +1,7 @@
 export type Client = {
 	id: string | number;
 	name: string;
-	type:
-		| "lead"
-		| "inquilino"
-		| "pendiente"
-		| "atrasado"
-		| "pagado"
-		| "propietario";
+	type: "lead" | "inquilino" | "propietario";
 	dni: string;
 	address: string;
 	phone: string | null;

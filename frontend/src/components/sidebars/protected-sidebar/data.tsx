@@ -48,6 +48,11 @@ export const agentNavigation = [
 		isActive: false,
 		items: [
 			{
+				title: "Agregar cliente",
+				icon: Plus,
+				href: paths.agent.clients.newLeads(),
+			},
+			{
 				title: "Leads",
 				icon: UserCheck,
 				href: paths.agent.clients.leads(),

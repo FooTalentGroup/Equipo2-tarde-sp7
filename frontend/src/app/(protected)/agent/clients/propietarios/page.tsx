@@ -1,69 +1,41 @@
 import ClientsLayout from "@src/components/layouts/client-layout";
-import { OwnerCard } from "@src/modules/clients/ui/PropertyOwnerCard";
-import type { Owner } from "@src/types/clients/owner";
+import { getClients } from "@src/modules/clients/services/clients-service";
+import { OwnerCard } from "@src/modules/clients/ui/property-owner-card";
+import type { Owner, OwnerApiResponse } from "@src/types/clients/owner";
 
-const owners: Owner[] = [
-	{
-		first_name: "Ana",
-		last_name: "Martínez",
-		phone: "1187654321",
-		email: "ana.martinez@example.com",
+function mapOwner(apiOwner: OwnerApiResponse): Owner {
+	return {
+		id: String(apiOwner.id),
+		first_name: apiOwner.first_name,
+		last_name: apiOwner.last_name,
+		phone: apiOwner.phone,
+		email: apiOwner.email,
 		contact_category: "Propietario",
-		dni: "28987654",
-		address: "Av. Santa Fe 2345, Piso 5",
-		notes: "Propietaria de 3 propiedades, prefiere contacto por email",
-		city: "Buenos Aires",
-		province: "Buenos Aires",
-		country: "Argentina",
-		id: "1",
-		created_at: "",
-		updated_at: "",
-		property_id: 12,
-	},
-	{
-		first_name: "Carlos",
-		last_name: "Fernández",
-		phone: "3415678234",
-		email: "carlos.fernandez@example.com",
-		contact_category: "Propietario",
-		dni: "32456789",
-		address: "Bv. Oroño 1520, Depto 8B",
-		notes:
-			"Propietario de 2 departamentos en zona norte, disponible horario laboral",
-		city: "Rosario",
-		province: "Santa Fe",
-		country: "Argentina",
-		id: "2",
-		created_at: "",
-		updated_at: "",
-		property_id: 55,
-	},
-	{
-		first_name: "María",
-		last_name: "González",
-		phone: "3414892765",
-		email: "maria.gonzalez@example.com",
-		contact_category: "Propietario",
-		dni: "27334521",
-		address: "San Lorenzo 945, PB",
-		notes:
-			"Propietaria de casa en Fisherton, prefiere contacto telefónico por las mañanas",
-		city: "Rosario",
-		province: "Santa Fe",
-		country: "Argentina",
-		id: "3",
-		created_at: "",
-		updated_at: "",
-		property_id: 101,
-	},
-];
+		dni: apiOwner.dni,
+		address: apiOwner.address ?? "",
+		notes: apiOwner.notes ?? "",
+		city: apiOwner.city ?? undefined,
+		province: apiOwner.province ?? undefined,
+		country: apiOwner.country ?? undefined,
+		property_id: apiOwner.owned_properties?.[0]?.id,
+		property_count: apiOwner.owned_properties?.length,
+		created_at: apiOwner.registered_at ?? "",
+		updated_at: apiOwner.registered_at ?? "",
+	};
+}
 
-export default function PropietariosPage() {
+export default async function PropietariosPage() {
+	const { clients } = await getClients<OwnerApiResponse>("clients", {
+		contact_category_id: 3,
+	});
+
+	const owners = (clients || []).map(mapOwner);
+
 	return (
 		<ClientsLayout activeTab="propietarios">
 			<div className="space-y-0">
-				{owners.map((owner, index) => (
-					<OwnerCard key={index} owner={owner} />
+				{owners.map((owner) => (
+					<OwnerCard key={owner.id} owner={owner} />
 				))}
 			</div>
 		</ClientsLayout>
