@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { CustomError, LoginProfileDto, RegisterProfileDto } from '../../domain';
 import { AuthServices } from '../services/auth.services';
+import { RevokedTokenModel } from '../../data/postgres/models/revoked-token.model';
+import { jwtAdapter } from '../../config';
 
 export class AuthController {
 
@@ -82,5 +84,53 @@ export class AuthController {
             this.handleError(error, res);
         });
     }
+
+    /**
+     * Logout - Revoke current JWT token
+     */
+    logout = async (req: Request, res: Response) => {
+        try {
+            const user = (req as any).user;
+            const authHeader = req.headers.authorization;
+            
+            if (!authHeader) {
+                return res.status(400).json({
+                    message: 'Token is required'
+                });
+            }
+            
+            const token = authHeader.split(' ')[1];
+            const decodedToken: any = await jwtAdapter.validateToken(token);
+            
+            if (!decodedToken || !decodedToken.jti) {
+                return res.status(400).json({
+                    message: 'Invalid token'
+                });
+            }
+            
+            // Calculate token expiration date
+            const expiresAt = new Date(decodedToken.exp * 1000);
+            
+            // Get IP and User Agent for audit trail
+            const ip = req.ip || req.socket.remoteAddress;
+            const userAgent = req.headers['user-agent'];
+            
+            // Revoke token by adding to blacklist
+            await RevokedTokenModel.create({
+                token_jti: decodedToken.jti,
+                user_id: parseInt(user.id),
+                expires_at: expiresAt,
+                reason: 'logout',
+                ip_address: ip,
+                user_agent: userAgent
+            });
+            
+            return res.json({
+                message: 'Logged out successfully'
+            });
+        } catch (error) {
+            this.handleError(error, res);
+        }
+    };
 
 }
