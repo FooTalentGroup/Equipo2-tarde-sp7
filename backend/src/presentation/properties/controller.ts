@@ -720,4 +720,56 @@ export class PropertyController {
 			this.handleError(error, res);
 		}
 	};
+
+	/**
+	 * Get document download URL
+	 * Returns document info with download URL (Cloudinary transformation)
+	 */
+	getDocumentDownloadUrl = async (req: Request, res: Response) => {
+		try {
+			const { documentId } = req.params;
+
+			// Validation: documentId must be a valid number
+			if (!documentId || isNaN(Number(documentId))) {
+				return res.status(400).json({
+					message: "Invalid document ID",
+				});
+			}
+
+			// Import PropertyDocumentModel
+			const { PropertyDocumentModel } = await import(
+				"../../data/postgres/models/properties/property-document.model"
+			);
+
+			// Find document in database
+			const document = await PropertyDocumentModel.findById(Number(documentId));
+
+			// Validation: document must exist
+			if (!document) {
+				return res.status(404).json({
+					message: "Document not found",
+				});
+			}
+
+			// Generate download URL with Cloudinary transformation
+			// fl_attachment forces download instead of opening in browser
+			const downloadUrl = document.file_path.replace(
+				"/upload/",
+				"/upload/fl_attachment/",
+			);
+
+			// Return document information
+			return res.json({
+				document: {
+					id: document.id,
+					document_name: document.document_name,
+					file_path: document.file_path, // Original URL for preview
+					download_url: downloadUrl, // URL that forces download
+					uploaded_at: document.uploaded_at,
+				},
+			});
+		} catch (error) {
+			this.handleError(error, res);
+		}
+	};
 }

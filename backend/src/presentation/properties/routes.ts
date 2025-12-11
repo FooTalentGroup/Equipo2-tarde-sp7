@@ -706,6 +706,77 @@ export class PropertyRoutes {
 			controller.deleteProperty(req, res),
 		);
 
+	/**
+	 * @swagger
+	 * /api/properties/documents/{documentId}/download-url:
+	 *   get:
+	 *     summary: Get document download URL
+	 *     description: |
+	 *       Returns document information with a Cloudinary URL that forces download.
+	 *       Uses the fl_attachment transformation to add Content-Disposition header.
+	 *     tags: [Properties]
+	 *     parameters:
+	 *       - in: path
+	 *         name: documentId
+	 *         required: true
+	 *         schema:
+	 *           type: integer
+	 *         description: Document ID
+	 *         example: 1
+	 *     responses:
+	 *       200:
+	 *         description: Document information with download URL
+	 *         content:
+	 *           application/json:
+	 *             schema:
+	 *               type: object
+	 *               properties:
+	 *                 document:
+	 *                   type: object
+	 *                   properties:
+	 *                     id:
+	 *                       type: integer
+	 *                       example: 1
+	 *                     document_name:
+	 *                       type: string
+	 *                       example: Escritura
+	 *                     file_path:
+	 *                       type: string
+	 *                       description: Original Cloudinary URL (for preview)
+	 *                       example: https://res.cloudinary.com/demo/raw/upload/v1/sample.pdf
+	 *                     download_url:
+	 *                       type: string
+	 *                       description: Cloudinary URL that forces download
+	 *                       example: https://res.cloudinary.com/demo/raw/upload/fl_attachment/v1/sample.pdf
+	 *                     uploaded_at:
+	 *                       type: string
+	 *                       format: date-time
+	 *                       example: 2024-12-10T20:00:00.000Z
+	 *       400:
+	 *         description: Invalid document ID
+	 *         content:
+	 *           application/json:
+	 *             schema:
+	 *               type: object
+	 *               properties:
+	 *                 message:
+	 *                   type: string
+	 *                   example: Invalid document ID
+	 *       404:
+	 *         description: Document not found
+	 *         content:
+	 *           application/json:
+	 *             schema:
+	 *               type: object
+	 *               properties:
+	 *                 message:
+	 *                   type: string
+	 *                   example: Document not found
+	 */
+	router.get("/documents/:documentId/download-url", (req, res) =>
+		controller.getDocumentDownloadUrl(req, res),
+	);
+
 		return router;
 	}
 }
