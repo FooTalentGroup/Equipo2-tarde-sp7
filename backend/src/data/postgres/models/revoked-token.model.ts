@@ -1,4 +1,4 @@
-import { PostgresDatabase } from '../postgres-database';
+import { PostgresDatabase } from '../database';
 
 export interface RevokedToken {
     id: number;
