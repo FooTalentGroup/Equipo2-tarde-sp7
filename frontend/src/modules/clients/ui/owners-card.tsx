@@ -11,6 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@src/components/ui/dropdown-menu";
 import { StatusBadge } from "@src/components/ui/status-badge";
+import { paths } from "@src/lib/paths";
 import type { Owner } from "@src/types/clients/owner";
 import { MoreHorizontal } from "lucide-react";
 
@@ -27,7 +28,7 @@ export function OwnersCard({ owner, onEdit, onDelete }: OwnersCardProps) {
 	const propertiesCount = owner.owned_properties?.length || 0;
 
 	const handleCardClick = () => {
-		router.push(`/admin/clients/owners/${owner.id}`);
+		router.push(paths.agent.owners.detail(owner.id.toString()));
 	};
 
 	const handleEdit = (e: React.MouseEvent) => {
