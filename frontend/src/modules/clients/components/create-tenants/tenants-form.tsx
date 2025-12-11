@@ -73,7 +73,7 @@ export default function TenantForm({
 					phone: data.phone,
 					email: data.email,
 					dni: data.dni,
-					contact_category: "Inquilino",
+					contact_category_id: 2,
 					/* address: data.address, */
 					rental_interest: true,
 					property_interest_phone: data.phone,

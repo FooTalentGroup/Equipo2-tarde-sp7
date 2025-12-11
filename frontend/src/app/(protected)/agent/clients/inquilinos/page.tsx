@@ -1,56 +1,18 @@
+"use server";
+
 import ClientsLayout from "@src/components/layouts/client-layout";
-import { TenantCard } from "@src/modules/clients/ui/TenantCard";
-import type { Tenant } from "@src/types/client";
+import { TenantsList } from "@src/modules/clients/components/tenants/tenants-list";
+import { getClients } from "@src/modules/clients/services/clients-service";
+import type { Tenant } from "@src/types/clients/tenant";
 
-const tenants: Tenant[] = [
-	{
-		name: "Julián Benítez",
-		dni: "33.912.554",
-		address: "Lavalle 2240, CABA",
-		phone: "+54 11 5678-9012",
-		email: "julian.b@email.com",
-		type: "Inquilino",
-		rentAmount: 250000,
-		nextIncrease: {
-			date: "2025-03-15",
-			amount: 275000,
-		},
-		currentPayment: {
-			amount: 250000,
-			dueDate: "2024-12-10",
-			status: "pending",
-		},
-		paymentHistory: [
-			{
-				month: "Noviembre",
-				amount: 250000,
-				status: "paid",
-				date: "2024-11-08",
-			},
-			{
-				month: "Octubre",
-				amount: 250000,
-				status: "paid",
-				date: "2024-10-10",
-			},
-			{
-				month: "Septiembre",
-				amount: 250000,
-				status: "paid",
-				date: "2024-09-09",
-			},
-		],
-	},
-]; // tus datos
+export default async function InquilinosPage() {
+	const { clients: tenants } = await getClients<Tenant>("clients", {
+		contact_category_id: 2,
+	});
 
-export default function InquilinosPage() {
 	return (
 		<ClientsLayout activeTab="inquilinos">
-			<div className="space-y-0">
-				{tenants.map((tenant) => (
-					<TenantCard key={tenant.dni} tenant={tenant} />
-				))}
-			</div>
+			<TenantsList tenants={tenants} itemsPerPage={5} />
 		</ClientsLayout>
 	);
 }

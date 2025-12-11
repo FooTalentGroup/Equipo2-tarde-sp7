@@ -3,10 +3,9 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 import SectionHeading from "@src/components/section-heading/index";
-import { Button } from "@src/components/ui/button";
 import { Input } from "@src/components/ui/input";
 import { paths } from "@src/lib/paths";
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 interface ClientsLayoutProps {
 	children: ReactNode;
@@ -18,24 +17,9 @@ export default function ClientsLayout({
 	activeTab,
 }: ClientsLayoutProps) {
 	return (
-		<div className="w-full mx-auto">
+		<div className="w-full">
 			{/* Header */}
-			<SectionHeading
-				title="Clientes"
-				actions={
-					<Button
-						size="default"
-						variant="tertiary"
-						asChild
-						aria-label="Crear cliente"
-					>
-						<Link href={paths.agent.clients.newLeads()}>
-							<Plus />
-							Crear cliente
-						</Link>
-					</Button>
-				}
-			/>
+			<SectionHeading title="Clientes" />
 
 			{/* Search and Navigation Tabs */}
 			<div className="w-full">

@@ -71,7 +71,7 @@ export default function OwnerForm({
 					phone: data.phone,
 					email: data.email,
 					dni: data.dni,
-					contact_category: "Propietario",
+					contact_category_id: 3,
 					address: data.address,
 					notes: data.notes || "",
 					...(propertyId !== undefined ? { property_id: propertyId } : {}),
