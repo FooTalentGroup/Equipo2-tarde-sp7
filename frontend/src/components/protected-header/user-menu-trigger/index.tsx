@@ -95,8 +95,11 @@ export default function UserMenuTrigger({ user }: Props) {
 				{/* <DropdownMenuSeparator /> */}
 				<AlertDialog>
 					<AlertDialogTrigger asChild>
-						<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-							<LogOut />
+						<DropdownMenuItem
+							onSelect={(e) => e.preventDefault()}
+							className="hover:text-tertiary"
+						>
+							<LogOut className="hover:text-inherit" />
 							Cerrar sesión
 						</DropdownMenuItem>
 					</AlertDialogTrigger>

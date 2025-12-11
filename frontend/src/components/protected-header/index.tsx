@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Button } from "@src/components/ui/button";
 import { paths } from "@src/lib/paths";
+import { AdminCreateLink } from "@src/modules/admin/components/admin-create-button";
 import { getCurrentUser } from "@src/modules/auth/lib/dal";
 import { ROLES } from "@src/types/user";
 
@@ -39,7 +40,7 @@ export default async function ProtectedHeader() {
 			</Button>
 
 			<div className="justify-self-end flex items-center gap-12">
-				{user?.role === ROLES.AGENT && <ActionDropdown />}
+				{user?.role === ROLES.AGENT ? <ActionDropdown /> : <AdminCreateLink />}
 				<UserMenuTrigger user={user} />
 			</div>
 		</header>

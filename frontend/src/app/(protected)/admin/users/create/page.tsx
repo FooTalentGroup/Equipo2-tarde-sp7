@@ -40,7 +40,7 @@ export default function CreateUserPage() {
 					>
 						<div className="flex items-center">
 							<ArrowLeft className="h-4 w-4 mr-2" />
-							<p>Volver a la lista de usuarios</p>
+							<p>Volver a la lista de agentes</p>
 						</div>
 					</Link>
 					<h1 className="text-secondary text-3xl font-bold">Crear agente</h1>
@@ -210,7 +210,7 @@ export default function CreateUserPage() {
 						{/* Información sobre el rol fijo */}
 						<div className="bg-blue-50 border border-blue-200 rounded-md p-4 mt-4">
 							<p className="text-blue-800 text-sm">
-								<strong>Nota:</strong> Todos los nuevos usuarios serán creados
+								<strong>Nota:</strong> Todos los nuevos agentes serán creados
 								como <strong>Agentes</strong> (Rol: Agent). Solo los
 								administradores existentes pueden modificar los roles
 								posteriormente si es necesario.

@@ -53,11 +53,10 @@ export const EditUserModal = ({
 			<DialogContent className="sm:max-w-2xl bg-white">
 				<DialogHeader>
 					<DialogTitle className="text-secondary text-3xl">
-						Editar usuario
+						Editar agente
 					</DialogTitle>
 					<DialogDescription className="text-muted-foreground font-medium text-base">
-						Modifique los detalles del usuario {user.first_name}{" "}
-						{user.last_name}
+						Modifique los detalles del agente {user.first_name} {user.last_name}
 					</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
@@ -258,7 +257,7 @@ export const EditUserModal = ({
 														onCheckedChange={field.onChange}
 													/>
 												</FormControl>
-												<FormLabel>Usuario activo</FormLabel>
+												<FormLabel>Agente activo</FormLabel>
 												<FormMessage />
 											</FormItem>
 										)}

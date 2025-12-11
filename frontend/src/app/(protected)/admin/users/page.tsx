@@ -19,14 +19,12 @@ export default async function AdminUsersPage() {
 			</section>
 		);
 	} catch (error) {
-		// Manejo de errores
-		console.error("Error al cargar usuarios:", error);
+		console.error("Error al cargar agentes:", error);
 
-		// Mensaje de error amigable para el usuario
 		const errorMessage =
 			error instanceof Error
 				? error.message
-				: "Ocurrió un error al cargar los usuarios";
+				: "Ocurrió un error al cargar los agentes";
 
 		return (
 			<section className="grid min-h-dvh max-h-fit grid-rows-[auto_1fr_auto]">
