@@ -151,27 +151,30 @@ export class ClientServices {
             property.age_id ? PropertyAgeModel.findById(property.age_id) : Promise.resolve(null)
         ]);
 
-        // Procesar precio principal (primer precio activo)
-        let priceData = null;
+        // Procesar todos los precios (venta, alquiler, etc.)
+        let pricesData: any[] = [];
         if (prices.length > 0) {
-            const price = prices[0];
-            const [currency, operationType] = await Promise.all([
-                CurrencyTypeModel.findById(price.currency_type_id),
-                PropertyOperationTypeModel.findById(price.operation_type_id)
-            ]);
+            pricesData = await Promise.all(
+                prices.map(async (price) => {
+                    const [currency, operationType] = await Promise.all([
+                        CurrencyTypeModel.findById(price.currency_type_id),
+                        PropertyOperationTypeModel.findById(price.operation_type_id)
+                    ]);
 
-            priceData = {
-                amount: price.price,
-                currency: currency ? {
-                    id: currency.id,
-                    name: currency.name,
-                    symbol: currency.symbol
-                } : null,
-                operation_type: operationType ? {
-                    id: operationType.id,
-                    name: operationType.name
-                } : null
-            };
+                    return {
+                        amount: price.price,
+                        currency: currency ? {
+                            id: currency.id,
+                            name: currency.name,
+                            symbol: currency.symbol
+                        } : null,
+                        operation_type: operationType ? {
+                            id: operationType.id,
+                            name: operationType.name
+                        } : null
+                    };
+                })
+            );
         }
 
         // Procesar dirección completa con ubicación
@@ -236,7 +239,7 @@ export class ClientServices {
             bathrooms: property.bathrooms_count,
             garage: property.parking_spaces_count > 0,
             address: addressData,
-            price: priceData,
+            prices: pricesData,  // Array de precios
             main_image: imageData,
             age: ageData
         };

@@ -648,31 +648,33 @@ export class ClientRoutes {
          *                               longitude:
          *                                 type: number
          *                                 example: -58.381592
-         *                       price:
-         *                         type: object
-         *                         nullable: true
-         *                         properties:
-         *                           amount:
-         *                             type: number
-         *                             example: 250000
-         *                           currency:
-         *                             type: object
-         *                             properties:
-         *                               id:
-         *                                 type: integer
-         *                               name:
-         *                                 type: string
-         *                               symbol:
-         *                                 type: string
-         *                                 example: ARS
-         *                           operation_type:
-         *                             type: object
-         *                             properties:
-         *                               id:
-         *                                 type: integer
-         *                               name:
-         *                                 type: string
-         *                                 example: Alquiler
+         *                       prices:
+         *                         type: array
+         *                         description: All prices for this property (sale, rental, etc.)
+         *                         items:
+         *                           type: object
+         *                           properties:
+         *                             amount:
+         *                               type: number
+         *                               example: 250000
+         *                             currency:
+         *                               type: object
+         *                               properties:
+         *                                 id:
+         *                                   type: integer
+         *                                 name:
+         *                                   type: string
+         *                                 symbol:
+         *                                   type: string
+         *                                   example: ARS
+         *                             operation_type:
+         *                               type: object
+         *                               properties:
+         *                                 id:
+         *                                   type: integer
+         *                                 name:
+         *                                   type: string
+         *                                   example: Alquiler
          *                       main_image:
          *                         type: object
          *                         nullable: true
@@ -741,9 +743,9 @@ export class ClientRoutes {
          *                     address:
          *                       type: object
          *                       nullable: true
-         *                     price:
-         *                       type: object
-         *                       nullable: true
+         *                     prices:
+         *                       type: array
+         *                       description: All prices for this property
          *                     main_image:
          *                       type: object
          *                       nullable: true
