@@ -31,7 +31,7 @@ export async function createClientServerAction<T extends ClientResponse>(
 export async function getClients<T = ClientResponse>(
 	endpoint: string = "clients",
 	filters?: Record<string, string | number | boolean | undefined | null>,
-) {
+): Promise<{ clients: T[]; count: number }> {
 	try {
 		const data = await api.get<{ clients: T[]; count: number }>(endpoint, {
 			params: filters,
@@ -40,5 +40,17 @@ export async function getClients<T = ClientResponse>(
 	} catch (error) {
 		console.error(`Error fetching clients from ${endpoint}:`, error);
 		return { clients: [] as T[], count: 0 };
+	}
+}
+
+export async function getClientById<T = ClientResponse>(
+	id: string,
+): Promise<T | null> {
+	try {
+		const data = await api.get<T>(`clients/${id}`);
+		return data;
+	} catch (error) {
+		console.error(`Error fetching client with id ${id}:`, error);
+		return null;
 	}
 }

@@ -47,6 +47,11 @@ export const agentNavigation = [
 		icon: Users,
 		isActive: false,
 		items: [
+      {
+				title: "Agregar cliente",
+				icon: Plus,
+				href: paths.agent.clients.newLeads(),
+			},
 			{
 				title: "Leads",
 				icon: UserCheck,
@@ -64,11 +69,6 @@ export const agentNavigation = [
 			},
 		],
 	},
-	// {
-	// 	title: "Reportes",
-	// 	href: paths.agent.reports.index(),
-	// 	icon: ChartColumnIncreasing,
-	// },
 	{
 		title: "Consultas",
 		href: paths.agent.inquiries.index(),

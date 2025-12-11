@@ -14,17 +14,17 @@ import { Input } from "@src/components/ui/input";
 import { PhoneInput } from "@src/components/ui/phone-input";
 import { Spinner } from "@src/components/ui/spinner";
 import { Textarea } from "@src/components/ui/textarea";
+import {
+	type OwnerFormData,
+	ownerFormSchema,
+} from "@src/modules/clients/schemas/owner-form.schema";
+import { createClientServerAction } from "@src/modules/clients/services/clients-service";
+import { ClientType } from "@src/modules/clients/services/types";
 import type { CreateOwner } from "@src/types/clients/owner";
 import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import {
-	type OwnerFormData,
-	ownerFormSchema,
-} from "../../schemas/owner-form.schema";
-import { createClientServerAction } from "../../services/clients-service";
-import { ClientType } from "../../services/types";
 import PropertySelect from "../PropertySelect";
 
 type OwnerFormProps = {
