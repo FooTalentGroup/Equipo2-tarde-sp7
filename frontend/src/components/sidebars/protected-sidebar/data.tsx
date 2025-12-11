@@ -80,13 +80,6 @@ export const adminnavigation = [
 	{
 		title: "Usuarios",
 		icon: Users,
-		isActive: true,
-		items: [
-			{
-				title: "Lista de usuarios",
-				icon: List,
-				href: paths.admin.dashboard(),
-			},
-		],
+		href: paths.admin.dashboard(),
 	},
 ] as NavigationItem[];
