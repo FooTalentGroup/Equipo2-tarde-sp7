@@ -1,28 +1,8 @@
-import type { BaseContact } from "./base";
-
-type BaseContactOptionalLocation = Omit<
+import type {
 	BaseContact,
-	"city" | "province" | "country"
-> & {
-	city?: string;
-	province?: string;
-	country?: string;
-};
-
-export interface CreateOwner extends BaseContactOptionalLocation {
-	contact_category: "Propietario";
-	address: string;
-	property_id?: number;
-}
-
-export interface Owner extends CreateOwner {
-	id: string;
-	created_at: string;
-	updated_at: string;
-	property_count?: number;
-}
-
-export type UpdateOwner = Partial<CreateOwner>;
+	BaseContactWithId,
+	ContactCategoryInfo,
+} from "./base";
 
 export interface OwnedProperty {
 	id: number;
@@ -38,33 +18,23 @@ export interface OwnedProperty {
 	publication_date?: string;
 }
 
-export interface ContactCategoryRef {
-	id: number;
-	name: string;
+export interface CreateOwner extends BaseContact {
+	contact_category_id?: number;
+	purchase_interest?: boolean;
+	rental_interest?: boolean;
+	city_id?: number | null;
 }
 
-export interface OwnerApiResponse {
+export interface Owner extends BaseContactWithId {
 	id: number;
-	first_name: string;
-	last_name: string;
-	email: string;
-	dni: string;
-	phone: string;
-	property_interest_phone: string | null;
-	address: string | null;
-	notes: string | null;
 	contact_category_id: number;
-	interest_zone: string | null;
 	purchase_interest: boolean;
 	rental_interest: boolean;
+	city_id: number | null;
+	interest_zone: string | null;
 	property_search_type_id: number | null;
-	city?: string | null;
-	province?: string | null;
-	country?: string | null;
-	city_id?: number | null;
-	registered_at: string | null;
-	contact_category: ContactCategoryRef;
-	properties_of_interest: unknown[];
+	contact_category: ContactCategoryInfo;
 	owned_properties: OwnedProperty[];
-	rented_property: unknown;
 }
+
+export type UpdateOwner = Partial<CreateOwner>;
