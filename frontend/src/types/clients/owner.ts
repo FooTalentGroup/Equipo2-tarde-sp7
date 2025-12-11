@@ -38,3 +38,27 @@ export interface Owner extends BaseContactWithId {
 }
 
 export type UpdateOwner = Partial<CreateOwner>;
+
+// Tipo para la respuesta del API (mantener para compatibilidad con páginas existentes)
+export interface OwnerApiResponse {
+	id: number;
+	first_name: string;
+	last_name: string;
+	email: string;
+	dni: string;
+	phone: string;
+	property_interest_phone: string | null;
+	address: string | null;
+	notes: string | null;
+	contact_category_id: number;
+	interest_zone: string | null;
+	purchase_interest: boolean;
+	rental_interest: boolean;
+	property_search_type_id: number | null;
+	city_id: number | null;
+	registered_at: string | null;
+	contact_category: ContactCategoryInfo;
+	properties_of_interest: unknown[];
+	owned_properties: OwnedProperty[];
+	rented_property: unknown;
+}
