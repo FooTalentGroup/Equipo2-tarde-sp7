@@ -4,10 +4,10 @@ import { useMemo, useState } from "react";
 
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
 import { LeadsCard } from "@src/modules/clients/ui/leads-card";
-import type { Lead } from "@src/types/clients/lead";
+import type { Lead, LeadWithProperties } from "@src/types/clients/lead";
 
 interface LeadsListProps {
-	leads: Lead[];
+	leads: (Lead | LeadWithProperties)[];
 	itemsPerPage?: number;
 }
 
