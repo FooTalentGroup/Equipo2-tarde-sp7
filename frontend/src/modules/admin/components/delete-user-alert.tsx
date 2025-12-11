@@ -34,15 +34,15 @@ export const DeleteUserAlert = ({
 			});
 
 			if (!response.ok) {
-				throw new Error("Error al eliminar el usuario");
+				throw new Error("Error al eliminar el agente");
 			}
 
-			toast.success("Usuario eliminado exitosamente");
+			toast.success("agente eliminado exitosamente");
 			onOpenChange?.(false);
 			router.refresh();
 		} catch (error) {
 			console.error("Error deleting user:", error);
-			toast.error("Error al eliminar el usuario. Por favor, intenta de nuevo.");
+			toast.error("Error al eliminar el agente. Por favor, intenta de nuevo.");
 		} finally {
 			setIsDeleting(false);
 		}
@@ -53,7 +53,7 @@ export const DeleteUserAlert = ({
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle className="text-secondary text-xl">
-						¿Estás seguro de eliminar este usuario?
+						¿Estás seguro de eliminar este agente?
 					</AlertDialogTitle>
 				</AlertDialogHeader>
 				<AlertDialogDescription className="text-gray-800">

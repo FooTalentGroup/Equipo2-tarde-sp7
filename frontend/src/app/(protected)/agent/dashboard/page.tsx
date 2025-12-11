@@ -7,6 +7,9 @@ export const metadata = {
 
 import { Suspense } from "react";
 
+import Link from "next/link";
+
+import { paths } from "@src/lib/paths";
 import ConsultationsSkeleton from "@src/modules/consultations/ui/ConsultationsSkeleton";
 import { InfoList } from "@src/modules/dashboard/components/info-list";
 
@@ -25,30 +28,26 @@ export default async function DashboardPage({ searchParams }: Props) {
 			: undefined,
 		start_date: resolvedSearchParams.start_date as string,
 		end_date: resolvedSearchParams.end_date as string,
-		is_read:
-			resolvedSearchParams.is_read === "true"
-				? true
-				: resolvedSearchParams.is_read === "false"
-					? false
-					: undefined,
-		limit: resolvedSearchParams.limit
-			? parseInt(resolvedSearchParams.limit as string, 10)
-			: undefined,
-		offset: resolvedSearchParams.offset
-			? parseInt(resolvedSearchParams.offset as string, 10)
-			: undefined,
+		is_read: false,
+		limit: 5,
+		offset: 0,
 	};
 	return (
 		<>
 			<InfoList />
 			<section className="shadow-consultations p-4 rounded-md">
-				<Heading
-					variant="subtitle1"
-					weight="medium"
-					className="text-secondary-dark-active mb-2"
-				>
-					Consultas
-				</Heading>
+				<div className="flex justify-between items-center">
+					<Heading
+						variant="subtitle1"
+						weight="medium"
+						className="text-secondary-dark-active mb-2"
+					>
+						Nuevas Consultas
+					</Heading>
+					<Link href={paths.agent.inquiries.index()} className="text-secondary">
+						Ver todas
+					</Link>
+				</div>
 				<Suspense
 					key={JSON.stringify(filters)}
 					fallback={<ConsultationsSkeleton />}

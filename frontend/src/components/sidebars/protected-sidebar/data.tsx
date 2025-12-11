@@ -47,7 +47,7 @@ export const agentNavigation = [
 		icon: Users,
 		isActive: false,
 		items: [
-			{
+      {
 				title: "Agregar cliente",
 				icon: Plus,
 				href: paths.agent.clients.newLeads(),
@@ -69,11 +69,6 @@ export const agentNavigation = [
 			},
 		],
 	},
-	// {
-	// 	title: "Reportes",
-	// 	href: paths.agent.reports.index(),
-	// 	icon: ChartColumnIncreasing,
-	// },
 	{
 		title: "Consultas",
 		href: paths.agent.inquiries.index(),
@@ -85,13 +80,6 @@ export const adminnavigation = [
 	{
 		title: "Usuarios",
 		icon: Users,
-		isActive: true,
-		items: [
-			{
-				title: "Lista de usuarios",
-				icon: List,
-				href: paths.admin.dashboard(),
-			},
-		],
+		href: paths.admin.dashboard(),
 	},
 ] as NavigationItem[];

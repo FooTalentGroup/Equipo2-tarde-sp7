@@ -7,7 +7,7 @@ export const InfoList = async () => {
 	const data = await getDashboardInfo();
 
 	return (
-		<ul className="flex gap-6">
+		<ul className="flex gap-6 justify-center">
 			<li>
 				<InfoAgentsCard
 					icon={House}
@@ -28,7 +28,7 @@ export const InfoList = async () => {
 				<InfoAgentsCard
 					icon={MessageSquare}
 					title={data?.unanswered_consultations || 0}
-					description="Consultas sin responder"
+					description="Consultas no leídas"
 					className="[&>svg]:text-blue-normal [&>svg]:bg-success"
 				/>
 			</li>
