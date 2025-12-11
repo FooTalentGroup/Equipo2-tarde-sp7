@@ -29,6 +29,10 @@ export interface RentedProperty {
 }
 
 export interface CreateTenant extends BaseContact {
+	contract_start_date: string;
+	contract_end_date: string;
+	next_increase_date: string;
+	monthly_amount: number | null;
 	contact_category_id?: number;
 	rental_interest?: boolean;
 	purchase_interest?: boolean;

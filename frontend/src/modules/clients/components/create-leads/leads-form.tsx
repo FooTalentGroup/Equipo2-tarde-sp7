@@ -71,10 +71,8 @@ export default function LeadsForm({
 					last_name: data.last_name,
 					phone: data.phone,
 					email: data.email,
-					contact_category: "Lead",
+					contact_category_id: 1,
 					interest_zone: data.interest_zone,
-					consultation_type_id: data.consultation_type_id,
-
 					notes: "",
 				};
 
