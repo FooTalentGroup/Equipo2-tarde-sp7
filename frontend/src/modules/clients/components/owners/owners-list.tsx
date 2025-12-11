@@ -4,10 +4,10 @@ import { useMemo, useState } from "react";
 
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
 import { OwnersCard } from "@src/modules/clients/ui/owners-card";
-import type { Owner } from "@src/types/clients/owner";
+import type { Owner, OwnerWithProperties } from "@src/types/clients/owner";
 
 interface OwnersListProps {
-	owners: Owner[];
+	owners: (Owner | OwnerWithProperties)[];
 	itemsPerPage?: number;
 }
 
