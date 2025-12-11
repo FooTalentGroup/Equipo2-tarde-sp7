@@ -131,6 +131,121 @@ export class ClientServices {
     }
 
     /**
+     * Helper privado: Enriquece los datos de una propiedad individual
+     * Agrega precio, imagen principal, dirección completa, características y antigüedad
+     */
+    private async enrichPropertyDetails(property: any): Promise<any> {
+        const { PropertyPriceModel } = await import('../../data/postgres/models/properties/property-price.model');
+        const { PropertyMultimediaModel } = await import('../../data/postgres/models/properties/property-multimedia.model');
+        const { PropertyAddressModel } = await import('../../data/postgres/models/properties/property-address.model');
+        const { AddressModel } = await import('../../data/postgres/models/properties/address.model');
+        const { PropertyAgeModel } = await import('../../data/postgres/models/properties/property-age.model');
+        const { PropertyOperationTypeModel } = await import('../../data/postgres/models/properties/property-operation-type.model');
+        const { CurrencyTypeModel } = await import('../../data/postgres/models/payments/currency-type.model');
+
+        // Obtener todos los datos en paralelo para optimizar performance
+        const [prices, mainImage, propertyAddresses, age] = await Promise.all([
+            PropertyPriceModel.findByPropertyId(property.id),
+            PropertyMultimediaModel.findPrimaryByPropertyId(property.id),
+            PropertyAddressModel.findByPropertyId(property.id),
+            property.age_id ? PropertyAgeModel.findById(property.age_id) : Promise.resolve(null)
+        ]);
+
+        // Procesar todos los precios (venta, alquiler, etc.)
+        let pricesData: any[] = [];
+        if (prices.length > 0) {
+            pricesData = await Promise.all(
+                prices.map(async (price) => {
+                    const [currency, operationType] = await Promise.all([
+                        CurrencyTypeModel.findById(price.currency_type_id),
+                        PropertyOperationTypeModel.findById(price.operation_type_id)
+                    ]);
+
+                    return {
+                        amount: price.price,
+                        currency: currency ? {
+                            id: currency.id,
+                            name: currency.name,
+                            symbol: currency.symbol
+                        } : null,
+                        operation_type: operationType ? {
+                            id: operationType.id,
+                            name: operationType.name
+                        } : null
+                    };
+                })
+            );
+        }
+
+        // Procesar dirección completa con ubicación
+        let addressData = null;
+        if (propertyAddresses.length > 0) {
+            const address = await AddressModel.findById(propertyAddresses[0].address_id);
+            if (address) {
+                const city = await CityModel.findById(address.city_id);
+                if (city) {
+                    const province = await ProvinceModel.findById(city.province_id);
+                    if (province) {
+                        const country = await CountryModel.findById(province.country_id);
+                        
+                        addressData = {
+                            full_address: address.full_address,
+                            neighborhood: address.neighborhood,
+                            city: {
+                                id: city.id,
+                                name: city.name,
+                                province: {
+                                    id: province.id,
+                                    name: province.name,
+                                    country: country ? {
+                                        id: country.id,
+                                        name: country.name
+                                    } : null
+                                }
+                            },
+                            location: {
+                                latitude: address.latitude,
+                                longitude: address.longitude
+                            }
+                        };
+                    }
+                }
+            }
+        }
+
+        // Procesar imagen principal
+        let imageData = null;
+        if (mainImage) {
+            imageData = {
+                id: mainImage.id,
+                url: mainImage.file_path,
+                is_primary: true
+            };
+        }
+
+        // Procesar antigüedad
+        let ageData = null;
+        if (age) {
+            ageData = {
+                id: age.id,
+                name: age.name
+            };
+        }
+
+        return {
+            description: property.description,
+            surface_area: property.total_area,
+            bedrooms: property.bedrooms_count,
+            bathrooms: property.bathrooms_count,
+            garage: property.parking_spaces_count > 0,
+            address: addressData,
+            prices: pricesData,  // Array de precios
+            main_image: imageData,
+            age: ageData
+        };
+    }
+
+    /**
      * Helper privado: Enriquece un cliente con sus propiedades asociadas
      * según su categoría (Lead, Propietario, Inquilino)
      */
@@ -164,14 +279,16 @@ export class ClientServices {
                         const property = await PropertyModel.findById(interest.property_id);
                         if (!property) return null;
                         
-                        const [propertyType, propertyStatus] = await Promise.all([
+                        const [propertyType, propertyStatus, enrichedDetails] = await Promise.all([
                             PropertyTypeModel.findById(property.property_type_id),
-                            PropertyStatusModel.findById(property.property_status_id)
+                            PropertyStatusModel.findById(property.property_status_id),
+                            this.enrichPropertyDetails(property)
                         ]);
 
                         return {
                             id: property.id,
                             title: property.title,
+                            ...enrichedDetails,
                             property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
                             property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                             interest_created_at: interest.created_at,
@@ -189,14 +306,16 @@ export class ClientServices {
             
             ownedProperties = await Promise.all(
                 properties.map(async (property: any) => {
-                    const [propertyType, propertyStatus] = await Promise.all([
+                    const [propertyType, propertyStatus, enrichedDetails] = await Promise.all([
                         PropertyTypeModel.findById(property.property_type_id),
-                        PropertyStatusModel.findById(property.property_status_id)
+                        PropertyStatusModel.findById(property.property_status_id),
+                        this.enrichPropertyDetails(property)
                     ]);
 
                     return {
                         id: property.id,
                         title: property.title,
+                        ...enrichedDetails,
                         property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
                         property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                         publication_date: property.publication_date
@@ -231,9 +350,10 @@ export class ClientServices {
                 if (activeRental && activeRental.property_id) {
                     const property = await PropertyModel.findById(activeRental.property_id);
                     if (property) {
-                        const [propertyType, propertyStatus] = await Promise.all([
+                        const [propertyType, propertyStatus, enrichedDetails] = await Promise.all([
                             PropertyTypeModel.findById(property.property_type_id),
-                            PropertyStatusModel.findById(property.property_status_id)
+                            PropertyStatusModel.findById(property.property_status_id),
+                            this.enrichPropertyDetails(property)
                         ]);
 
                         // Obtener información del alquiler desde rentals
@@ -248,6 +368,7 @@ export class ClientServices {
                         rentedProperty = {
                             id: property.id,
                             title: property.title,
+                            ...enrichedDetails,
                             property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
                             property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                             rental: {
@@ -273,14 +394,16 @@ export class ClientServices {
                         const property = await PropertyModel.findById(interest.property_id);
                         if (!property) return null;
                         
-                        const [propertyType, propertyStatus] = await Promise.all([
+                        const [propertyType, propertyStatus, enrichedDetails] = await Promise.all([
                             PropertyTypeModel.findById(property.property_type_id),
-                            PropertyStatusModel.findById(property.property_status_id)
+                            PropertyStatusModel.findById(property.property_status_id),
+                            this.enrichPropertyDetails(property)
                         ]);
 
                         return {
                             id: property.id,
                             title: property.title,
+                            ...enrichedDetails,
                             property_type: propertyType ? { id: propertyType.id, name: propertyType.name } : null,
                             property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                             interest_created_at: interest.created_at,

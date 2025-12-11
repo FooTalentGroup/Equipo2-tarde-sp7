@@ -533,7 +533,7 @@ export class ClientRoutes {
          * @swagger
          * /api/clients/{id}:
          *   get:
-         *     summary: Get client by ID
+         *     summary: Get client by ID with enriched property details
          *     tags: [Clients]
          *     security:
          *       - bearerAuth: []
@@ -543,9 +543,234 @@ export class ClientRoutes {
          *         required: true
          *         schema:
          *           type: integer
+         *         description: Client ID
          *     responses:
          *       200:
-         *         description: Client details
+         *         description: Client details with enriched property information
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 client:
+         *                   type: object
+         *                   properties:
+         *                     id:
+         *                       type: integer
+         *                       example: 1
+         *                     first_name:
+         *                       type: string
+         *                       example: Juan
+         *                     last_name:
+         *                       type: string
+         *                       example: Pérez
+         *                     email:
+         *                       type: string
+         *                       example: juan.perez@example.com
+         *                     phone:
+         *                       type: string
+         *                       example: "+541112345678"
+         *                     contact_category:
+         *                       type: object
+         *                       properties:
+         *                         id:
+         *                           type: integer
+         *                         name:
+         *                           type: string
+         *                           example: Lead
+         *                     city:
+         *                       type: object
+         *                       nullable: true
+         *                 properties_of_interest:
+         *                   type: array
+         *                   description: Properties of interest (for Leads and Tenants)
+         *                   items:
+         *                     type: object
+         *                     properties:
+         *                       id:
+         *                         type: integer
+         *                         example: 10
+         *                       title:
+         *                         type: string
+         *                         example: Departamento 2 ambientes Palermo
+         *                       description:
+         *                         type: string
+         *                         example: Hermoso departamento con vista al parque
+         *                       surface_area:
+         *                         type: number
+         *                         example: 65.5
+         *                       bedrooms:
+         *                         type: integer
+         *                         example: 2
+         *                       bathrooms:
+         *                         type: integer
+         *                         example: 1
+         *                       garage:
+         *                         type: boolean
+         *                         example: true
+         *                       address:
+         *                         type: object
+         *                         nullable: true
+         *                         properties:
+         *                           full_address:
+         *                             type: string
+         *                             example: Av. Santa Fe 1234, Palermo
+         *                           neighborhood:
+         *                             type: string
+         *                             example: Palermo
+         *                           city:
+         *                             type: object
+         *                             properties:
+         *                               id:
+         *                                 type: integer
+         *                               name:
+         *                                 type: string
+         *                               province:
+         *                                 type: object
+         *                                 properties:
+         *                                   id:
+         *                                     type: integer
+         *                                   name:
+         *                                     type: string
+         *                                   country:
+         *                                     type: object
+         *                                     properties:
+         *                                       id:
+         *                                         type: integer
+         *                                       name:
+         *                                         type: string
+         *                           location:
+         *                             type: object
+         *                             properties:
+         *                               latitude:
+         *                                 type: number
+         *                                 example: -34.603722
+         *                               longitude:
+         *                                 type: number
+         *                                 example: -58.381592
+         *                       prices:
+         *                         type: array
+         *                         description: All prices for this property (sale, rental, etc.)
+         *                         items:
+         *                           type: object
+         *                           properties:
+         *                             amount:
+         *                               type: number
+         *                               example: 250000
+         *                             currency:
+         *                               type: object
+         *                               properties:
+         *                                 id:
+         *                                   type: integer
+         *                                 name:
+         *                                   type: string
+         *                                 symbol:
+         *                                   type: string
+         *                                   example: ARS
+         *                             operation_type:
+         *                               type: object
+         *                               properties:
+         *                                 id:
+         *                                   type: integer
+         *                                 name:
+         *                                   type: string
+         *                                   example: Alquiler
+         *                       main_image:
+         *                         type: object
+         *                         nullable: true
+         *                         properties:
+         *                           id:
+         *                             type: integer
+         *                           url:
+         *                             type: string
+         *                             example: https://res.cloudinary.com/xxx/image/upload/v123/property_10.jpg
+         *                           is_primary:
+         *                             type: boolean
+         *                             example: true
+         *                       age:
+         *                         type: object
+         *                         nullable: true
+         *                         properties:
+         *                           id:
+         *                             type: integer
+         *                           name:
+         *                             type: string
+         *                             example: 5 años
+         *                       property_type:
+         *                         type: object
+         *                         properties:
+         *                           id:
+         *                             type: integer
+         *                           name:
+         *                             type: string
+         *                       property_status:
+         *                         type: object
+         *                         properties:
+         *                           id:
+         *                             type: integer
+         *                           name:
+         *                             type: string
+         *                       interest_created_at:
+         *                         type: string
+         *                         format: date-time
+         *                       interest_notes:
+         *                         type: string
+         *                 owned_properties:
+         *                   type: array
+         *                   description: Properties owned by the client (for Owners)
+         *                   items:
+         *                     type: object
+         *                     description: Same structure as properties_of_interest, without interest_created_at and interest_notes
+         *                 rented_property:
+         *                   type: object
+         *                   nullable: true
+         *                   description: Currently rented property (for Tenants)
+         *                   properties:
+         *                     id:
+         *                       type: integer
+         *                     title:
+         *                       type: string
+         *                     description:
+         *                       type: string
+         *                     surface_area:
+         *                       type: number
+         *                     bedrooms:
+         *                       type: integer
+         *                     bathrooms:
+         *                       type: integer
+         *                     garage:
+         *                       type: boolean
+         *                     address:
+         *                       type: object
+         *                       nullable: true
+         *                     prices:
+         *                       type: array
+         *                       description: All prices for this property
+         *                     main_image:
+         *                       type: object
+         *                       nullable: true
+         *                     age:
+         *                       type: object
+         *                       nullable: true
+         *                     property_type:
+         *                       type: object
+         *                     property_status:
+         *                       type: object
+         *                     rental:
+         *                       type: object
+         *                       properties:
+         *                         id:
+         *                           type: integer
+         *                         contract_start_date:
+         *                           type: string
+         *                           format: date
+         *                         contract_end_date:
+         *                           type: string
+         *                           format: date
+         *                         monthly_amount:
+         *                           type: string
+         *                         currency:
+         *                           type: object
          *       404:
          *         description: Client not found
          */
