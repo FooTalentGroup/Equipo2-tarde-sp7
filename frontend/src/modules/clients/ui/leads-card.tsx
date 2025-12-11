@@ -49,7 +49,7 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 			onClick={handleCardClick}
 		>
 			<CardContent className="p-0 w-full">
-				<div className="flex items-center justify-between px-4 py-3">
+				<div className="flex items-start justify-between px-4 py-3">
 					<div className="flex items-center gap-4 flex-1">
 						<div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-semibold text-slate-700">
 							{lead.first_name.charAt(0)}
