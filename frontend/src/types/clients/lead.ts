@@ -1,16 +1,43 @@
-import type { BaseContact } from "./base";
+import type {
+	BaseContact,
+	BaseContactWithId,
+	ContactCategoryInfo,
+} from "./base";
 
-export interface CreateLead extends BaseContact {
-	contact_category: "Lead";
-	interest_zone: string;
-	consultation_type_id: number;
-	property_search_type: string;
+export interface PropertyOfInterest {
+	id: number;
+	title: string;
+	property_type: {
+		id: number;
+		name: string;
+	};
+	property_status: {
+		id: number;
+		name: string;
+	};
+	interest_created_at: string;
+	interest_notes?: string | null;
 }
 
-export interface Lead extends CreateLead {
-	id: string;
-	created_at: string;
-	updated_at: string;
+export interface CreateLead extends BaseContact {
+	contact_category_id?: number;
+	interest_zone: string | null;
+	purchase_interest?: boolean;
+	rental_interest?: boolean;
+	property_search_type_id: number | null;
+	city_id: number | null;
+}
+
+export interface Lead extends BaseContactWithId {
+	id: number;
+	contact_category_id: number;
+	interest_zone: string | null;
+	purchase_interest: boolean;
+	rental_interest: boolean;
+	property_search_type_id: number | null;
+	city_id: number | null;
+	contact_category: ContactCategoryInfo;
+	properties_of_interest: PropertyOfInterest[];
 }
 
 export type UpdateLead = Partial<CreateLead>;
@@ -21,6 +48,6 @@ export interface LeadFormInitialData {
 	last_name: string;
 	phone: string;
 	email: string;
-	interest_zone: string;
-	consultation_type_id: number;
+	interest_zone: string | null;
+	property_search_type_id: number | null;
 }
