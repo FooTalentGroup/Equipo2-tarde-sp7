@@ -17,10 +17,10 @@ import { Building2, ChevronDown, Plus, User } from "lucide-react";
 export default function ActionDropdown() {
 	return (
 		<ButtonGroup>
-			<Button asChild variant="tertiary" size="default" className="mr-0.5">
-				<Link href={paths.agent.properties.new()}>
+			<Button asChild variant="tertiary" size="default" className="mr-0.5 w-27">
+				<Link href={paths.agent.properties.new()} className="flex items-center">
 					<Plus />
-					Crear propiedad
+					Crear
 				</Link>
 			</Button>
 			<DropdownMenu>
@@ -29,17 +29,17 @@ export default function ActionDropdown() {
 						<ChevronDown />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end" className="w-52">
+				<DropdownMenuContent align="end" className="">
 					<DropdownMenuGroup>
 						<Link href={paths.agent.properties.new()}>
-							<DropdownMenuItem>
-								<Building2 />
+							<DropdownMenuItem className="hover:text-tertiary">
+								<Building2 className="hover:text-inherit" />
 								Crear propiedad
 							</DropdownMenuItem>
 						</Link>
 						<Link href={paths.agent.clients.newLeads()}>
-							<DropdownMenuItem>
-								<User />
+							<DropdownMenuItem className="hover:text-tertiary">
+								<User className="hover:text-inherit" />
 								Crear cliente
 							</DropdownMenuItem>
 						</Link>
