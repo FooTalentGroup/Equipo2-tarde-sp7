@@ -714,7 +714,10 @@ export class PropertyRoutes {
 	 *     description: |
 	 *       Returns document information with a Cloudinary URL that forces download.
 	 *       Uses the fl_attachment transformation to add Content-Disposition header.
+	 *       **Requires authentication.**
 	 *     tags: [Properties]
+	 *     security:
+	 *       - bearerAuth: []
 	 *     parameters:
 	 *       - in: path
 	 *         name: documentId
@@ -773,8 +776,10 @@ export class PropertyRoutes {
 	 *                   type: string
 	 *                   example: Document not found
 	 */
-	router.get("/documents/:documentId/download-url", (req, res) =>
-		controller.getDocumentDownloadUrl(req, res),
+	router.get(
+		"/documents/:documentId/download-url",
+		authMiddleware.authenticate,
+		(req, res) => controller.getDocumentDownloadUrl(req, res),
 	);
 
 		return router;
