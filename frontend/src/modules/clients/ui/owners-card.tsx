@@ -28,7 +28,7 @@ export function OwnersCard({ owner, onEdit, onDelete }: OwnersCardProps) {
 	const propertiesCount = owner.owned_properties?.length || 0;
 
 	const handleCardClick = () => {
-		router.push(paths.agent.owners.detail(owner.id.toString()));
+		router.push(paths.agent.clients.owners.detail(owner.id.toString()));
 	};
 
 	const handleEdit = (e: React.MouseEvent) => {
