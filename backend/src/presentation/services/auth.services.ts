@@ -91,6 +91,11 @@ export class AuthServices {
             throw CustomError.badRequest('Invalid credentials');
         }
 
+        // Validate user is active
+        if (!profile.active) {
+            throw CustomError.forbidden('User account is disabled. Please contact the administrator.');
+        }
+
         // Create entity from profile
         const profileEntity = ProfileEntity.fromObject(profile);
         
