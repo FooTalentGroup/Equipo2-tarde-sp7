@@ -18,7 +18,10 @@ import {
 	type OwnerFormData,
 	ownerFormSchema,
 } from "@src/modules/clients/schemas/owner-form.schema";
-import { createClientServerAction } from "@src/modules/clients/services/clients-service";
+import {
+	createClientServerAction,
+	updateClientById,
+} from "@src/modules/clients/services/clients-service";
 import { ClientType } from "@src/modules/clients/services/types";
 import type { CreateOwner } from "@src/types/clients/owner";
 import type { Property } from "@src/types/property";
@@ -31,12 +34,16 @@ type OwnerFormProps = {
 	availableProperties: Property[];
 	onSubmit?: (data: OwnerFormData) => Promise<void> | void;
 	onCancel?: () => void;
+	initialValues?: Partial<OwnerFormData>;
+	clientId?: string;
 };
 
 export default function OwnerForm({
 	availableProperties,
 	onSubmit,
 	onCancel,
+	initialValues,
+	clientId,
 }: OwnerFormProps) {
 	/* const availableProperties = getPropertiesWithoutOwner(); */
 
@@ -51,6 +58,7 @@ export default function OwnerForm({
 			address: "",
 			property_id: "",
 			notes: "",
+			...initialValues,
 		},
 	});
 
@@ -82,6 +90,13 @@ export default function OwnerForm({
 				//   ...ownerData,
 				//   property_id: data.assigned_property_id
 				// });
+				if (clientId) {
+					await updateClientById(clientId, ownerData);
+					toast.success("Propietario actualizado exitosamente");
+					window.location.href = `/agent/clients/propietarios/${clientId}`;
+					return;
+				}
+
 				await createClientServerAction(
 					ClientType.OWNER,
 					ownerData as CreateOwner,
