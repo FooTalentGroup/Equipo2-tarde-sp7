@@ -107,7 +107,7 @@ export interface Owner {
 
 // Tipo extendido cuando el owner incluye información de propiedades (para listas)
 export interface OwnerWithProperties extends Owner {
-	owned_properties_count?: number; // Conteo de propiedades para listas
+	owned_properties?: OwnedProperty[]; // Array de propiedades del propietario
 }
 
 export type UpdateOwner = Partial<CreateOwner>;
