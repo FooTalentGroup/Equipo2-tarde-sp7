@@ -31,7 +31,7 @@ export const paths = {
 				index: () => "/agent/clients/inquilinos",
 				new: () => "/agent/clients/create/inquilinos",
 				detail: (id: string | number) => `/agent/clients/inquilinos/${id}`,
-				edit: (id: string | number) => `/agent/clients/inquilinos/${id}/edit`,
+				edit: (id: string | number) => `/agent/clients/edit/inquilinos/${id}`,
 			},
 			owners: {
 				index: () => "/agent/clients/propietarios",
