@@ -71,6 +71,16 @@ export class Server {
 		this.app.use("/docs", swaggerUi.serve, swaggerSetup);
 		this.app.use("/api-docs", swaggerUi.serve, swaggerSetup);
 
+		//* Health Check Endpoint (para UptimeRobot y monitoreo)
+		this.app.get("/health", (req, res) => {
+			res.status(200).json({
+				status: "ok",
+				timestamp: new Date().toISOString(),
+				uptime: process.uptime(),
+				service: "Real Estate API",
+			});
+		});
+
 		//* Routes
 		this.app.use(this.routes);
 
