@@ -20,16 +20,25 @@ export const paths = {
 		dashboard: () => "/agent/dashboard",
 		clients: {
 			index: () => "/agent/clients",
-			newLeads: () => "/agent/clients/create/leads",
-			newInquilinos: () => "/agent/clients/create/inquilinos",
-			leads: () => "/agent/clients/leads",
-			inquilinos: () => "/agent/clients/inquilinos",
-			propietarios: () => "/agent/clients/propietarios",
 			searchProperties: () => "/agent/clients/search",
-		},
-		owners: {
-			new: () => "/agent/clients/create/propietarios",
-			detail: (id: string) => `/agent/clients/propietarios/${id}`,
+			leads: {
+				index: () => "/agent/clients/leads",
+				new: () => "/agent/clients/create/leads",
+				detail: (id: string | number) => `/agent/clients/leads/${id}`,
+				edit: (id: string | number) => `/agent/clients/leads/${id}/edit`,
+			},
+			inquilinos: {
+				index: () => "/agent/clients/inquilinos",
+				new: () => "/agent/clients/create/inquilinos",
+				detail: (id: string | number) => `/agent/clients/inquilinos/${id}`,
+				edit: (id: string | number) => `/agent/clients/inquilinos/${id}/edit`,
+			},
+			owners: {
+				index: () => "/agent/clients/propietarios",
+				new: () => "/agent/clients/create/propietarios",
+				detail: (id: string | number) => `/agent/clients/propietarios/${id}`,
+				edit: (id: string | number) => `/agent/clients/propietarios/${id}/edit`,
+			},
 		},
 		properties: {
 			index: () => "/agent/properties",

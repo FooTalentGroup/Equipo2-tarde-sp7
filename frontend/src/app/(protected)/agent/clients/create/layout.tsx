@@ -36,7 +36,7 @@ export default function CreateClientLayout({ children }: ClientsLayoutProps) {
 				<div className="flex items-center my-4">
 					<div className="justify-start gap-2 rounded-none bg-transparent text-black flex">
 						<Link
-							href={paths.agent.clients.newLeads()}
+							href={paths.agent.clients.leads.new()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "leads"
 									? "bg-tertiary text-primary-foreground"
@@ -46,7 +46,7 @@ export default function CreateClientLayout({ children }: ClientsLayoutProps) {
 							Leads
 						</Link>
 						<Link
-							href={paths.agent.clients.newInquilinos()}
+							href={paths.agent.clients.inquilinos.new()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "inquilinos"
 									? "bg-tertiary text-primary-foreground"
@@ -56,7 +56,7 @@ export default function CreateClientLayout({ children }: ClientsLayoutProps) {
 							Inquilinos
 						</Link>
 						<Link
-							href={paths.agent.owners.new()}
+							href={paths.agent.clients.owners.new()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${
 								activeTab === "propietarios"
 									? "bg-tertiary text-primary-foreground"

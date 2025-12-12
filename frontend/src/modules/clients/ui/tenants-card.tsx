@@ -11,6 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@src/components/ui/dropdown-menu";
 import { StatusBadge } from "@src/components/ui/status-badge";
+import { paths } from "@src/lib/paths";
 import type { Tenant } from "@src/types/clients/tenant";
 import { MoreHorizontal } from "lucide-react";
 
@@ -29,7 +30,7 @@ export function TenantsCard({ tenant, onEdit, onDelete }: TenantsCardProps) {
 	const monthlyAmount = tenant.rented_property?.rental?.monthly_amount;
 
 	const handleCardClick = () => {
-		router.push(`/admin/clients/tenants/${tenant.id}`);
+		router.push(paths.agent.clients.inquilinos.detail(tenant.id));
 	};
 
 	const handleEdit = (e: React.MouseEvent) => {

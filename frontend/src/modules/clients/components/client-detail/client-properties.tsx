@@ -21,17 +21,18 @@ interface Property {
 }
 
 interface ClientPropertiesProps {
+	title?: string;
 	properties: Property[];
 }
 
-export function ClientProperties({ properties }: ClientPropertiesProps) {
+export function ClientProperties({ title, properties }: ClientPropertiesProps) {
 	return (
 		<Card>
 			<CardContent className="px-4 py-1">
 				<div className="flex items-center justify-between mb-6">
 					<h3 className="font-semibold text-lg text-slate-900 flex items-center gap-2">
 						<Building2 className="h-5 w-5" />
-						Propiedades ({properties.length})
+						{title ?? `Propiedades (${properties.length})`}
 					</h3>
 					<Button variant="tertiary">Agregar Propiedad</Button>
 				</div>

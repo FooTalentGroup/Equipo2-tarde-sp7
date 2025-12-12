@@ -37,7 +37,7 @@ export default function ActionDropdown() {
 								Crear propiedad
 							</DropdownMenuItem>
 						</Link>
-						<Link href={paths.agent.clients.newLeads()}>
+						<Link href={paths.agent.clients.leads.new()}>
 							<DropdownMenuItem className="hover:text-tertiary">
 								<User className="hover:text-inherit" />
 								Crear cliente

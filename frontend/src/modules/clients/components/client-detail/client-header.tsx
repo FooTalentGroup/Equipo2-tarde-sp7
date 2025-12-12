@@ -12,7 +12,7 @@ interface ClientHeaderProps {
 	id: string;
 	firstName: string;
 	lastName: string;
-	dni: string;
+	dni?: string;
 	status: "lead" | "inquilino" | "propietario";
 	editPath: string;
 }
@@ -47,7 +47,9 @@ export function ClientHeader({
 									</h1>
 									<StatusBadge status={status}>{statusLabel}</StatusBadge>
 								</div>
-								<div className="text-sm text-slate-500">DNI: {dni}</div>
+								{dni && (
+									<div className="text-sm text-slate-500">DNI: {dni}</div>
+								)}
 							</div>
 						</div>
 						<div className="flex flex-col items-center gap-1">

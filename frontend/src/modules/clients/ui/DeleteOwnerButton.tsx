@@ -43,7 +43,7 @@ export function DeleteOwnerButton({
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			// Redirigir a la lista de propietarios
-			router.push(paths.agent.clients.propietarios());
+			router.push(paths.agent.clients.owners.index());
 			router.refresh();
 		} catch (error) {
 			console.error("Error al eliminar propietario:", error);

@@ -6,7 +6,7 @@ import { Calendar, Mail, MapPin, Phone, User } from "lucide-react";
 interface ClientContactInfoProps {
 	phone: string;
 	email: string;
-	address: string;
+	address?: string;
 	createdAt: string;
 }
 
@@ -38,13 +38,15 @@ export function ClientContactInfo({
 							<div className="text-sm text-slate-900">{email}</div>
 						</div>
 					</div>
-					<div className="flex items-start gap-3">
-						<MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
-						<div>
-							<div className="text-xs text-slate-500">Dirección</div>
-							<div className="text-sm text-slate-900">{address}</div>
+					{address && (
+						<div className="flex items-start gap-3">
+							<MapPin className="h-5 w-5 text-slate-400 mt-0.5" />
+							<div>
+								<div className="text-xs text-slate-500">Dirección</div>
+								<div className="text-sm text-slate-900">{address}</div>
+							</div>
 						</div>
-					</div>
+					)}
 					<div className="flex items-start gap-3">
 						<Calendar className="h-5 w-5 text-slate-400 mt-0.5" />
 						<div>
