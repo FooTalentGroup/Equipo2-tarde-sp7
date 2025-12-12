@@ -8,6 +8,7 @@ import {
 import {
 	addOwnedProperty,
 	getClientById,
+	removeOwnedProperty,
 } from "@src/modules/clients/services/clients-service";
 import { getProperties } from "@src/modules/properties/services/property-service";
 import type { OwnerApiResponse } from "@src/types/clients/owner";
