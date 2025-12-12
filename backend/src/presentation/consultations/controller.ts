@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import { CustomError } from "../../domain";
 import { CreatePropertyConsultationDto } from "../../domain/dtos/consultations/create-property-consultation.dto";
+import { CreateGeneralConsultationDto } from "../../domain/dtos/consultations/create-general-consultation.dto";
 import { DeleteMultipleConsultationsDto } from "../../domain/dtos/consultations/delete-multiple-consultations.dto";
 import type { PropertyConsultationServices } from "../services/property-consultation.services";
 
@@ -40,6 +41,33 @@ export class ConsultationController {
 
 			// Create consultation
 			const result = await this.consultationServices.createPropertyConsultation(
+				createConsultationDto,
+			);
+
+			return res.status(201).json(result);
+		} catch (error) {
+			this.handleError(error, res);
+		}
+	};
+
+	/**
+	 * Create a general consultation from public website (without property)
+	 * No authentication required - public endpoint
+	 */
+	createGeneralConsultation = async (req: Request, res: Response) => {
+		try {
+			// Validate DTO
+			const [error, createConsultationDto] =
+				CreateGeneralConsultationDto.create(req.body);
+
+			if (error || !createConsultationDto) {
+				return res.status(400).json({
+					message: error || "Invalid data",
+				});
+			}
+
+			// Create general consultation
+			const result = await this.consultationServices.createGeneralConsultation(
 				createConsultationDto,
 			);
 
