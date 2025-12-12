@@ -14,8 +14,8 @@ export class DashboardServices {
 	 * Gets all dashboard data including consultations, stats
 	 */
 	async getDashboardData() {
-		// 1. Get latest 4 consultations (unread first, then most recent)
-		const consultations = await this.getLatestConsultations(4);
+		// 1. Get latest 5 consultations (most recent by date)
+		const consultations = await this.getLatestConsultations(5);
 
 		// 2. Get property counts and consultation counts in parallel
 		const [activeProperties, inactiveProperties, unansweredConsultations, unreadConsultations] = await Promise.all([
@@ -37,52 +37,18 @@ export class DashboardServices {
 	}
 
 	/**
-	 * Gets latest consultations (unread first, then most recent)
-	 * Returns maximum 4 consultations
-	 * Logic: Always return up to 4 consultations, prioritizing unread ones.
-	 * If there are less than 4 unread, fill with the most recent read ones.
+	 * Gets latest consultations ordered by date DESC
+	 * Returns maximum 'limit' consultations
 	 */
-	private async getLatestConsultations(limit: number = 4) {
-		// Step 1: Get all unread consultations (ordered by date DESC)
-		const unreadConsultations = await ClientConsultationModel.findAll({
-			is_read: false,
-			limit: limit, // Get up to limit unread
+	private async getLatestConsultations(limit: number = 5) {
+		// Get latest consultations ordered by date
+		const consultations = await ClientConsultationModel.findAll({
+			limit: limit,
 		});
-
-		// Step 2: If we have less than limit unread, get the most recent read ones to complete to limit
-		let consultations = [...unreadConsultations];
-		
-		// Always try to return exactly 'limit' consultations if available
-		if (unreadConsultations.length < limit) {
-			const remaining = limit - unreadConsultations.length;
-			const readConsultations = await ClientConsultationModel.findAll({
-				is_read: true,
-				limit: remaining,
-			});
-			// Combine: unread first, then read ones
-			consultations = [...unreadConsultations, ...readConsultations];
-		}
-
-		// Step 3: Ensure final list is sorted correctly:
-		// - Unread first (is_read = false) regardless of date
-		// - Then by consultation_date DESC (newest first) within each group
-		consultations.sort((a, b) => {
-			// Priority 1: Unread (false) comes before read (true)
-			if (a.is_read !== b.is_read) {
-				return a.is_read ? 1 : -1;
-			}
-			// Priority 2: Within same read status, sort by date DESC (newest first)
-			const dateA = a.consultation_date ? new Date(a.consultation_date).getTime() : 0;
-			const dateB = b.consultation_date ? new Date(b.consultation_date).getTime() : 0;
-			return dateB - dateA; // DESC order
-		});
-
-		// Slice to limit before enriching
-		const limitedConsultations = consultations.slice(0, limit);
 
 		// Enrich consultations with client and property data
 		const enrichedConsultations = await Promise.all(
-			limitedConsultations.map(async (consultation) => {
+			consultations.map(async (consultation) => {
 				// Get client data if client_id exists
 				let client = null;
 				if (consultation.client_id) {

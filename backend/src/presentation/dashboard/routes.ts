@@ -19,10 +19,11 @@ export class DashboardRoutes {
 		 *     summary: Get dashboard data
 		 *     description: |
 		 *       Returns aggregated data for the dashboard including:
-		 *       - Latest 4 consultations (unread first, then most recent)
+		 *       - Latest 5 consultations (most recent by date)
 		 *       - Count of active properties (not archived)
 		 *       - Count of inactive properties (archived)
-		 *       - Count of unanswered consultations
+		 *       - Count of unanswered consultations (without response)
+		 *       - Count of unread consultations
 		 *     tags: [Dashboard]
 		 *     security:
 		 *       - bearerAuth: []
