@@ -5,7 +5,12 @@ import {
 	ClientNotes,
 	ClientProperties,
 } from "@src/modules/clients/components/client-detail";
-import { getClientById } from "@src/modules/clients/services/clients-service";
+import {
+	addPropertyOfInterest,
+	getClientById,
+	removePropertyOfInterest,
+} from "@src/modules/clients/services/clients-service";
+import { getProperties } from "@src/modules/properties/services/property-service";
 import type { LeadApiResponse } from "@src/types/clients/lead";
 
 export default async function LeadDetailPage({
@@ -31,6 +36,21 @@ export default async function LeadDetailPage({
 
 	const clientData = responseData.client;
 	const propertiesOfInterest = responseData.properties_of_interest || [];
+
+	// Propiedades disponibles para asignar (desde backend)
+	const { properties: availableProperties } = await getProperties({
+		includeArchived: false,
+	});
+
+	async function handleAddPropertyOfInterest(propertyId: string) {
+		"use server";
+		await addPropertyOfInterest(id, propertyId);
+	}
+
+	async function handleDeletePropertyOfInterest(propertyId: string | number) {
+		"use server";
+		await removePropertyOfInterest(id, propertyId);
+	}
 
 	// Mapear datos del backend
 	const client = {
@@ -91,6 +111,10 @@ export default async function LeadDetailPage({
 						<ClientProperties
 							properties={properties}
 							title="Propiedades de interés"
+							availableProperties={availableProperties}
+							onAddProperty={handleAddPropertyOfInterest}
+							onDeleteProperty={handleDeletePropertyOfInterest}
+							operationType={[1, 2]}
 						/>
 					</div>
 				</div>
