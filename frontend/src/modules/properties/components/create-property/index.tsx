@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, AlertDescription, AlertTitle } from "@src/components/ui/alert";
 import { Badge } from "@src/components/ui/badge";
 import { Button } from "@src/components/ui/button";
+import { Card, CardContent } from "@src/components/ui/card";
 import { Form } from "@src/components/ui/form";
 import { Heading } from "@src/components/ui/heading";
 import { Separator } from "@src/components/ui/separator";
@@ -238,9 +239,9 @@ export default function CreatePropertyForm({
 	}
 
 	return (
-		<section className="grid lg:grid-cols-[1fr_auto_275px] xl:grid-cols-[1fr_auto_375px] gap-4">
+		<section className="grid lg:grid-cols-[1fr_275px] xl:grid-cols-[1fr_275px] gap-4">
 			<div className="flex flex-col gap-8 ">
-				<nav aria-label="Progress" className="w-full">
+				<nav aria-label="Progress" className="w-full max-w-[719px] mx-auto">
 					<ol className="flex w-full items-start">
 						{stepper.all.map((step, index, _array) => (
 							<li
@@ -298,66 +299,80 @@ export default function CreatePropertyForm({
 					<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
 						{stepper.switch({
 							info: ({ title }) => (
-								<div className="grid gap-6">
-									<Heading variant="subtitle2" weight="semibold">
-										{title}
-									</Heading>
-									<PropertyBasicInfoForm form={form} />
-								</div>
+								<Card className="border-none">
+									<CardContent className="grid gap-6">
+										<Heading variant="subtitle2" weight="semibold">
+											{title}
+										</Heading>
+										<PropertyBasicInfoForm form={form} />
+									</CardContent>
+								</Card>
 							),
 							features: ({ title }) => (
-								<div className="grid gap-6">
-									<Heading variant="subtitle2" weight="semibold">
-										{title}
-									</Heading>
-									<PropertyFeaturesForm form={form} />
-								</div>
+								<Card className="border-none">
+									<CardContent className="grid gap-6">
+										<Heading variant="subtitle2" weight="semibold">
+											{title}
+										</Heading>
+										<PropertyFeaturesForm form={form} />
+									</CardContent>
+								</Card>
 							),
 							surfaces: ({ title }) => (
-								<div className="grid gap-6">
-									<Heading variant="subtitle2" weight="semibold">
-										{title}
-									</Heading>
-									<PropertySurfacesForm form={form} />
-								</div>
+								<Card className="border-none">
+									<CardContent className="grid gap-6">
+										<Heading variant="subtitle2" weight="semibold">
+											{title}
+										</Heading>
+										<PropertySurfacesForm form={form} />
+									</CardContent>
+								</Card>
 							),
 							values: ({ title }) => (
-								<div className="grid gap-6">
-									<Heading variant="subtitle2" weight="semibold">
-										{title}
-									</Heading>
-									<PropertyValuesForm form={form} />
-								</div>
+								<Card className="border-none">
+									<CardContent className="grid gap-6">
+										<Heading variant="subtitle2" weight="semibold">
+											{title}
+										</Heading>
+										<PropertyValuesForm form={form} />
+									</CardContent>
+								</Card>
 							),
 							services: ({ title }) => (
-								<div className="grid gap-6">
-									<Heading variant="subtitle2" weight="semibold">
-										{title}
-									</Heading>
-									<PropertyServicesForm form={form} />
-								</div>
+								<Card className="border-none">
+									<CardContent className="grid gap-6">
+										<Heading variant="subtitle2" weight="semibold">
+											{title}
+										</Heading>
+										<PropertyServicesForm form={form} />
+									</CardContent>
+								</Card>
 							),
 							gallery: ({ title }) => (
-								<div className="grid gap-6">
-									<Heading variant="subtitle2" weight="semibold">
-										{title}
-									</Heading>
-									<Badge
-										variant="outline"
-										size="lg"
-										className="text-wrap! grid gap-3 grid-cols-[auto_1fr] h-auto"
-									>
-										<InfoIcon className="w-4! h-4!" />
-										La primera imagen en la galería sera usada como imágen
-										principal y se mostrará en el portal
-									</Badge>
-									<PropertyGalleryForm form={form} />
-								</div>
+								<Card className="border-none">
+									<CardContent className="grid gap-6">
+										<Heading variant="subtitle2" weight="semibold">
+											{title}
+										</Heading>
+										<Badge
+											variant="outline"
+											size="lg"
+											className="text-wrap! grid gap-3 grid-cols-[auto_1fr] h-auto"
+										>
+											<InfoIcon className="w-4! h-4!" />
+											La primera imagen en la galería sera usada como imágen
+											principal y se mostrará en el portal
+										</Badge>
+										<PropertyGalleryForm form={form} />
+									</CardContent>
+								</Card>
 							),
 							documents: () => (
-								<div className="grid gap-6">
-									<PropertyDocumentsForm form={form} />
-								</div>
+								<Card className="border-none">
+									<CardContent className="grid gap-6">
+										<PropertyDocumentsForm form={form} />
+									</CardContent>
+								</Card>
 							),
 						})}
 
@@ -395,8 +410,8 @@ export default function CreatePropertyForm({
 					</form>
 				</Form>
 			</div>
-			<Separator orientation="vertical" />
-			<Alert className="h-fit grid grid-cols-[auto_1fr] gap-4">
+
+			<Alert className="h-fit grid grid-cols-[auto_1fr] gap-4 shadow-md border-none">
 				<div className="bg-secondary/20 p-2 w-9 text-secondary h-9 grid place-content-center rounded-md">
 					<Info />
 				</div>

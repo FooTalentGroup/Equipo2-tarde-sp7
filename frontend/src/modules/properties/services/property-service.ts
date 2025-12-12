@@ -189,12 +189,15 @@ export async function updateProperty(id: number | string, data: PropertyForm) {
 			});
 		}
 
-		const existingImageIds = data.images?.gallery
+		const imageOrder = data.images?.gallery
 			?.filter((f: File | PropertyImage): f is PropertyImage => "id" in f)
-			.map((f) => f.id);
+			.map((f, index) => ({
+				id: f.id,
+				is_primary: index === 0,
+			}));
 
-		if (existingImageIds && existingImageIds.length > 0) {
-			formData.append("existing_images", JSON.stringify(existingImageIds));
+		if (imageOrder && imageOrder.length > 0) {
+			formData.append("imageOrder", JSON.stringify(imageOrder));
 		}
 
 		if (data.documents?.files && data.documents.files.length > 0) {
@@ -204,6 +207,8 @@ export async function updateProperty(id: number | string, data: PropertyForm) {
 				}
 			});
 		}
+
+		console.log("formData=>", formData);
 
 		const res = await api.patch<Property>(`properties/${id}/grouped`, formData);
 		revalidateTag("properties", { expire: 0 });

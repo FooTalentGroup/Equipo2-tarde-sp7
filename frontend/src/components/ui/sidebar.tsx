@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import {
 	type ComponentProps,
 	type CSSProperties,
@@ -517,59 +518,69 @@ const sidebarMenuButtonVariants = cva(
 	},
 );
 
-function SidebarMenuButton({
-	asChild = false,
-	isActive = false,
-	variant = "default",
-	size = "default",
-	tooltip,
-	className,
-	...props
-}: ComponentProps<"button"> & {
-	asChild?: boolean;
-	isActive?: boolean;
-	tooltip?: string | ComponentProps<typeof TooltipContent>;
-} & VariantProps<typeof sidebarMenuButtonVariants>) {
-	const Comp = asChild ? Slot : "button";
-	const { isMobile, state } = useSidebar();
+const SidebarMenuButton = React.forwardRef<
+	HTMLButtonElement,
+	ComponentProps<"button"> & {
+		asChild?: boolean;
+		isActive?: boolean;
+		tooltip?: string | ComponentProps<typeof TooltipContent>;
+	} & VariantProps<typeof sidebarMenuButtonVariants>
+>(
+	(
+		{
+			asChild = false,
+			isActive = false,
+			variant = "default",
+			size = "default",
+			tooltip,
+			className,
+			...props
+		},
+		ref,
+	) => {
+		const Comp = asChild ? Slot : "button";
+		const { isMobile, state } = useSidebar();
 
-	const button = (
-		<Comp
-			data-slot="sidebar-menu-button"
-			data-sidebar="menu-button"
-			data-size={size}
-			data-active={isActive}
-			className={cn(
-				sidebarMenuButtonVariants({ variant, size }),
-				className,
-				"h-11 [&>svg]:size-5 text-base",
-			)}
-			{...props}
-		/>
-	);
-
-	if (!tooltip) {
-		return button;
-	}
-
-	if (typeof tooltip === "string") {
-		tooltip = {
-			children: tooltip,
-		};
-	}
-
-	return (
-		<Tooltip>
-			<TooltipTrigger asChild>{button}</TooltipTrigger>
-			<TooltipContent
-				side="right"
-				align="center"
-				hidden={state !== "collapsed" || isMobile}
-				{...tooltip}
+		const button = (
+			<Comp
+				ref={ref}
+				data-slot="sidebar-menu-button"
+				data-sidebar="menu-button"
+				data-size={size}
+				data-active={isActive}
+				className={cn(
+					sidebarMenuButtonVariants({ variant, size }),
+					className,
+					"h-11 [&>svg]:size-5 text-base",
+				)}
+				{...props}
 			/>
-		</Tooltip>
-	);
-}
+		);
+
+		if (!tooltip) {
+			return button;
+		}
+
+		if (typeof tooltip === "string") {
+			tooltip = {
+				children: tooltip,
+			};
+		}
+
+		return (
+			<Tooltip>
+				<TooltipTrigger asChild>{button}</TooltipTrigger>
+				<TooltipContent
+					side="right"
+					align="center"
+					hidden={state !== "collapsed" || isMobile}
+					{...tooltip}
+				/>
+			</Tooltip>
+		);
+	},
+);
+SidebarMenuButton.displayName = "SidebarMenuButton";
 
 function SidebarMenuAction({
 	className,
@@ -686,38 +697,42 @@ function SidebarMenuSubItem({ className, ...props }: ComponentProps<"li">) {
 	);
 }
 
-function SidebarMenuSubButton({
-	asChild = false,
-	size = "md",
-	isActive = false,
-	className,
-	...props
-}: ComponentProps<"a"> & {
-	asChild?: boolean;
-	size?: "sm" | "md" | "lg";
-	isActive?: boolean;
-}) {
-	const Comp = asChild ? Slot : "a";
+const SidebarMenuSubButton = React.forwardRef<
+	HTMLAnchorElement,
+	ComponentProps<"a"> & {
+		asChild?: boolean;
+		size?: "sm" | "md" | "lg";
+		isActive?: boolean;
+	}
+>(
+	(
+		{ asChild = false, size = "md", isActive = false, className, ...props },
+		ref,
+	) => {
+		const Comp = asChild ? Slot : "a";
 
-	return (
-		<Comp
-			data-slot="sidebar-menu-sub-button"
-			data-sidebar="menu-sub-button"
-			data-size={size}
-			data-active={isActive}
-			className={cn(
-				"text-sidebar-foreground [&>svg]:text-sidebar-foreground h-11 ring-sidebar-ring hover:[&>svg]:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground flex px-4 py-2 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
-				"data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:[&>svg]:text-sidebar-accent-foreground",
-				size === "sm" && "text-xs",
-				size === "md" && "text-sm",
-				size === "lg" && "text-base",
-				"group-data-[collapsible=icon]:hidden",
-				className,
-			)}
-			{...props}
-		/>
-	);
-}
+		return (
+			<Comp
+				ref={ref}
+				data-slot="sidebar-menu-sub-button"
+				data-sidebar="menu-sub-button"
+				data-size={size}
+				data-active={isActive}
+				className={cn(
+					"text-sidebar-foreground [&>svg]:text-sidebar-foreground h-11 ring-sidebar-ring hover:[&>svg]:text-sidebar-accent-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground active:bg-sidebar-accent active:text-sidebar-accent-foreground flex px-4 py-2 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md outline-hidden focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
+					"data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground data-[active=true]:[&>svg]:text-sidebar-accent-foreground",
+					size === "sm" && "text-xs",
+					size === "md" && "text-sm",
+					size === "lg" && "text-base",
+					"group-data-[collapsible=icon]:hidden",
+					className,
+				)}
+				{...props}
+			/>
+		);
+	},
+);
+SidebarMenuSubButton.displayName = "SidebarMenuSubButton";
 
 export {
 	Sidebar,

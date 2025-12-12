@@ -1,29 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Button } from "@src/components/ui/button";
 import { paths } from "@src/lib/paths";
 import { getCompanySettings } from "@src/services/settings-service";
-
-import MainLayout from "../layouts/main-layout";
 
 export default async function PublicHeader() {
 	const settings = await getCompanySettings();
 
 	return (
-		<MainLayout
-			size="xl"
-			className="px-4 bg-sidebar sticky top-0 z-50 min-h-(--admin-header-height) max-h-(--admin-header-height) grid grid-cols-[auto_1fr] justify-between items-center gap-4"
-		>
+		<header className="px-4 bg-sidebar sticky top-0 z-50 min-h-(--admin-header-height) max-h-(--admin-header-height) grid  justify-center items-center gap-4">
 			{settings?.logo_url ? (
-				<Image
-					src={settings.logo_url}
-					width={400}
-					height={100}
-					alt={settings.company_name || "Company Logo"}
-					className="object-contain max-h-[100px] w-full"
-					priority
-				/>
+				<Link href={paths.public.landing()}>
+					<Image
+						src={settings.logo_url}
+						width={400}
+						height={100}
+						alt={settings.company_name || "Company Logo"}
+						className="object-contain max-h-[100px] w-full"
+						priority
+					/>
+				</Link>
 			) : (
 				<svg
 					className="w-full! h-full!"
@@ -46,7 +42,7 @@ export default async function PublicHeader() {
 					/>
 				</svg>
 			)}
-			<div className="flex gap-2 justify-self-end">
+			{/* <div className="flex gap-2 justify-self-end">
 				<Button asChild variant="ghost">
 					<Link href={paths.public.landing()}>Inicio</Link>
 				</Button>
@@ -59,7 +55,7 @@ export default async function PublicHeader() {
 				<Button asChild variant="tertiary">
 					<Link href={paths.public.contact()}>Contáctanos</Link>
 				</Button>
-			</div>
-		</MainLayout>
+			</div> */}
+		</header>
 	);
 }
