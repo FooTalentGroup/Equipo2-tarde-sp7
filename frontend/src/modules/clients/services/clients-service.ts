@@ -55,6 +55,18 @@ export async function getClientById<T = ClientResponse>(
 	}
 }
 
+export async function deleteClientById<T = ClientResponse>(
+	id: string,
+): Promise<T | null> {
+	try {
+		const data = await api.delete<T>(`clients/${id}`);
+		return data;
+	} catch (error) {
+		console.error(`Error deleting client with id ${id}:`, error);
+		return null;
+	}
+}
+
 export async function updateClientById<T = ClientResponse>(
 	id: string,
 	data: Partial<ClientData>,
