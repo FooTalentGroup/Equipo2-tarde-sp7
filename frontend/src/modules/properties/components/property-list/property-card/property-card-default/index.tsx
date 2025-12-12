@@ -82,15 +82,15 @@ export default function PropertyCardDefault({ property, href }: Props) {
 					</div>
 				</div>
 				<Separator />
-				<div className="flex gap-3 justify-between items-center p-4">
-					<p className="font-semibold text-base text-foreground">
-						{price?.currency?.symbol || "USD"}
+				<div className="flex gap-3 justify-between flex-col xl:flex-row items-center p-4">
+					<p className="font-semibold text-sm lg:text-base text-foreground">
+						{price?.currency?.symbol || "USD"}{" "}
 						{Number(price?.price || 0).toLocaleString()}
 					</p>
 					<Badge
 						variant={isAvailable ? "success" : "outline"}
 						className={cn(
-							"gap-2.5 bg-transparent border-transparent h-7 text-sm",
+							"gap-2.5  bg-transparent border-transparent h-7 text-sm",
 							!isAvailable && "text-amber-600",
 						)}
 					>
