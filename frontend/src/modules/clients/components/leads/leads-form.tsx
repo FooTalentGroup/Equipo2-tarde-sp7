@@ -23,6 +23,8 @@ import {
 } from "@src/components/ui/select";
 import { Spinner } from "@src/components/ui/spinner";
 import { Textarea } from "@src/components/ui/textarea";
+import { paths } from "@src/lib/paths";
+import PropertySelect from "@src/modules/clients/ui/property-select";
 import type { CreateLead } from "@src/types/clients/lead";
 import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
@@ -37,12 +39,10 @@ import {
 	updateClientById,
 } from "../../services/clients-service";
 import { ClientType } from "../../services/types";
-import PropertySelect from "../PropertySelect";
 
 type ContactFormProps = {
 	availableProperties: Property[];
 	onSubmit?: (data: ContactFormData) => Promise<void> | void;
-	onCancel?: () => void;
 	initialValues?: Partial<ContactFormData>;
 	clientId?: string;
 };
@@ -50,7 +50,6 @@ type ContactFormProps = {
 export default function LeadsForm({
 	availableProperties,
 	onSubmit,
-	onCancel,
 	initialValues,
 	clientId,
 }: ContactFormProps) {
@@ -103,20 +102,12 @@ export default function LeadsForm({
 
 			await createClientServerAction(ClientType.LEAD, payload as CreateLead);
 			toast.success("Contacto guardado exitosamente");
-			form.reset();
+			router.push(paths.agent.clients.leads.index());
 		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : "Error al guardar el contacto";
 			toast.error(errorMessage);
 			console.error("Contact form error:", error);
-		}
-	};
-
-	const handleCancel = () => {
-		if (onCancel) {
-			onCancel();
-		} else {
-			form.reset();
 		}
 	};
 
@@ -255,11 +246,12 @@ export default function LeadsForm({
 									<FormControl>
 										<PropertySelect
 											value={field.value}
-											onChange={(propertyId) => {
+											onChange={(propertyId, _property) => {
 												field.onChange(propertyId);
 											}}
 											availableProperties={availableProperties}
-											placeholder="Av. Santa Fe 2568"
+											operationTypes={[1, 2]}
+											placeholder="Av. Santa Fe 1234"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										/>
 									</FormControl>
@@ -304,7 +296,7 @@ export default function LeadsForm({
 							type="button"
 							size={"lg"}
 							variant="outline"
-							onClick={handleCancel}
+							onClick={() => router.back()}
 							className="rounded-md"
 						>
 							Cancelar

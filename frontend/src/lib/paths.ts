@@ -37,7 +37,7 @@ export const paths = {
 				index: () => "/agent/clients/propietarios",
 				new: () => "/agent/clients/create/propietarios",
 				detail: (id: string | number) => `/agent/clients/propietarios/${id}`,
-				edit: (id: string | number) => `/agent/clients/propietarios/${id}/edit`,
+				edit: (id: string | number) => `/agent/clients/edit/propietarios/${id}`,
 			},
 		},
 		properties: {

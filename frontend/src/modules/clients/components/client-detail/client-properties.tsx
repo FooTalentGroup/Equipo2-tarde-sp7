@@ -5,6 +5,8 @@ import Link from "next/link";
 
 import { Button } from "@src/components/ui/button";
 import { Card, CardContent } from "@src/components/ui/card";
+import { ImagePlaceholder } from "@src/components/ui/image-placeholder";
+import { parseAmount } from "@src/lib/parsing";
 import { paths } from "@src/lib/paths";
 import type { RentedProperty } from "@src/types/clients/tenant";
 import { Building2 } from "lucide-react";
@@ -41,6 +43,12 @@ function normalizeProperty(property: Property | RentedProperty): Property {
 
 	// Es del tipo RentedProperty, mapear a Property
 	const rented = property as RentedProperty;
+
+	// Solo usar rental.monthly_amount, NO usar prices como fallback
+	const rentAmount = rented.rental?.monthly_amount
+		? parseAmount(rented.rental.monthly_amount)
+		: undefined;
+
 	return {
 		id: String(rented.id),
 		address: rented.address.full_address,
@@ -49,17 +57,18 @@ function normalizeProperty(property: Property | RentedProperty): Property {
 		rooms: rented.bedrooms,
 		bathrooms: rented.bathrooms,
 		surface: parseFloat(rented.surface_area),
-		image: rented.main_image?.url || "/api/placeholder/400/300",
+		image: rented.main_image?.url ?? "",
 		status: rented.property_status.name.toLowerCase(),
 		age:
 			rented.age?.name ||
 			new Date(rented.publication_date).toLocaleDateString("es-AR"),
-		prices: rented.rental
-			? {
-					rent: rented.rental.monthly_amount || 0,
-					maintenance: 0,
-				}
-			: undefined,
+		prices:
+			rentAmount !== undefined
+				? {
+						rent: rentAmount,
+						maintenance: 0,
+					}
+				: undefined,
 	};
 }
 
@@ -72,6 +81,14 @@ export function ClientProperties({
 		properties as (Property | RentedProperty)[]
 	).map(normalizeProperty);
 
+	const monthlyAmount = normalizedProperties.reduce(
+		(total, property) => total + (property.prices?.rent ?? 0),
+		0,
+	);
+	const hasRent = normalizedProperties.some(
+		(property) => property.prices?.rent !== undefined,
+	);
+
 	return (
 		<Card>
 			<CardContent className="px-4 py-1">
@@ -80,7 +97,16 @@ export function ClientProperties({
 						<Building2 className="h-5 w-5" />
 						{title ?? `Propiedades (${normalizedProperties.length})`}
 					</h3>
-					{addProperty && <Button variant="tertiary">Agregar Propiedad</Button>}
+					{addProperty ? (
+						<Button variant="tertiary">Agregar Propiedad</Button>
+					) : (
+						<div className="">
+							<div className="text-xs text-slate-500">Alquiler</div>
+							<div className="text-2xl font-semibold text-slate-900">
+								{hasRent ? `$${monthlyAmount.toLocaleString("es-AR")}` : "N/A"}
+							</div>
+						</div>
+					)}
 				</div>
 
 				<div className="space-y-4">
@@ -93,12 +119,16 @@ export function ClientProperties({
 								<div className="flex gap-4">
 									{/* Imagen */}
 									<div className="w-32 h-32 bg-slate-200 rounded-lg shrink-0 overflow-hidden relative">
-										<Image
-											src={property.image}
-											alt={property.address}
-											fill
-											className="object-cover"
-										/>
+										{property.image ? (
+											<Image
+												src={property.image}
+												alt={property.address}
+												fill
+												className="object-cover"
+											/>
+										) : (
+											<ImagePlaceholder className="h-full w-full bg-slate-100" />
+										)}
 									</div>
 
 									{/* Información */}

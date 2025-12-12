@@ -1,5 +1,7 @@
 "use client";
 
+import Router from "next/router";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
 import {
@@ -23,17 +25,15 @@ import {
 	updateClientById,
 } from "@src/modules/clients/services/clients-service";
 import { ClientType } from "@src/modules/clients/services/types";
+import PropertySelect from "@src/modules/clients/ui/property-select";
 import type { CreateOwner } from "@src/types/clients/owner";
 import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import PropertySelect from "../PropertySelect";
-
 type OwnerFormProps = {
 	availableProperties: Property[];
 	onSubmit?: (data: OwnerFormData) => Promise<void> | void;
-	onCancel?: () => void;
 	initialValues?: Partial<OwnerFormData>;
 	clientId?: string;
 };
@@ -41,7 +41,6 @@ type OwnerFormProps = {
 export default function OwnerForm({
 	availableProperties,
 	onSubmit,
-	onCancel,
 	initialValues,
 	clientId,
 }: OwnerFormProps) {
@@ -61,6 +60,8 @@ export default function OwnerForm({
 			...initialValues,
 		},
 	});
+
+	// Selección simple de propiedad (por ahora no multi-select)
 
 	const handleSubmit = async (data: OwnerFormData) => {
 		try {
@@ -85,11 +86,6 @@ export default function OwnerForm({
 					...(propertyId !== undefined ? { property_id: propertyId } : {}),
 				};
 
-				// Aquí irá la llamada al backend
-				// const response = await axios.post('/api/owners', {
-				//   ...ownerData,
-				//   property_id: data.assigned_property_id
-				// });
 				if (clientId) {
 					await updateClientById(clientId, ownerData);
 					toast.success("Propietario actualizado exitosamente");
@@ -101,32 +97,13 @@ export default function OwnerForm({
 					ClientType.OWNER,
 					ownerData as CreateOwner,
 				);
-				/* console.log("Datos del propietario para backend:", {
-					...ownerData,
-					property_id: data.property_id,
-				});
-
-				// Simular delay de envío
-				await new Promise((resolve) => setTimeout(resolve, 1000)); */
 
 				toast.success("Propietario guardado exitosamente");
 				form.reset();
 			}
 		} catch (error) {
-			const errorMessage =
-				error instanceof Error
-					? error.message
-					: "Error al guardar el propietario";
-			toast.error(errorMessage);
+			toast.error("Error al guardar el propietario");
 			console.error("Owner form error:", error);
-		}
-	};
-
-	const handleCancel = () => {
-		if (onCancel) {
-			onCancel();
-		} else {
-			form.reset();
 		}
 	};
 
@@ -213,7 +190,7 @@ export default function OwnerForm({
 									<FormControl>
 										<PhoneInput
 											defaultCountry="AR"
-											countries={["AR", "UY", "CL", "BR", "PY"]}
+											countries={["AR"]}
 											placeholder="Ingresá un número de teléfono"
 											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
 											{...field}
@@ -283,13 +260,13 @@ export default function OwnerForm({
 									</FormLabel>
 									<FormControl>
 										<PropertySelect
+											availableProperties={availableProperties}
+											operationTypes={[1]}
 											value={field.value}
 											onChange={(propertyId, property) => {
 												field.onChange(propertyId);
 												console.log("Propiedad seleccionada:", property);
 											}}
-											availableProperties={availableProperties}
-											operationTypes={[1]}
 											placeholder="Seleccione o busque una propiedad"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										/>
@@ -335,7 +312,7 @@ export default function OwnerForm({
 							type="button"
 							variant="outline"
 							size={"lg"}
-							onClick={handleCancel}
+							onClick={() => Router.back()}
 							className="rounded-md"
 						>
 							Cancelar

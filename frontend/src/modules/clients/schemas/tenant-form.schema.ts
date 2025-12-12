@@ -18,6 +18,7 @@ export const tenantFormSchema = z
 		contract_end_date: z.string().min(1, "La fecha de fin es requerida"),
 		next_increase_date: z.string().optional(),
 		monthly_amount: z.string().min(1, "El monto de alquiler es requerido"),
+		currency_type_id: z.number().int().positive().optional(),
 		notes: z
 			.string()
 			.max(300, "Las notas no pueden exceder 300 caracteres")

@@ -1,3 +1,4 @@
+import { paths } from "@src/lib/paths";
 import {
 	ClientContactInfo,
 	ClientHeader,
@@ -56,7 +57,7 @@ export default async function TenantDetailPage({
 		rooms: rentedProperty.bedrooms,
 		bathrooms: rentedProperty.bathrooms,
 		surface: parseFloat(rentedProperty.surface_area),
-		image: rentedProperty.main_image?.url || "/api/placeholder/400/300",
+		image: rentedProperty.main_image?.url || "",
 		status: rentedProperty.property_status.name.toLowerCase(),
 		age: rentedProperty.publication_date
 			? new Date(rentedProperty.publication_date).toLocaleDateString("es-AR")
@@ -71,8 +72,9 @@ export default async function TenantDetailPage({
 					id={client.id}
 					firstName={client.first_name}
 					lastName={client.last_name}
-					status="lead"
-					editPath={`${id}/edit`}
+					status="inquilino"
+					editPath={paths.agent.clients.inquilinos.edit(id)}
+					dni={client.dni}
 				/>
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 					{/* Columna izquierda - Información */}

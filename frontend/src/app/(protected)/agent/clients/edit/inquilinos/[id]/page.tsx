@@ -46,6 +46,7 @@ export default async function Page({
 				? String(rented.rental.monthly_amount)
 				: "",
 		notes: client.notes || "",
+		currency_type_id: 1,
 	};
 
 	return (

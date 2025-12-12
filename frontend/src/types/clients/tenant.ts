@@ -86,6 +86,7 @@ export interface CreateTenant extends BaseContact {
 	rental_interest?: boolean;
 	purchase_interest?: boolean;
 	city_id?: number | null;
+	currency_type_id: number;
 }
 
 export interface PropertySearchType {

@@ -1,5 +1,5 @@
 import { cn } from "@src/lib/utils";
-import { ImageIcon } from "lucide-react";
+import { ImageOff } from "lucide-react";
 
 interface ImagePlaceholderProps extends React.HTMLAttributes<HTMLDivElement> {
 	icon?: React.ElementType;
@@ -8,7 +8,7 @@ interface ImagePlaceholderProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function ImagePlaceholder({
 	className,
-	icon: Icon = ImageIcon,
+	icon: Icon = ImageOff,
 	iconSize = "h-10 w-10",
 	...props
 }: ImagePlaceholderProps) {

@@ -1,4 +1,4 @@
-import OwnerForm from "@src/modules/clients/components/create-owners/owners-forms";
+import OwnerForm from "@src/modules/clients/components/owners/owners-forms";
 import type { OwnerFormData } from "@src/modules/clients/schemas/owner-form.schema";
 import { getClientById } from "@src/modules/clients/services/clients-service";
 import TipAlert from "@src/modules/clients/ui/TipAlert";
@@ -31,11 +31,21 @@ export default async function Page({
 	const client = clientResponse.client;
 	const firstOwnedPropertyId = clientResponse.owned_properties?.[0]?.id ?? null;
 
+	const toE164 = (p?: string) => {
+		if (!p) return "";
+		// Normaliza a AR (+54) si no incluye prefijo
+		if (!p.startsWith("+")) {
+			const digits = p.replace(/\D/g, "");
+			return `+54${digits}`;
+		}
+		return p;
+	};
+
 	const initialValues: OwnerFormData = {
 		first_name: client.first_name || "",
 		last_name: client.last_name || "",
 		dni: client.dni || "",
-		phone: client.phone || "",
+		phone: toE164(client.phone),
 		email: client.email || "",
 		address: client.address || "",
 		property_id: firstOwnedPropertyId ? String(firstOwnedPropertyId) : "",

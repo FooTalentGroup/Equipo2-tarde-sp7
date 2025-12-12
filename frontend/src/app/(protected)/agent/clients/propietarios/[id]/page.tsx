@@ -1,3 +1,4 @@
+import { paths } from "@src/lib/paths";
 import {
 	ClientContactInfo,
 	ClientHeader,
@@ -55,7 +56,7 @@ export default async function OwnerDetailPage({
 		rooms: prop.bedrooms,
 		bathrooms: prop.bathrooms,
 		surface: parseFloat(prop.surface_area),
-		image: prop.main_image?.url || "/api/placeholder/400/300",
+		image: prop.main_image?.url || "",
 		status: prop.property_status.name.toLowerCase(),
 		age: prop.age?.name || "",
 	}));
@@ -70,7 +71,7 @@ export default async function OwnerDetailPage({
 					lastName={owner.last_name}
 					dni={owner.dni}
 					status="propietario"
-					editPath={`${id}/edit`}
+					editPath={paths.agent.clients.owners.edit(id)}
 				/>
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 					{/* Columna izquierda - Información */}

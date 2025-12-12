@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
 import {
@@ -14,6 +16,8 @@ import { Input } from "@src/components/ui/input";
 import { PhoneInput } from "@src/components/ui/phone-input";
 import { Spinner } from "@src/components/ui/spinner";
 import { Textarea } from "@src/components/ui/textarea";
+import { paths } from "@src/lib/paths";
+import PropertySelect from "@src/modules/clients/ui/property-select";
 import type { CreateTenant } from "@src/types/clients/tenant";
 import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
@@ -29,12 +33,10 @@ import {
 } from "../../services/clients-service";
 import { ClientType } from "../../services/types";
 import DatePickerField from "../../ui/date-picker-field";
-import PropertySelect from "../PropertySelect";
 
 type TenantFormProps = {
 	availableProperties: Property[];
 	onSubmit?: (data: TenantFormData) => Promise<void> | void;
-	onCancel?: () => void;
 	initialValues?: Partial<TenantFormData>;
 	clientId?: string;
 };
@@ -42,10 +44,10 @@ type TenantFormProps = {
 export default function TenantForm({
 	availableProperties,
 	onSubmit,
-	onCancel,
 	initialValues,
 	clientId,
 }: TenantFormProps) {
+	const router = useRouter();
 	const form = useForm<TenantFormData>({
 		resolver: zodResolver(tenantFormSchema),
 		defaultValues: {
@@ -91,12 +93,20 @@ export default function TenantForm({
 					contract_end_date: data.contract_end_date,
 					next_increase_date: data.next_increase_date,
 					monthly_amount: Number(data.monthly_amount),
+					currency_type_id: 1,
 				};
 				if (clientId) {
-					await updateClientById(clientId, tenantData);
+					console.log("=== UPDATE DEBUG ===");
+					console.log("clientId:", clientId);
+					console.log("monthly_amount enviado:", tenantData.monthly_amount);
+					console.log("Datos completos:", tenantData);
+					console.log("====================");
+
+					const result = await updateClientById(clientId, tenantData);
+					console.log("Respuesta del servidor:", result);
 					toast.success("Inquilino actualizado exitosamente");
-					// redirigir a detalle
-					window.location.href = `/agent/clients/inquilinos/${clientId}`;
+					// redirigir a detalle usando paths centralizado
+					router.push(paths.agent.clients.inquilinos.detail(clientId));
 					return;
 				}
 
@@ -105,7 +115,7 @@ export default function TenantForm({
 					tenantData as CreateTenant,
 				);
 				toast.success("Inquilino guardado exitosamente");
-				form.reset();
+				router.push(paths.agent.clients.inquilinos.index());
 			}
 		} catch (error) {
 			const errorMessage =
@@ -114,14 +124,6 @@ export default function TenantForm({
 					: "Error al guardar el inquilino";
 			toast.error(errorMessage);
 			console.error("Tenant form error:", error);
-		}
-	};
-
-	const handleCancel = () => {
-		if (onCancel) {
-			onCancel();
-		} else {
-			form.reset();
 		}
 	};
 
@@ -208,7 +210,7 @@ export default function TenantForm({
 									<FormControl>
 										<PhoneInput
 											defaultCountry="AR"
-											countries={["AR", "UY", "CL", "BR", "PY"]}
+											countries={["AR"]}
 											placeholder="Ingresá un número de teléfono"
 											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
 											{...field}
@@ -390,7 +392,7 @@ export default function TenantForm({
 							type="button"
 							variant="outline"
 							size={"lg"}
-							onClick={handleCancel}
+							onClick={() => router.back()}
 							className="rounded-md"
 						>
 							Cancelar

@@ -56,11 +56,7 @@ export function DeleteOwnerButton({
 	return (
 		<AlertDialog>
 			<AlertDialogTrigger asChild>
-				<Button
-					variant="outline"
-					size="sm"
-					className="text-[#95141B] hover:text-red-700 border-[#FDBABE] hover:bg-red-50 w-full"
-				>
+				<Button variant="outline-destructive">
 					<Trash2 className="h-4 w-4 mr-2" />
 					Borrar contacto
 				</Button>
