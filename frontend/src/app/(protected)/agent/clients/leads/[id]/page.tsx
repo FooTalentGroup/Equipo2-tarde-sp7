@@ -5,7 +5,7 @@ import {
 	ClientProperties,
 } from "@src/modules/clients/components/client-detail";
 import { getClientById } from "@src/modules/clients/services/clients-service";
-import type { Lead } from "@src/types/clients/lead";
+import type { LeadApiResponse } from "@src/types/clients/lead";
 
 export default async function LeadDetailPage({
 	params,
@@ -14,17 +14,8 @@ export default async function LeadDetailPage({
 }) {
 	const { id } = await params;
 
-	// Obtener datos del propietario desde el backend
-	const responseData = await getClientById<{
-		client: Lead;
-		properties_of_interest: Array<{
-			id: number;
-			title: string;
-			property_type: { id: number; name: string };
-			property_status: { id: number; name: string };
-			interest_created_at: string;
-		}>;
-	}>(id);
+	// Obtener datos del lead desde el backend (nueva estructura)
+	const responseData = await getClientById<LeadApiResponse>(id);
 
 	// Si no hay datos, mostrar fallback
 	if (!responseData || !responseData.client) {
@@ -38,7 +29,7 @@ export default async function LeadDetailPage({
 	}
 
 	const clientData = responseData.client;
-	/* const ownedProperties = responseData.owned_properties || []; */
+	const propertiesOfInterest = responseData.properties_of_interest || [];
 
 	// Mapear datos del backend
 	const client = {
@@ -47,7 +38,7 @@ export default async function LeadDetailPage({
 		last_name: clientData.last_name,
 		email: clientData.email,
 		phone: clientData.phone,
-		dni: clientData.dni,
+		dni: clientData.dni ?? "",
 		address: clientData.address ?? "",
 		created_at: clientData.registered_at
 			? new Date(clientData.registered_at).toLocaleDateString("es-AR")
@@ -55,60 +46,21 @@ export default async function LeadDetailPage({
 		notes: clientData.notes ?? "",
 	};
 
-	// Mapear propiedades desde el backend
-	/* const properties = ownedProperties.map((prop) => ({
+	// Mapear propiedades desde el backend con la estructura completa
+	const properties = propertiesOfInterest.map((prop) => ({
 		id: String(prop.id),
-		full-address: prop.title,
-		city: "",
-		type: prop.property_type?.name || "Propiedad",
-		rooms: 0,
-		bathrooms: 0,
-		surface: 0,
-		image: "/api/placeholder/400/300",
-		status: prop.property_status?.name?.toLowerCase() || "disponible",
+		address: prop.address.full_address,
+		city: prop.address.city.name,
+		type: prop.property_type.name,
+		rooms: prop.bedrooms,
+		bathrooms: prop.bathrooms,
+		surface: parseFloat(prop.surface_area),
+		image: prop.main_image?.url || "/api/placeholder/400/300",
+		status: prop.property_status.name.toLowerCase(),
 		age: prop.publication_date
 			? new Date(prop.publication_date).toLocaleDateString("es-AR")
 			: "",
-	})); */
-
-	const properties = [
-		{
-			id: "1",
-			address: "Calle Mayor 45, 3º B",
-			city: "Rosario",
-			type: "Departamento",
-			rooms: 3,
-			bathrooms: 2,
-			surface: 85,
-			image: "/api/placeholder/400/300",
-			status: "ocupado",
-			age: "1 año",
-		},
-		{
-			id: "2",
-			address: "Av. de la Libertad 128",
-			city: "Rosario",
-			type: "Casa",
-			rooms: 4,
-			bathrooms: 3,
-			surface: 180,
-			image: "/api/placeholder/400/300",
-			status: "disponible",
-			age: "2 años",
-		},
-		{
-			id: "3",
-			address: "San Martín 567, 1º A",
-			city: "Rosario",
-			type: "Departamento",
-			rooms: 2,
-			bathrooms: 1,
-			surface: 55,
-			image: "/api/placeholder/400/300",
-			status: "ocupado",
-			age: "5 años",
-		},
-	];
+	}));
 
 	return (
 		<div className="min-h-screen">

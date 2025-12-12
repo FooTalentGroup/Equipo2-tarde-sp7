@@ -12,11 +12,14 @@ import {
 } from "@src/components/ui/dropdown-menu";
 import { StatusBadge } from "@src/components/ui/status-badge";
 import { paths } from "@src/lib/paths";
-import type { Tenant } from "@src/types/clients/tenant";
+import type {
+	Tenant,
+	TenantWithRentedProperty,
+} from "@src/types/clients/tenant";
 import { MoreHorizontal } from "lucide-react";
 
 interface TenantsCardProps {
-	tenant: Tenant;
+	tenant: Tenant | TenantWithRentedProperty;
 	onEdit?: (id: number) => void;
 	onDelete?: (id: number) => void;
 }
@@ -26,8 +29,10 @@ export function TenantsCard({ tenant, onEdit, onDelete }: TenantsCardProps) {
 
 	const tenantName = `${tenant.first_name} ${tenant.last_name}`;
 	const propertyTitle =
-		tenant.rented_property?.title || "Sin propiedad asignada"; //debe mostrarse la direcciion de la propiedad
-	const monthlyAmount = tenant.rented_property?.rental?.monthly_amount;
+		(tenant as TenantWithRentedProperty).rented_property?.address
+			?.full_address || "Sin propiedad asignada";
+	const monthlyAmount = (tenant as TenantWithRentedProperty).rented_property
+		?.rental?.monthly_amount;
 
 	const handleCardClick = () => {
 		router.push(paths.agent.clients.inquilinos.detail(tenant.id));

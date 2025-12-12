@@ -14,17 +14,8 @@ export default async function OwnerDetailPage({
 }) {
 	const { id } = await params;
 
-	// Obtener datos del propietario desde el backend
-	const responseData = await getClientById<{
-		client: OwnerApiResponse;
-		owned_properties: Array<{
-			id: number;
-			title: string;
-			property_type: { id: number; name: string };
-			property_status: { id: number; name: string };
-			publication_date: string;
-		}>;
-	}>(id);
+	// Obtener datos del propietario desde el backend (nueva estructura)
+	const responseData = await getClientById<OwnerApiResponse>(id);
 
 	// Si no hay datos, mostrar fallback
 	if (!responseData || !responseData.client) {
@@ -38,7 +29,7 @@ export default async function OwnerDetailPage({
 	}
 
 	const ownerData = responseData.client;
-	/* const ownedProperties = responseData.owned_properties || []; */
+	const ownedProperties = responseData.owned_properties || [];
 
 	// Mapear datos del backend
 	const owner = {
@@ -47,7 +38,7 @@ export default async function OwnerDetailPage({
 		last_name: ownerData.last_name,
 		email: ownerData.email,
 		phone: ownerData.phone,
-		dni: ownerData.dni,
+		dni: ownerData.dni ?? "",
 		address: ownerData.address ?? "",
 		created_at: ownerData.registered_at
 			? new Date(ownerData.registered_at).toLocaleDateString("es-AR")
@@ -55,60 +46,21 @@ export default async function OwnerDetailPage({
 		notes: ownerData.notes ?? "",
 	};
 
-	// Mapear propiedades desde el backend
-	/* const properties = ownedProperties.map((prop) => ({
+	// Mapear propiedades desde el backend con la estructura completa
+	const properties = ownedProperties.map((prop) => ({
 		id: String(prop.id),
-		address: prop.title,
-		city: "",
-		type: prop.property_type?.name || "Propiedad",
-		rooms: 0,
-		bathrooms: 0,
-		surface: 0,
-		image: "/api/placeholder/400/300",
-		status: prop.property_status?.name?.toLowerCase() || "disponible",
+		address: prop.address.full_address,
+		city: prop.address.city.name,
+		type: prop.property_type.name,
+		rooms: prop.bedrooms,
+		bathrooms: prop.bathrooms,
+		surface: parseFloat(prop.surface_area),
+		image: prop.main_image?.url || "/api/placeholder/400/300",
+		status: prop.property_status.name.toLowerCase(),
 		age: prop.publication_date
 			? new Date(prop.publication_date).toLocaleDateString("es-AR")
 			: "",
-	})); */
-
-	const properties = [
-		{
-			id: "1",
-			address: "Calle Mayor 45, 3º B",
-			city: "Rosario",
-			type: "Departamento",
-			rooms: 3,
-			bathrooms: 2,
-			surface: 85,
-			image: "/api/placeholder/400/300",
-			status: "ocupado",
-			age: "1 año",
-		},
-		{
-			id: "2",
-			address: "Av. de la Libertad 128",
-			city: "Rosario",
-			type: "Casa",
-			rooms: 4,
-			bathrooms: 3,
-			surface: 180,
-			image: "/api/placeholder/400/300",
-			status: "disponible",
-			age: "2 años",
-		},
-		{
-			id: "3",
-			address: "San Martín 567, 1º A",
-			city: "Rosario",
-			type: "Departamento",
-			rooms: 2,
-			bathrooms: 1,
-			surface: 55,
-			image: "/api/placeholder/400/300",
-			status: "ocupado",
-			age: "5 años",
-		},
-	];
+	}));
 
 	return (
 		<div className="min-h-screen">

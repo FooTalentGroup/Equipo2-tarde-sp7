@@ -4,10 +4,13 @@ import { useMemo, useState } from "react";
 
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
 import { TenantsCard } from "@src/modules/clients/ui/tenants-card";
-import type { Tenant } from "@src/types/clients/tenant";
+import type {
+	Tenant,
+	TenantWithRentedProperty,
+} from "@src/types/clients/tenant";
 
 interface TenantsListProps {
-	tenants: Tenant[];
+	tenants: (Tenant | TenantWithRentedProperty)[];
 	itemsPerPage?: number;
 }
 

@@ -12,11 +12,11 @@ import {
 } from "@src/components/ui/dropdown-menu";
 import { StatusBadge } from "@src/components/ui/status-badge";
 import { paths } from "@src/lib/paths";
-import type { Lead } from "@src/types/clients/lead";
+import type { Lead, LeadWithProperties } from "@src/types/clients/lead";
 import { Mail, MoreHorizontal, Phone } from "lucide-react";
 
 interface LeadsCardProps {
-	lead: Lead;
+	lead: Lead | LeadWithProperties;
 	onEdit?: (id: number) => void;
 	onDelete?: (id: number) => void;
 }

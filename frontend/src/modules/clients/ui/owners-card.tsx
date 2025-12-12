@@ -12,11 +12,11 @@ import {
 } from "@src/components/ui/dropdown-menu";
 import { StatusBadge } from "@src/components/ui/status-badge";
 import { paths } from "@src/lib/paths";
-import type { Owner } from "@src/types/clients/owner";
+import type { Owner, OwnerWithProperties } from "@src/types/clients/owner";
 import { MoreHorizontal } from "lucide-react";
 
 interface OwnersCardProps {
-	owner: Owner;
+	owner: Owner | OwnerWithProperties;
 	onEdit?: (id: number) => void;
 	onDelete?: (id: number) => void;
 }
@@ -25,7 +25,8 @@ export function OwnersCard({ owner, onEdit, onDelete }: OwnersCardProps) {
 	const router = useRouter();
 
 	const ownerName = `${owner.first_name} ${owner.last_name}`;
-	const propertiesCount = owner.owned_properties?.length || 0;
+	const propertiesCount =
+		(owner as OwnerWithProperties).owned_properties_count || 0;
 
 	const handleCardClick = () => {
 		router.push(paths.agent.clients.owners.detail(owner.id.toString()));
