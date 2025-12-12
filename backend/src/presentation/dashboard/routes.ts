@@ -19,10 +19,12 @@ export class DashboardRoutes {
 		 *     summary: Get dashboard data
 		 *     description: |
 		 *       Returns aggregated data for the dashboard including:
-		 *       - Latest 4 consultations (unread first, then most recent)
+		 *       - Latest 5 consultations (most recent by date)
 		 *       - Count of active properties (not archived)
 		 *       - Count of inactive properties (archived)
-		 *       - Count of unanswered consultations
+		 *       - Count of unanswered consultations (without response)
+		 *       - Count of unread consultations
+		 *       - Count of new leads created today
 		 *     tags: [Dashboard]
 		 *     security:
 		 *       - bearerAuth: []
@@ -83,12 +85,23 @@ export class DashboardRoutes {
 		 *                         active_properties:
 		 *                           type: integer
 		 *                           example: 247
+		 *                           description: Count of non-archived properties
 		 *                         inactive_properties:
 		 *                           type: integer
 		 *                           example: 120
+		 *                           description: Count of archived properties
 		 *                         unanswered_consultations:
 		 *                           type: integer
-		 *                           example: 15
+		 *                           example: 41
+		 *                           description: Count of consultations without response (responded_by_user_id IS NULL)
+		 *                         unread_consultations:
+		 *                           type: integer
+		 *                           example: 10
+		 *                           description: Count of unread consultations (is_read = false)
+		 *                         new_leads_today:
+		 *                           type: integer
+		 *                           example: 3
+		 *                           description: Count of new leads created today
 		 *       401:
 		 *         description: Unauthorized
 		 *       500:
