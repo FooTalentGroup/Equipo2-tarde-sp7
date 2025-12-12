@@ -83,12 +83,19 @@ export class DashboardRoutes {
 		 *                         active_properties:
 		 *                           type: integer
 		 *                           example: 247
+		 *                           description: Count of non-archived properties
 		 *                         inactive_properties:
 		 *                           type: integer
 		 *                           example: 120
+		 *                           description: Count of archived properties
 		 *                         unanswered_consultations:
 		 *                           type: integer
-		 *                           example: 15
+		 *                           example: 41
+		 *                           description: Count of consultations without response (responded_by_user_id IS NULL)
+		 *                         unread_consultations:
+		 *                           type: integer
+		 *                           example: 10
+		 *                           description: Count of unread consultations (is_read = false)
 		 *       401:
 		 *         description: Unauthorized
 		 *       500:

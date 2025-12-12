@@ -17,14 +17,13 @@ export class DashboardServices {
 		// 1. Get latest 4 consultations (unread first, then most recent)
 		const consultations = await this.getLatestConsultations(4);
 
-		// 2. Get property counts
-		const [activeProperties, inactiveProperties] = await Promise.all([
+		// 2. Get property counts and consultation counts in parallel
+		const [activeProperties, inactiveProperties, unansweredConsultations, unreadConsultations] = await Promise.all([
 			this.countActiveProperties(),
 			this.countInactiveProperties(),
+			this.countUnansweredConsultations(),
+			this.countUnreadConsultations(),
 		]);
-
-		// 3. Get unanswered consultations count
-		const unansweredConsultations = await this.countUnansweredConsultations();
 
 		return {
 			consultations,
@@ -32,6 +31,7 @@ export class DashboardServices {
 				active_properties: activeProperties,
 				inactive_properties: inactiveProperties,
 				unanswered_consultations: unansweredConsultations,
+				unread_consultations: unreadConsultations,
 			},
 		};
 	}
@@ -77,12 +77,12 @@ export class DashboardServices {
 			return dateB - dateA; // DESC order
 		});
 
-		// Return up to limit consultations
-		return consultations.slice(0, limit);
+		// Slice to limit before enriching
+		const limitedConsultations = consultations.slice(0, limit);
 
 		// Enrich consultations with client and property data
 		const enrichedConsultations = await Promise.all(
-			consultations.map(async (consultation) => {
+			limitedConsultations.map(async (consultation) => {
 				// Get client data if client_id exists
 				let client = null;
 				if (consultation.client_id) {
@@ -182,6 +182,15 @@ export class DashboardServices {
 	 */
 	private async countUnansweredConsultations(): Promise<number> {
 		const query = `SELECT COUNT(*) as count FROM client_consultations WHERE responded_by_user_id IS NULL`;
+		const result = await PostgresDatabase.query(query);
+		return parseInt(result.rows[0]?.count || '0', 10);
+	}
+
+	/**
+	 * Counts unread consultations
+	 */
+	private async countUnreadConsultations(): Promise<number> {
+		const query = `SELECT COUNT(*) as count FROM client_consultations WHERE is_read = false`;
 		const result = await PostgresDatabase.query(query);
 		return parseInt(result.rows[0]?.count || '0', 10);
 	}
