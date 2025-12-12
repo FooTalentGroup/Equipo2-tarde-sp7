@@ -11,7 +11,7 @@ export const InfoAgentsCard = ({
 	return (
 		<article
 			className={cn(
-				"shadow-consultations h-40  md:w-[220px] py-6 pl-6 pb-[17px] space-y-4 rounded-md",
+				"shadow-consultations h-40  w-full py-6 pl-6 pb-[17px] space-y-4 rounded-md",
 				className,
 			)}
 		>
