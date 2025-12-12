@@ -29,6 +29,7 @@ interface Property {
 interface ClientPropertiesProps {
 	title?: string;
 	properties: (Property | RentedProperty)[] | [];
+	addProperty?: boolean;
 }
 
 // Helper para normalizar propiedades de diferentes tipos a la estructura simple
@@ -62,7 +63,11 @@ function normalizeProperty(property: Property | RentedProperty): Property {
 	};
 }
 
-export function ClientProperties({ title, properties }: ClientPropertiesProps) {
+export function ClientProperties({
+	title,
+	properties,
+	addProperty = true,
+}: ClientPropertiesProps) {
 	const normalizedProperties = (
 		properties as (Property | RentedProperty)[]
 	).map(normalizeProperty);
@@ -75,7 +80,7 @@ export function ClientProperties({ title, properties }: ClientPropertiesProps) {
 						<Building2 className="h-5 w-5" />
 						{title ?? `Propiedades (${normalizedProperties.length})`}
 					</h3>
-					<Button variant="tertiary">Agregar Propiedad</Button>
+					{addProperty && <Button variant="tertiary">Agregar Propiedad</Button>}
 				</div>
 
 				<div className="space-y-4">
@@ -140,6 +145,7 @@ export function ClientProperties({ title, properties }: ClientPropertiesProps) {
 													</div>
 												</div>
 											</div>
+
 											<Button variant="outline" size="sm" asChild>
 												<Link
 													href={paths.agent.properties.detail(

@@ -90,7 +90,8 @@ export default async function TenantDetailPage({
 					<div className="lg:col-span-2">
 						<ClientProperties
 							properties={properties}
-							title="Propiedades de interés"
+							title="Propiedades alquilada"
+							addProperty={false}
 						/>
 					</div>
 				</div>
