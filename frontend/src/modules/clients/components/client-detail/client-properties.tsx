@@ -5,10 +5,11 @@ import Link from "next/link";
 import { Button } from "@src/components/ui/button";
 import { Card, CardContent } from "@src/components/ui/card";
 import { paths } from "@src/lib/paths";
+import type { RentedProperty } from "@src/types/clients/tenant";
 import { Building2 } from "lucide-react";
 
 interface Property {
-	id: string;
+	id: string | number;
 	address: string;
 	city: string;
 	type: string;
@@ -17,28 +18,67 @@ interface Property {
 	surface: number;
 	image: string;
 	status: string;
-	age: string;
+	age?: string;
+	prices?: {
+		rent: number;
+		maintenance: number;
+	};
 }
 
 interface ClientPropertiesProps {
 	title?: string;
-	properties: Property[];
+	properties: (Property | RentedProperty)[] | [];
+}
+
+// Helper para normalizar propiedades de diferentes tipos a la estructura simple
+function normalizeProperty(property: Property | RentedProperty): Property {
+	if ("address" in property && typeof property.address === "string") {
+		// Es del tipo Property simple
+		return property as Property;
+	}
+
+	// Es del tipo RentedProperty, mapear a Property
+	const rented = property as RentedProperty;
+	return {
+		id: String(rented.id),
+		address: rented.address.full_address,
+		city: rented.address.city.name,
+		type: rented.property_type.name,
+		rooms: rented.bedrooms,
+		bathrooms: rented.bathrooms,
+		surface: parseFloat(rented.surface_area),
+		image: rented.main_image?.url || "/api/placeholder/400/300",
+		status: rented.property_status.name.toLowerCase(),
+		age:
+			rented.age?.name ||
+			new Date(rented.publication_date).toLocaleDateString("es-AR"),
+		prices: rented.rental
+			? {
+					rent: rented.rental.monthly_amount || 0,
+					maintenance: 0,
+				}
+			: undefined,
+	};
 }
 
 export function ClientProperties({ title, properties }: ClientPropertiesProps) {
+	const normalizedProperties = (
+		properties as (Property | RentedProperty)[]
+	).map(normalizeProperty);
+
 	return (
 		<Card>
 			<CardContent className="px-4 py-1">
 				<div className="flex items-center justify-between mb-6">
 					<h3 className="font-semibold text-lg text-slate-900 flex items-center gap-2">
 						<Building2 className="h-5 w-5" />
-						{title ?? `Propiedades (${properties.length})`}
+						{title ?? `Propiedades (${normalizedProperties.length})`}
 					</h3>
 					<Button variant="tertiary">Agregar Propiedad</Button>
 				</div>
 
 				<div className="space-y-4">
-					{properties.map((property) => (
+					{normalizedProperties.map((property) => (
 						<Card
 							key={property.id}
 							className="hover:shadow-md transition-shadow"
@@ -97,7 +137,11 @@ export function ClientProperties({ title, properties }: ClientPropertiesProps) {
 												</div>
 											</div>
 											<Button variant="outline" size="sm" asChild>
-												<Link href={paths.agent.properties.detail(property.id)}>
+												<Link
+													href={paths.agent.properties.detail(
+														String(property.id),
+													)}
+												>
 													Ver Detalles
 												</Link>
 											</Button>
