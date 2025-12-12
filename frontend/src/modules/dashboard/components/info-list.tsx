@@ -1,4 +1,4 @@
-import { CircleAlert, House, MessageSquare } from "lucide-react";
+import { CircleAlert, House, MessageSquare, UserCheck } from "lucide-react";
 
 import { getDashboardInfo } from "../services/dashboard-info";
 import { InfoAgentsCard } from "./info-agents-card";
@@ -30,6 +30,14 @@ export const InfoList = async () => {
 					title={data?.unanswered_consultations || 0}
 					description="Consultas no leídas"
 					className="[&>svg]:text-blue-normal [&>svg]:bg-success"
+				/>
+			</li>
+			<li>
+				<InfoAgentsCard
+					icon={UserCheck}
+					title={data?.new_leads_today || 0}
+					description="Nuevos leads"
+					className="[&>svg]:text-header [&>svg]:bg-muted"
 				/>
 			</li>
 		</ul>
