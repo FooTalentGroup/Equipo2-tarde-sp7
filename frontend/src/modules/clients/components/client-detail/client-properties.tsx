@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 
 import { Button } from "@src/components/ui/button";
@@ -86,10 +87,13 @@ export function ClientProperties({ title, properties }: ClientPropertiesProps) {
 							<CardContent className="px-4 py-1">
 								<div className="flex gap-4">
 									{/* Imagen */}
-									<div className="w-32 h-32 bg-slate-200 rounded-lg shrink-0 overflow-hidden">
-										<div className="w-full h-full bg-linear-to-br from-slate-300 to-slate-400 flex items-center justify-center">
-											<Building2 className="h-12 w-12 text-slate-500" />
-										</div>
+									<div className="w-32 h-32 bg-slate-200 rounded-lg shrink-0 overflow-hidden relative">
+										<Image
+											src={property.image}
+											alt={property.address}
+											fill
+											className="object-cover"
+										/>
 									</div>
 
 									{/* Información */}
