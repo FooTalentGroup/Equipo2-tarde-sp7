@@ -113,6 +113,12 @@ export class ClientServices {
         const categoryName = category?.name;
         const properties = await this.enrichClientWithProperties(clientEntity.id, categoryName || null);
 
+        // Para Leads: obtener consultas con tipo de consulta
+        let consultations: any[] = [];
+        if (categoryName === 'Lead') {
+            consultations = await this.getClientConsultations(clientEntity.id);
+        }
+
         return {
             client: {
                 ...clientEntity.toPublicObject(),
@@ -126,7 +132,8 @@ export class ClientServices {
                 } : null,
                 city: city
             },
-            ...properties
+            ...properties,
+            ...(categoryName === 'Lead' && { consultations })
         };
     }
 
@@ -420,6 +427,57 @@ export class ClientServices {
             owned_properties: ownedProperties, // Para Owners
             rented_property: rentedProperty // Para Inquilinos (solo la activa)
         };
+    }
+
+    /**
+     * Helper privado: Obtiene las consultas de un cliente con información de tipo
+     * Incluye el tipo de consulta para cada consulta asociada
+     */
+    private async getClientConsultations(clientId: number): Promise<any[]> {
+        const { ClientConsultationModel } = await import('../../data/postgres/models/crm/client-consultation.model');
+        const { ConsultationTypeModel } = await import('../../data/postgres/models/crm/consultation-type.model');
+        
+        // Obtener todas las consultas del cliente
+        const consultations = await ClientConsultationModel.findByClientId(clientId);
+        
+        if (consultations.length === 0) {
+            return [];
+        }
+        
+        // Enriquecer cada consulta con su tipo
+        const enrichedConsultations = await Promise.all(
+            consultations.map(async (consultation) => {
+                const consultationType = await ConsultationTypeModel.findById(consultation.consultation_type_id);
+                
+                // Obtener información de la propiedad si existe
+                let property = null;
+                if (consultation.property_id) {
+                    const propertyData = await PropertyModel.findById(consultation.property_id);
+                    if (propertyData) {
+                        property = {
+                            id: propertyData.id,
+                            title: propertyData.title
+                        };
+                    }
+                }
+                
+                return {
+                    id: consultation.id,
+                    consultation_date: consultation.consultation_date,
+                    message: consultation.message,
+                    response: consultation.response || null,
+                    response_date: consultation.response_date || null,
+                    is_read: consultation.is_read || false,
+                    consultation_type: consultationType ? {
+                        id: consultationType.id,
+                        name: consultationType.name
+                    } : null,
+                    property: property
+                };
+            })
+        );
+        
+        return enrichedConsultations;
     }
 
     /**
