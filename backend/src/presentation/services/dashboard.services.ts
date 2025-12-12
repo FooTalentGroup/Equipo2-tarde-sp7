@@ -18,11 +18,12 @@ export class DashboardServices {
 		const consultations = await this.getLatestConsultations(5);
 
 		// 2. Get property counts and consultation counts in parallel
-		const [activeProperties, inactiveProperties, unansweredConsultations, unreadConsultations] = await Promise.all([
+		const [activeProperties, inactiveProperties, unansweredConsultations, unreadConsultations, newLeadsToday] = await Promise.all([
 			this.countActiveProperties(),
 			this.countInactiveProperties(),
 			this.countUnansweredConsultations(),
 			this.countUnreadConsultations(),
+			this.countNewLeadsToday(),
 		]);
 
 		return {
@@ -32,6 +33,7 @@ export class DashboardServices {
 				inactive_properties: inactiveProperties,
 				unanswered_consultations: unansweredConsultations,
 				unread_consultations: unreadConsultations,
+				new_leads_today: newLeadsToday,
 			},
 		};
 	}
@@ -160,5 +162,29 @@ export class DashboardServices {
 		const result = await PostgresDatabase.query(query);
 		return parseInt(result.rows[0]?.count || '0', 10);
 	}
-}
 
+	/**
+	 * Counts new leads created today
+	 */
+	private async countNewLeadsToday(): Promise<number> {
+		const { ContactCategoryModel } = await import('../../data/postgres/models');
+		
+		// Get Lead category
+		const leadCategory = await ContactCategoryModel.findByName('Lead');
+		
+		if (!leadCategory?.id) {
+			return 0;
+		}
+
+		// Count clients created today with Lead category
+		const query = `
+			SELECT COUNT(*) as count 
+			FROM clients 
+			WHERE contact_category_id = $1 
+			AND DATE(registered_at) = CURRENT_DATE
+			AND deleted = false
+		`;
+		const result = await PostgresDatabase.query(query, [leadCategory.id]);
+		return parseInt(result.rows[0]?.count || '0', 10);
+	}
+}
