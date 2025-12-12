@@ -11,6 +11,7 @@ import {
 	DropdownMenuTrigger,
 } from "@src/components/ui/dropdown-menu";
 import { StatusBadge } from "@src/components/ui/status-badge";
+import { parseAmount } from "@src/lib/parsing";
 import { paths } from "@src/lib/paths";
 import type {
 	Tenant,
@@ -31,8 +32,9 @@ export function TenantsCard({ tenant, onEdit, onDelete }: TenantsCardProps) {
 	const propertyTitle =
 		(tenant as TenantWithRentedProperty).rented_property?.address
 			?.full_address || "Sin propiedad asignada";
-	const monthlyAmount = (tenant as TenantWithRentedProperty).rented_property
+	const monthlyAmountRaw = (tenant as TenantWithRentedProperty).rented_property
 		?.rental?.monthly_amount;
+	const monthlyAmount = parseAmount(monthlyAmountRaw);
 
 	const handleCardClick = () => {
 		router.push(paths.agent.clients.inquilinos.detail(tenant.id));
@@ -80,7 +82,7 @@ export function TenantsCard({ tenant, onEdit, onDelete }: TenantsCardProps) {
 					<div className="flex items-center gap-4">
 						<div className="text-right mr-2">
 							<div className="text-xs text-slate-500">Alquiler</div>
-							<div className="text-2xl font-bold text-slate-900">
+							<div className="text-2xl font-semibold text-slate-900">
 								{monthlyAmount
 									? `$${monthlyAmount.toLocaleString("es-AR")}`
 									: "N/A"}

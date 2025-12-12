@@ -1,3 +1,4 @@
+import { paths } from "@src/lib/paths";
 import {
 	ClientContactInfo,
 	ClientHeader,
@@ -55,7 +56,7 @@ export default async function LeadDetailPage({
 		rooms: prop.bedrooms,
 		bathrooms: prop.bathrooms,
 		surface: parseFloat(prop.surface_area),
-		image: prop.main_image?.url || "/api/placeholder/400/300",
+		image: prop.main_image?.url || "",
 		status: prop.property_status.name.toLowerCase(),
 		age: prop.publication_date
 			? new Date(prop.publication_date).toLocaleDateString("es-AR")
@@ -71,7 +72,7 @@ export default async function LeadDetailPage({
 					firstName={client.first_name}
 					lastName={client.last_name}
 					status="lead"
-					editPath={`${id}/edit`}
+					editPath={paths.agent.clients.leads.edit(id)}
 				/>
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 					{/* Columna izquierda - Información */}

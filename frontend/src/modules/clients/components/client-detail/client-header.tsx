@@ -5,8 +5,8 @@ import Link from "next/link";
 import { Button } from "@src/components/ui/button";
 import { Card, CardContent } from "@src/components/ui/card";
 import { StatusBadge } from "@src/components/ui/status-badge";
-/* import { paths } from "@src/lib/paths"; */
 import { DeleteOwnerButton } from "@src/modules/clients/ui/DeleteOwnerButton";
+import { Pen } from "lucide-react";
 
 interface ClientHeaderProps {
 	id: string;
@@ -34,7 +34,7 @@ export function ClientHeader({
 	return (
 		<div className="mb-6">
 			<Card>
-				<CardContent className="p-6">
+				<CardContent className="px-6 py-4">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-4">
 							<div className="w-16 h-16 bg-slate-200 rounded-full flex items-center justify-center font-semibold text-slate-700 text-2xl">
@@ -53,8 +53,12 @@ export function ClientHeader({
 							</div>
 						</div>
 						<div className="flex flex-col items-center gap-1">
-							<Button variant="outline" size="sm" className="px-10" asChild>
-								<Link href={editPath}>Editar contacto</Link>
+							<Button variant="tertiary" className="w-full" asChild>
+								<Link href={editPath}>
+									{/* <Link href={paths.agent.clients.owners.edit(id)}> */}
+									<Pen className="h-4 w-4 mr-2" />
+									Editar contacto
+								</Link>
 							</Button>
 							<DeleteOwnerButton
 								ownerId={id}

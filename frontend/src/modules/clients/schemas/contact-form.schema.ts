@@ -35,10 +35,12 @@ export const contactFormSchema = z.object({
 		.toLowerCase(),
 
 	consultation_type_id: z.number().int().positive(),
+	// interest_zone queda opcional/deprecado
 	interest_zone: z
 		.string()
-		.min(2, "La zona de interés debe tener al menos 2 caracteres")
-		.max(200, "La zona de interés no puede exceder 200 caracteres"),
+		.max(200, "La zona de interés no puede exceder 200 caracteres")
+		.optional()
+		.or(z.literal("")),
 	property_id: z.string().optional(),
 	notes: z
 		.string()

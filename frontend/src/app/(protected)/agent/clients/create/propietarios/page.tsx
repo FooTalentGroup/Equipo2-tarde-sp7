@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import OwnerForm from "@src/modules/clients/components/create-owners/owners-forms";
+import OwnerForm from "@src/modules/clients/components/owners/owners-forms";
 import TipAlert from "@src/modules/clients/ui/TipAlert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 

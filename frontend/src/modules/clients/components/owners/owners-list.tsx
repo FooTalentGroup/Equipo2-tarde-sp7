@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
+import { paths } from "@src/lib/paths";
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
 import { OwnersCard } from "@src/modules/clients/ui/owners-card";
 import type { Owner, OwnerWithProperties } from "@src/types/clients/owner";
@@ -12,6 +15,7 @@ interface OwnersListProps {
 }
 
 export function OwnersList({ owners, itemsPerPage = 10 }: OwnersListProps) {
+	const router = useRouter();
 	const [currentPage, setCurrentPage] = useState(1);
 	const [ownersList, setOwnersList] = useState(owners);
 
@@ -32,8 +36,7 @@ export function OwnersList({ owners, itemsPerPage = 10 }: OwnersListProps) {
 	};
 
 	const handleEdit = (id: number) => {
-		// TODO: Implementar edición de owner
-		console.log("Editar owner:", id);
+		router.push(paths.agent.clients.owners.edit(id));
 	};
 
 	const handleDelete = (id: number) => {

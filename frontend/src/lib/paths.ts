@@ -25,19 +25,19 @@ export const paths = {
 				index: () => "/agent/clients/leads",
 				new: () => "/agent/clients/create/leads",
 				detail: (id: string | number) => `/agent/clients/leads/${id}`,
-				edit: (id: string | number) => `/agent/clients/leads/${id}/edit`,
+				edit: (id: string | number) => `/agent/clients/edit/leads/${id}`,
 			},
 			inquilinos: {
 				index: () => "/agent/clients/inquilinos",
 				new: () => "/agent/clients/create/inquilinos",
 				detail: (id: string | number) => `/agent/clients/inquilinos/${id}`,
-				edit: (id: string | number) => `/agent/clients/inquilinos/${id}/edit`,
+				edit: (id: string | number) => `/agent/clients/edit/inquilinos/${id}`,
 			},
 			owners: {
 				index: () => "/agent/clients/propietarios",
 				new: () => "/agent/clients/create/propietarios",
 				detail: (id: string | number) => `/agent/clients/propietarios/${id}`,
-				edit: (id: string | number) => `/agent/clients/propietarios/${id}/edit`,
+				edit: (id: string | number) => `/agent/clients/edit/propietarios/${id}`,
 			},
 		},
 		properties: {

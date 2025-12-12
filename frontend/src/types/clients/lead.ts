@@ -76,6 +76,7 @@ export interface CreateLead extends BaseContact {
 	rental_interest?: boolean;
 	property_search_type_id: number | null;
 	city_id: number | null;
+	property_id?: number;
 }
 
 export interface PropertySearchType {

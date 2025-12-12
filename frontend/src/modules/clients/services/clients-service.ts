@@ -54,3 +54,16 @@ export async function getClientById<T = ClientResponse>(
 		return null;
 	}
 }
+
+export async function updateClientById<T = ClientResponse>(
+	id: string,
+	data: Partial<ClientData>,
+): Promise<T | null> {
+	try {
+		const response = await api.patch<T>(`clients/${id}`, data);
+		return response;
+	} catch (error) {
+		console.error(`Error updating client with id ${id}:`, error);
+		return null;
+	}
+}

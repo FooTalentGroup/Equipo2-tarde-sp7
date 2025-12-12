@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
+import { paths } from "@src/lib/paths";
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
 import { TenantsCard } from "@src/modules/clients/ui/tenants-card";
 import type {
@@ -15,6 +18,7 @@ interface TenantsListProps {
 }
 
 export function TenantsList({ tenants, itemsPerPage = 10 }: TenantsListProps) {
+	const router = useRouter();
 	const [currentPage, setCurrentPage] = useState(1);
 	const [tenantsList, setTenantsList] = useState(tenants);
 
@@ -35,8 +39,7 @@ export function TenantsList({ tenants, itemsPerPage = 10 }: TenantsListProps) {
 	};
 
 	const handleEdit = (id: number) => {
-		// TODO: Implementar edición de tenant
-		console.log("Editar tenant:", id);
+		router.push(paths.agent.clients.inquilinos.edit(id));
 	};
 
 	const handleDelete = (id: number) => {

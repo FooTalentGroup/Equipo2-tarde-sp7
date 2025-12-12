@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import LeadsForm from "@src/modules/clients/components/create-leads/leads-form";
+import LeadsForm from "@src/modules/clients/components/leads/leads-form";
 import TipAlert from "@src/modules/clients/ui/TipAlert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 

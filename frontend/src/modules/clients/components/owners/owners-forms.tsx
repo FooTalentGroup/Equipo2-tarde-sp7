@@ -1,5 +1,7 @@
 "use client";
 
+import Router from "next/router";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
 import {
@@ -12,88 +14,96 @@ import {
 } from "@src/components/ui/form";
 import { Input } from "@src/components/ui/input";
 import { PhoneInput } from "@src/components/ui/phone-input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@src/components/ui/select";
 import { Spinner } from "@src/components/ui/spinner";
 import { Textarea } from "@src/components/ui/textarea";
-import type { CreateLead } from "@src/types/clients/lead";
+import {
+	type OwnerFormData,
+	ownerFormSchema,
+} from "@src/modules/clients/schemas/owner-form.schema";
+import {
+	createClientServerAction,
+	updateClientById,
+} from "@src/modules/clients/services/clients-service";
+import { ClientType } from "@src/modules/clients/services/types";
+import PropertySelect from "@src/modules/clients/ui/property-select";
+import type { CreateOwner } from "@src/types/clients/owner";
 import type { Property } from "@src/types/property";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import {
-	type ContactFormData,
-	contactFormSchema,
-} from "../../schemas/contact-form.schema";
-import { createClientServerAction } from "../../services/clients-service";
-import { ClientType } from "../../services/types";
-import PropertySelect from "../PropertySelect";
-
-type ContactFormProps = {
+type OwnerFormProps = {
 	availableProperties: Property[];
-	onSubmit?: (data: ContactFormData) => Promise<void> | void;
-	onCancel?: () => void;
+	onSubmit?: (data: OwnerFormData) => Promise<void> | void;
+	initialValues?: Partial<OwnerFormData>;
+	clientId?: string;
 };
 
-export default function LeadsForm({
+export default function OwnerForm({
 	availableProperties,
 	onSubmit,
-	onCancel,
-}: ContactFormProps) {
-	const form = useForm<ContactFormData>({
-		resolver: zodResolver(contactFormSchema),
+	initialValues,
+	clientId,
+}: OwnerFormProps) {
+	/* const availableProperties = getPropertiesWithoutOwner(); */
+
+	const form = useForm<OwnerFormData>({
+		resolver: zodResolver(ownerFormSchema),
 		defaultValues: {
 			first_name: "",
 			last_name: "",
+			dni: "",
 			phone: "",
 			email: "",
-			consultation_type_id: 1,
-
-			interest_zone: "",
+			address: "",
+			property_id: "",
 			notes: "",
+			...initialValues,
 		},
 	});
 
-	const handleSubmit = async (data: ContactFormData) => {
+	// Selección simple de propiedad (por ahora no multi-select)
+
+	const handleSubmit = async (data: OwnerFormData) => {
 		try {
 			if (onSubmit) {
 				await onSubmit(data);
 			} else {
 				// Preparar datos para el backend
-				// Mapear consultation_type a los campos del Lead
-				const leadData: Partial<CreateLead> = {
+				const propertyId =
+					data.property_id && data.property_id !== ""
+						? Number(data.property_id)
+						: undefined;
+
+				const ownerData: Partial<CreateOwner> = {
 					first_name: data.first_name,
 					last_name: data.last_name,
 					phone: data.phone,
 					email: data.email,
-					contact_category_id: 1,
-					interest_zone: data.interest_zone,
-					notes: "",
+					dni: data.dni,
+					contact_category_id: 3,
+					address: data.address,
+					notes: data.notes || "",
+					...(propertyId !== undefined ? { property_id: propertyId } : {}),
 				};
 
-				await createClientServerAction(ClientType.LEAD, leadData as CreateLead);
+				if (clientId) {
+					await updateClientById(clientId, ownerData);
+					toast.success("Propietario actualizado exitosamente");
+					window.location.href = `/agent/clients/propietarios/${clientId}`;
+					return;
+				}
 
-				toast.success("Contacto guardado exitosamente");
+				await createClientServerAction(
+					ClientType.OWNER,
+					ownerData as CreateOwner,
+				);
+
+				toast.success("Propietario guardado exitosamente");
 				form.reset();
 			}
 		} catch (error) {
-			const errorMessage =
-				error instanceof Error ? error.message : "Error al guardar el contacto";
-			toast.error(errorMessage);
-			console.error("Contact form error:", error);
-		}
-	};
-
-	const handleCancel = () => {
-		if (onCancel) {
-			onCancel();
-		} else {
-			form.reset();
+			toast.error("Error al guardar el propietario");
+			console.error("Owner form error:", error);
 		}
 	};
 
@@ -146,8 +156,29 @@ export default function LeadsForm({
 						/>
 					</div>
 
-					{/* Teléfono y Email */}
+					{/* DNI y Teléfono */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+						<FormField
+							control={form.control}
+							name="dni"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel className="text-secondary-dark font-semibold">
+										DNI <span className="text-danger-normal">*</span>
+									</FormLabel>
+									<FormControl>
+										<Input
+											type="text"
+											placeholder="12345678"
+											className="text-base placeholder:text-grey-light border-input-border/70 focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-12 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+											{...field}
+										/>
+									</FormControl>
+									<FormMessageWithIcon className="text-xs" />
+								</FormItem>
+							)}
+						/>
+
 						<FormField
 							control={form.control}
 							name="phone"
@@ -159,7 +190,7 @@ export default function LeadsForm({
 									<FormControl>
 										<PhoneInput
 											defaultCountry="AR"
-											countries={["AR", "UY", "CL", "BR", "PY"]}
+											countries={["AR"]}
 											placeholder="Ingresá un número de teléfono"
 											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
 											{...field}
@@ -168,7 +199,11 @@ export default function LeadsForm({
 									<FormMessageWithIcon className="text-xs" />
 								</FormItem>
 							)}
-						/>{" "}
+						/>
+					</div>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+						{/* Email */}
 						<FormField
 							control={form.control}
 							name="email"
@@ -189,40 +224,35 @@ export default function LeadsForm({
 								</FormItem>
 							)}
 						/>
-					</div>
 
-					{/* Tipo de consulta y Zona de interés */}
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+						{/* Dirección */}
 						<FormField
 							control={form.control}
-							name="consultation_type_id"
+							name="address"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel className="text-secondary-dark font-semibold">
-										Tipo de consulta
+										Dirección <span className="text-danger-normal">*</span>
 									</FormLabel>
-									<Select
-										onValueChange={(value) => field.onChange(Number(value))}
-									>
-										<FormControl>
-											<SelectTrigger className="w-full text-base data-placeholder:text-grey-light border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active h-12 shadow-input-border">
-												<SelectValue placeholder="Seleccione tipo de consulta" />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent className="bg-dropdown-background">
-											<SelectItem value="1">Consulta General</SelectItem>
-											<SelectItem value="3">Consulta por Alquiler</SelectItem>
-											<SelectItem value="2">Consulta por Compra</SelectItem>
-											<SelectItem value="4">Consulta por Venta</SelectItem>
-										</SelectContent>
-									</Select>
+									<FormControl>
+										<Input
+											type="text"
+											placeholder="Av. Santa Fe 1234"
+											className="text-base placeholder:text-grey-light border-input-border/70 focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-12 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+											{...field}
+										/>
+									</FormControl>
 									<FormMessageWithIcon className="text-xs" />
 								</FormItem>
 							)}
 						/>
+					</div>
+
+					{/* Propiedad Asociada */}
+					<div className="w-1/2 pr-4">
 						<FormField
 							control={form.control}
-							name="interest_zone"
+							name="property_id"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel className="text-secondary-dark font-semibold">
@@ -230,11 +260,13 @@ export default function LeadsForm({
 									</FormLabel>
 									<FormControl>
 										<PropertySelect
-											value={field.value}
-											onChange={(propertyId) => {
-												field.onChange(propertyId);
-											}}
 											availableProperties={availableProperties}
+											operationTypes={[1]}
+											value={field.value}
+											onChange={(propertyId, property) => {
+												field.onChange(propertyId);
+												console.log("Propiedad seleccionada:", property);
+											}}
 											placeholder="Seleccione o busque una propiedad"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										/>
@@ -258,7 +290,7 @@ export default function LeadsForm({
 									<FormControl>
 										<Textarea
 											placeholder="Agregar notas adicionales..."
-											className="text-base border-input-border/70 placeholder:text-grey-light focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active py-4 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal resize-none min-h-[100px]"
+											className="text-base border-input-border/70 placeholder:text-grey-light focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal resize-none min-h-[100px]"
 											maxLength={300}
 											{...field}
 										/>
@@ -278,17 +310,17 @@ export default function LeadsForm({
 					<div className="flex gap-3 justify-end pt-4">
 						<Button
 							type="button"
-							size={"lg"}
 							variant="outline"
-							onClick={handleCancel}
+							size={"lg"}
+							onClick={() => Router.back()}
 							className="rounded-md"
 						>
 							Cancelar
 						</Button>
 						<Button
 							type="submit"
-							size={"lg"}
 							className="rounded-md"
+							size={"lg"}
 							variant="tertiary"
 							disabled={form.formState.isSubmitting}
 						>

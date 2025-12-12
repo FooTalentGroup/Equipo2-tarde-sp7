@@ -49,11 +49,14 @@ export default function PropertySelect({
 		);
 	}, [availableProperties, operationTypes]);
 
-	const selectedProperty = filteredProperties.find(
+	// Mostrar la propiedad seleccionada aunque esté fuera del filtro
+	const selectedProperty = availableProperties.find(
 		(p) => p.id.toString() === value,
 	);
 
-	const buttonText = selectedProperty ? selectedProperty.title : placeholder;
+	const buttonText = selectedProperty
+		? selectedProperty.main_address.full_address
+		: placeholder;
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -92,13 +95,16 @@ export default function PropertySelect({
 								>
 									<div className="flex flex-col items-start min-w-0 flex-1">
 										<span className="font-medium truncate">
-											{property.title}
+											{property.main_address.full_address}
 										</span>
-										{property.main_address?.full_address && (
-											<span className="text-xs text-muted-foreground truncate">
-												{property.main_address.full_address}
-											</span>
-										)}
+										{/* <span className="font-medium truncate">
+                      {property.title}
+                    </span>
+                    {property.main_address?.full_address && (
+                      <span className="text-xs text-muted-foreground truncate">
+                        {property.main_address.full_address}
+                      </span>
+                    )} */}
 									</div>
 									<CheckIcon
 										className={cn(
