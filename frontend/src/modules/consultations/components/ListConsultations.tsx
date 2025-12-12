@@ -93,26 +93,6 @@ export default function ListConsultations({ consultationsData }: Props) {
 		});
 	};
 
-	const handleSendResponse = async (
-		consultationId: number,
-		response: string,
-	) => {
-		// TODO: Llamar al backend para enviar respuesta
-		console.log("Send response to:", consultationId, response);
-
-		setConsultations((prev) =>
-			prev.map((c) =>
-				c.id === consultationId
-					? {
-							...c,
-							response,
-							response_date: new Date().toISOString(),
-						}
-					: c,
-			),
-		);
-	};
-
 	const handleAddContact = async (consultation: Consultation) => {
 		try {
 			const result = await convertConsultationToLead(consultation.id);
@@ -143,7 +123,12 @@ export default function ListConsultations({ consultationsData }: Props) {
 	};
 
 	const handleDelete = (id: number) => {
-		setConsultations((prev) => prev.filter((c) => c.id !== id));
+		const idToRemove = Number(id);
+		setConsultations((prev) => prev.filter((c) => Number(c.id) !== idToRemove));
+		setSelectedConsultation((prev) => (prev?.id === idToRemove ? null : prev));
+		setDialogOpen((open) =>
+			selectedConsultation?.id === idToRemove ? false : open,
+		);
 	};
 
 	return (
@@ -171,7 +156,6 @@ export default function ListConsultations({ consultationsData }: Props) {
 				consultation={selectedConsultation}
 				open={dialogOpen}
 				onOpenChange={setDialogOpen}
-				onSendResponse={handleSendResponse}
 				onAddContact={handleAddContact}
 			/>
 		</div>

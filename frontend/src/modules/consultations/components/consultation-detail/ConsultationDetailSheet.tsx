@@ -1,11 +1,17 @@
 "use client";
 
+import { memo, useCallback, useMemo } from "react";
+
+import Link from "next/link";
+
+import { Button } from "@src/components/ui/button";
 import {
 	Sheet,
 	SheetContent,
 	SheetHeader,
 	SheetTitle,
 } from "@src/components/ui/sheet";
+import { paths } from "@src/lib/paths";
 import type { Consultation } from "@src/types/consultations";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -14,11 +20,14 @@ import { es } from "date-fns/locale";
 import { ConsultationActions } from "./ConsultationActions";
 import { ConsultationContactInfo } from "./ConsultationContactInfo";
 
+// Memoizamos componentes hijos para evitar renders innecesarios
+const MemoConsultationContactInfo = memo(ConsultationContactInfo);
+const MemoConsultationActions = memo(ConsultationActions);
+
 interface ConsultationDetailSheetProps {
 	consultation: Consultation | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSendResponse?: (consultationId: number, response: string) => Promise<void>;
 	onAddContact?: (consultation: Consultation) => void;
 }
 
@@ -26,25 +35,21 @@ export function ConsultationDetailSheet({
 	consultation,
 	open,
 	onOpenChange,
-	onSendResponse,
 	onAddContact,
 }: ConsultationDetailSheetProps) {
+	const property = consultation?.property;
+	const hasProperty = !!property;
+	const propertyUrl = useMemo(
+		() =>
+			property?.id ? paths.public.property(String(property.id)) : undefined,
+		[property?.id],
+	);
+
+	const handleAddContact = useCallback(() => {
+		if (onAddContact && consultation) onAddContact(consultation);
+	}, [onAddContact, consultation]);
+
 	if (!consultation) return null;
-
-	/* const handleSendResponse = async () => {
-		if (!response.trim() || !onSendResponse) return;
-
-		setIsSending(true);
-		try {
-			await onSendResponse(consultation.id, response);
-			setResponse("");
-			onOpenChange(false);
-		} catch (error) {
-			console.error("Error sending response:", error);
-		} finally {
-			setIsSending(false);
-		}
-	}; */
 
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
@@ -62,7 +67,46 @@ export function ConsultationDetailSheet({
 				{/* Content - scrollable */}
 				<div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
 					{/* Cliente Info */}
-					<ConsultationContactInfo consultation={consultation} />
+					<MemoConsultationContactInfo consultation={consultation} />
+
+					{/* Tipo de consulta (siempre que exista) */}
+					{consultation.consultation_type?.name && (
+						<div>
+							<h3 className="font-semibold text-sm mb-2">Tipo de consulta</h3>
+							<div className="bg-slate-50 rounded-lg p-3">
+								<p className="text-sm text-slate-700 font-medium">
+									{consultation.consultation_type.name}
+								</p>
+							</div>
+						</div>
+					)}
+
+					{/* Propiedad consultada (solo si hay propiedad) */}
+					{hasProperty && (
+						<div>
+							<h3 className="font-semibold text-sm mb-2">
+								Propiedad consultada
+							</h3>
+							<div className="bg-slate-50 rounded-lg p-3 flex items-center justify-between">
+								<div className="flex items-center gap-2">
+									<p className="text-sm text-slate-700 font-medium">
+										{property?.title}
+									</p>
+								</div>
+								{propertyUrl && (
+									<Button variant="outline" asChild className="ml-4">
+										<Link
+											href={propertyUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											Ver propiedad
+										</Link>
+									</Button>
+								)}
+							</div>
+						</div>
+					)}
 
 					{/* Mensaje */}
 					<div>
@@ -97,10 +141,9 @@ export function ConsultationDetailSheet({
 					)}
 				</div>
 
-				<ConsultationActions
+				<MemoConsultationActions
 					consultation={consultation}
-					onSendResponse={onSendResponse}
-					onAddContact={() => onAddContact?.(consultation)}
+					onAddContact={handleAddContact}
 					onOpenChange={onOpenChange}
 				/>
 			</SheetContent>

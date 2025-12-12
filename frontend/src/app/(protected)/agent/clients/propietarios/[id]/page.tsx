@@ -5,7 +5,12 @@ import {
 	ClientNotes,
 	ClientProperties,
 } from "@src/modules/clients/components/client-detail";
-import { getClientById } from "@src/modules/clients/services/clients-service";
+import {
+	addOwnedProperty,
+	getClientById,
+	removeOwnedProperty,
+} from "@src/modules/clients/services/clients-service";
+import { getProperties } from "@src/modules/properties/services/property-service";
 import type { OwnerApiResponse } from "@src/types/clients/owner";
 
 export default async function OwnerDetailPage({
@@ -31,6 +36,21 @@ export default async function OwnerDetailPage({
 
 	const ownerData = responseData.client;
 	const ownedProperties = responseData.owned_properties || [];
+
+	// Propiedades disponibles para asignar (desde backend)
+	const { properties: availableProperties } = await getProperties({
+		includeArchived: false,
+	});
+
+	async function handleAddOwnedProperty(propertyId: string) {
+		"use server";
+		await addOwnedProperty(id, propertyId);
+	}
+
+	async function handleDeleteOwnedProperty(propertyId: string | number) {
+		"use server";
+		await removeOwnedProperty(id, propertyId);
+	}
 
 	// Mapear datos del backend
 	const owner = {
@@ -87,7 +107,13 @@ export default async function OwnerDetailPage({
 
 					{/* Columna derecha - Propiedades */}
 					<div className="lg:col-span-2">
-						<ClientProperties properties={properties} />
+						<ClientProperties
+							properties={properties}
+							availableProperties={availableProperties}
+							operationType={[1]}
+							onAddProperty={handleAddOwnedProperty}
+							onDeleteProperty={handleDeleteOwnedProperty}
+						/>
 					</div>
 				</div>
 			</div>
