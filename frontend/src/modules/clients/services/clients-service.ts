@@ -112,3 +112,37 @@ export async function addOwnedProperty(
 		return false;
 	}
 }
+
+export async function removePropertyOfInterest(
+	clientId: string | number,
+	propertyId: string | number,
+): Promise<boolean> {
+	try {
+		await api.delete(
+			`clients/${clientId}/properties-of-interest/${propertyId}`,
+		);
+		return true;
+	} catch (error) {
+		console.error(
+			`Error removing property of interest for client ${clientId}:`,
+			error,
+		);
+		return false;
+	}
+}
+
+export async function removeOwnedProperty(
+	clientId: string | number,
+	propertyId: string | number,
+): Promise<boolean> {
+	try {
+		await api.delete(`clients/${clientId}/owned-properties/${propertyId}`);
+		return true;
+	} catch (error) {
+		console.error(
+			`Error removing owned property for client ${clientId}:`,
+			error,
+		);
+		return false;
+	}
+}

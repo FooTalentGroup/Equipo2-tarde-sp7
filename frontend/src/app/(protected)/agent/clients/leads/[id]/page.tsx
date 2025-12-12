@@ -8,6 +8,7 @@ import {
 import {
 	addPropertyOfInterest,
 	getClientById,
+	removePropertyOfInterest,
 } from "@src/modules/clients/services/clients-service";
 import { getProperties } from "@src/modules/properties/services/property-service";
 import type { LeadApiResponse } from "@src/types/clients/lead";
@@ -44,6 +45,11 @@ export default async function LeadDetailPage({
 	async function handleAddPropertyOfInterest(propertyId: string) {
 		"use server";
 		await addPropertyOfInterest(id, propertyId);
+	}
+
+	async function handleDeletePropertyOfInterest(propertyId: string | number) {
+		"use server";
+		await removePropertyOfInterest(id, propertyId);
 	}
 
 	// Mapear datos del backend
@@ -107,6 +113,7 @@ export default async function LeadDetailPage({
 							title="Propiedades de interés"
 							availableProperties={availableProperties}
 							onAddProperty={handleAddPropertyOfInterest}
+							onDeleteProperty={handleDeletePropertyOfInterest}
 							operationType={[1, 2]}
 						/>
 					</div>

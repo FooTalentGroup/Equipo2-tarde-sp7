@@ -46,6 +46,11 @@ export default async function OwnerDetailPage({
 		await addOwnedProperty(id, propertyId);
 	}
 
+	async function handleDeleteOwnedProperty(propertyId: string | number) {
+		"use server";
+		await removeOwnedProperty(id, propertyId);
+	}
+
 	// Mapear datos del backend
 	const owner = {
 		id: String(ownerData.id),
@@ -106,6 +111,7 @@ export default async function OwnerDetailPage({
 							availableProperties={availableProperties}
 							operationType={[1]}
 							onAddProperty={handleAddOwnedProperty}
+							onDeleteProperty={handleDeleteOwnedProperty}
 						/>
 					</div>
 				</div>
