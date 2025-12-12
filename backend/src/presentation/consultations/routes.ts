@@ -144,6 +144,133 @@ export class ConsultationRoutes {
 
 		/**
 		 * @swagger
+		 * /api/consultations/general:
+		 *   post:
+		 *     summary: Create a general consultation from public website
+		 *     description: |
+		 *       Public endpoint to submit general consultations from the landing page.
+		 *       - Does NOT require a specific property
+		 *       - Stores consultant information without creating a client
+		 *       - Records the consultation with type "Consulta General"
+		 *       - Client (Lead) will be created when admin approves the consultation
+		 *     tags: [Consultations]
+		 *     requestBody:
+		 *       required: true
+		 *       content:
+		 *         application/json:
+		 *           schema:
+		 *             type: object
+		 *             required:
+		 *               - first_name
+		 *               - last_name
+		 *               - phone
+		 *               - message
+		 *             properties:
+		 *               first_name:
+		 *                 type: string
+		 *                 minLength: 2
+		 *                 maxLength: 100
+		 *                 description: Consultant's first name
+		 *                 example: María
+		 *               last_name:
+		 *                 type: string
+		 *                 minLength: 2
+		 *                 maxLength: 100
+		 *                 description: Consultant's last name
+		 *                 example: González
+		 *               phone:
+		 *                 type: string
+		 *                 minLength: 8
+		 *                 maxLength: 20
+		 *                 description: Consultant's phone number
+		 *                 example: "+54 221 987-6543"
+		 *               message:
+		 *                 type: string
+		 *                 minLength: 10
+		 *                 maxLength: 1000
+		 *                 description: General consultation message
+		 *                 example: "Busco departamento de 2 ambientes en La Plata, zona centro. ¿Tienen disponibilidad?"
+		 *               email:
+		 *                 type: string
+		 *                 format: email
+		 *                 maxLength: 255
+		 *                 description: Consultant's email (optional)
+		 *                 example: maria.gonzalez@example.com
+		 *     responses:
+		 *       201:
+		 *         description: General consultation created successfully
+		 *         content:
+		 *           application/json:
+		 *             schema:
+		 *               type: object
+		 *               properties:
+		 *                 message:
+		 *                   type: string
+		 *                   example: General consultation submitted successfully
+		 *                 consultation:
+		 *                   type: object
+		 *                   properties:
+		 *                     id:
+		 *                       type: integer
+		 *                       example: 15
+		 *                     message:
+		 *                       type: string
+		 *                       example: "Busco departamento de 2 ambientes en La Plata"
+		 *                     consultation_date:
+		 *                       type: string
+		 *                       format: date-time
+		 *                       example: "2025-12-12T17:45:00.000Z"
+		 *                     consultation_type:
+		 *                       type: object
+		 *                       properties:
+		 *                         id:
+		 *                           type: integer
+		 *                           example: 4
+		 *                         name:
+		 *                           type: string
+		 *                           example: "Consulta General"
+		 *                 consultant:
+		 *                   type: object
+		 *                   properties:
+		 *                     first_name:
+		 *                       type: string
+		 *                       example: María
+		 *                     last_name:
+		 *                       type: string
+		 *                       example: González
+		 *                     email:
+		 *                       type: string
+		 *                       example: maria.gonzalez@example.com
+		 *                     phone:
+		 *                       type: string
+		 *                       example: "+54 221 987-6543"
+		 *       400:
+		 *         description: Bad request - Validation error
+		 *         content:
+		 *           application/json:
+		 *             schema:
+		 *               type: object
+		 *               properties:
+		 *                 message:
+		 *                   type: string
+		 *                   example: "Message must be at least 10 characters"
+		 *       500:
+		 *         description: Internal server error
+		 *         content:
+		 *           application/json:
+		 *             schema:
+		 *               type: object
+		 *               properties:
+		 *                 message:
+		 *                   type: string
+		 *                   example: "Error creating consultation"
+		 */
+		router.post("/general", (req, res) =>
+			controller.createGeneralConsultation(req, res),
+		);
+
+		/**
+		 * @swagger
 		 * /api/consultations/property:
 		 *   post:
 		 *     summary: Create a property consultation from public website

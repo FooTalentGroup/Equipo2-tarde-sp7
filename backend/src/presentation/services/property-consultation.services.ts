@@ -6,6 +6,7 @@ import { ConsultationTypeModel } from "../../data/postgres/models/crm/consultati
 import { PropertyModel } from "../../data/postgres/models/properties/property.model";
 import { CustomError } from "../../domain";
 import type { CreatePropertyConsultationDto } from "../../domain/dtos/consultations/create-property-consultation.dto";
+import type { CreateGeneralConsultationDto } from "../../domain/dtos/consultations/create-general-consultation.dto";
 import { ClientCreationHelper } from "./helpers/client-creation.helper";
 
 export class PropertyConsultationServices {
@@ -531,6 +532,69 @@ export class PropertyConsultationServices {
 			throw CustomError.internalServerError(
 				"Error converting consultation to lead",
 			);
+		}
+	}
+
+	/**
+	 * Crea una consulta general desde la web pública (sin propiedad específica)
+	 * - NO requiere property_id
+	 * - Almacena datos del consultante SIN crear el cliente
+	 * - Usa tipo de consulta "Consulta General"
+	 * - El cliente (Lead) se creará cuando el admin apruebe la consulta
+	 */
+	async createGeneralConsultation(dto: CreateGeneralConsultationDto) {
+		try {
+			// 1. Buscar tipo de consulta "Consulta General"
+			const consultationType =
+				await ConsultationTypeModel.findByName("Consulta General");
+
+			if (!consultationType || !consultationType.id) {
+				throw CustomError.internalServerError(
+					'Consultation type "Consulta General" not configured. Please run database seeds.',
+				);
+			}
+
+			// 2. Crear la consulta SIN propiedad y SIN crear el cliente
+			// Almacenar datos del consultante directamente en la consulta
+			const consultation = await ClientConsultationModel.create({
+				client_id: undefined, // No hay cliente todavía
+				property_id: undefined, // No hay propiedad asociada
+				consultation_type_id: consultationType.id,
+				message: dto.message,
+				consultation_date: new Date(),
+				is_read: false,
+				// Almacenar datos del consultante
+				consultant_first_name: dto.first_name,
+				consultant_last_name: dto.last_name,
+				consultant_phone: dto.phone,
+				consultant_email: dto.email,
+			});
+
+			// 3. Retornar respuesta
+			return {
+				message: "General consultation submitted successfully",
+				consultation: {
+					id: consultation.id,
+					message: consultation.message,
+					consultation_date: consultation.consultation_date,
+					consultation_type: {
+						id: consultationType.id,
+						name: consultationType.name,
+					},
+				},
+				consultant: {
+					first_name: dto.first_name,
+					last_name: dto.last_name,
+					email: dto.email,
+					phone: dto.phone,
+				},
+			};
+		} catch (error) {
+			if (error instanceof CustomError) {
+				throw error;
+			}
+			console.error("Error creating general consultation:", error);
+			throw CustomError.internalServerError("Error creating consultation");
 		}
 	}
 }
