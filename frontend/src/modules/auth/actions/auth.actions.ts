@@ -16,7 +16,7 @@ import { redirect } from "next/navigation";
 
 import { paths } from "@src/lib/paths";
 
-import { deleteSession, setSession } from "../lib/session";
+import { deleteSession, getToken, setSession } from "../lib/session";
 import type { LoginFormData } from "../schemas/login";
 import type { RegisterFormData } from "../schemas/register";
 import type { AuthResponse } from "../types";
@@ -126,6 +126,20 @@ export async function registerAction(
  * Deletes the current session and redirects to login page
  */
 export async function logoutAction() {
-	await deleteSession();
-	redirect(paths.auth.login());
+	try {
+		const token = await getToken();
+		if (token) {
+			await fetch(`${API_URL}/auth/logout`, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+		}
+	} catch (error) {
+		console.error("Logout error:", error);
+	} finally {
+		await deleteSession();
+		redirect(paths.auth.login());
+	}
 }
