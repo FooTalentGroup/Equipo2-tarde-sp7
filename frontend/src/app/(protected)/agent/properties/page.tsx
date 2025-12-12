@@ -42,7 +42,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
 		<>
 			<SectionHeading title="Propiedades" />
 			<div className="flex justify-between items-center gap-4">
-				<PropertySearch className="max-w-[400px]" />
+				<PropertySearch className="w-full lg:max-w-[400px]" />
 				<PropertyFilterSheet />
 			</div>
 			<Suspense key={JSON.stringify(filters)} fallback={<PropertiesSkeleton />}>

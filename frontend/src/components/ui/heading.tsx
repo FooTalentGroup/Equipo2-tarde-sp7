@@ -8,7 +8,7 @@ const headingVariants = cva("font-bold font-mono text-heading", {
 		variant: {
 			h1: "text-[3.3125rem] leading-[1.2]", // 53px
 			h2: "text-[2.5rem] leading-[1.2]", // 40px
-			h3: "text-[1.9375rem] leading-[1.2]", // 31px
+			h3: "text-[1.5rem] lg:text-[1.9375rem] leading-[1.2]", // 31px
 			subtitle1: "text-[1.5rem] leading-[1.2]", // 24px
 			subtitle2: "text-[1.25rem] leading-[1.2]", // 20px
 			subtitle3: "text-lg leading-[1.2]", // 18px

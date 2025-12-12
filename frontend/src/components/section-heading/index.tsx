@@ -18,7 +18,7 @@ export default function SectionHeading({
 }: SectionHeadingProps) {
 	return (
 		<>
-			<section className="flex items-center gap-4 justify-between h-12">
+			<section className="flex items-center gap-4 justify-between h-10">
 				<div className="flex flex-col gap-1">
 					<Heading variant="h3" weight="semibold" className="text-secondary">
 						{title}

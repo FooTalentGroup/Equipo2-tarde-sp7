@@ -32,7 +32,7 @@ import {
 import { useIsMobile } from "@src/hooks/use-mobile";
 import { cn } from "@src/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
-import { PanelLeftIcon } from "lucide-react";
+import { Menu } from "lucide-react";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -298,7 +298,7 @@ function SidebarTrigger({
 			}}
 			{...props}
 		>
-			<PanelLeftIcon />
+			<Menu className="size-7" />
 			<span className="sr-only">Toggle Sidebar</span>
 		</Button>
 	);

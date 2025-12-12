@@ -7,8 +7,11 @@ export const paths = {
 	public: {
 		landing: () => "/",
 		properties: () => "/properties",
+		rent: () => "/rent",
+		sale: () => "/sale",
 		property: (id: string) => `/properties/${id}`,
 		unauthorized: () => "/unauthorized",
+		contact: () => "/contact",
 	},
 
 	auth: {

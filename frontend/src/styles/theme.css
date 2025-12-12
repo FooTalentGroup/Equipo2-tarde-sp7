@@ -53,6 +53,7 @@
   --color-danger-light: var(--danger-light);
   --color-danger-dark: var(--danger-dark);
   --color-danger-normal: var(--danger-normal);
+  --color-danger-hover: var(--danger-hover);
 
   /* Attention */
   --color-attention: var(--attention);
@@ -91,6 +92,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-tertiary: var(--tertiary);
   --color-tertiary-foreground: var(--tertiary-foreground);
+  --color-tertiary-hover: var(--tertiary-hover);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
@@ -141,7 +143,7 @@
 
   /* Primary */
   --primary: #0c2b4e;
-  --primary-hover: #0b2746;
+  --primary-hover: #07192c;
   --primary-normal-active: #0a223e;
   --primary-foreground: #ffffff;
 
@@ -154,12 +156,13 @@
   --secondary-darker-foreground: #ffffff;
   --secondary-light: #b8c3cf;
   --secondary-light-foreground: #091523;
-  --secondary-hover: #17375a;
+  --secondary-hover: #112841;
 
   /* Tertiary */
   --tertiary: #083fb3;
   --tertiary-foreground: #ffffff;
   --tertiary-light: #e6ecf7;
+  --tertiary-hover: #062f84;
 
   /* Outline */
   --outline: #f2f2f2;
@@ -190,6 +193,7 @@
   --destructive: #fff3f6;
   --destructive-border: #f8222d;
   --destructive-foreground: #f8222d;
+  --destructive-hover: #c51b24;
 
   /* Attention */
   --attention: #feb938;
