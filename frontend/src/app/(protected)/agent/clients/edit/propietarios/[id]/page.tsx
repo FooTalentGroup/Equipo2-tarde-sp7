@@ -1,13 +1,12 @@
 import { cookies } from "next/headers";
 
-import LeadsForm from "@src/modules/clients/components/leads/leads-form";
+import OwnerForm from "@src/modules/clients/components/create-owners/owners-forms";
 import TipAlert from "@src/modules/clients/ui/TipAlert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 
 export const dynamic = "force-dynamic";
 
 async function Page() {
-	// Cargar propiedades en el servidor con autenticación
 	const cookieStore = await cookies();
 	const token = cookieStore.get("authToken")?.value || "";
 
@@ -20,7 +19,7 @@ async function Page() {
 
 	return (
 		<div className="flex w-full gap-6">
-			<LeadsForm availableProperties={availableProperties} />
+			<OwnerForm availableProperties={availableProperties} />
 			<TipAlert />
 		</div>
 	);

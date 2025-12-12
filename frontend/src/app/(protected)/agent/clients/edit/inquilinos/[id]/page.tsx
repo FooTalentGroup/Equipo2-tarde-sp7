@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import LeadsForm from "@src/modules/clients/components/leads/leads-form";
+import TenantForm from "@src/modules/clients/components/create-tenants/tenants-form";
 import TipAlert from "@src/modules/clients/ui/TipAlert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 
@@ -20,7 +20,7 @@ async function Page() {
 
 	return (
 		<div className="flex w-full gap-6">
-			<LeadsForm availableProperties={availableProperties} />
+			<TenantForm availableProperties={availableProperties} />
 			<TipAlert />
 		</div>
 	);

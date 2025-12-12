@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
 import {
@@ -30,7 +32,10 @@ import {
 	type ContactFormData,
 	contactFormSchema,
 } from "../../schemas/contact-form.schema";
-import { createClientServerAction } from "../../services/clients-service";
+import {
+	createClientServerAction,
+	updateClientById,
+} from "../../services/clients-service";
 import { ClientType } from "../../services/types";
 import PropertySelect from "../PropertySelect";
 
@@ -38,49 +43,67 @@ type ContactFormProps = {
 	availableProperties: Property[];
 	onSubmit?: (data: ContactFormData) => Promise<void> | void;
 	onCancel?: () => void;
+	initialValues?: Partial<ContactFormData>;
+	clientId?: string;
 };
 
 export default function LeadsForm({
 	availableProperties,
 	onSubmit,
 	onCancel,
+	initialValues,
+	clientId,
 }: ContactFormProps) {
+	const router = useRouter();
+
+	const defaultValues: ContactFormData = {
+		first_name: "",
+		last_name: "",
+		phone: "",
+		email: "",
+		consultation_type_id: 1,
+		notes: "",
+		property_id: "",
+		...initialValues,
+	};
+
 	const form = useForm<ContactFormData>({
 		resolver: zodResolver(contactFormSchema),
-		defaultValues: {
-			first_name: "",
-			last_name: "",
-			phone: "",
-			email: "",
-			consultation_type_id: 1,
-
-			interest_zone: "",
-			notes: "",
-		},
+		defaultValues,
 	});
 
 	const handleSubmit = async (data: ContactFormData) => {
 		try {
 			if (onSubmit) {
 				await onSubmit(data);
-			} else {
-				// Preparar datos para el backend
-				// Mapear consultation_type a los campos del Lead
-				const leadData: Partial<CreateLead> = {
-					first_name: data.first_name,
-					last_name: data.last_name,
-					phone: data.phone,
-					email: data.email,
-					contact_category_id: 1,
-					interest_zone: data.interest_zone,
-					notes: "",
-				};
-
-				await createClientServerAction(ClientType.LEAD, leadData as CreateLead);
-
-				toast.success("Contacto guardado exitosamente");
-				form.reset();
+				return;
 			}
+
+			// Mapear y enviar según modo (crear/editar)
+			const payload: Partial<CreateLead> = {
+				first_name: data.first_name,
+				last_name: data.last_name,
+				phone: data.phone,
+				email: data.email,
+				contact_category_id: 1,
+				notes: data.notes || "",
+				property_id: data.property_id
+					? Number.isNaN(Number(data.property_id))
+						? undefined
+						: Number(data.property_id)
+					: undefined,
+			};
+
+			if (clientId) {
+				await updateClientById(clientId, payload);
+				toast.success("Contacto actualizado exitosamente");
+				router.push(`/agent/clients/leads/${clientId}`);
+				return;
+			}
+
+			await createClientServerAction(ClientType.LEAD, payload as CreateLead);
+			toast.success("Contacto guardado exitosamente");
+			form.reset();
 		} catch (error) {
 			const errorMessage =
 				error instanceof Error ? error.message : "Error al guardar el contacto";
@@ -202,6 +225,7 @@ export default function LeadsForm({
 										Tipo de consulta
 									</FormLabel>
 									<Select
+										value={field.value ? String(field.value) : undefined}
 										onValueChange={(value) => field.onChange(Number(value))}
 									>
 										<FormControl>
@@ -222,7 +246,7 @@ export default function LeadsForm({
 						/>
 						<FormField
 							control={form.control}
-							name="interest_zone"
+							name="property_id"
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel className="text-secondary-dark font-semibold">
@@ -235,7 +259,7 @@ export default function LeadsForm({
 												field.onChange(propertyId);
 											}}
 											availableProperties={availableProperties}
-											placeholder="Seleccione o busque una propiedad"
+											placeholder="Av. Santa Fe 2568"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 										/>
 									</FormControl>

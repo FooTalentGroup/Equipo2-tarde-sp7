@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
+import { paths } from "@src/lib/paths";
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
 import { LeadsCard } from "@src/modules/clients/ui/leads-card";
 import type { Lead, LeadWithProperties } from "@src/types/clients/lead";
@@ -12,6 +15,7 @@ interface LeadsListProps {
 }
 
 export function LeadsList({ leads, itemsPerPage = 10 }: LeadsListProps) {
+	const router = useRouter();
 	const [currentPage, setCurrentPage] = useState(1);
 	const [leadsList, setLeadsList] = useState(leads);
 
@@ -32,8 +36,7 @@ export function LeadsList({ leads, itemsPerPage = 10 }: LeadsListProps) {
 	};
 
 	const handleEdit = (id: number) => {
-		// TODO: Implementar edición de lead
-		console.log("Editar lead:", id);
+		router.push(paths.agent.clients.leads.edit(id));
 	};
 
 	const handleDelete = (id: number) => {
