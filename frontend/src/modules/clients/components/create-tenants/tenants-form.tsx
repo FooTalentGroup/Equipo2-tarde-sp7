@@ -23,7 +23,10 @@ import {
 	type TenantFormData,
 	tenantFormSchema,
 } from "../../schemas/tenant-form.schema";
-import { createClientServerAction } from "../../services/clients-service";
+import {
+	createClientServerAction,
+	updateClientById,
+} from "../../services/clients-service";
 import { ClientType } from "../../services/types";
 import PropertySelect from "../PropertySelect";
 import DatePickerField from "./DatePickerField";
@@ -32,12 +35,16 @@ type TenantFormProps = {
 	availableProperties: Property[];
 	onSubmit?: (data: TenantFormData) => Promise<void> | void;
 	onCancel?: () => void;
+	initialValues?: Partial<TenantFormData>;
+	clientId?: string;
 };
 
 export default function TenantForm({
 	availableProperties,
 	onSubmit,
 	onCancel,
+	initialValues,
+	clientId,
 }: TenantFormProps) {
 	const form = useForm<TenantFormData>({
 		resolver: zodResolver(tenantFormSchema),
@@ -54,6 +61,7 @@ export default function TenantForm({
 			next_increase_date: "",
 			monthly_amount: "",
 			notes: "",
+			...initialValues,
 		},
 	});
 
@@ -84,12 +92,18 @@ export default function TenantForm({
 					next_increase_date: data.next_increase_date,
 					monthly_amount: Number(data.monthly_amount),
 				};
-				console.log("Submitting tenant data:", tenantData);
+				if (clientId) {
+					await updateClientById(clientId, tenantData);
+					toast.success("Inquilino actualizado exitosamente");
+					// redirigir a detalle
+					window.location.href = `/agent/clients/inquilinos/${clientId}`;
+					return;
+				}
+
 				await createClientServerAction(
 					ClientType.TENANT,
 					tenantData as CreateTenant,
 				);
-
 				toast.success("Inquilino guardado exitosamente");
 				form.reset();
 			}
