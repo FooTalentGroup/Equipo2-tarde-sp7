@@ -200,39 +200,43 @@ export default function CreatePropertyForm({
 		mode: "all",
 	});
 
+	async function handleSave() {
+		try {
+			const allData = form.getValues();
+			let result:
+				| Awaited<ReturnType<typeof createProperty>>
+				| Awaited<ReturnType<typeof updateProperty>>;
+
+			if (propertyId) {
+				result = await updateProperty(propertyId, allData);
+			} else {
+				result = await createProperty(allData);
+			}
+
+			if (result && typeof result === "object" && "error" in result) {
+				throw new Error((result as { error: string }).error);
+			}
+
+			toast.success(
+				propertyId
+					? "Propiedad actualizada exitosamente"
+					: "Propiedad guardada exitosamente",
+			);
+
+			router.push(paths.agent.properties.index());
+		} catch (error) {
+			const errorMessage =
+				error instanceof Error
+					? error.message
+					: "Error al guardar la propiedad";
+			toast.error(errorMessage);
+			console.error("Error al guardar propiedad:", error);
+		}
+	}
+
 	async function onSubmit(_data: PropertyForm) {
 		if (stepper.isLast) {
-			try {
-				const allData = form.getValues();
-				let result:
-					| Awaited<ReturnType<typeof createProperty>>
-					| Awaited<ReturnType<typeof updateProperty>>;
-
-				if (propertyId) {
-					result = await updateProperty(propertyId, allData);
-				} else {
-					result = await createProperty(allData);
-				}
-
-				if (result && typeof result === "object" && "error" in result) {
-					throw new Error((result as { error: string }).error);
-				}
-
-				toast.success(
-					propertyId
-						? "Propiedad actualizada exitosamente"
-						: "Propiedad guardada exitosamente",
-				);
-
-				router.push(paths.agent.properties.index());
-			} catch (error) {
-				const errorMessage =
-					error instanceof Error
-						? error.message
-						: "Error al guardar la propiedad";
-				toast.error(errorMessage);
-				console.error("Error al guardar propiedad:", error);
-			}
+			await handleSave();
 		} else {
 			stepper.next();
 		}
@@ -274,7 +278,6 @@ export default function CreatePropertyForm({
 										const valid = await form.trigger();
 										if (!valid) return;
 
-										if (index - currentIndex > 1) return;
 										stepper.goTo(step.id);
 									}}
 								>
@@ -391,22 +394,45 @@ export default function CreatePropertyForm({
 								{stepper.isFirst ? "Cancelar" : "Atrás"}
 							</Button>
 
+							{(!stepper.isLast || !propertyId) && (
+								<Button
+									type="submit"
+									size="lg"
+									variant="tertiary"
+									disabled={form.formState.isSubmitting}
+								>
+									{stepper.isLast ? (
+										<>
+											{form.formState.isSubmitting && <Spinner />}
+											{form.formState.isSubmitting ? "Guardando..." : "Guardar"}
+										</>
+									) : (
+										"Continuar"
+									)}
+								</Button>
+							)}
+						</div>
+						{propertyId && (
 							<Button
-								type="submit"
+								type="button"
 								size="lg"
 								variant="tertiary"
+								onClick={form.handleSubmit(handleSave)}
 								disabled={form.formState.isSubmitting}
+								className="w-fit mx-auto"
 							>
 								{stepper.isLast ? (
 									<>
 										{form.formState.isSubmitting && <Spinner />}
-										{form.formState.isSubmitting ? "Guardando..." : "Guardar"}
+										{form.formState.isSubmitting
+											? "Guardando..."
+											: "	Guardar cambios"}
 									</>
 								) : (
-									"Cotinuar"
+									"	Guardar cambios"
 								)}
 							</Button>
-						</div>
+						)}
 					</form>
 				</Form>
 			</div>
