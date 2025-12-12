@@ -1,15 +1,26 @@
 "use client";
 
+import { useState } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@src/components/ui/button";
 import { Card, CardContent } from "@src/components/ui/card";
 import { ImagePlaceholder } from "@src/components/ui/image-placeholder";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@src/components/ui/popover";
 import { parseAmount } from "@src/lib/parsing";
 import { paths } from "@src/lib/paths";
+import PropertySelect from "@src/modules/clients/ui/property-select";
 import type { RentedProperty } from "@src/types/clients/tenant";
-import { Building2 } from "lucide-react";
+import type { Property as FullProperty } from "@src/types/property";
+import { Building2, PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 
 interface Property {
 	id: string | number;
@@ -32,19 +43,18 @@ interface ClientPropertiesProps {
 	title?: string;
 	properties: (Property | RentedProperty)[] | [];
 	addProperty?: boolean;
+	availableProperties?: FullProperty[];
+	operationType?: number[];
+	onAddProperty?: (propertyId: string) => Promise<void>;
 }
 
-// Helper para normalizar propiedades de diferentes tipos a la estructura simple
+// Normalize Property or RentedProperty into a single shape
 function normalizeProperty(property: Property | RentedProperty): Property {
 	if ("address" in property && typeof property.address === "string") {
-		// Es del tipo Property simple
 		return property as Property;
 	}
 
-	// Es del tipo RentedProperty, mapear a Property
 	const rented = property as RentedProperty;
-
-	// Solo usar rental.monthly_amount, NO usar prices como fallback
 	const rentAmount = rented.rental?.monthly_amount
 		? parseAmount(rented.rental.monthly_amount)
 		: undefined;
@@ -76,7 +86,15 @@ export function ClientProperties({
 	title,
 	properties,
 	addProperty = true,
+	availableProperties = [],
+	operationType,
+	onAddProperty,
 }: ClientPropertiesProps) {
+	const router = useRouter();
+	const [open, setOpen] = useState(false);
+	const [selectedPropertyId, setSelectedPropertyId] = useState<string>("");
+	const [saving, setSaving] = useState(false);
+
 	const normalizedProperties = (
 		properties as (Property | RentedProperty)[]
 	).map(normalizeProperty);
@@ -98,7 +116,59 @@ export function ClientProperties({
 						{title ?? `Propiedades (${normalizedProperties.length})`}
 					</h3>
 					{addProperty ? (
-						<Button variant="tertiary">Agregar Propiedad</Button>
+						<Popover open={open} onOpenChange={setOpen}>
+							<PopoverTrigger asChild>
+								<Button variant="outline">
+									<PlusIcon /> Agregar Propiedad
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent
+								side="bottom"
+								align="start"
+								sideOffset={10}
+								className="rounded-xl p-4 text-sm shadow-lg max-w-[420px] bg-sidebar"
+								style={{ width: 420 }}
+							>
+								<div className="space-y-3">
+									<PropertySelect
+										availableProperties={availableProperties}
+										operationTypes={operationType ?? [1, 2]}
+										value={selectedPropertyId}
+										onChange={(id) => setSelectedPropertyId(id)}
+										placeholder="Seleccionar propiedad"
+										className="w-full"
+									/>
+									<div className="flex justify-end">
+										<Button
+											variant="secondary"
+											size="sm"
+											disabled={!selectedPropertyId || saving || !onAddProperty}
+											onClick={async () => {
+												if (!selectedPropertyId || !onAddProperty) return;
+												try {
+													setSaving(true);
+													await onAddProperty(selectedPropertyId);
+													toast.success("Propiedad agregada correctamente");
+													setOpen(false);
+													setSelectedPropertyId("");
+													router.refresh();
+												} catch (error) {
+													console.error(
+														"Error saving property to client:",
+														error,
+													);
+													toast.error("No se pudo agregar la propiedad");
+												} finally {
+													setSaving(false);
+												}
+											}}
+										>
+											{saving ? "Guardando..." : "Guardar"}
+										</Button>
+									</div>
+								</div>
+							</PopoverContent>
+						</Popover>
 					) : (
 						<div className="">
 							<div className="text-xs text-slate-500">Alquiler</div>

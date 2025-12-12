@@ -79,3 +79,36 @@ export async function updateClientById<T = ClientResponse>(
 		return null;
 	}
 }
+
+export async function addPropertyOfInterest(
+	clientId: string | number,
+	propertyId: string | number,
+): Promise<boolean> {
+	try {
+		await api.post(`clients/${clientId}/properties-of-interest`, {
+			property_id: Number(propertyId),
+		});
+		return true;
+	} catch (error) {
+		console.error(
+			`Error adding property of interest for client ${clientId}:`,
+			error,
+		);
+		return false;
+	}
+}
+
+export async function addOwnedProperty(
+	clientId: string | number,
+	propertyId: string | number,
+): Promise<boolean> {
+	try {
+		await api.post(`clients/${clientId}/owned-properties`, {
+			property_id: Number(propertyId),
+		});
+		return true;
+	} catch (error) {
+		console.error(`Error adding owned property for client ${clientId}:`, error);
+		return false;
+	}
+}
