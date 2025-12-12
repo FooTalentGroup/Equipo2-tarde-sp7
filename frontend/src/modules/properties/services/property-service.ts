@@ -278,3 +278,18 @@ export async function toggleFeaturedProperty(
 		return { success: false, error };
 	}
 }
+
+export async function getDocumentDownloadUrl(documentId: number) {
+	try {
+		const res = await api.get<{ document: { download_url: string } }>(
+			`properties/documents/${documentId}/download-url`,
+		);
+		return { success: true, url: res.document.download_url };
+	} catch (error) {
+		console.error("Error getting document download url:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : "Error desconocido",
+		};
+	}
+}
