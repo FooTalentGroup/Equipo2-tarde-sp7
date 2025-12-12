@@ -1,4 +1,4 @@
-import TenantForm from "@src/modules/clients/components/create-tenants/tenants-form";
+import TenantForm from "@src/modules/clients/components/tenants/tenants-form";
 import type { TenantFormData } from "@src/modules/clients/schemas/tenant-form.schema";
 import { getClientById } from "@src/modules/clients/services/clients-service";
 import TipAlert from "@src/modules/clients/ui/TipAlert";

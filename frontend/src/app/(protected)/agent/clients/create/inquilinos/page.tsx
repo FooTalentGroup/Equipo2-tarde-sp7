@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-import TenantForm from "@src/modules/clients/components/create-tenants/tenants-form";
+import TenantForm from "@src/modules/clients/components/tenants/tenants-form";
 import TipAlert from "@src/modules/clients/ui/TipAlert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 

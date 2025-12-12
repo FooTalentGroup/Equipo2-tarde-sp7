@@ -28,8 +28,8 @@ import {
 	updateClientById,
 } from "../../services/clients-service";
 import { ClientType } from "../../services/types";
+import DatePickerField from "../../ui/date-picker-field";
 import PropertySelect from "../PropertySelect";
-import DatePickerField from "./DatePickerField";
 
 type TenantFormProps = {
 	availableProperties: Property[];
