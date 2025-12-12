@@ -1,25 +1,17 @@
 "use client";
 
-import { useState } from "react";
-
 import Image from "next/image";
 import Link from "next/link";
 
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "@src/components/ui/alert-dialog";
 import { Button } from "@src/components/ui/button";
 import { Card, CardContent } from "@src/components/ui/card";
 import { ImagePlaceholder } from "@src/components/ui/image-placeholder";
 import { paths } from "@src/lib/paths";
-import { Trash2 } from "lucide-react";
-import { toast } from "sonner";
+
+// TODO: Import AlertDialog and Trash2 when delete endpoint is implemented
+// import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger } from "@src/components/ui/alert-dialog";
+// import { Trash2 } from "lucide-react";
+// import { toast } from "sonner";
 
 export interface ClientProperty {
 	id: string | number;
@@ -40,30 +32,15 @@ export interface ClientProperty {
 
 interface ClientPropertyCardProps {
 	property: ClientProperty;
-	onDelete?: (id: string | number) => Promise<void>;
+	// TODO: Uncomment onDelete when delete endpoint is implemented in backend
+	// onDelete?: (id: string | number) => Promise<void>;
 }
 
-export function ClientPropertyCard({
-	property,
-	onDelete,
-}: ClientPropertyCardProps) {
-	const [isDeleting, setIsDeleting] = useState(false);
-	const [openDialog, setOpenDialog] = useState(false);
-
-	const handleConfirmDelete = async () => {
-		if (!onDelete) return;
-		try {
-			setIsDeleting(true);
-			await onDelete(property.id);
-			setOpenDialog(false);
-			toast.success("Propiedad eliminada correctamente");
-		} catch (error) {
-			console.error("Error deleting property:", error);
-			toast.error("No se pudo eliminar la propiedad");
-		} finally {
-			setIsDeleting(false);
-		}
-	};
+export function ClientPropertyCard({ property }: ClientPropertyCardProps) {
+	// TODO: Uncomment state and handler when delete endpoint is implemented
+	// const [isDeleting, setIsDeleting] = useState(false);
+	// const [openDialog, setOpenDialog] = useState(false);
+	// const handleConfirmDelete = async () => { ... }
 	return (
 		<Card
 			key={property.id}
@@ -96,6 +73,7 @@ export function ClientPropertyCard({
 									{property.city} · {property.type}
 								</div>
 							</div>
+							{/* TODO: Uncomment when delete endpoint is implemented in backend
 							{onDelete && (
 								<AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
 									<AlertDialogTrigger asChild>
@@ -111,8 +89,7 @@ export function ClientPropertyCard({
 									<AlertDialogContent>
 										<AlertDialogTitle>Eliminar propiedad</AlertDialogTitle>
 										<AlertDialogDescription>
-											¿Estás seguro de que deseas eliminar esta propiedad? Esta
-											acción no se puede deshacer.
+											¿Estás seguro de que deseas eliminar esta propiedad? Esta acción no se puede deshacer.
 										</AlertDialogDescription>
 										<div className="flex gap-3 justify-end">
 											<AlertDialogCancel>Cancelar</AlertDialogCancel>
@@ -127,6 +104,13 @@ export function ClientPropertyCard({
 									</AlertDialogContent>
 								</AlertDialog>
 							)}
+							*/}
+							<div className="flex flex-col items-center">
+								<div className="text-xs text-slate-500">Antigüedad</div>
+								<div className="text-lg font-bold text-slate-900">
+									{property.age}
+								</div>
+							</div>
 						</div>
 
 						<div className="flex items-center justify-between">

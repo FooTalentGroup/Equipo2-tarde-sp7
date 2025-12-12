@@ -172,7 +172,8 @@ export function ClientProperties({
 						<ClientPropertyCard
 							key={property.id}
 							property={property}
-							onDelete={onDeleteProperty}
+							// TODO: Enable when backend implements delete endpoints
+							/* onDelete={onDeleteProperty} */
 						/>
 					))}
 				</div>
