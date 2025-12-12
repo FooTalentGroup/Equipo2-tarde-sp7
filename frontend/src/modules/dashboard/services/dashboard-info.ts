@@ -7,6 +7,7 @@ type DashboardStats = {
 	active_properties: number;
 	inactive_properties: number;
 	unanswered_consultations: number;
+	new_leads_today: number;
 };
 
 type DashboardResponse = {
