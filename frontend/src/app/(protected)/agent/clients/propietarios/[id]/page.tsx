@@ -57,9 +57,7 @@ export default async function OwnerDetailPage({
 		surface: parseFloat(prop.surface_area),
 		image: prop.main_image?.url || "/api/placeholder/400/300",
 		status: prop.property_status.name.toLowerCase(),
-		age: prop.publication_date
-			? new Date(prop.publication_date).toLocaleDateString("es-AR")
-			: "",
+		age: prop.age?.name || "",
 	}));
 
 	return (

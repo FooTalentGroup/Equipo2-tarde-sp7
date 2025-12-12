@@ -26,7 +26,7 @@ export function OwnersCard({ owner, onEdit, onDelete }: OwnersCardProps) {
 
 	const ownerName = `${owner.first_name} ${owner.last_name}`;
 	const propertiesCount =
-		(owner as OwnerWithProperties).owned_properties_count || 0;
+		(owner as OwnerWithProperties).owned_properties?.length || 0;
 
 	const handleCardClick = () => {
 		router.push(paths.agent.clients.owners.detail(owner.id.toString()));
