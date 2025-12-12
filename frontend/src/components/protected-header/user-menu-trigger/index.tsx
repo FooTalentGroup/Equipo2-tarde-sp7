@@ -52,7 +52,7 @@ export default function UserMenuTrigger({ user }: Props) {
 						/>
 						<AvatarFallback className="rounded-lg">CN</AvatarFallback>
 					</Avatar>
-					<div className="grid flex-1 text-left text-sm leading-tight">
+					<div className="hidden md:grid flex-1 text-left text-sm leading-tight">
 						<p className="truncate font-medium text-lg">{`${user.first_name} ${user.last_name}`}</p>
 					</div>
 					{/* <ChevronsUpDown className="ml-auto size-4" /> */}

@@ -189,12 +189,15 @@ export async function updateProperty(id: number | string, data: PropertyForm) {
 			});
 		}
 
-		const existingImageIds = data.images?.gallery
+		const imageOrder = data.images?.gallery
 			?.filter((f: File | PropertyImage): f is PropertyImage => "id" in f)
-			.map((f) => f.id);
+			.map((f, index) => ({
+				id: f.id,
+				is_primary: index === 0,
+			}));
 
-		if (existingImageIds && existingImageIds.length > 0) {
-			formData.append("existing_images", JSON.stringify(existingImageIds));
+		if (imageOrder && imageOrder.length > 0) {
+			formData.append("imageOrder", JSON.stringify(imageOrder));
 		}
 
 		if (data.documents?.files && data.documents.files.length > 0) {
@@ -273,5 +276,20 @@ export async function toggleFeaturedProperty(
 	} catch (error) {
 		console.error("Error toggling featured property:", error);
 		return { success: false, error };
+	}
+}
+
+export async function getDocumentDownloadUrl(documentId: number) {
+	try {
+		const res = await api.get<{ document: { download_url: string } }>(
+			`properties/documents/${documentId}/download-url`,
+		);
+		return { success: true, url: res.document.download_url };
+	} catch (error) {
+		console.error("Error getting document download url:", error);
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : "Error desconocido",
+		};
 	}
 }

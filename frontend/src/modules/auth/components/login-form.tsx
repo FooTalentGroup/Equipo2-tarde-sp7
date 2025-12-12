@@ -119,6 +119,7 @@ export default function LoginForm({
 										{...field}
 									/>
 								</FormControl>
+								<FormMessage />
 							</FormItem>
 						)}
 					/>

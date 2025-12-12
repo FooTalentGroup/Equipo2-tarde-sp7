@@ -1,11 +1,15 @@
+"use client";
+
 import { useState } from "react";
 
 import { Button } from "@src/components/ui/button";
 import { Separator } from "@src/components/ui/separator";
+import { getDocumentDownloadUrl } from "@src/modules/properties/services/property-service";
 import type { PropertyDetail } from "@src/types/property-detail";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar, Download, FileText } from "lucide-react";
+import { toast } from "sonner";
 
 type Props = {
 	property: PropertyDetail;
@@ -79,9 +83,20 @@ export default function PropertyDocuments({ property }: Props) {
 										variant="tertiary"
 										size="sm"
 										className="w-full"
-										onClick={() => {
-											const downloadUrl = `${doc.file_path}?fl_attachment`;
-											window.open(downloadUrl, "_blank");
+										onClick={async () => {
+											if (doc.id) {
+												try {
+													const result = await getDocumentDownloadUrl(doc.id);
+													if (result.success && result.url) {
+														window.open(result.url, "_blank");
+													} else {
+														toast.error("No se pudo descargar el documento");
+													}
+												} catch (error) {
+													console.error(error);
+													toast.error("Error al descargar el documento");
+												}
+											}
 										}}
 									>
 										<Download className="mr-2 h-3 w-3" />

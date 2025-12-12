@@ -145,8 +145,13 @@ export default function PropertyFilterSheet() {
 		<section className="">
 			<Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
 				<SheetTrigger asChild>
-					<Button type="submit" variant="outline" className="w-[140px]">
-						<AdjustmentsHorizontalIcon className="size-6" /> Filtrar
+					<Button
+						type="submit"
+						variant="outline"
+						className="w-full lg:w-[140px]"
+					>
+						<AdjustmentsHorizontalIcon className="size-6" />
+						<span className="sr-only md:not-sr-only">Filtrar</span>
 						{activeFilters > 0 && (
 							<Badge className=" " variant="default">
 								{activeFilters}

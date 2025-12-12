@@ -5,7 +5,7 @@ import { cn } from "@src/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const buttonVariants = cva(
-	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 text-wrap focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive-foreground aria-invalid:bg-destructive",
+	"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 text-wrap focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive-foreground aria-invalid:bg-destructive cursor-pointer!",
 	{
 		variants: {
 			variant: {
@@ -13,7 +13,7 @@ const buttonVariants = cva(
 				combobox:
 					"bg-transparent text-input-placeholder border-input-border border text-sm!	px-3!",
 				destructive:
-					"bg-destructive-foreground text-destructive focus-visible:ring-destructive-foreground/20 ",
+					"bg-destructive-foreground text-destructive focus-visible:ring-destructive-foreground/20 hover:bg-destructive-hover",
 				outline:
 					"border bg-transparent text-secondary shadow-xs border-secondary hover:bg-outline-hover hover:text-secondary",
 				"outline-blue":
@@ -25,7 +25,7 @@ const buttonVariants = cva(
 					"border bg-card text-foreground shadow-xs border-blue-normal hover:bg-outline-hover hover:text-blue-normal",
 				"blue-normal": "border bg-blue-normal text-white border-blue-normal",
 				secondary:
-					"bg-secondary text-secondary-foreground hover:bg-secondary-hover",
+					"bg-secondary text-secondary-foreground hover:bg-secondary-hover hover:text-secondary-hover",
 				tertiary:
 					"bg-tertiary text-tertiary-foreground hover:bg-tertiary-hover",
 				ghost: "hover:bg-accent hover:text-accent-foreground",

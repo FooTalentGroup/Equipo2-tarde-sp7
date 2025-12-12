@@ -92,7 +92,7 @@ type AlertDialogContentProps = React.ComponentProps<
 function AlertDialogContent({
 	className,
 	children,
-	variant = "default",
+	variant = "destructive",
 	...props
 }: AlertDialogContentProps) {
 	return (

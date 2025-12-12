@@ -29,7 +29,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export default function PropertyDocumentsForm({ form }: Props) {
 	return (
-		<div className="grid gap-8">
+		<div className="grid gap-6">
 			<FormField
 				control={form.control}
 				name="documents.files"
