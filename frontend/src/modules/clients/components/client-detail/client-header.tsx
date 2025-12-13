@@ -7,11 +7,17 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@src/components/ui/button";
 import { Card, CardContent } from "@src/components/ui/card";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@src/components/ui/dropdown-menu";
 import { StatusBadge } from "@src/components/ui/status-badge";
 import { paths } from "@src/lib/paths";
 import { deleteClientById } from "@src/modules/clients/services/clients-service";
 import { DeleteClientDialog } from "@src/modules/clients/ui/delete-client-dialog";
-import { Pen, Trash2 } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { toast } from "sonner";
 
 interface ClientHeaderProps {
@@ -93,21 +99,49 @@ export function ClientHeader({
 									)}
 								</div>
 							</div>
-							<div className="flex flex-col items-center gap-2">
-								<Button variant="tertiary" className="w-full" asChild>
-									<Link href={editPath}>
-										<Pen className="h-4 w-4 mr-2" />
-										Editar contacto
-									</Link>
-								</Button>
-								<Button
-									variant="outline-destructive"
-									className="w-full cursor-pointer"
-									onClick={() => setOpenDeleteDialog(true)}
-								>
-									<Trash2 className="mr-2 h-4 w-4" />
-									Eliminar usuario
-								</Button>
+							<div className="flex items-start gap-14">
+								{status === "lead" && (
+									<div className="flex flex-col items-center gap-2">
+										<Button
+											variant="outline-blue"
+											className="w-full hover:bg-primary hover:border-none hover:text-white hover:shadow-lg"
+											onClick={() => {
+												console.log("Converting to inquilino, id:", id);
+												router.push(paths.agent.clients.inquilinos.new(id));
+											}}
+										>
+											Convertir en inquilino
+										</Button>
+										<Button
+											variant="outline"
+											className="w-full cursor-pointer"
+											onClick={() => {
+												console.log("Converting to propietario, id:", id);
+												router.push(paths.agent.clients.owners.new(id));
+											}}
+										>
+											Convertir en propietario
+										</Button>
+									</div>
+								)}
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button variant="ghost" size="icon" className="h-8 w-8">
+											<MoreHorizontal className="h-4 w-4 text-slate-500" />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align="center">
+										<DropdownMenuItem asChild>
+											<Link href={editPath}>Editar contacto</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											onClick={() => setOpenDeleteDialog(true)}
+											className="text-red-600"
+										>
+											Eliminar usuario
+										</DropdownMenuItem>
+									</DropdownMenuContent>
+								</DropdownMenu>
 							</div>
 						</div>
 					</CardContent>

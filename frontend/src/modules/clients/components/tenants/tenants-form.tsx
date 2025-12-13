@@ -29,6 +29,7 @@ import {
 } from "../../schemas/tenant-form.schema";
 import {
 	createClientServerAction,
+	deleteClientById,
 	updateClientById,
 } from "../../services/clients-service";
 import { ClientType } from "../../services/types";
@@ -39,6 +40,7 @@ type TenantFormProps = {
 	onSubmit?: (data: TenantFormData) => Promise<void> | void;
 	initialValues?: Partial<TenantFormData>;
 	clientId?: string;
+	leadId?: string;
 };
 
 export default function TenantForm({
@@ -46,6 +48,7 @@ export default function TenantForm({
 	onSubmit,
 	initialValues,
 	clientId,
+	leadId,
 }: TenantFormProps) {
 	const router = useRouter();
 	const form = useForm<TenantFormData>({
@@ -84,7 +87,6 @@ export default function TenantForm({
 					email: data.email,
 					dni: data.dni,
 					contact_category_id: 2,
-					/* address: data.address, */
 					rental_interest: true,
 					property_interest_phone: data.phone,
 					notes: data.notes || "",
@@ -96,14 +98,7 @@ export default function TenantForm({
 					currency_type_id: 1,
 				};
 				if (clientId) {
-					console.log("=== UPDATE DEBUG ===");
-					console.log("clientId:", clientId);
-					console.log("monthly_amount enviado:", tenantData.monthly_amount);
-					console.log("Datos completos:", tenantData);
-					console.log("====================");
-
-					const result = await updateClientById(clientId, tenantData);
-					console.log("Respuesta del servidor:", result);
+					await updateClientById(clientId, tenantData);
 					toast.success("Inquilino actualizado exitosamente");
 					// redirigir a detalle usando paths centralizado
 					router.push(paths.agent.clients.inquilinos.detail(clientId));
@@ -114,7 +109,20 @@ export default function TenantForm({
 					ClientType.TENANT,
 					tenantData as CreateTenant,
 				);
-				toast.success("Inquilino guardado exitosamente");
+
+				// Si se creó desde un lead, eliminar el lead y mostrar mensaje combinado
+				if (leadId) {
+					try {
+						await deleteClientById(leadId);
+						toast.success("Inquilino creado y lead convertido exitosamente");
+					} catch (deleteError) {
+						console.error("Error eliminando lead:", deleteError);
+						toast.error("Inquilino creado, pero error al eliminar el lead");
+					}
+				} else {
+					toast.success("Inquilino guardado exitosamente");
+				}
+
 				router.push(paths.agent.clients.inquilinos.index());
 			}
 		} catch (error) {
@@ -212,7 +220,7 @@ export default function TenantForm({
 											defaultCountry="AR"
 											countries={["AR"]}
 											placeholder="Ingresá un número de teléfono"
-											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
+											className="text-base [&_input]:placeholder:text-grey-light [&_input]:border-input-border/70 [&_input]:focus-visible:border-input-active [&_input]:focus-visible:shadow-input-active [&_input]:focus-visible:border-2 [&_input]:focus-visible:ring-0 [&_input]:rounded-r-lg [&_button]:rounded-l-lg [&_input]:not-placeholder-shown:border-input-active [&_input]:not-placeholder-shown:border-2 [&_input]:text-primary-normal-active [&_input]:h-12 [&_input]:py-2 [&_input]:shadow-input-border [&_input]:aria-invalid:bg-input-danger [&_input]:aria-invalid:border-danger-normal [&_button]:not-placeholder-shown:border-input-active [&_button]:not-placeholder-shown:border-2"
 											{...field}
 										/>
 									</FormControl>
@@ -245,26 +253,6 @@ export default function TenantForm({
 							)}
 						/>
 
-						{/* <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-secondary-dark font-semibold">
-                    Nuevo inmueble
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Av. Santa Fe 1234"
-                      className="text-base placeholder:text-grey-light border-input-border/70 focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-12 py-4 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessageWithIcon className="text-xs" />
-                </FormItem>
-              )}
-            /> */}
 						<FormField
 							control={form.control}
 							name="property_id"

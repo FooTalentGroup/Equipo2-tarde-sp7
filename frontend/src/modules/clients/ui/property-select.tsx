@@ -66,8 +66,8 @@ export default function PropertySelect({
 					role="combobox"
 					aria-expanded={open}
 					className={cn(
-						"w-full justify-between border-input-border/60 rounded-lg",
-						value && "text-input-foreground",
+						"w-full justify-between border-input-border/70 focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg py-2 shadow-input-border",
+						value && "border-input-active border-2 text-primary-normal-active",
 						!value && "text-grey-light",
 						className,
 					)}

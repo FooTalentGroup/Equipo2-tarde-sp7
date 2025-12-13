@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useSearch } from "@src/contexts/search-context";
 import { paths } from "@src/lib/paths";
 import { deleteClientById } from "@src/modules/clients/services/clients-service";
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
@@ -22,22 +23,34 @@ interface TenantsListProps {
 
 export function TenantsList({ tenants, itemsPerPage = 10 }: TenantsListProps) {
 	const router = useRouter();
+	const { filterData } = useSearch();
 	const [currentPage, setCurrentPage] = useState(1);
-	const [tenantsList, setTenantsList] = useState(tenants);
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 	const [tenantToDelete, setTenantToDelete] = useState<
 		Tenant | TenantWithRentedProperty | null
 	>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	const totalPages = Math.ceil(tenantsList.length / itemsPerPage);
+	// Filtrar tenants basado en el término de búsqueda
+	const filteredTenants = useMemo(() => {
+		return filterData(tenants, [
+			"first_name",
+			"last_name",
+			"dni",
+			"address",
+			"phone",
+			"email",
+		]);
+	}, [tenants, filterData]);
+
+	const totalPages = Math.ceil(filteredTenants.length / itemsPerPage);
 
 	// Calcular items de la página actual
 	const paginatedTenants = useMemo(() => {
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		const endIndex = startIndex + itemsPerPage;
-		return tenantsList.slice(startIndex, endIndex);
-	}, [tenantsList, currentPage, itemsPerPage]);
+		return filteredTenants.slice(startIndex, endIndex);
+	}, [filteredTenants, currentPage, itemsPerPage]);
 
 	const handlePageChange = (page: number) => {
 		if (page >= 1 && page <= totalPages) {
@@ -51,7 +64,7 @@ export function TenantsList({ tenants, itemsPerPage = 10 }: TenantsListProps) {
 	};
 
 	const handleDelete = (id: number) => {
-		const tenant = tenantsList.find((item) => item.id === id);
+		const tenant = filteredTenants.find((item) => item.id === id);
 		if (!tenant) return;
 		setTenantToDelete(tenant);
 		setOpenDeleteDialog(true);
@@ -63,9 +76,6 @@ export function TenantsList({ tenants, itemsPerPage = 10 }: TenantsListProps) {
 		try {
 			const result = await deleteClientById(tenantToDelete.id.toString());
 			if (result) {
-				setTenantsList((prev) =>
-					prev.filter((t) => t.id !== tenantToDelete.id),
-				);
 				toast.success("Inquilino eliminado correctamente");
 				router.refresh();
 				setOpenDeleteDialog(false);
@@ -81,7 +91,7 @@ export function TenantsList({ tenants, itemsPerPage = 10 }: TenantsListProps) {
 		}
 	};
 
-	if (tenantsList.length === 0) {
+	if (filteredTenants.length === 0) {
 		return (
 			<div className="text-center py-8 text-slate-500">
 				No hay inquilinos disponibles

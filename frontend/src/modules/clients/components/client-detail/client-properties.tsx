@@ -76,7 +76,6 @@ export function ClientProperties({
 	availableProperties = [],
 	operationType,
 	onAddProperty,
-	onDeleteProperty,
 }: ClientPropertiesProps) {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);

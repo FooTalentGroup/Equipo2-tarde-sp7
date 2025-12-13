@@ -32,13 +32,19 @@ export const paths = {
 			},
 			inquilinos: {
 				index: () => "/agent/clients/inquilinos",
-				new: () => "/agent/clients/create/inquilinos",
+				new: (id?: string | number) =>
+					id
+						? `/agent/clients/create/inquilinos/${id}`
+						: "/agent/clients/create/inquilinos",
 				detail: (id: string | number) => `/agent/clients/inquilinos/${id}`,
 				edit: (id: string | number) => `/agent/clients/edit/inquilinos/${id}`,
 			},
 			owners: {
 				index: () => "/agent/clients/propietarios",
-				new: () => "/agent/clients/create/propietarios",
+				new: (id?: string | number) =>
+					id
+						? `/agent/clients/create/propietarios/${id}`
+						: "/agent/clients/create/propietarios",
 				detail: (id: string | number) => `/agent/clients/propietarios/${id}`,
 				edit: (id: string | number) => `/agent/clients/edit/propietarios/${id}`,
 			},

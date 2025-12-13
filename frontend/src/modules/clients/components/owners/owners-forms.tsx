@@ -1,6 +1,6 @@
 "use client";
 
-import Router from "next/router";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
@@ -16,12 +16,14 @@ import { Input } from "@src/components/ui/input";
 import { PhoneInput } from "@src/components/ui/phone-input";
 import { Spinner } from "@src/components/ui/spinner";
 import { Textarea } from "@src/components/ui/textarea";
+import { paths } from "@src/lib/paths";
 import {
 	type OwnerFormData,
 	ownerFormSchema,
 } from "@src/modules/clients/schemas/owner-form.schema";
 import {
 	createClientServerAction,
+	deleteClientById,
 	updateClientById,
 } from "@src/modules/clients/services/clients-service";
 import { ClientType } from "@src/modules/clients/services/types";
@@ -36,6 +38,7 @@ type OwnerFormProps = {
 	onSubmit?: (data: OwnerFormData) => Promise<void> | void;
 	initialValues?: Partial<OwnerFormData>;
 	clientId?: string;
+	leadId?: string;
 };
 
 export default function OwnerForm({
@@ -43,7 +46,9 @@ export default function OwnerForm({
 	onSubmit,
 	initialValues,
 	clientId,
+	leadId,
 }: OwnerFormProps) {
+	const router = useRouter();
 	/* const availableProperties = getPropertiesWithoutOwner(); */
 
 	const form = useForm<OwnerFormData>({
@@ -98,8 +103,21 @@ export default function OwnerForm({
 					ownerData as CreateOwner,
 				);
 
-				toast.success("Propietario guardado exitosamente");
-				form.reset();
+				// Si se creó desde un lead, eliminar el lead y mostrar mensaje combinado
+				if (leadId) {
+					try {
+						await deleteClientById(leadId);
+						toast.success("Propietario creado y lead convertido exitosamente");
+					} catch (deleteError) {
+						console.error("Error eliminando lead:", deleteError);
+						toast.error("Propietario creado, pero error al eliminar el lead");
+					}
+				} else {
+					toast.success("Propietario guardado exitosamente");
+				}
+
+				// Redirigir al listado de propietarios
+				router.push(paths.agent.clients.owners.index());
 			}
 		} catch (error) {
 			toast.error("Error al guardar el propietario");
@@ -192,7 +210,7 @@ export default function OwnerForm({
 											defaultCountry="AR"
 											countries={["AR"]}
 											placeholder="Ingresá un número de teléfono"
-											className="text-base [&_input]:placeholder:text-grey-light [&_button]:border-input-border/60 [&_input]:border-input-border/60"
+											className="text-base [&_input]:placeholder:text-grey-light [&_input]:border-input-border/70 [&_input]:focus-visible:border-input-active [&_input]:focus-visible:shadow-input-active [&_input]:focus-visible:border-2 [&_input]:focus-visible:ring-0 [&_input]:rounded-r-lg [&_button]:rounded-l-lg [&_input]:not-placeholder-shown:border-input-active [&_input]:not-placeholder-shown:border-2 [&_input]:text-primary-normal-active [&_input]:h-12 [&_input]:py-2 [&_input]:shadow-input-border [&_input]:aria-invalid:bg-input-danger [&_input]:aria-invalid:border-danger-normal [&_button]:not-placeholder-shown:border-input-active [&_button]:not-placeholder-shown:border-2"
 											{...field}
 										/>
 									</FormControl>
@@ -256,16 +274,15 @@ export default function OwnerForm({
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel className="text-secondary-dark font-semibold">
-										Propiedad de interés
+										Propiedad Asociada
 									</FormLabel>
 									<FormControl>
 										<PropertySelect
 											availableProperties={availableProperties}
 											operationTypes={[1]}
 											value={field.value}
-											onChange={(propertyId, property) => {
+											onChange={(propertyId) => {
 												field.onChange(propertyId);
-												console.log("Propiedad seleccionada:", property);
 											}}
 											placeholder="Seleccione o busque una propiedad"
 											className="aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
@@ -312,7 +329,7 @@ export default function OwnerForm({
 							type="button"
 							variant="outline"
 							size={"lg"}
-							onClick={() => Router.back()}
+							onClick={() => router.back()}
 							className="rounded-md"
 						>
 							Cancelar
