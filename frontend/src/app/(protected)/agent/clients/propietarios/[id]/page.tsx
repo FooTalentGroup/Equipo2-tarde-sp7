@@ -82,7 +82,7 @@ export default async function OwnerDetailPage({
 							address={owner.address}
 							createdAt={owner.created_at}
 						/>
-						<ClientNotes notes={owner.notes} />
+						<ClientNotes notes={owner.notes} clientId={owner.id} />
 					</div>
 
 					{/* Columna derecha - Propiedades */}
