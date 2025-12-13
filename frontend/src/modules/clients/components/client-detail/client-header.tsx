@@ -21,6 +21,7 @@ interface ClientHeaderProps {
 	dni?: string;
 	status: "lead" | "inquilino" | "propietario";
 	editPath: string;
+	consultationTypeName?: string; // nuevo: tipo de consulta a mostrar
 }
 
 export function ClientHeader({
@@ -30,6 +31,7 @@ export function ClientHeader({
 	dni,
 	status,
 	editPath,
+	consultationTypeName,
 }: ClientHeaderProps) {
 	const router = useRouter();
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -80,6 +82,11 @@ export function ClientHeader({
 											{firstName} {lastName}
 										</h1>
 										<StatusBadge status={status}>{statusLabel}</StatusBadge>
+									</div>
+									{/* Tipo de consulta */}
+									<div className="text-sm text-slate-600">
+										Tipo de consulta:{" "}
+										{consultationTypeName || "Consulta general"}
 									</div>
 									{dni && (
 										<div className="text-sm text-slate-500">DNI: {dni}</div>

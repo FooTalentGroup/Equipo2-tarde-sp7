@@ -78,7 +78,7 @@ export default function ConsultationFilters({ unreadCount }: Props) {
 				<Mail className="size-4" />
 				No leídos
 				{unreadCount > 0 && (
-					<Badge className="ml-1 bg-[#3B82F6] rounded-full text-white px-1.5 py-1 text-xs">
+					<Badge className="ml-1 bg-[#3B82F6] text-white text-xs rounded-full min-w-6 h-6 px-0.5 flex items-center justify-center leading-none">
 						{unreadCount}
 					</Badge>
 				)}

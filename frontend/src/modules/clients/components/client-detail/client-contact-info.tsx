@@ -5,7 +5,7 @@ import { Calendar, Mail, MapPin, Phone, User } from "lucide-react";
 
 interface ClientContactInfoProps {
 	phone: string;
-	email: string;
+	email?: string;
 	address?: string;
 	createdAt: string;
 }

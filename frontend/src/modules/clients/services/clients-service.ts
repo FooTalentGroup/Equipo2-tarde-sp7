@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { api } from "@src/lib/axios";
 import { getToken } from "@src/modules/auth/lib/session";
 
@@ -85,9 +87,10 @@ export async function addPropertyOfInterest(
 	propertyId: string | number,
 ): Promise<boolean> {
 	try {
-		await api.post(`clients/${clientId}/properties-of-interest`, {
+		await api.post(`/clients/${clientId}/properties-of-interest`, {
 			property_id: Number(propertyId),
 		});
+		revalidatePath("/agent/consultations");
 		return true;
 	} catch (error) {
 		console.error(
@@ -95,6 +98,23 @@ export async function addPropertyOfInterest(
 			error,
 		);
 		return false;
+	}
+}
+
+export async function getClientPropertiesOfInterest(
+	clientId: string | number,
+): Promise<number[]> {
+	try {
+		const response = await api.get<{
+			properties_of_interest: Array<{ id: number }>;
+		}>(`/clients/${clientId}`);
+		return response.properties_of_interest?.map((prop) => prop.id) || [];
+	} catch (error) {
+		console.error(
+			`Error getting properties of interest for client ${clientId}:`,
+			error,
+		);
+		return [];
 	}
 }
 
