@@ -56,7 +56,7 @@ export async function deleteConsultation(id: number) {
 	return result;
 }
 export async function deleteAllConsultations() {
-	await api.delete(`/consultations`);
+	await api.delete(`/consultations/bulk`);
 	revalidatePath("/consultations");
 }
 
