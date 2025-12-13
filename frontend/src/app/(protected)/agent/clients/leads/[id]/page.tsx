@@ -109,7 +109,7 @@ export default async function LeadDetailPage({
 							address={client.address}
 							createdAt={client.created_at}
 						/>
-						<ClientNotes notes={client.notes} />
+						<ClientNotes notes={client.notes} clientId={client.id} />
 					</div>
 
 					{/* Columna derecha - Propiedades */}
