@@ -290,6 +290,7 @@ export default function TenantForm({
 									value={field.value}
 									onChange={field.onChange}
 									label="Fecha de inicio de contrato"
+									side="bottom"
 								/>
 							)}
 						/>
@@ -302,6 +303,7 @@ export default function TenantForm({
 									value={field.value}
 									onChange={field.onChange}
 									label="Fecha de fin de contrato"
+									side="bottom"
 								/>
 							)}
 						/>
@@ -317,6 +319,7 @@ export default function TenantForm({
 									value={field.value || ""}
 									onChange={field.onChange}
 									label="Fecha del próximo"
+									side="bottom"
 								/>
 							)}
 						/>

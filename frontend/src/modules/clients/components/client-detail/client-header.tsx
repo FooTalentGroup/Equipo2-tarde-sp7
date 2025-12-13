@@ -89,11 +89,13 @@ export function ClientHeader({
 										</h1>
 										<StatusBadge status={status}>{statusLabel}</StatusBadge>
 									</div>
-									{/* Tipo de consulta */}
-									<div className="text-sm text-slate-600">
-										Tipo de consulta:{" "}
-										{consultationTypeName || "Consulta general"}
-									</div>
+									{/* Tipo de consulta - solo para leads */}
+									{status === "lead" && (
+										<div className="text-sm text-slate-600">
+											Tipo de consulta:{" "}
+											{consultationTypeName || "Consulta general"}
+										</div>
+									)}
 									{dni && (
 										<div className="text-sm text-slate-500">DNI: {dni}</div>
 									)}

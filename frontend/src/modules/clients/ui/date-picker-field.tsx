@@ -24,6 +24,7 @@ type DatePickerFieldProps = {
 	label: string;
 	placeholder?: string;
 	required?: boolean;
+	side?: "top" | "right" | "bottom" | "left";
 };
 
 export default function DatePickerField({
@@ -32,6 +33,7 @@ export default function DatePickerField({
 	label,
 	placeholder = "dd/mm/aaaa",
 	required = false,
+	side = "bottom",
 }: DatePickerFieldProps) {
 	return (
 		<FormItem className="flex flex-col">
@@ -59,7 +61,12 @@ export default function DatePickerField({
 						</Button>
 					</FormControl>
 				</PopoverTrigger>
-				<PopoverContent className="w-full p-0 flex justify-center" align="end">
+				<PopoverContent
+					className="w-full p-0 flex justify-center"
+					align="start"
+					side={side}
+					avoidCollisions={false}
+				>
 					<Calendar
 						mode="single"
 						selected={value ? parseISO(value) : undefined}
