@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useSearch } from "@src/contexts/search-context";
 import { paths } from "@src/lib/paths";
 import { deleteClientById } from "@src/modules/clients/services/clients-service";
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
@@ -19,22 +20,34 @@ interface LeadsListProps {
 
 export function LeadsList({ leads, itemsPerPage = 10 }: LeadsListProps) {
 	const router = useRouter();
+	const { filterData } = useSearch();
 	const [currentPage, setCurrentPage] = useState(1);
-	const [leadsList, setLeadsList] = useState(leads);
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 	const [leadToDelete, setLeadToDelete] = useState<
 		Lead | LeadWithProperties | null
 	>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	const totalPages = Math.ceil(leadsList.length / itemsPerPage);
+	// Filtrar leads basado en el término de búsqueda
+	const filteredLeads = useMemo(() => {
+		return filterData(leads, [
+			"first_name",
+			"last_name",
+			"dni",
+			"address",
+			"phone",
+			"email",
+		]);
+	}, [leads, filterData]);
+
+	const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
 
 	// Calcular items de la página actual
 	const paginatedLeads = useMemo(() => {
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		const endIndex = startIndex + itemsPerPage;
-		return leadsList.slice(startIndex, endIndex);
-	}, [leadsList, currentPage, itemsPerPage]);
+		return filteredLeads.slice(startIndex, endIndex);
+	}, [filteredLeads, currentPage, itemsPerPage]);
 
 	const handlePageChange = (page: number) => {
 		if (page >= 1 && page <= totalPages) {
@@ -48,7 +61,7 @@ export function LeadsList({ leads, itemsPerPage = 10 }: LeadsListProps) {
 	};
 
 	const handleDelete = (id: number) => {
-		const lead = leadsList.find((item) => item.id === id);
+		const lead = filteredLeads.find((item) => item.id === id);
 		if (!lead) return;
 		setLeadToDelete(lead);
 		setOpenDeleteDialog(true);
@@ -60,7 +73,6 @@ export function LeadsList({ leads, itemsPerPage = 10 }: LeadsListProps) {
 		try {
 			const result = await deleteClientById(leadToDelete.id.toString());
 			if (result) {
-				setLeadsList((prev) => prev.filter((l) => l.id !== leadToDelete.id));
 				toast.success("Lead eliminado correctamente");
 				router.refresh();
 				setOpenDeleteDialog(false);
@@ -76,7 +88,7 @@ export function LeadsList({ leads, itemsPerPage = 10 }: LeadsListProps) {
 		}
 	};
 
-	if (leadsList.length === 0) {
+	if (filteredLeads.length === 0) {
 		return (
 			<div className="text-center py-8 text-slate-500">
 				No hay leads disponibles

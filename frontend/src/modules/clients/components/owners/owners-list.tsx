@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { useSearch } from "@src/contexts/search-context";
 import { paths } from "@src/lib/paths";
 import { deleteClientById } from "@src/modules/clients/services/clients-service";
 import { ClientsPagination } from "@src/modules/clients/ui/clients-pagination";
@@ -19,22 +20,34 @@ interface OwnersListProps {
 
 export function OwnersList({ owners, itemsPerPage = 10 }: OwnersListProps) {
 	const router = useRouter();
+	const { filterData } = useSearch();
 	const [currentPage, setCurrentPage] = useState(1);
-	const [ownersList, setOwnersList] = useState(owners);
 	const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 	const [ownerToDelete, setOwnerToDelete] = useState<
 		Owner | OwnerWithProperties | null
 	>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	const totalPages = Math.ceil(ownersList.length / itemsPerPage);
+	// Filtrar owners basado en el término de búsqueda
+	const filteredOwners = useMemo(() => {
+		return filterData(owners, [
+			"first_name",
+			"last_name",
+			"dni",
+			"address",
+			"phone",
+			"email",
+		]);
+	}, [owners, filterData]);
+
+	const totalPages = Math.ceil(filteredOwners.length / itemsPerPage);
 
 	// Calcular items de la página actual
 	const paginatedOwners = useMemo(() => {
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		const endIndex = startIndex + itemsPerPage;
-		return ownersList.slice(startIndex, endIndex);
-	}, [ownersList, currentPage, itemsPerPage]);
+		return filteredOwners.slice(startIndex, endIndex);
+	}, [filteredOwners, currentPage, itemsPerPage]);
 
 	const handlePageChange = (page: number) => {
 		if (page >= 1 && page <= totalPages) {
@@ -48,7 +61,7 @@ export function OwnersList({ owners, itemsPerPage = 10 }: OwnersListProps) {
 	};
 
 	const handleDelete = (id: number) => {
-		const owner = ownersList.find((item) => item.id === id);
+		const owner = filteredOwners.find((item) => item.id === id);
 		if (!owner) return;
 		setOwnerToDelete(owner);
 		setOpenDeleteDialog(true);
@@ -60,7 +73,6 @@ export function OwnersList({ owners, itemsPerPage = 10 }: OwnersListProps) {
 		try {
 			const result = await deleteClientById(ownerToDelete.id.toString());
 			if (result) {
-				setOwnersList((prev) => prev.filter((o) => o.id !== ownerToDelete.id));
 				toast.success("Propietario eliminado correctamente");
 				router.refresh();
 				setOpenDeleteDialog(false);
@@ -76,7 +88,7 @@ export function OwnersList({ owners, itemsPerPage = 10 }: OwnersListProps) {
 		}
 	};
 
-	if (ownersList.length === 0) {
+	if (filteredOwners.length === 0) {
 		return (
 			<div className="text-center py-8 text-slate-500">
 				No hay propietarios disponibles

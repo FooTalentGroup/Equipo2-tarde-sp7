@@ -220,7 +220,7 @@ export default function LeadsForm({
 										onValueChange={(value) => field.onChange(Number(value))}
 									>
 										<FormControl>
-											<SelectTrigger className="w-full text-base data-placeholder:text-grey-light border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active h-12 shadow-input-border">
+											<SelectTrigger className="w-full text-base data-placeholder:text-grey-light border-input-border/70 focus:border-input-active focus:shadow-input-active focus:border-2 focus:ring-0 rounded-lg text-primary-normal-active h-12 shadow-input-border not-placeholder-shown:border-input-active not-placeholder-shown:border-2">
 												<SelectValue placeholder="Seleccione tipo de consulta" />
 											</SelectTrigger>
 										</FormControl>

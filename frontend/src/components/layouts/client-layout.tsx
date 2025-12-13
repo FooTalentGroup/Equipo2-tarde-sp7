@@ -1,9 +1,12 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import Link from "next/link";
 
 import SectionHeading from "@src/components/section-heading/index";
 import { Input } from "@src/components/ui/input";
+import { SearchProvider, useSearch } from "@src/contexts/search-context";
 import { paths } from "@src/lib/paths";
 import { Search } from "lucide-react";
 
@@ -12,10 +15,9 @@ interface ClientsLayoutProps {
 	activeTab: "leads" | "inquilinos" | "propietarios";
 }
 
-export default function ClientsLayout({
-	children,
-	activeTab,
-}: ClientsLayoutProps) {
+function ClientsLayoutContent({ children, activeTab }: ClientsLayoutProps) {
+	const { searchTerm, setSearchTerm } = useSearch();
+
 	return (
 		<div className="w-full">
 			{/* Header */}
@@ -31,6 +33,8 @@ export default function ClientsLayout({
 								type="text"
 								placeholder="Buscar por nombre, DNI o dirección..."
 								className="pl-10 h-7"
+								value={searchTerm}
+								onChange={(e) => setSearchTerm(e.target.value)}
 							/>
 						</div>
 					</div>
@@ -73,5 +77,18 @@ export default function ClientsLayout({
 			{/* Content Area - Aquí se renderiza el contenido de cada página */}
 			<div className="mt-0">{children}</div>
 		</div>
+	);
+}
+
+export default function ClientsLayout({
+	children,
+	activeTab,
+}: ClientsLayoutProps) {
+	return (
+		<SearchProvider>
+			<ClientsLayoutContent activeTab={activeTab}>
+				{children}
+			</ClientsLayoutContent>
+		</SearchProvider>
 	);
 }
