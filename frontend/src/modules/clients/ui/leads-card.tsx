@@ -65,7 +65,11 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500 mt-1">
 								<div className="flex items-center gap-1">
 									<Mail className="h-3.5 w-3.5" />
-									<span className="truncate">{lead.email}</span>
+									<span className="truncate">
+										{("consultations" in lead &&
+											(lead as any).consultations?.[0]?.type?.name) ||
+											"Consulta general"}
+									</span>
 								</div>
 								<span className="text-slate-300">·</span>
 								<div className="flex items-center gap-1">
