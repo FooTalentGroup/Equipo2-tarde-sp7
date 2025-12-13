@@ -13,7 +13,7 @@ import {
 import { StatusBadge } from "@src/components/ui/status-badge";
 import { paths } from "@src/lib/paths";
 import type { Lead, LeadWithProperties } from "@src/types/clients/lead";
-import { Mail, MoreHorizontal, Phone } from "lucide-react";
+import { Info, MoreHorizontal, Phone } from "lucide-react";
 
 interface LeadsCardProps {
 	lead: Lead | LeadWithProperties;
@@ -70,7 +70,7 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 							</div>
 							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500 mt-1">
 								<div className="flex items-center gap-1">
-									<Mail className="h-3.5 w-3.5" />
+									<Info className="h-3.5 w-3.5" />
 									<span className="truncate">{consultationTypeName}</span>
 								</div>
 								<span className="text-slate-300">·</span>
