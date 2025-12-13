@@ -2,6 +2,7 @@
 
 import { Button } from "@src/components/ui/button";
 import { Card, CardContent } from "@src/components/ui/card";
+import { Checkbox } from "@src/components/ui/checkbox";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -21,6 +22,9 @@ interface ConsultationCardProps {
 	onMarkAsUnread?: (id: number) => void;
 	onDelete?: (id: number) => void;
 	onClick?: () => void;
+	isSelectionMode?: boolean;
+	isSelected?: boolean;
+	onToggleSelection?: (id: number) => void;
 }
 
 export function ConsultationCard({
@@ -29,6 +33,9 @@ export function ConsultationCard({
 	onMarkAsUnread,
 	onDelete,
 	onClick,
+	isSelectionMode = false,
+	isSelected = false,
+	onToggleSelection,
 }: ConsultationCardProps) {
 	const formattedDate = format(
 		new Date(consultation.consultation_date),
@@ -60,12 +67,24 @@ export function ConsultationCard({
 
 	return (
 		<Card
-			className="mb-3 cursor-pointer hover:bg-slate-50 transition-colors"
+			className={`mb-3 cursor-pointer hover:bg-slate-50 transition-colors ${
+				isSelected ? "ring-2 ring-blue-500 bg-blue-50" : ""
+			}`}
 			onClick={onClick}
 		>
 			<CardContent className="p-0 w-full">
 				<div className="flex items-start justify-between px-4 py-1">
 					<div className="flex items-center gap-4 flex-1">
+						{/* Checkbox para selección */}
+						{isSelectionMode && (
+							<Checkbox
+								checked={isSelected}
+								onCheckedChange={() => onToggleSelection?.(consultation.id)}
+								onClick={(e) => e.stopPropagation()}
+								className="mt-1"
+							/>
+						)}
+
 						{/* Información principal */}
 						<div className="text-left flex-1 min-w-0">
 							{/* Nombre */}

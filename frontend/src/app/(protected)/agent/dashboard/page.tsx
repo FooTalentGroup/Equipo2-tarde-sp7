@@ -10,6 +10,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 
 import { paths } from "@src/lib/paths";
+import { getConsultations } from "@src/modules/consultations/service/consultation-service";
 import ConsultationsSkeleton from "@src/modules/consultations/ui/ConsultationsSkeleton";
 import { InfoList } from "@src/modules/dashboard/components/info-list";
 
@@ -31,6 +32,9 @@ export default async function DashboardPage({ searchParams }: Props) {
 		limit: 5,
 		offset: 0,
 	};
+
+	const initialData = await getConsultations(filters);
+
 	return (
 		<>
 			<InfoList />
@@ -51,7 +55,7 @@ export default async function DashboardPage({ searchParams }: Props) {
 					key={JSON.stringify(filters)}
 					fallback={<ConsultationsSkeleton />}
 				>
-					<ConsultationResults filters={filters} />
+					<ConsultationResults filters={filters} initialData={initialData} />
 				</Suspense>
 			</section>
 		</>

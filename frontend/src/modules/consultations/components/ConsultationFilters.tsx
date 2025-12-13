@@ -5,14 +5,17 @@ import { Button } from "@src/components/ui/button";
 import { Funnel, Mail } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 
-import { deleteAllConsultations } from "../service/consultation-service";
 import { DeleteAllConsultationsAction } from "../ui/DeleteAllConsultationsAction";
 
 interface Props {
 	unreadCount: number;
+	onStartSelection?: () => void;
 }
 
-export default function ConsultationFilters({ unreadCount }: Props) {
+export default function ConsultationFilters({
+	unreadCount,
+	onStartSelection,
+}: Props) {
 	const [startDate, setStartDate] = useQueryState(
 		"start_date",
 		parseAsString.withDefault("").withOptions({ shallow: false }),
@@ -53,10 +56,6 @@ export default function ConsultationFilters({ unreadCount }: Props) {
 	const activeFilter =
 		isRead === "false" ? "unread" : startDate && endDate ? "last7" : "all";
 
-	const handleDeleteAll = async () => {
-		await deleteAllConsultations();
-	};
-
 	return (
 		<div className="flex items-center gap-3 mt-2">
 			{/* Últimos 7 días */}
@@ -94,7 +93,7 @@ export default function ConsultationFilters({ unreadCount }: Props) {
 			</Button>
 
 			{/* Borrar todas */}
-			<DeleteAllConsultationsAction onDeleteAll={handleDeleteAll} />
+			<DeleteAllConsultationsAction onStartSelection={onStartSelection} />
 		</div>
 	);
 }
