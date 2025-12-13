@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
-/* import { useRouter } from "next/navigation"; */
+import { useRouter } from "next/navigation";
 
+import { paths } from "@src/lib/paths";
 import { getClients } from "@src/modules/clients/services/clients-service";
 import type { BaseContact, BaseContactWithId } from "@src/types/clients/base";
-
-// import { toast } from "sonner";
+import { toast } from "sonner";
 
 // Tipo flexible que acepta tanto contactos completos como parciales
 type ContactInput =
@@ -29,7 +29,7 @@ export function useContactManager({
 	contact,
 	onAddContact,
 }: UseContactManagerProps) {
-	/* const router = useRouter(); */
+	const router = useRouter();
 	const [existingContact, setExistingContact] =
 		useState<BaseContactWithId | null>(null);
 	const [isChecking, setIsChecking] = useState(false);
@@ -100,6 +100,7 @@ export function useContactManager({
 				await onAddContact();
 			}
 
+			toast.success("Contacto agregado exitosamente");
 			return true;
 		} catch (error) {
 			console.error("Error adding contact:", error);
@@ -117,8 +118,8 @@ export function useContactManager({
 		}
 
 		// Redirigir al perfil del contacto
-		/* router.push(`/contacts/${existingContact.id}`); */
-		alert(`Navegar al perfil del contacto con ID: ${existingContact.id}`);
+		router.push(paths.agent.clients.leads.detail(existingContact.id));
+		toast.success("Redirigiendo al perfil del contacto");
 	};
 
 	// Manejar clic en el botón (agregar o ver)
