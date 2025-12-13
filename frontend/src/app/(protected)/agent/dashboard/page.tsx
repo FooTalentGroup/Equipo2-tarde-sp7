@@ -28,7 +28,12 @@ export default async function DashboardPage({ searchParams }: Props) {
 			: undefined,
 		start_date: resolvedSearchParams.start_date as string,
 		end_date: resolvedSearchParams.end_date as string,
-		is_read: false,
+		is_read:
+			resolvedSearchParams.is_read === "true"
+				? true
+				: resolvedSearchParams.is_read === "false"
+					? false
+					: undefined,
 		limit: 5,
 		offset: 0,
 	};

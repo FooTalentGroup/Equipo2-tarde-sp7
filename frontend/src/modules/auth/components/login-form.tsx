@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -73,7 +72,7 @@ export default function LoginForm({
 					router.push(redirect);
 					router.refresh();
 				} else {
-					toast.error(result.message || "Error al iniciar sesión");
+					toast.error("Error al iniciar sesión");
 				}
 			}
 		} catch (error) {
@@ -129,14 +128,9 @@ export default function LoginForm({
 						name="password"
 						render={({ field }) => (
 							<FormItem>
-								<div className="flex justify-between">
-									<FormLabel className="text-secondary-dark font-semibold">
-										Contraseña
-									</FormLabel>
-									<Link href={""} className="hover:underline text-secondary">
-										¿Olvidaste tu contraseña?
-									</Link>
-								</div>
+								<FormLabel className="text-secondary-dark font-semibold">
+									Contraseña
+								</FormLabel>
 								<div className="flex items-center relative">
 									<FormControl>
 										<Input
