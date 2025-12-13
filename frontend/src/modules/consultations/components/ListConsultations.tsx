@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import {
 	convertConsultationToLead,
+	deleteConsultation,
 	markConsultationAsRead,
 	markConsultationAsUnread,
 } from "../service/consultation-service";
@@ -97,25 +98,19 @@ export default function ListConsultations({ consultationsData }: Props) {
 		try {
 			const result = await convertConsultationToLead(consultation.id);
 
-			setConsultations((prev) =>
-				prev.map((c) =>
-					c.id === consultation.id
-						? {
-								...c,
-								client: result.client,
-								consultant: null,
-							}
-						: c,
-				),
-			);
-
+			// Si se convirtió correctamente, eliminamos la consulta del listado y cerramos el sheet
+			setConsultations((prev) => prev.filter((c) => c.id !== consultation.id));
 			setSelectedConsultation((prev) =>
-				prev && prev.id === consultation.id
-					? { ...prev, client: result.client, consultant: null }
-					: prev,
+				prev?.id === consultation.id ? null : prev,
+			);
+			setDialogOpen((open) =>
+				open && selectedConsultation?.id === consultation.id ? false : open,
 			);
 
-			toast.success(result.message || "Consulta convertida a lead");
+			// Eliminamos también del backend para mantener consistencia
+			await deleteConsultation(consultation.id);
+
+			toast.success("Contacto agregado exitosamente");
 		} catch (error) {
 			console.error("Error converting consultation to lead:", error);
 			toast.error("No se pudo convertir la consulta a lead");

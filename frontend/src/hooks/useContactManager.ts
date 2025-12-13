@@ -4,7 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import { getClients } from "@src/modules/clients/services/clients-service";
 import type { BaseContact, BaseContactWithId } from "@src/types/clients/base";
-import { toast } from "sonner";
+
+// import { toast } from "sonner";
 
 // Tipo flexible que acepta tanto contactos completos como parciales
 type ContactInput =
@@ -121,16 +122,17 @@ export function useContactManager({
 	};
 
 	// Manejar clic en el botón (agregar o ver)
-	const handleAddOrView = async () => {
+	const handleAddOrView = async (): Promise<boolean> => {
 		if (existingContact) {
 			viewContact();
+			return false;
 		} else {
 			const success = await addContact();
 			if (success) {
-				toast.success("Contacto agregado exitosamente");
 				// Re-verifica para refrescar el estado con el contacto ya persistido
 				await checkExistingContact();
 			}
+			return success;
 		}
 	};
 

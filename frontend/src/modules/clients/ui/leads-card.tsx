@@ -13,7 +13,7 @@ import {
 import { StatusBadge } from "@src/components/ui/status-badge";
 import { paths } from "@src/lib/paths";
 import type { Lead, LeadWithProperties } from "@src/types/clients/lead";
-import { Info, MoreHorizontal, Phone } from "lucide-react";
+import { Mail, MoreHorizontal, Phone } from "lucide-react";
 
 interface LeadsCardProps {
 	lead: Lead | LeadWithProperties;
@@ -25,12 +25,6 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 	const router = useRouter();
 
 	const leadName = `${lead.first_name} ${lead.last_name}`;
-
-	// Derivar el tipo de consulta sin usar any
-	const consultationTypeName =
-		"consultations" in lead && Array.isArray(lead.consultations)
-			? (lead.consultations[0]?.type?.name ?? "Consulta general")
-			: "Consulta general";
 
 	const handleCardClick = () => {
 		router.push(paths.agent.clients.leads.detail(lead.id.toString()));
@@ -70,8 +64,8 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 							</div>
 							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500 mt-1">
 								<div className="flex items-center gap-1">
-									<Info className="h-3.5 w-3.5" />
-									<span className="truncate">{consultationTypeName}</span>
+									<Mail className="h-3.5 w-3.5" />
+									<span className="truncate">{lead.email}</span>
 								</div>
 								<span className="text-slate-300">·</span>
 								<div className="flex items-center gap-1">

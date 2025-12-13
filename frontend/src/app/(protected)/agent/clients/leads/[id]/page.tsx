@@ -36,6 +36,11 @@ export default async function LeadDetailPage({
 
 	const clientData = responseData.client;
 	const propertiesOfInterest = responseData.properties_of_interest || [];
+	const consultationTypeName =
+		responseData.consultations && responseData.consultations.length > 0
+			? (responseData.consultations[0]?.consultation_type?.name ??
+				"Consulta general")
+			: "Consulta general";
 
 	// Propiedades disponibles para asignar (desde backend)
 	const { properties: availableProperties } = await getProperties({
@@ -93,6 +98,7 @@ export default async function LeadDetailPage({
 					lastName={client.last_name}
 					status="lead"
 					editPath={paths.agent.clients.leads.edit(id)}
+					consultationTypeName={consultationTypeName}
 				/>
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 					{/* Columna izquierda - Información */}

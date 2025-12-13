@@ -16,6 +16,7 @@ interface ConsultationActionsProps {
 export function ConsultationActions({
 	consultation,
 	onAddContact,
+	onOpenChange,
 }: ConsultationActionsProps) {
 	const contact = consultation.client || consultation.consultant;
 
@@ -31,9 +32,12 @@ export function ConsultationActions({
 		onAddContact: onAddContact ? () => onAddContact(consultation) : undefined,
 	});
 
-	const handleLogAndOpenContact = useCallback(() => {
-		handleAddOrView();
-	}, [handleAddOrView]);
+	const handleLogAndOpenContact = useCallback(async () => {
+		const success = await handleAddOrView();
+		if (success) {
+			onOpenChange(false);
+		}
+	}, [handleAddOrView, onOpenChange]);
 
 	return (
 		<div className="space-y-3 border-t bg-slate-50 px-6 py-4">

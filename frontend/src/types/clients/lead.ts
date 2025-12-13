@@ -94,7 +94,7 @@ export interface Lead {
 	first_name: string;
 	last_name: string;
 	phone: string;
-	email: string;
+	email?: string; // email deja de ser relevante
 	dni: string | null;
 	notes: string | null;
 	address: string | null;
@@ -121,6 +121,13 @@ export type UpdateLead = Partial<CreateLead>;
 // Tipo para la respuesta del API con la nueva estructura del backend
 export interface LeadApiResponse {
 	client: Lead;
+	consultations?: Array<{
+		id: number;
+		consultation_date: string;
+		is_read: boolean;
+		consultation_type?: { id: number; name: string };
+		property?: { id: number; title: string };
+	}>;
 	properties_of_interest: PropertyOfInterest[];
 	owned_properties: unknown[];
 	rented_property: unknown;
