@@ -26,6 +26,12 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 
 	const leadName = `${lead.first_name} ${lead.last_name}`;
 
+	// Derivar el tipo de consulta sin usar any
+	const consultationTypeName =
+		"consultations" in lead && Array.isArray(lead.consultations)
+			? (lead.consultations[0]?.type?.name ?? "Consulta general")
+			: "Consulta general";
+
 	const handleCardClick = () => {
 		router.push(paths.agent.clients.leads.detail(lead.id.toString()));
 	};
@@ -65,11 +71,7 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500 mt-1">
 								<div className="flex items-center gap-1">
 									<Mail className="h-3.5 w-3.5" />
-									<span className="truncate">
-										{("consultations" in lead &&
-											(lead as any).consultations?.[0]?.type?.name) ||
-											"Consulta general"}
-									</span>
+									<span className="truncate">{consultationTypeName}</span>
 								</div>
 								<span className="text-slate-300">·</span>
 								<div className="flex items-center gap-1">
