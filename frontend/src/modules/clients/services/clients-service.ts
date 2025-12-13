@@ -87,14 +87,9 @@ export async function addPropertyOfInterest(
 	propertyId: string | number,
 ): Promise<boolean> {
 	try {
-		console.log("Calling addPropertyOfInterest:", { clientId, propertyId });
-		const response = await api.post(
-			`/clients/${clientId}/properties-of-interest`,
-			{
-				property_id: Number(propertyId),
-			},
-		);
-		console.log("Response:", response);
+		await api.post(`/clients/${clientId}/properties-of-interest`, {
+			property_id: Number(propertyId),
+		});
 		revalidatePath("/agent/consultations");
 		return true;
 	} catch (error) {
