@@ -6,7 +6,7 @@ import { createContext, useContext, useMemo, useState } from "react";
 interface SearchContextType {
 	searchTerm: string;
 	setSearchTerm: (term: string) => void;
-	filterData: <T extends Record<string, any>>(
+	filterData: <T extends Record<string, unknown>>(
 		data: T[],
 		searchFields: (keyof T)[],
 	) => T[];
@@ -22,7 +22,7 @@ export function SearchProvider({ children }: SearchProviderProps) {
 	const [searchTerm, setSearchTerm] = useState("");
 
 	const filterData = useMemo(() => {
-		return <T extends Record<string, any>>(
+		return <T extends Record<string, unknown>>(
 			data: T[],
 			searchFields: (keyof T)[],
 		) => {
