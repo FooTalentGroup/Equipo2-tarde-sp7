@@ -40,7 +40,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 						<FormItem>
 							<FormLabel>Título de la propiedad</FormLabel>
 							<FormControl>
-								<Input placeholder="Nombre y Apellido" {...field} />
+								<Input placeholder="Casa de campo" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -140,7 +140,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 						<FormItem>
 							<FormLabel>Código postal</FormLabel>
 							<FormControl>
-								<Input placeholder="Juan Perez" {...field} />
+								<Input placeholder="1430" {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
