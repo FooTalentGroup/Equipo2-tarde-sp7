@@ -44,7 +44,9 @@ export default function DatePickerField({
 						<Button
 							variant="outline"
 							className={cn(
-								"h-10 pl-3 text-left font-normal border-input-border/70 hover:bg-transparent hover:border-input-active rounded-lg",
+								"h-12 pl-3 text-left font-normal border-input-border/70 hover:bg-transparent hover:border-input-active focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg py-2 shadow-input-border",
+								value &&
+									"border-input-active border-2 text-primary-normal-active",
 								!value && "text-grey-light",
 							)}
 						>
