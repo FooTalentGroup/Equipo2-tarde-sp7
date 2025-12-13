@@ -16,9 +16,23 @@ import {
 
 type Props = {
 	consultationsData: Consultation[];
+	isSelectionMode?: boolean;
+	selectedIds?: Set<number>;
+	onStartSelection?: () => void;
+	onCancelSelection?: () => void;
+	onDeleteSelected?: () => void;
+	onSelectionChange?: (ids: Set<number>) => void;
 };
 
-export default function ListConsultations({ consultationsData }: Props) {
+export default function ListConsultations({
+	consultationsData,
+	isSelectionMode = false,
+	selectedIds = new Set(),
+	onStartSelection,
+	onCancelSelection,
+	onDeleteSelected,
+	onSelectionChange,
+}: Props) {
 	const [consultations, setConsultations] = useState<Consultation[]>(
 		consultationsData || [],
 	);
@@ -30,13 +44,41 @@ export default function ListConsultations({ consultationsData }: Props) {
 	>(new Map());
 
 	const handleCardClick = (consultation: Consultation) => {
-		setSelectedConsultation(consultation);
-		setDialogOpen(true);
+		if (isSelectionMode) {
+			// En modo selección, toggle la selección
+			handleToggleSelection(consultation.id);
+		} else {
+			// Modo normal: abrir el modal
+			setSelectedConsultation(consultation);
+			setDialogOpen(true);
 
-		// Marcar como leído al abrir
-		if (!consultation.is_read) {
-			handleMarkAsRead(consultation.id);
+			// Marcar como leído al abrir
+			if (!consultation.is_read) {
+				handleMarkAsRead(consultation.id);
+			}
 		}
+	};
+
+	const handleToggleSelection = (consultationId: number) => {
+		const newSet = new Set(selectedIds);
+		if (newSet.has(consultationId)) {
+			newSet.delete(consultationId);
+		} else {
+			newSet.add(consultationId);
+		}
+		onSelectionChange?.(newSet);
+	};
+
+	const handleStartSelection = () => {
+		onStartSelection?.();
+	};
+
+	const handleCancelSelection = () => {
+		onCancelSelection?.();
+	};
+
+	const handleDeleteSelected = async () => {
+		onDeleteSelected?.();
 	};
 
 	const handleMarkAsRead = async (id: number) => {
@@ -114,6 +156,9 @@ export default function ListConsultations({ consultationsData }: Props) {
 							onMarkAsUnread={handleMarkAsUnread}
 							onDelete={handleDelete}
 							onClick={() => handleCardClick(consultation)}
+							isSelectionMode={isSelectionMode}
+							isSelected={selectedIds.has(consultation.id)}
+							onToggleSelection={handleToggleSelection}
 						/>
 					))
 				)}

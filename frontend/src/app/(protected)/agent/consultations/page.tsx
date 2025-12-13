@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 
 import SectionHeading from "@src/components/section-heading";
-import ConsultationFilters from "@src/modules/consultations/components/ConsultationFilters";
-import ConsultationResults from "@src/modules/consultations/components/ConsultationResults";
+import ConsultationsClient from "@src/modules/consultations/components/ConsultationsClient";
 import { getConsultations } from "@src/modules/consultations/service/consultation-service";
 import ConsultationsSkeleton from "@src/modules/consultations/ui/ConsultationsSkeleton";
 
@@ -46,17 +45,22 @@ export default async function ConsultationsPage({ searchParams }: Props) {
 	const quickData = await getConsultations({ is_read: false });
 	const unreadCount = quickData.total;
 
+	const initialData = await getConsultations(filters);
+
 	return (
 		<>
 			<div>
 				<SectionHeading title="Panel de Consultas" separator={false} />
-				<ConsultationFilters unreadCount={unreadCount} />
 			</div>
 			<Suspense
 				key={JSON.stringify(filters)}
 				fallback={<ConsultationsSkeleton />}
 			>
-				<ConsultationResults filters={filters} />
+				<ConsultationsClient
+					unreadCount={unreadCount}
+					filters={filters}
+					initialData={initialData}
+				/>
 			</Suspense>
 		</>
 	);
