@@ -25,45 +25,9 @@ export default function ListConsultations({ consultationsData }: Props) {
 	const [selectedConsultation, setSelectedConsultation] =
 		useState<Consultation | null>(null);
 	const [dialogOpen, setDialogOpen] = useState(false);
-
-	// Polling ligero para detectar nuevas consultas sin recargar la página
-	/* 	useEffect(() => {
-		let isActive = true;
-
-		const fetchConsultations = async () => {
-			try {
-				const newConsultations = await getConsultationsForPolling();
-
-				if (!isActive) return;
-
-				setConsultations((prev) => {
-					// Si la cantidad o IDs cambiaron, reemplazamos; si no, mantenemos para evitar renders innecesarios
-					const prevIds = new Set(prev.map((c) => c.id));
-					const changed =
-						newConsultations.length !== prev.length ||
-						newConsultations.some((c) => !prevIds.has(c.id));
-					return changed ? newConsultations : prev;
-				});
-
-				// Si la consulta seleccionada está abierta, sincronizamos sus datos
-				setSelectedConsultation((prev) => {
-					if (!prev) return prev;
-					const updated = newConsultations.find((c) => c.id === prev.id);
-					return updated ? updated : prev;
-				});
-			} catch (error) {
-				console.error("Error fetching consultations:", error);
-			}
-		};
-
-		fetchConsultations();
-		const intervalId = setInterval(fetchConsultations, 30000); // 30s
-
-		return () => {
-			isActive = false;
-			clearInterval(intervalId);
-		};
-	}, []); */
+	const [consultationContactMap, setConsultationContactMap] = useState<
+		Map<number, number>
+	>(new Map());
 
 	const handleCardClick = (consultation: Consultation) => {
 		setSelectedConsultation(consultation);
@@ -98,19 +62,27 @@ export default function ListConsultations({ consultationsData }: Props) {
 		try {
 			const result = await convertConsultationToLead(consultation.id);
 
-			// Si se convirtió correctamente, eliminamos la consulta del listado y cerramos el sheet
-			setConsultations((prev) => prev.filter((c) => c.id !== consultation.id));
-			setSelectedConsultation((prev) =>
-				prev?.id === consultation.id ? null : prev,
-			);
-			setDialogOpen((open) =>
-				open && selectedConsultation?.id === consultation.id ? false : open,
-			);
-
-			// Eliminamos también del backend para mantener consistencia
-			await deleteConsultation(consultation.id);
-
-			toast.success("Contacto agregado exitosamente");
+			// Si la conversión fue exitosa, guardar el contactId en el mapa
+			if (result?.client?.id) {
+				setConsultationContactMap((prev) =>
+					new Map(prev).set(consultation.id, result.client.id),
+				);
+				// Mantener el sheet abierto para que el usuario pueda agregar propiedades
+				toast.success("Contacto agregado exitosamente");
+			} else {
+				// Si no devolvió cliente, eliminar la consulta como antes
+				setConsultations((prev) =>
+					prev.filter((c) => c.id !== consultation.id),
+				);
+				setSelectedConsultation((prev) =>
+					prev?.id === consultation.id ? null : prev,
+				);
+				setDialogOpen((open) =>
+					open && selectedConsultation?.id === consultation.id ? false : open,
+				);
+				await deleteConsultation(consultation.id);
+				toast.success("Contacto agregado exitosamente");
+			}
 		} catch (error) {
 			console.error("Error converting consultation to lead:", error);
 			toast.error("No se pudo convertir la consulta a lead");
@@ -152,6 +124,12 @@ export default function ListConsultations({ consultationsData }: Props) {
 				open={dialogOpen}
 				onOpenChange={setDialogOpen}
 				onAddContact={handleAddContact}
+				contactId={
+					selectedConsultation?.client?.id ??
+					(selectedConsultation
+						? consultationContactMap.get(selectedConsultation.id)
+						: undefined)
+				}
 			/>
 		</div>
 	);

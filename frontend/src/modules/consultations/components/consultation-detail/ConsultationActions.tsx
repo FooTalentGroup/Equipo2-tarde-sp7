@@ -2,8 +2,11 @@
 
 import { useCallback, useMemo } from "react";
 
+import Link from "next/link";
+
 import { Button } from "@src/components/ui/button";
 import { useContactManager } from "@src/hooks/useContactManager";
+import { paths } from "@src/lib/paths";
 import type { Consultation } from "@src/types/consultations";
 import { UserPlusIcon } from "lucide-react";
 
@@ -33,11 +36,15 @@ export function ConsultationActions({
 	});
 
 	const handleLogAndOpenContact = useCallback(async () => {
+		if (existingContact && consultation.client?.id) {
+			// Si es un contacto existente, navegar al detalle
+			return;
+		}
 		const success = await handleAddOrView();
 		if (success) {
 			onOpenChange(false);
 		}
-	}, [handleAddOrView, onOpenChange]);
+	}, [handleAddOrView, onOpenChange, existingContact, consultation.client?.id]);
 
 	return (
 		<div className="space-y-3 border-t bg-slate-50 px-6 py-4">
@@ -52,20 +59,25 @@ export function ConsultationActions({
 			</Button>
 
 			{/* Botón Agregar / Ver Contacto */}
-			<Button
-				variant="outline"
-				onClick={handleLogAndOpenContact}
-				disabled={isProcessing}
-				className="w-full"
-				size="lg"
-			>
-				<UserPlusIcon className="h-4 w-4 mr-2" />
-				{isProcessing
-					? "Procesando..."
-					: existingContact
-						? "Ver Contacto"
-						: "Agregar Contacto"}
-			</Button>
+			{existingContact && consultation.client?.id ? (
+				<Button variant={"outline"} asChild className="w-full" size="lg">
+					<Link href={paths.agent.clients.leads.detail(consultation.client.id)}>
+						<UserPlusIcon className="h-4 w-4 mr-2" />
+						Ver Contacto
+					</Link>
+				</Button>
+			) : (
+				<Button
+					variant="outline"
+					onClick={handleLogAndOpenContact}
+					disabled={isProcessing}
+					className="w-full"
+					size="lg"
+				>
+					<UserPlusIcon className="h-4 w-4 mr-2" />
+					{isProcessing ? "Procesando..." : "Agregar Contacto"}
+				</Button>
+			)}
 		</div>
 	);
 }
