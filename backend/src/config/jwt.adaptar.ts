@@ -2,12 +2,13 @@ import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { envs } from "./envs";
 import { JwtAdapter } from '../domain/interfaces/jwt.adapter';
+import type { JwtPayload } from '../domain/interfaces/jwt-payload';
 
 
 const secret = envs.JWT_SECRET as string;
 
 export class JwtAdapterImpl implements JwtAdapter {
-    async generateToken(payload: { [key: string]: any }, duration: string = '24h'): Promise<string> {
+    async generateToken(payload: JwtPayload, duration: string = '24h'): Promise<string> {
         return new Promise((resolve, reject) => {
             // Generate unique JWT ID for blacklist tracking
             const jti = uuidv4();
@@ -28,20 +29,20 @@ export class JwtAdapterImpl implements JwtAdapter {
         });
     }
 
-    async verifyToken(token: string): Promise<{ [key: string]: any }> {
+    async verifyToken(token: string): Promise<JwtPayload> {
         return new Promise((resolve, reject) => {
             jwt.verify(
                 token,
                 secret,
                 (err, decoded) => {
                     if (err) reject(err);
-                    else resolve(decoded as { [key: string]: any });
+                    else resolve(decoded as JwtPayload);
                 }
             );
         });
     }
 
-    async validateToken(token: string): Promise<{ [key: string]: any } | null> {
+    async validateToken(token: string): Promise<JwtPayload | null> {
         try {
             const decoded = await this.verifyToken(token);
             return decoded;

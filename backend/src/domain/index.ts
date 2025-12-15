@@ -11,4 +11,6 @@ export * from './interfaces/file-upload.adapter';
 export * from './use-cases';
 export * from './interfaces/hash.adapter';
 export * from './interfaces/jwt.adapter';
+export * from './interfaces/jwt-payload';
+export * from './interfaces/database-rows';
 export * from './utils';
