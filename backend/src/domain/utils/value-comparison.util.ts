@@ -11,7 +11,7 @@
  * @param oldValue - The existing value to compare against
  * @returns true if values are different, false if they are the same
  */
-export function hasValueChanged(newValue: any, oldValue: any): boolean {
+export function hasValueChanged(newValue: unknown, oldValue: unknown): boolean {
     // If newValue is undefined, it means the field wasn't provided - no change
     if (newValue === undefined) return false;
     
@@ -33,7 +33,7 @@ export function hasValueChanged(newValue: any, oldValue: any): boolean {
  * - Converts to string for consistent comparison
  * - Handles null/undefined
  */
-function normalizeValue(value: any): any {
+function normalizeValue(value: unknown): string | number | boolean | null | undefined {
     if (value === null || value === undefined) return value;
     
     if (typeof value === 'string') {

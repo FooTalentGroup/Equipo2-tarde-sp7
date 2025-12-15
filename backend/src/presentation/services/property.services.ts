@@ -308,8 +308,9 @@ export class PropertyServices {
 						});
 						multimediaRecords.push(multimedia);
 					}
-				} catch (error: any) {
+				} catch (error: unknown) {
 					// Si falla la subida de imágenes, la transacción hará ROLLBACK
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					// Pero también intentamos limpiar las imágenes subidas a Cloudinary
 					for (const url of uploadedImages) {
 						try {
@@ -322,7 +323,7 @@ export class PropertyServices {
 						}
 					}
 					throw CustomError.internalServerError(
-						`Error uploading images: ${error.message}`,
+						`Error uploading images: ${errorMessage}`,
 					);
 				}
 			}
@@ -1132,14 +1133,15 @@ export class PropertyServices {
 				throw CustomError.internalServerError("Failed to delete property");
 			}
 			return { message: "Property deleted successfully" };
-		} catch (error: any) {
+		} catch (error: unknown) {
 			// If there's a foreign key constraint error, it means it has RESTRICT relationships
-			if (error.code === "23503") {
+			if (error && typeof error === 'object' && 'code' in error && error.code === "23503") {
 				throw CustomError.badRequest(
 					"Cannot delete property: it has active rentals or sales. Archive it instead.",
 				);
 			}
-			throw error;
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+			throw CustomError.internalServerError(`Error updating property: ${errorMessage}`);
 		}
 	}
 
@@ -1514,8 +1516,9 @@ export class PropertyServices {
 							console.error("Error deleting uploaded image:", deleteError);
 						}
 					}
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					throw CustomError.internalServerError(
-						`Error uploading images: ${error.message}`,
+						`Error uploading images: ${errorMessage}`,
 					);
 				}
 			} else {
@@ -1570,7 +1573,7 @@ export class PropertyServices {
 						});
 						documentRecords.push(docRecord);
 					}
-				} catch (error: any) {
+				} catch (error: unknown) {
 					// Clean up uploaded documents
 					for (const url of uploadedDocuments) {
 						try {
@@ -1579,8 +1582,9 @@ export class PropertyServices {
 							console.error("Error deleting uploaded document:", deleteError);
 						}
 					}
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					throw CustomError.internalServerError(
-						`Error uploading documents: ${error.message}`,
+						`Error uploading documents: ${errorMessage}`,
 					);
 				}
 			}
@@ -2163,7 +2167,8 @@ export class PropertyServices {
 						});
 						multimediaRecords.push(multimedia);
 					}
-				} catch (error: any) {
+				} catch (error: unknown) {
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					for (const url of uploadedImages) {
 						try {
 							await this.fileUploadAdapter.deleteFile(url);
@@ -2171,7 +2176,7 @@ export class PropertyServices {
 							console.error("Error deleting uploaded image:", deleteError);
 						}
 					}
-					throw CustomError.internalServerError(`Error uploading images: ${error.message}`);
+					throw CustomError.internalServerError(`Error uploading images: ${errorMessage}`);
 				}
 			}
 
@@ -2204,12 +2209,13 @@ export class PropertyServices {
 						const docRecord = await PropertyDocumentModel.create({
 							property_id: id,
 							client_id: finalOwnerId || undefined,
-							document_name: documentName,
+					document_name: documentName,
 							file_path: documentUrl,
 						});
 						documentRecords.push(docRecord);
 					}
-				} catch (error: any) {
+				} catch (error: unknown) {
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					for (const url of uploadedDocuments) {
 						try {
 							await this.fileUploadAdapter.deleteFile(url);
@@ -2217,7 +2223,7 @@ export class PropertyServices {
 							console.error("Error deleting uploaded document:", deleteError);
 						}
 					}
-					throw CustomError.internalServerError(`Error uploading documents: ${error.message}`);
+					throw CustomError.internalServerError(`Error uploading documents: ${errorMessage}`);
 				}
 			}
 
