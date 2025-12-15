@@ -117,7 +117,7 @@ export class ClientController {
                 offset,
             } = req.query;
 
-            const filters: any = {};
+            const filters: Record<string, unknown> = {};
 
             if (contact_category_id) filters.contact_category_id = Number(contact_category_id);
             if (purchase_interest !== undefined) filters.purchase_interest = purchase_interest === 'true';

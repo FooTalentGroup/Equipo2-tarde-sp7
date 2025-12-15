@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { CustomError, LoginProfileDto, RegisterProfileDto } from '../../domain';
+import type { JwtPayload } from '../../domain/interfaces/jwt-payload';
 import { AuthServices } from '../services/auth.services';
 import { RevokedTokenModel } from '../../data/postgres/models/revoked-token.model';
 import { jwtAdapter } from '../../config';
@@ -100,7 +101,7 @@ export class AuthController {
             }
             
             const token = authHeader.split(' ')[1];
-            const decodedToken: any = await jwtAdapter.validateToken(token);
+            const decodedToken: JwtPayload | null = await jwtAdapter.validateToken(token);
             
             if (!decodedToken || !decodedToken.jti) {
                 return res.status(400).json({
@@ -109,7 +110,9 @@ export class AuthController {
             }
             
             // Calculate token expiration date
-            const expiresAt = new Date(decodedToken.exp * 1000);
+            const expiresAt = decodedToken.exp 
+                ? new Date(decodedToken.exp * 1000)
+                : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default 24h if not present
             
             // Get IP and User Agent for audit trail
             const ip = req.ip || req.socket.remoteAddress;

@@ -145,7 +145,7 @@ export class PropertyController {
 				offset,
 			} = req.query;
 
-			const filters: any = {};
+			const filters: Record<string, unknown> = {};
 
 			if (property_type_id) filters.property_type_id = Number(property_type_id);
 			if (property_status_id)
@@ -189,7 +189,7 @@ export class PropertyController {
 			}
 
 			// Parsear body si viene como JSON string (form-data)
-			let updateData: any = req.body;
+			let updateData: Record<string, unknown> = req.body;
 			if (typeof req.body.propertyDetails === "string") {
 				try {
 					updateData = JSON.parse(req.body.propertyDetails);
@@ -294,10 +294,10 @@ export class PropertyController {
 			}
 
 			// Prepare body data for DTO creation, ensuring visibility_status is "Archivada"
-			const bodyWithArchive: any = { ...req.body };
+			const bodyWithArchive: Record<string, unknown> = { ...req.body };
 			
 			// Parse and merge basic data if it exists, or create new
-			let basicData: any = { visibility_status: "Archivada" };
+			let basicData: Record<string, unknown> = { visibility_status: "Archivada" };
 			if (bodyWithArchive.basic) {
 				try {
 					const parsedBasic = typeof bodyWithArchive.basic === 'string' 

@@ -90,7 +90,7 @@ export class UserServices {
             }
 
             // Prepare update data
-            const updateData: any = {};
+            const updateData: Record<string, unknown> = {};
             
             if (updateUserDto.first_name !== undefined) {
                 updateData.first_name = updateUserDto.first_name;

@@ -524,7 +524,7 @@ export class ClientServices {
         }
 
         // Preparar datos de actualización - solo incluir campos que realmente cambiaron
-        const updateData: any = {};
+        const updateData: Record<string, unknown> = {};
         
         if (updateClientDto.first_name !== undefined && hasValueChanged(updateClientDto.first_name, existingClient.first_name)) {
             updateData.first_name = updateClientDto.first_name;

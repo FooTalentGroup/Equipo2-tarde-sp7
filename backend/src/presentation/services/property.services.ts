@@ -1962,7 +1962,7 @@ export class PropertyServices {
 					: existingProperty.disposition_id;
 
 			// 4. Prepare update data for property
-			const updateData: any = {};
+			const updateData: Record<string, unknown> = {};
 
 			if (basic?.title) updateData.title = basic.title;
 			if (basic?.description !== undefined) updateData.description = basic.description;
