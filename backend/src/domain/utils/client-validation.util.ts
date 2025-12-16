@@ -134,7 +134,7 @@ export function validateDni(dni: string | undefined): [string?, void?] {
  * @param property_id - ID de propiedad a validar
  * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
  */
-export function validatePropertyId(property_id: any): [string?, void?] {
+export function validatePropertyId(property_id: unknown): [string?, void?] {
     if (property_id !== undefined && property_id !== null) {
         if (isNaN(Number(property_id))) {
             return ['Property ID must be a number', undefined];

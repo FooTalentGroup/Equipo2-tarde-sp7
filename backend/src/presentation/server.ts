@@ -1,4 +1,5 @@
 import express, { type Router } from "express";
+import type { Server as HttpServer } from "http";
 import path from "path";
 
 import { PostgresDatabase } from "../data/postgres/database";
@@ -11,7 +12,7 @@ interface Options {
 
 export class Server {
 	public readonly app = express();
-	private serverListener?: any;
+	private serverListener?: HttpServer;
 	private readonly port: number;
 	private readonly publicPath: string;
 	private readonly routes: Router;

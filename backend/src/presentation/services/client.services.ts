@@ -9,6 +9,16 @@ import {
 } from '../../data/postgres/models';
 import { UpdateClientDto } from '../../domain/dtos/clients';
 import { CustomError, ClientEntity, hasValueChanged, normalizePhone } from '../../domain';
+import type { PropertyRow, RentalInfoRow, ConsultationRow, PropertyPriceRow } from '../../domain/interfaces/database-rows';
+import type {
+    EnrichedConsultation,
+    PropertyDetails,
+    CurrencyInfo,
+    OperationTypeInfo,
+    PropertyOfInterest,
+    OwnedPropertyWithDetails,
+    RentedPropertyWithDetails
+} from '../../domain/interfaces/enriched-data';
 
 /**
  * Service para manejar operaciones de clientes
@@ -97,7 +107,19 @@ export class ClientServices {
                 const province = await ProvinceModel.findById(city.province_id);
                 if (province) {
                     const country = await CountryModel.findById(province.country_id);
-                    (city as any).province = province ? {
+                    
+                    interface CityWithProvince {
+                        id: number | undefined;
+                        name: string;
+                        province_id: number;
+                        province?: {
+                            id: number | undefined;
+                            name: string;
+                            country: { id: number | undefined; name: string } | null;
+                        } | null;
+                    }
+                    const cityWithProvince = city as CityWithProvince;
+                    cityWithProvince.province = province ? {
                         id: province.id,
                         name: province.name,
                         country: country ? {
@@ -114,7 +136,7 @@ export class ClientServices {
         const properties = await this.enrichClientWithProperties(clientEntity.id, categoryName || null);
 
         // Para Leads: obtener consultas con tipo de consulta
-        let consultations: any[] = [];
+        let consultations: EnrichedConsultation[] = [];
         if (categoryName === 'Lead') {
             consultations = await this.getClientConsultations(clientEntity.id);
         }
@@ -141,7 +163,7 @@ export class ClientServices {
      * Helper privado: Enriquece los datos de una propiedad individual
      * Agrega precio, imagen principal, dirección completa, características y antigüedad
      */
-    private async enrichPropertyDetails(property: any): Promise<any> {
+    private async enrichPropertyDetails(property: PropertyRow): Promise<PropertyDetails> {
         const { PropertyPriceModel } = await import('../../data/postgres/models/properties/property-price.model');
         const { PropertyMultimediaModel } = await import('../../data/postgres/models/properties/property-multimedia.model');
         const { PropertyAddressModel } = await import('../../data/postgres/models/properties/property-address.model');
@@ -159,7 +181,11 @@ export class ClientServices {
         ]);
 
         // Procesar todos los precios (venta, alquiler, etc.)
-        let pricesData: any[] = [];
+        let pricesData: Array<{
+            amount: number;
+            currency: CurrencyInfo | null;
+            operation_type: OperationTypeInfo | null;
+        }> = [];
         if (prices.length > 0) {
             pricesData = await Promise.all(
                 prices.map(async (price) => {
@@ -196,6 +222,8 @@ export class ClientServices {
                         const country = await CountryModel.findById(province.country_id);
                         
                         addressData = {
+                            street: address.street || null,
+                            number: address.number || null,
                             full_address: address.full_address,
                             neighborhood: address.neighborhood,
                             city: {
@@ -211,8 +239,8 @@ export class ClientServices {
                                 }
                             },
                             location: {
-                                latitude: address.latitude,
-                                longitude: address.longitude
+                                latitude: address.latitude ?? null,
+                                longitude: address.longitude ?? null
                             }
                         };
                     }
@@ -244,7 +272,7 @@ export class ClientServices {
             surface_area: property.total_area,
             bedrooms: property.bedrooms_count,
             bathrooms: property.bathrooms_count,
-            garage: property.parking_spaces_count > 0,
+            garage: (property.parking_spaces_count || 0) > 0,
             address: addressData,
             prices: pricesData,  // Array de precios
             main_image: imageData,
@@ -260,9 +288,9 @@ export class ClientServices {
         clientId: number,
         categoryName: string | null
     ): Promise<{
-        properties_of_interest: any[];
-        owned_properties: any[];
-        rented_property: any | null;
+        properties_of_interest: PropertyOfInterest[];
+        owned_properties: OwnedPropertyWithDetails[];
+        rented_property: RentedPropertyWithDetails | null;
     }> {
         // Obtener propiedades relacionadas según el tipo de cliente
         const { PropertyModel } = await import('../../data/postgres/models/properties/property.model');
@@ -272,16 +300,16 @@ export class ClientServices {
         const { RentalModel } = await import('../../data/postgres/models/rentals/rental.model');
         const { CurrencyTypeModel } = await import('../../data/postgres/models/payments/currency-type.model');
 
-        let propertiesOfInterest: any[] = [];
-        let ownedProperties: any[] = [];
-        let rentedProperty: any = null;
+        let propertiesOfInterest: PropertyOfInterest[] = [];
+        let ownedProperties: OwnedPropertyWithDetails[] = [];
+        let rentedProperty: RentedPropertyWithDetails | null = null;
 
         // Para Leads: obtener propiedades de interés desde client_property_interests
         if (categoryName === 'Lead') {
             const interests = await ClientPropertyInterestModel.findByClientId(clientId);
             
             if (interests.length > 0) {
-                propertiesOfInterest = await Promise.all(
+                const interestResults = await Promise.all(
                     interests.map(async (interest) => {
                         const property = await PropertyModel.findById(interest.property_id);
                         if (!property) return null;
@@ -289,7 +317,7 @@ export class ClientServices {
                         const [propertyType, propertyStatus, enrichedDetails] = await Promise.all([
                             PropertyTypeModel.findById(property.property_type_id),
                             PropertyStatusModel.findById(property.property_status_id),
-                            this.enrichPropertyDetails(property)
+                            this.enrichPropertyDetails(property as PropertyRow)
                         ]);
 
                         return {
@@ -300,10 +328,10 @@ export class ClientServices {
                             property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                             interest_created_at: interest.created_at,
                             interest_notes: interest.notes
-                        };
+                        } as PropertyOfInterest;
                     })
                 );
-                propertiesOfInterest = propertiesOfInterest.filter(p => p !== null);
+                propertiesOfInterest = interestResults.filter((p): p is PropertyOfInterest => p !== null);
             }
         }
 
@@ -312,11 +340,11 @@ export class ClientServices {
             const properties = await PropertyModel.findAll({ owner_id: clientId });
             
             ownedProperties = await Promise.all(
-                properties.map(async (property: any) => {
+                properties.map(async (property: PropertyRow) => {
                     const [propertyType, propertyStatus, enrichedDetails] = await Promise.all([
                         PropertyTypeModel.findById(property.property_type_id),
                         PropertyStatusModel.findById(property.property_status_id),
-                        this.enrichPropertyDetails(property)
+                        this.enrichPropertyDetails(property as PropertyRow)
                     ]);
 
                     return {
@@ -360,12 +388,12 @@ export class ClientServices {
                         const [propertyType, propertyStatus, enrichedDetails] = await Promise.all([
                             PropertyTypeModel.findById(property.property_type_id),
                             PropertyStatusModel.findById(property.property_status_id),
-                            this.enrichPropertyDetails(property)
+                            this.enrichPropertyDetails(property as PropertyRow)
                         ]);
 
                         // Obtener información del alquiler desde rentals
                         const rentals = await RentalModel.findAll({ property_id: activeRental.property_id });
-                        const rentalInfo = rentals.find((r: any) => r.client_rental_id === activeRental.id);
+                        const rentalInfo = rentals.find(r => r.client_rental_id === activeRental.id);
 
                         let currency = null;
                         if (rentalInfo?.currency_type_id) {
@@ -380,10 +408,10 @@ export class ClientServices {
                             property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                             rental: {
                                 id: activeRental.id,
-                                contract_start_date: activeRental.contract_start_date,
-                                contract_end_date: activeRental.contract_end_date,
-                                next_increase_date: activeRental.next_increase_date,
-                                monthly_amount: rentalInfo?.monthly_amount || null,
+                                contract_start_date: activeRental.contract_start_date ?? null,
+                                contract_end_date: activeRental.contract_end_date ?? null,
+                                next_increase_date: activeRental.next_increase_date ?? null,
+                                monthly_amount: rentalInfo?.monthly_amount ?? 0,
                                 currency: currency ? { id: currency.id, name: currency.name, symbol: currency.symbol } : null,
                                 external_reference: activeRental.external_reference || null
                             }
@@ -396,7 +424,7 @@ export class ClientServices {
             const interests = await ClientPropertyInterestModel.findByClientId(clientId);
             
             if (interests.length > 0) {
-                propertiesOfInterest = await Promise.all(
+                const interestResults = await Promise.all(
                     interests.map(async (interest) => {
                         const property = await PropertyModel.findById(interest.property_id);
                         if (!property) return null;
@@ -404,7 +432,7 @@ export class ClientServices {
                         const [propertyType, propertyStatus, enrichedDetails] = await Promise.all([
                             PropertyTypeModel.findById(property.property_type_id),
                             PropertyStatusModel.findById(property.property_status_id),
-                            this.enrichPropertyDetails(property)
+                            this.enrichPropertyDetails(property as PropertyRow)
                         ]);
 
                         return {
@@ -415,10 +443,10 @@ export class ClientServices {
                             property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                             interest_created_at: interest.created_at,
                             interest_notes: interest.notes
-                        };
+                        } as PropertyOfInterest;
                     })
                 );
-                propertiesOfInterest = propertiesOfInterest.filter(p => p !== null);
+                propertiesOfInterest = interestResults.filter((p): p is PropertyOfInterest => p !== null);
             }
         }
 
@@ -524,7 +552,7 @@ export class ClientServices {
         }
 
         // Preparar datos de actualización - solo incluir campos que realmente cambiaron
-        const updateData: any = {};
+        const updateData: Record<string, unknown> = {};
         
         if (updateClientDto.first_name !== undefined && hasValueChanged(updateClientDto.first_name, existingClient.first_name)) {
             updateData.first_name = updateClientDto.first_name;

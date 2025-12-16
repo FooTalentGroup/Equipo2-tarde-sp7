@@ -8,6 +8,8 @@ import { CustomError } from "../../domain";
 import type { CreatePropertyConsultationDto } from "../../domain/dtos/consultations/create-property-consultation.dto";
 import type { CreateGeneralConsultationDto } from "../../domain/dtos/consultations/create-general-consultation.dto";
 import { ClientCreationHelper } from "./helpers/client-creation.helper";
+import type { ConsultationRow } from '../../domain/interfaces/database-rows';
+import type { ConsultationQueryRow } from '../../domain/interfaces/enriched-data';
 
 export class PropertyConsultationServices {
 	constructor() {}
@@ -160,7 +162,7 @@ export class PropertyConsultationServices {
             `;
 
 			const conditions: string[] = [];
-			const values: any[] = [];
+			const values: unknown[] = [];
 			let paramIndex = 1;
 
 			// Aplicar filtros
@@ -199,7 +201,7 @@ export class PropertyConsultationServices {
 			const result = await dbClient.query(query, values);
 
 			// Formatear respuesta
-			const consultations = result.rows.map((row: any) => ({
+			const consultations = result.rows.map((row: ConsultationQueryRow) => ({
 				id: row.id,
 				consultation_date: row.consultation_date,
 				message: row.message,

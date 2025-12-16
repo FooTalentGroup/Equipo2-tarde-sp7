@@ -25,6 +25,9 @@ import {
 	RentalModel,
 	VisibilityStatusModel,
 } from "../../data/postgres/models";
+import type { PropertyService } from "../../data/postgres/models/properties/property-service.model";
+import type { Expense } from "../../data/postgres/models/shared/expense.model";
+import type { PropertyPrice } from "../../data/postgres/models/properties/property-price.model";
 import { TransactionHelper } from "../../data/postgres/transaction.helper";
 import { CustomError } from "../../domain";
 import type {
@@ -33,6 +36,19 @@ import type {
 	UpdatePropertyGroupedDto,
 } from "../../domain/dtos/properties";
 import type { FileUploadAdapter } from "../../domain/interfaces/file-upload.adapter";
+import type { 
+	PropertyPriceRow, 
+	PropertyAddressRow, 
+	PropertyServiceRow, 
+	ExpenseRow,
+	PropertyRow 
+} from '../../domain/interfaces/database-rows';
+import type {
+	EnrichedPropertyPrice,
+	EnrichedPropertyAddress,
+	EnrichedExpense,
+	PropertyListItem
+} from '../../domain/interfaces/enriched-data';
 
 /**
  * Service for handling property operations
@@ -308,8 +324,9 @@ export class PropertyServices {
 						});
 						multimediaRecords.push(multimedia);
 					}
-				} catch (error: any) {
+				} catch (error: unknown) {
 					// Si falla la subida de imágenes, la transacción hará ROLLBACK
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					// Pero también intentamos limpiar las imágenes subidas a Cloudinary
 					for (const url of uploadedImages) {
 						try {
@@ -322,7 +339,7 @@ export class PropertyServices {
 						}
 					}
 					throw CustomError.internalServerError(
-						`Error uploading images: ${error.message}`,
+						`Error uploading images: ${errorMessage}`,
 					);
 				}
 			}
@@ -349,7 +366,7 @@ export class PropertyServices {
 
 			// Enriquecer precios con moneda y tipo de operación
 			const enrichedPrices = await Promise.all(
-				prices.map(async (price: any) => {
+				prices.map(async (price: PropertyPrice) => {
 					const [currency, operationType] = await Promise.all([
 						CurrencyTypeModel.findById(price.currency_type_id),
 						PropertyOperationTypeModel.findById(price.operation_type_id),
@@ -432,7 +449,7 @@ export class PropertyServices {
 							: null,
 					},
 					// Precios enriquecidos (con objetos de moneda y operación completos)
-					prices: enrichedPrices.map((price: any) => ({
+					prices: enrichedPrices.map((price: EnrichedPropertyPrice) => ({
 						id: price.id,
 						property_id: price.property_id,
 						price: price.price,
@@ -565,7 +582,7 @@ export class PropertyServices {
 
 		// Enriquecer precios con moneda y tipo de operación
 		const enrichedPrices = await Promise.all(
-			(property.prices || []).map(async (price: any) => {
+			(property.prices || []).map(async (price: PropertyPriceRow) => {
 				const [currency, operationType] = await Promise.all([
 					CurrencyTypeModel.findById(price.currency_type_id),
 					PropertyOperationTypeModel.findById(price.operation_type_id),
@@ -595,7 +612,7 @@ export class PropertyServices {
 
 		// Enrich addresses with city and province
 		const enrichedAddresses = await Promise.all(
-			(property.addresses || []).map(async (address: any) => {
+			(property.addresses || []).map(async (address: PropertyAddressRow) => {
 				if (!address || !address.city_id) return null;
 
 				const city = await CityModel.findById(address.city_id);
@@ -638,7 +655,7 @@ export class PropertyServices {
 		// Obtener servicios vinculados
 		const propertyServices = await PropertyServiceModel.findByPropertyId(id);
 		const enrichedServices = await Promise.all(
-			propertyServices.map(async (ps: any) => {
+			propertyServices.map(async (ps: PropertyService) => {
 				const service = await CatalogServiceModel.findById(ps.service_id);
 				return service
 					? {
@@ -655,7 +672,7 @@ export class PropertyServices {
 		// Obtener expensas
 		const expenses = await ExpenseModel.findByPropertyId(id);
 		const enrichedExpenses = await Promise.all(
-			expenses.map(async (expense: any) => {
+			expenses.map(async (expense: Expense) => {
 				const currency = await CurrencyTypeModel.findById(
 					expense.currency_type_id,
 				);
@@ -836,7 +853,7 @@ export class PropertyServices {
 						}
 					: null,
 				// Precios enriquecidos (con objetos de moneda y operación, no solo IDs)
-				prices: enrichedPrices.map((price: any) => ({
+				prices: enrichedPrices.map((price: EnrichedPropertyPrice) => ({
 					id: price.id,
 					property_id: price.property_id,
 					price: price.price,
@@ -847,7 +864,7 @@ export class PropertyServices {
 				// Direcciones enriquecidas (con objetos de ciudad, provincia, país, no solo IDs)
 				addresses: enrichedAddresses
 					.filter((a) => a !== null)
-					.map((addr: any) => ({
+					.map((addr: EnrichedPropertyAddress) => ({
 						id: addr.id,
 						street: addr.street || null,
 						number: addr.number || null,
@@ -904,7 +921,7 @@ export class PropertyServices {
 		);
 
 		const enrichedProperties = await Promise.all(
-			properties.map(async (property: any) => {
+			properties.map(async (property: PropertyListItem) => {
 				// Obtener información de moneda y tipo de operación del precio principal
 				let mainPriceInfo = null;
 				if (
@@ -1132,14 +1149,15 @@ export class PropertyServices {
 				throw CustomError.internalServerError("Failed to delete property");
 			}
 			return { message: "Property deleted successfully" };
-		} catch (error: any) {
+		} catch (error: unknown) {
 			// If there's a foreign key constraint error, it means it has RESTRICT relationships
-			if (error.code === "23503") {
+			if (error && typeof error === 'object' && 'code' in error && error.code === "23503") {
 				throw CustomError.badRequest(
 					"Cannot delete property: it has active rentals or sales. Archive it instead.",
 				);
 			}
-			throw error;
+			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+			throw CustomError.internalServerError(`Error updating property: ${errorMessage}`);
 		}
 	}
 
@@ -1505,7 +1523,7 @@ export class PropertyServices {
 					console.log(
 						`[PropertyServices] Successfully processed ${multimediaRecords.length} images`,
 					);
-				} catch (error: any) {
+				} catch (error: unknown) {
 					console.error(`[PropertyServices] Error uploading images:`, error);
 					for (const url of uploadedImages) {
 						try {
@@ -1514,8 +1532,9 @@ export class PropertyServices {
 							console.error("Error deleting uploaded image:", deleteError);
 						}
 					}
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					throw CustomError.internalServerError(
-						`Error uploading images: ${error.message}`,
+						`Error uploading images: ${errorMessage}`,
 					);
 				}
 			} else {
@@ -1570,7 +1589,7 @@ export class PropertyServices {
 						});
 						documentRecords.push(docRecord);
 					}
-				} catch (error: any) {
+				} catch (error: unknown) {
 					// Clean up uploaded documents
 					for (const url of uploadedDocuments) {
 						try {
@@ -1579,8 +1598,9 @@ export class PropertyServices {
 							console.error("Error deleting uploaded document:", deleteError);
 						}
 					}
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					throw CustomError.internalServerError(
-						`Error uploading documents: ${error.message}`,
+						`Error uploading documents: ${errorMessage}`,
 					);
 				}
 			}
@@ -1607,7 +1627,7 @@ export class PropertyServices {
 
 			// Enrich prices
 			const enrichedPrices = await Promise.all(
-				prices.map(async (price: any) => {
+				prices.map(async (price: PropertyPrice) => {
 					const [currency, operationType] = await Promise.all([
 						CurrencyTypeModel.findById(price.currency_type_id),
 						PropertyOperationTypeModel.findById(price.operation_type_id),
@@ -1639,7 +1659,7 @@ export class PropertyServices {
 			const enrichedExpenses =
 				expenses.length > 0
 					? await Promise.all(
-							expenses.map(async (expense: any) => {
+							expenses.map(async (expense: Expense) => {
 								const currency = await CurrencyTypeModel.findById(
 									expense.currency_type_id,
 								);
@@ -1667,7 +1687,7 @@ export class PropertyServices {
 				property.id,
 			);
 			const enrichedServices = await Promise.all(
-				propertyServices.map(async (ps: any) => {
+				propertyServices.map(async (ps: PropertyService) => {
 					const service = await CatalogServiceModel.findById(ps.service_id);
 					return service
 						? {
@@ -1958,7 +1978,7 @@ export class PropertyServices {
 					: existingProperty.disposition_id;
 
 			// 4. Prepare update data for property
-			const updateData: any = {};
+			const updateData: Record<string, unknown> = {};
 
 			if (basic?.title) updateData.title = basic.title;
 			if (basic?.description !== undefined) updateData.description = basic.description;
@@ -2163,7 +2183,8 @@ export class PropertyServices {
 						});
 						multimediaRecords.push(multimedia);
 					}
-				} catch (error: any) {
+				} catch (error: unknown) {
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					for (const url of uploadedImages) {
 						try {
 							await this.fileUploadAdapter.deleteFile(url);
@@ -2171,7 +2192,7 @@ export class PropertyServices {
 							console.error("Error deleting uploaded image:", deleteError);
 						}
 					}
-					throw CustomError.internalServerError(`Error uploading images: ${error.message}`);
+					throw CustomError.internalServerError(`Error uploading images: ${errorMessage}`);
 				}
 			}
 
@@ -2204,12 +2225,13 @@ export class PropertyServices {
 						const docRecord = await PropertyDocumentModel.create({
 							property_id: id,
 							client_id: finalOwnerId || undefined,
-							document_name: documentName,
+					document_name: documentName,
 							file_path: documentUrl,
 						});
 						documentRecords.push(docRecord);
 					}
-				} catch (error: any) {
+				} catch (error: unknown) {
+					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 					for (const url of uploadedDocuments) {
 						try {
 							await this.fileUploadAdapter.deleteFile(url);
@@ -2217,7 +2239,7 @@ export class PropertyServices {
 							console.error("Error deleting uploaded document:", deleteError);
 						}
 					}
-					throw CustomError.internalServerError(`Error uploading documents: ${error.message}`);
+					throw CustomError.internalServerError(`Error uploading documents: ${errorMessage}`);
 				}
 			}
 

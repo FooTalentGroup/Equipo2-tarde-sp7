@@ -3,7 +3,7 @@ import {
     ContactCategoryModel,
     PropertyModel
 } from '../../../data/postgres/models';
-import { CustomError } from '../../../domain';
+import { CustomError, ClientEntity } from '../../../domain';
 import { normalizePhone } from '../../../domain/utils/phone-normalization.util';
 
 /**
@@ -69,7 +69,7 @@ export class ClientCreationHelper {
             purchase_interest?: boolean;
         },
         categoryId: number
-    ): Promise<{ client: any; wasCreated: boolean }> {
+    ): Promise<{ client: ClientEntity; wasCreated: boolean }> {
         // 1. PRIORIDAD 1: Verificar duplicado por email (si se proporciona)
         if (clientData.email) {
             const existingByEmail = await ClientModel.findByEmail(clientData.email);
@@ -126,7 +126,7 @@ export class ClientCreationHelper {
         }
 
         console.log(`New client created with ID: ${newClient.id}`);
-        return { client: newClient, wasCreated: true };
+        return { client: ClientEntity.fromDatabaseObject(newClient), wasCreated: true };
     }
 }
 
