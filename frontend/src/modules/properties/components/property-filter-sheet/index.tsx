@@ -23,6 +23,7 @@ import {
 } from "@src/components/ui/select";
 import {
 	Sheet,
+	SheetBody,
 	SheetContent,
 	SheetDescription,
 	SheetFooter,
@@ -31,6 +32,7 @@ import {
 	SheetTrigger,
 } from "@src/components/ui/sheet";
 import { Switch } from "@src/components/ui/switch";
+import { useIsMobile } from "@src/hooks/use-mobile";
 import { PROPERTY_TYPE } from "@src/modules/properties/consts";
 import { OperationType, OperationTypeLabel } from "@src/types/property";
 import type { PropertyFilterForm } from "@src/types/property-filter";
@@ -39,6 +41,11 @@ import { useForm } from "react-hook-form";
 
 export default function PropertyFilterSheet() {
 	const [sheetOpen, setSheetOpen] = useState<boolean>(false);
+
+	const isMobile = useIsMobile();
+
+	const buttonSize = isMobile ? "default" : "lg";
+	const sheetSide = isMobile ? "bottom" : "right";
 
 	const [propertyTypeId, setPropertyTypeId] = useQueryState(
 		"property_type_id",
@@ -61,10 +68,7 @@ export default function PropertyFilterSheet() {
 		"operation_type_id",
 		parseAsString.withDefault("").withOptions({ shallow: false }),
 	);
-	// const [includeArchived, setIncludeArchived] = useQueryState(
-	// 	"includeArchived",
-	// 	parseAsBoolean.withDefault(false).withOptions({ shallow: false }),
-	// );
+
 	const [featuredWeb, setFeaturedWeb] = useQueryState(
 		"featured_web",
 		parseAsBoolean.withDefault(false).withOptions({ shallow: false }),
@@ -77,7 +81,6 @@ export default function PropertyFilterSheet() {
 			max_price: maxPrice,
 			search: search,
 			operation_type_id: operationTypeId,
-			// includeArchived: includeArchived,
 			featured_web: featuredWeb,
 		},
 	});
@@ -89,7 +92,6 @@ export default function PropertyFilterSheet() {
 			max_price: maxPrice,
 			search: search,
 			operation_type_id: operationTypeId,
-			// includeArchived: includeArchived,
 			featured_web: featuredWeb,
 		});
 	}, [
@@ -110,7 +112,6 @@ export default function PropertyFilterSheet() {
 				setMaxPrice(data.max_price || null),
 				setSearch(data.search || null),
 				setOperationTypeId(data.operation_type_id || null),
-				// setIncludeArchived(data.includeArchived || null),
 				setFeaturedWeb(data.featured_web || null),
 			]);
 			setSheetOpen(false);
@@ -127,18 +128,25 @@ export default function PropertyFilterSheet() {
 			setMaxPrice(null),
 			setSearch(null),
 			setOperationTypeId(null),
-			// setIncludeArchived(null),
 			setFeaturedWeb(null),
 		]);
 	}
 
-	const activeFilters = [
+	const appliedFiltersCount = [
 		propertyTypeId,
 		minPrice,
 		maxPrice,
 		operationTypeId,
-		//includeArchived,
 		featuredWeb,
+	].filter(Boolean).length;
+
+	const values = form.watch();
+	const pendingFiltersCount = [
+		values.property_type_id,
+		values.min_price,
+		values.max_price,
+		values.operation_type_id,
+		values.featured_web,
 	].filter(Boolean).length;
 
 	return (
@@ -152,21 +160,21 @@ export default function PropertyFilterSheet() {
 					>
 						<AdjustmentsHorizontalIcon className="size-6" />
 						<span className="sr-only md:not-sr-only">Filtrar</span>
-						{activeFilters > 0 && (
+						{appliedFiltersCount > 0 && (
 							<Badge className=" " variant="default">
-								{activeFilters}
+								{appliedFiltersCount}
 							</Badge>
 						)}
 					</Button>
 				</SheetTrigger>
-				<SheetContent>
+				<SheetContent className="w-full lg:w-auto" side={sheetSide}>
 					<SheetHeader>
 						<SheetTitle>Filtros</SheetTitle>
 						<SheetDescription className="sr-only">
 							Filtros avanzados para propiedades
 						</SheetDescription>
 					</SheetHeader>
-					<div className="grid flex-1 auto-rows-min gap-6 px-6">
+					<SheetBody>
 						<Form {...form}>
 							<form
 								onSubmit={form.handleSubmit(onSubmit)}
@@ -229,25 +237,6 @@ export default function PropertyFilterSheet() {
 										/>
 									</div>
 
-									{/* <FormField
-										control={form.control}
-										name="includeArchived"
-										render={({ field }) => (
-											<FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-												<div className="space-y-0.5">
-													<FormLabel className="text-base">
-														Incluir archivados
-													</FormLabel>
-												</div>
-												<FormControl>
-													<Switch
-														checked={field.value}
-														onCheckedChange={field.onChange}
-													/>
-												</FormControl>
-											</FormItem>
-										)}
-									/> */}
 									<FormField
 										control={form.control}
 										name="operation_type_id"
@@ -300,19 +289,24 @@ export default function PropertyFilterSheet() {
 								</div>
 							</form>
 						</Form>
-					</div>
-					<SheetFooter className="grid grid-cols-2 gap-5">
-						<Button variant="outline" size="lg" onClick={handleOnClear}>
+					</SheetBody>
+					<SheetFooter className="grid gap-4 grid-cols-2 lg:gap-5">
+						<Button variant="outline" size={buttonSize} onClick={handleOnClear}>
 							Limpiar filtros
 						</Button>
 						<Button
 							type="button"
-							size="lg"
+							size={buttonSize}
 							className="w-full"
 							onClick={form.handleSubmit(onSubmit)}
 						>
 							<AdjustmentsHorizontalIcon className="size-6" />
-							Filtrar
+							<div>
+								Filtrar
+								{pendingFiltersCount > 0 && (
+									<span className="ml-1">{`(${pendingFiltersCount})`}</span>
+								)}
+							</div>
 						</Button>
 					</SheetFooter>
 				</SheetContent>

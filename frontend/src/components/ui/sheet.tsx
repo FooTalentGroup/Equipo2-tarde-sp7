@@ -60,7 +60,7 @@ function SheetContent({
 			<SheetPrimitive.Content
 				data-slot="sheet-content"
 				className={cn(
-					"bg-card rounded-l-none data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col gap-4 shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+					"bg-card rounded-l-none data-[state=open]:animate-in data-[state=closed]:animate-out fixed z-50 flex flex-col shadow-lg transition ease-in-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
 					side === "right" &&
 						"data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm",
 					side === "left" &&
@@ -84,7 +84,7 @@ function SheetHeader({ className, children }: React.ComponentProps<"div">) {
 		<div
 			data-slot="sheet-header"
 			className={cn(
-				"flex justify-between gap-5 items-start px-4 pt-4 lg:px-6 lg:pt-6",
+				"flex justify-between bg-card sticky top-0 pb-4 gap-5 items-start px-4 pt-4 lg:px-6 lg:pt-6",
 				className,
 			)}
 		>
@@ -101,7 +101,23 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div
 			data-slot="sheet-footer"
-			className={cn("mt-auto flex flex-col gap-2 px-6 pb-6", className)}
+			className={cn(
+				"mt-auto flex flex-col gap-2 pt-4 px-6 bg-card pb-6 sticky bottom-0",
+				className,
+			)}
+			{...props}
+		/>
+	);
+}
+
+function SheetBody({ className, ...props }: React.ComponentProps<"div">) {
+	return (
+		<div
+			data-slot="sheet-body"
+			className={cn(
+				"grid flex-1 auto-rows-min gap-6 px-6 overflow-y-auto h-fit",
+				className,
+			)}
 			{...props}
 		/>
 	);
@@ -144,6 +160,7 @@ export {
 	SheetContent,
 	SheetHeader,
 	SheetFooter,
+	SheetBody,
 	SheetTitle,
 	SheetDescription,
 };

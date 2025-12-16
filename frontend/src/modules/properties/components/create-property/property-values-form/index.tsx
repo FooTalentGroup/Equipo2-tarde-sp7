@@ -28,13 +28,13 @@ type Props = {
 
 export default function PropertyValuesForm({ form }: Props) {
 	return (
-		<div className="grid grid-cols-2 gap-10 items-start">
+		<div className="grid lg:grid-cols-2 gap-4 lg:gap-10 items-start">
 			<FormField
 				control={form.control}
 				name="values.prices.0.price"
 				render={({ field }) => (
 					<FormItem>
-						<FormLabel>Precio</FormLabel>
+						<FormLabel required>Precio</FormLabel>
 						<FormControl>
 							<InputGroup>
 								<InputGroupAddon align="inline-start" className="">
@@ -84,7 +84,7 @@ export default function PropertyValuesForm({ form }: Props) {
 				name="values.expenses.0.amount"
 				render={({ field }) => (
 					<FormItem>
-						<FormLabel>Expensas</FormLabel>
+						<FormLabel required>Expensas</FormLabel>
 						<FormControl>
 							<InputGroup>
 								<InputGroupAddon align="inline-start" className="">

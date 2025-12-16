@@ -28,7 +28,7 @@ export default async function AdminLayout({ children }: Props) {
 	return (
 		<SidebarProvider header={<ProtectedHeader />} className="">
 			<ProtectedSidebar role={user.role} />
-			<SidebarInset className="w-full rounded-l-2xl rounded-r-2xl md:rounded-r-none  rounded-b-none relative h-[calc(100dvh-(var(--admin-header-height)))] border-t border-l border-r md:border-r-0 items-center border-tertiary bg-card lg:p-8 p-4 overflow-y-auto">
+			<SidebarInset className="w-full rounded-l-2xl rounded-r-2xl md:rounded-r-none  rounded-b-none relative h-[calc(100dvh-(var(--admin-header-height-mobile)))] lg:h-[calc(100dvh-(var(--admin-header-height)))] border-t border-l border-r md:border-r-0 items-center border-tertiary bg-card lg:p-8 p-4 overflow-y-auto">
 				<MainLayout
 					size="lg"
 					className="flex flex-1 flex-col gap-4 lg:gap-8 mx-0 w-full! px-0"

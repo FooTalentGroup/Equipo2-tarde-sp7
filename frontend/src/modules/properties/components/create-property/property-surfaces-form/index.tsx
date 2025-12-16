@@ -15,14 +15,14 @@ interface PropertySurfacesProps {
 
 export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 	return (
-		<div className="grid grid-cols-2 gap-10 items-start">
+		<div className="grid lg:grid-cols-2 lg:gap-10 items-start">
 			<div className="grid gap-4">
 				<FormField
 					control={form.control}
 					name="surface.land_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Terreno</FormLabel>
+							<FormLabel required>Terreno</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -36,7 +36,7 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 					name="surface.covered_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Cubierta (m²)</FormLabel>
+							<FormLabel required>Cubierta (m²)</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -50,7 +50,7 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 					name="surface.uncovered_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Descubierta</FormLabel>
+							<FormLabel required>Descubierta</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -66,7 +66,7 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 					name="surface.semi_covered_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Semicubierta</FormLabel>
+							<FormLabel required>Semicubierta</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -80,7 +80,7 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 					name="surface.total_built_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Total construido</FormLabel>
+							<FormLabel required>Total construido</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>
@@ -94,7 +94,7 @@ export default function PropertySurfacesForm({ form }: PropertySurfacesProps) {
 					name="surface.total_area"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Total</FormLabel>
+							<FormLabel required>Total</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="0" {...field} />
 							</FormControl>

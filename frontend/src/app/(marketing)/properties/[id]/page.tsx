@@ -43,14 +43,18 @@ export default async function PropertyDetailPage({ params }: Props) {
 	const { property } = data;
 
 	return (
-		<MainLayout as="section" size="lg" className="py-20 flex flex-col gap-8">
+		<MainLayout
+			as="section"
+			size="lg"
+			className="py-10 lg:py-20 flex flex-col gap-8"
+		>
 			<Button variant="text" asChild className="mr-auto">
 				<Link href={paths.public.landing()}>
 					<ArrowLeft />
 					Volver atrás
 				</Link>
 			</Button>
-			<div className="flex justify-between gap-5">
+			<div className="flex flex-col lg:flex-row justify-between gap-5">
 				<div className="flex flex-col gap-2.5">
 					<Heading variant="subtitle1" weight="semibold">
 						{property.title}
@@ -73,7 +77,7 @@ export default async function PropertyDetailPage({ params }: Props) {
 				</Heading>
 			</div>
 			<PropertyGallery images={property.images} />
-			<div className="grid gap-3 grid-cols-[1fr_460px]">
+			<div className="grid gap-4 lg:grid-cols-[1fr_460px]">
 				<div className="flex flex-col gap-8">
 					<Section title="Descripción">
 						<p className="text-muted-foreground whitespace-pre-wrap">

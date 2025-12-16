@@ -21,7 +21,7 @@ export default async function PropertiesList() {
 	);
 
 	return (
-		<MainLayout size="lg" className="py-20 grid gap-8">
+		<MainLayout size="lg" className="py-10 lg:py-20 grid gap-8">
 			<Heading variant="h3" className="text-center">
 				Propiedades disponibles
 			</Heading>

@@ -27,10 +27,10 @@ export default function PropertyTabs({ property }: Props) {
 			<TabsContent value="details" className=" grid gap-4">
 				<PropertyInfo property={property} />
 			</TabsContent>
-			<TabsContent value="multimedia" className="px-4">
+			<TabsContent value="multimedia" className="lg:px-4">
 				<PropertyMultimedia property={property} />
 			</TabsContent>
-			<TabsContent value="documents" className="px-4">
+			<TabsContent value="documents" className="lg:px-4">
 				<PropertyDocuments property={property} />
 			</TabsContent>
 		</Tabs>

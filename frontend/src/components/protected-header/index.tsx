@@ -14,7 +14,7 @@ export default async function ProtectedHeader() {
 	const user = await getCurrentUser();
 
 	return (
-		<header className="px-4 bg-sidebar sticky top-0 z-50 min-h-(--admin-header-height) grid grid-cols-2 items-center gap-4">
+		<header className="px-4 bg-sidebar sticky top-0 z-50 min-h-(--admin-header-height-mobile) lg:min-h-(--admin-header-height) grid grid-cols-2 items-center gap-4">
 			<div className="flex items-center gap-4">
 				<div className="lg:hidden">
 					<SidebarTrigger />

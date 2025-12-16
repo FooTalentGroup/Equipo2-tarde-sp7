@@ -79,7 +79,7 @@ export default function PropertyDocumentsForm({ form }: Props) {
 												value={file}
 												className="relative flex items-center p-4 gap-3 border rounded-xl bg-card shadow-sm transition-all hover:shadow-md"
 											>
-												<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+												<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-tertiary">
 													<FileText className="size-5" />
 												</div>
 												<div className="flex flex-1 flex-col gap-0.5 overflow-hidden">
@@ -98,7 +98,7 @@ export default function PropertyDocumentsForm({ form }: Props) {
 														<Button
 															variant="ghost"
 															size="icon"
-															className="size-6 text-muted-foreground hover:text-destructive absolute top-2 right-2 sm:relative sm:top-0 sm:right-0 sm:size-8"
+															className="size-6 text-muted-foreground hover:text-destructive lg:absolute top-2 right-2 sm:relative sm:top-0 sm:right-0 sm:size-8"
 														>
 															<Trash2 className="size-4" />
 															<span className="sr-only">Eliminar</span>
@@ -124,7 +124,7 @@ export default function PropertyDocumentsForm({ form }: Props) {
 				render={({ field }) => (
 					<FormItem className="flex flex-row items-center justify-between">
 						<div className="space-y-1">
-							<FormLabel className="text-xl font-semibold text-primary">
+							<FormLabel className="lg:text-xl font-semibold text-primary">
 								Publicar en la web
 							</FormLabel>
 							<FormDescription className="text-base">

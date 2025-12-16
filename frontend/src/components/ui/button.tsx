@@ -34,11 +34,13 @@ const buttonVariants = cva(
 				link: "text-primary underline-offset-4 hover:underline",
 				white: "bg-white text-foreground fill-foreground hover:bg-white-hover",
 				text: "text-secondary border-none bg-transparent",
+				fab: "bg-fab text-fab-foreground z-20",
 			},
 			size: {
 				default: "h-10 px-4 py-2 has-[>svg]:px-3",
 				sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
 				lg: "h-12 rounded-md px-6 has-[>svg]:px-6 text-base",
+				fab: "h-14 rounded-xl px-6 has-[>svg]:px-6 min-w-14 w-fit text-base shadow-fab",
 				icon: "size-10",
 				"icon-sm": "size-8",
 				"icon-lg": "size-12",

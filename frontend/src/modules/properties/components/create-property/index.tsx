@@ -244,7 +244,7 @@ export default function CreatePropertyForm({
 
 	return (
 		<section className="grid lg:grid-cols-[1fr_275px] xl:grid-cols-[1fr_275px] gap-4">
-			<div className="flex flex-col gap-8 ">
+			<div className="grid grid-cols-1 gap-4 lg:gap-8 ">
 				<nav aria-label="Progress" className="w-full max-w-[719px] mx-auto">
 					<ol className="flex w-full items-start">
 						{stepper.all.map((step, index, _array) => (
@@ -252,9 +252,9 @@ export default function CreatePropertyForm({
 								key={step.id}
 								className={`${
 									index === _array.length - 1 ? "" : "flex-1"
-								} grid grid-cols-[2.5rem_1fr] grid-rows-[auto_auto] gap-y-2`}
+								} grid grid-cols-[2rem_1fr] grid-rows-[auto] lg:grid-cols-[2.5rem_1fr] lg:grid-rows-[auto_auto] gap-0 lg:gap-y-2`}
 							>
-								<span className="col-start-1 row-start-1 flex w-10 justify-center overflow-visible whitespace-nowrap text-center text-sm font-medium">
+								<span className="hidden lg:flex col-start-1 row-start-1 w-10 justify-center overflow-visible whitespace-nowrap text-center text-sm font-medium">
 									{step.subtitle}
 								</span>
 								<Button
@@ -273,7 +273,7 @@ export default function CreatePropertyForm({
 									aria-posinset={index + 1}
 									aria-setsize={steps.length}
 									aria-selected={stepper.current.id === step.id}
-									className="col-start-1 row-start-2 z-10 flex size-10 border-2! items-center justify-center rounded-full"
+									className="col-start-1 row-start-1 lg:col-start-1 lg:row-start-2 z-10 flex size-8 p-0 lg:size-10 border-2! items-center justify-center rounded-full"
 									onClick={async () => {
 										const valid = await form.trigger();
 										if (!valid) return;
@@ -289,7 +289,7 @@ export default function CreatePropertyForm({
 								</Button>
 								{index < _array.length - 1 && (
 									<Separator
-										className={`col-start-2 row-start-2 h-0.5! w-full self-center ${
+										className={`col-start-2 row-start-1 lg:col-start-2 lg:row-start-2 h-0.5! w-full self-center ${
 											index < currentIndex ? "bg-tertiary" : "bg-border"
 										}`}
 									/>
@@ -299,12 +299,15 @@ export default function CreatePropertyForm({
 					</ol>
 				</nav>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="grid gap-6 pb-[145px] lg:pb-0"
+					>
 						{stepper.switch({
 							info: ({ title }) => (
-								<Card className="border-none">
+								<Card className="">
 									<CardContent className="grid gap-6">
-										<Heading variant="subtitle2" weight="semibold">
+										<Heading as="h2" variant="subtitle2" weight="semibold">
 											{title}
 										</Heading>
 										<PropertyBasicInfoForm form={form} />
@@ -312,9 +315,9 @@ export default function CreatePropertyForm({
 								</Card>
 							),
 							features: ({ title }) => (
-								<Card className="border-none">
+								<Card className="">
 									<CardContent className="grid gap-6">
-										<Heading variant="subtitle2" weight="semibold">
+										<Heading as="h2" variant="subtitle2" weight="semibold">
 											{title}
 										</Heading>
 										<PropertyFeaturesForm form={form} />
@@ -322,9 +325,9 @@ export default function CreatePropertyForm({
 								</Card>
 							),
 							surfaces: ({ title }) => (
-								<Card className="border-none">
+								<Card className="">
 									<CardContent className="grid gap-6">
-										<Heading variant="subtitle2" weight="semibold">
+										<Heading as="h2" variant="subtitle2" weight="semibold">
 											{title}
 										</Heading>
 										<PropertySurfacesForm form={form} />
@@ -332,9 +335,9 @@ export default function CreatePropertyForm({
 								</Card>
 							),
 							values: ({ title }) => (
-								<Card className="border-none">
+								<Card className="">
 									<CardContent className="grid gap-6">
-										<Heading variant="subtitle2" weight="semibold">
+										<Heading as="h2" variant="subtitle2" weight="semibold">
 											{title}
 										</Heading>
 										<PropertyValuesForm form={form} />
@@ -342,9 +345,9 @@ export default function CreatePropertyForm({
 								</Card>
 							),
 							services: ({ title }) => (
-								<Card className="border-none">
+								<Card className="">
 									<CardContent className="grid gap-6">
-										<Heading variant="subtitle2" weight="semibold">
+										<Heading as="h2" variant="subtitle2" weight="semibold">
 											{title}
 										</Heading>
 										<PropertyServicesForm form={form} />
@@ -352,9 +355,9 @@ export default function CreatePropertyForm({
 								</Card>
 							),
 							gallery: ({ title }) => (
-								<Card className="border-none">
+								<Card className="">
 									<CardContent className="grid gap-6">
-										<Heading variant="subtitle2" weight="semibold">
+										<Heading as="h2" variant="subtitle2" weight="semibold">
 											{title}
 										</Heading>
 										<Badge
@@ -371,7 +374,7 @@ export default function CreatePropertyForm({
 								</Card>
 							),
 							documents: () => (
-								<Card className="border-none">
+								<Card className="">
 									<CardContent className="grid gap-6">
 										<PropertyDocumentsForm form={form} />
 									</CardContent>
@@ -379,65 +382,68 @@ export default function CreatePropertyForm({
 							),
 						})}
 
-						<div className="flex gap-4 justify-between mt-8">
-							<Button
-								type="button"
-								size="lg"
-								variant="outline"
-								onClick={
-									stepper.isFirst
-										? () => router.push(paths.agent.properties.index())
-										: stepper.prev
-								}
-								disabled={form.formState.isSubmitting}
-							>
-								{stepper.isFirst ? "Cancelar" : "Atrás"}
-							</Button>
-
-							{(!stepper.isLast || !propertyId) && (
+						<div className="fixed bottom-0 right-0 left-0 z-10  px-4 py-4 bg-card border-t lg:static lg:mx-0 lg:p-0 lg:bg-transparent lg:border-none lg:mt-8 col-span-full flex flex-col gap-4">
+							<div className="grid grid-cols-2 lg:flex gap-4 justify-between">
 								<Button
-									type="submit"
-									size="lg"
-									variant="tertiary"
+									type="button"
+									variant="outline"
+									className="h-10 px-4 lg:h-11 lg:px-8"
+									onClick={
+										stepper.isFirst
+											? () => router.push(paths.agent.properties.index())
+											: stepper.prev
+									}
 									disabled={form.formState.isSubmitting}
+								>
+									{stepper.isFirst ? "Cancelar" : "Atrás"}
+								</Button>
+
+								{(!stepper.isLast || !propertyId) && (
+									<Button
+										type="submit"
+										variant="tertiary"
+										className="h-10 px-4 lg:h-11 lg:px-8"
+										disabled={form.formState.isSubmitting}
+									>
+										{stepper.isLast ? (
+											<>
+												{form.formState.isSubmitting && <Spinner />}
+												{form.formState.isSubmitting
+													? "Guardando..."
+													: "Guardar"}
+											</>
+										) : (
+											"Continuar"
+										)}
+									</Button>
+								)}
+							</div>
+							{propertyId && (
+								<Button
+									type="button"
+									variant="tertiary"
+									onClick={form.handleSubmit(handleSave)}
+									disabled={form.formState.isSubmitting}
+									className="w-full lg:w-fit mx-auto h-10 px-4 lg:h-11 lg:px-8"
 								>
 									{stepper.isLast ? (
 										<>
 											{form.formState.isSubmitting && <Spinner />}
-											{form.formState.isSubmitting ? "Guardando..." : "Guardar"}
+											{form.formState.isSubmitting
+												? "Guardando..."
+												: "	Guardar cambios"}
 										</>
 									) : (
-										"Continuar"
+										"	Guardar cambios"
 									)}
 								</Button>
 							)}
 						</div>
-						{propertyId && (
-							<Button
-								type="button"
-								size="lg"
-								variant="tertiary"
-								onClick={form.handleSubmit(handleSave)}
-								disabled={form.formState.isSubmitting}
-								className="w-fit mx-auto"
-							>
-								{stepper.isLast ? (
-									<>
-										{form.formState.isSubmitting && <Spinner />}
-										{form.formState.isSubmitting
-											? "Guardando..."
-											: "	Guardar cambios"}
-									</>
-								) : (
-									"	Guardar cambios"
-								)}
-							</Button>
-						)}
 					</form>
 				</Form>
 			</div>
 
-			<Alert className="h-fit grid grid-cols-[auto_1fr] gap-4 shadow-md border-none">
+			<Alert className="hidden h-fit lg:grid grid-cols-[auto_1fr] gap-4 shadow-md ">
 				<div className="bg-secondary/20 p-2 w-9 text-secondary h-9 grid place-content-center rounded-md">
 					<Info />
 				</div>

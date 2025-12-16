@@ -44,41 +44,43 @@ export default function PropertyGallery({ images }: Props) {
 
 	if (!images || images.length === 0) {
 		return (
-			<div className="flex h-[500px] w-full items-center justify-center rounded-lg bg-muted">
+			<div className="flex bg-muted h-64 w-full items-center justify-center rounded-lg lg:h-[500px]">
 				<p className="">No hay imágenes disponibles</p>
 			</div>
 		);
 	}
 
 	return (
-		<div className=" w-full flex h-[500px] gap-4">
-			<div className="w-full h-full relative rounded-2xl overflow-hidden bg-muted">
-				<Carousel setApi={setApi} className="w-full">
-					<CarouselContent>
+		<div className="flex w-full flex-col gap-4 lg:h-[500px] lg:flex-row">
+			<div className="relative w-full overflow-hidden rounded-2xl bg-muted lg:h-full">
+				<Carousel setApi={setApi} className="w-full h-full">
+					<CarouselContent className="h-full">
 						{images.map((image, index) => (
 							<CarouselItem key={image.id}>
-								<figure className="border-0 shadow-none flex items-center justify-center p-0 relative overflow-hidden rounded-lg aspect-video h-full w-full">
+								<figure className="relative flex aspect-video h-full w-full items-center justify-center overflow-hidden rounded-lg border-0 p-0 shadow-none">
 									<Image
 										src={image.file_path}
 										alt={`Property image ${index + 1}`}
 										fill
-										className="object-cover w-full h-full"
+										className="h-full w-full object-cover"
 										priority={index === 0}
 									/>
 								</figure>
 							</CarouselItem>
 						))}
 					</CarouselContent>
+					<CarouselPrevious className="left-2 lg:hidden" variant="white" />
+					<CarouselNext className="right-2 lg:hidden" variant="white" />
 				</Carousel>
 			</div>
 			<Carousel
 				orientation="vertical"
-				className="w-full max-w-xs h-[500px]"
+				className="hidden h-[500px] w-full max-w-xs lg:block"
 				opts={{
 					align: "start",
 				}}
 			>
-				<CarouselContent className="-mt-1 h-[500px] flex">
+				<CarouselContent className="-mt-1 flex h-[500px]">
 					{images.map((image, index) => (
 						<CarouselItem
 							key={image.id}
