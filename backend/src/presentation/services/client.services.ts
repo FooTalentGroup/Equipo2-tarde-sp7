@@ -309,7 +309,7 @@ export class ClientServices {
             const interests = await ClientPropertyInterestModel.findByClientId(clientId);
             
             if (interests.length > 0) {
-                propertiesOfInterest = await Promise.all(
+                const interestResults = await Promise.all(
                     interests.map(async (interest) => {
                         const property = await PropertyModel.findById(interest.property_id);
                         if (!property) return null;
@@ -328,10 +328,10 @@ export class ClientServices {
                             property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                             interest_created_at: interest.created_at,
                             interest_notes: interest.notes
-                        };
+                        } as PropertyOfInterest;
                     })
                 );
-                propertiesOfInterest = propertiesOfInterest.filter((p): p is PropertyOfInterest => p !== null);
+                propertiesOfInterest = interestResults.filter((p): p is PropertyOfInterest => p !== null);
             }
         }
 
@@ -424,7 +424,7 @@ export class ClientServices {
             const interests = await ClientPropertyInterestModel.findByClientId(clientId);
             
             if (interests.length > 0) {
-                propertiesOfInterest = await Promise.all(
+                const interestResults = await Promise.all(
                     interests.map(async (interest) => {
                         const property = await PropertyModel.findById(interest.property_id);
                         if (!property) return null;
@@ -443,10 +443,10 @@ export class ClientServices {
                             property_status: propertyStatus ? { id: propertyStatus.id, name: propertyStatus.name } : null,
                             interest_created_at: interest.created_at,
                             interest_notes: interest.notes
-                        };
+                        } as PropertyOfInterest;
                     })
                 );
-                propertiesOfInterest = propertiesOfInterest.filter((p): p is PropertyOfInterest => p !== null);
+                propertiesOfInterest = interestResults.filter((p): p is PropertyOfInterest => p !== null);
             }
         }
 
