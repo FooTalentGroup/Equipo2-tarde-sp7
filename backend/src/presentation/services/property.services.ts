@@ -25,6 +25,9 @@ import {
 	RentalModel,
 	VisibilityStatusModel,
 } from "../../data/postgres/models";
+import type { PropertyService } from "../../data/postgres/models/properties/property-service.model";
+import type { Expense } from "../../data/postgres/models/shared/expense.model";
+import type { PropertyPrice } from "../../data/postgres/models/properties/property-price.model";
 import { TransactionHelper } from "../../data/postgres/transaction.helper";
 import { CustomError } from "../../domain";
 import type {
@@ -33,6 +36,19 @@ import type {
 	UpdatePropertyGroupedDto,
 } from "../../domain/dtos/properties";
 import type { FileUploadAdapter } from "../../domain/interfaces/file-upload.adapter";
+import type { 
+	PropertyPriceRow, 
+	PropertyAddressRow, 
+	PropertyServiceRow, 
+	ExpenseRow,
+	PropertyRow 
+} from '../../domain/interfaces/database-rows';
+import type {
+	EnrichedPropertyPrice,
+	EnrichedPropertyAddress,
+	EnrichedExpense,
+	PropertyListItem
+} from '../../domain/interfaces/enriched-data';
 
 /**
  * Service for handling property operations
@@ -350,7 +366,7 @@ export class PropertyServices {
 
 			// Enriquecer precios con moneda y tipo de operación
 			const enrichedPrices = await Promise.all(
-				prices.map(async (price: any) => {
+				prices.map(async (price: PropertyPrice) => {
 					const [currency, operationType] = await Promise.all([
 						CurrencyTypeModel.findById(price.currency_type_id),
 						PropertyOperationTypeModel.findById(price.operation_type_id),
@@ -433,7 +449,7 @@ export class PropertyServices {
 							: null,
 					},
 					// Precios enriquecidos (con objetos de moneda y operación completos)
-					prices: enrichedPrices.map((price: any) => ({
+					prices: enrichedPrices.map((price: EnrichedPropertyPrice) => ({
 						id: price.id,
 						property_id: price.property_id,
 						price: price.price,
@@ -566,7 +582,7 @@ export class PropertyServices {
 
 		// Enriquecer precios con moneda y tipo de operación
 		const enrichedPrices = await Promise.all(
-			(property.prices || []).map(async (price: any) => {
+			(property.prices || []).map(async (price: PropertyPriceRow) => {
 				const [currency, operationType] = await Promise.all([
 					CurrencyTypeModel.findById(price.currency_type_id),
 					PropertyOperationTypeModel.findById(price.operation_type_id),
@@ -596,7 +612,7 @@ export class PropertyServices {
 
 		// Enrich addresses with city and province
 		const enrichedAddresses = await Promise.all(
-			(property.addresses || []).map(async (address: any) => {
+			(property.addresses || []).map(async (address: PropertyAddressRow) => {
 				if (!address || !address.city_id) return null;
 
 				const city = await CityModel.findById(address.city_id);
@@ -639,7 +655,7 @@ export class PropertyServices {
 		// Obtener servicios vinculados
 		const propertyServices = await PropertyServiceModel.findByPropertyId(id);
 		const enrichedServices = await Promise.all(
-			propertyServices.map(async (ps: any) => {
+			propertyServices.map(async (ps: PropertyService) => {
 				const service = await CatalogServiceModel.findById(ps.service_id);
 				return service
 					? {
@@ -656,7 +672,7 @@ export class PropertyServices {
 		// Obtener expensas
 		const expenses = await ExpenseModel.findByPropertyId(id);
 		const enrichedExpenses = await Promise.all(
-			expenses.map(async (expense: any) => {
+			expenses.map(async (expense: Expense) => {
 				const currency = await CurrencyTypeModel.findById(
 					expense.currency_type_id,
 				);
@@ -837,7 +853,7 @@ export class PropertyServices {
 						}
 					: null,
 				// Precios enriquecidos (con objetos de moneda y operación, no solo IDs)
-				prices: enrichedPrices.map((price: any) => ({
+				prices: enrichedPrices.map((price: EnrichedPropertyPrice) => ({
 					id: price.id,
 					property_id: price.property_id,
 					price: price.price,
@@ -848,7 +864,7 @@ export class PropertyServices {
 				// Direcciones enriquecidas (con objetos de ciudad, provincia, país, no solo IDs)
 				addresses: enrichedAddresses
 					.filter((a) => a !== null)
-					.map((addr: any) => ({
+					.map((addr: EnrichedPropertyAddress) => ({
 						id: addr.id,
 						street: addr.street || null,
 						number: addr.number || null,
@@ -905,7 +921,7 @@ export class PropertyServices {
 		);
 
 		const enrichedProperties = await Promise.all(
-			properties.map(async (property: any) => {
+			properties.map(async (property: PropertyListItem) => {
 				// Obtener información de moneda y tipo de operación del precio principal
 				let mainPriceInfo = null;
 				if (
@@ -1507,7 +1523,7 @@ export class PropertyServices {
 					console.log(
 						`[PropertyServices] Successfully processed ${multimediaRecords.length} images`,
 					);
-				} catch (error: any) {
+				} catch (error: unknown) {
 					console.error(`[PropertyServices] Error uploading images:`, error);
 					for (const url of uploadedImages) {
 						try {
@@ -1611,7 +1627,7 @@ export class PropertyServices {
 
 			// Enrich prices
 			const enrichedPrices = await Promise.all(
-				prices.map(async (price: any) => {
+				prices.map(async (price: PropertyPrice) => {
 					const [currency, operationType] = await Promise.all([
 						CurrencyTypeModel.findById(price.currency_type_id),
 						PropertyOperationTypeModel.findById(price.operation_type_id),
@@ -1643,7 +1659,7 @@ export class PropertyServices {
 			const enrichedExpenses =
 				expenses.length > 0
 					? await Promise.all(
-							expenses.map(async (expense: any) => {
+							expenses.map(async (expense: Expense) => {
 								const currency = await CurrencyTypeModel.findById(
 									expense.currency_type_id,
 								);
@@ -1671,7 +1687,7 @@ export class PropertyServices {
 				property.id,
 			);
 			const enrichedServices = await Promise.all(
-				propertyServices.map(async (ps: any) => {
+				propertyServices.map(async (ps: PropertyService) => {
 					const service = await CatalogServiceModel.findById(ps.service_id);
 					return service
 						? {
