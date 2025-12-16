@@ -25,15 +25,14 @@ export default function PropertyFeaturesForm({
 	form,
 }: PropertyCharacteristicsProps) {
 	return (
-		<div className="grid grid-cols-2 gap-10 items-start">
-			{/* Columna izquierda */}
+		<div className="grid lg:grid-cols-2 gap-4 lg:gap-10 items-start">
 			<div className="grid gap-4">
 				<FormField
 					control={form.control}
 					name="characteristics.rooms_count"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Ambientes</FormLabel>
+							<FormLabel required>Ambientes</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="3" {...field} />
 							</FormControl>
@@ -46,7 +45,7 @@ export default function PropertyFeaturesForm({
 					name="characteristics.bedrooms_count"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Dormitorios</FormLabel>
+							<FormLabel required>Dormitorios</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="1" {...field} />
 							</FormControl>
@@ -59,7 +58,7 @@ export default function PropertyFeaturesForm({
 					name="characteristics.bathrooms_count"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Baños</FormLabel>
+							<FormLabel required>Baños</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="1" {...field} />
 							</FormControl>
@@ -72,7 +71,7 @@ export default function PropertyFeaturesForm({
 					name="characteristics.toilets_count"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Toilettes</FormLabel>
+							<FormLabel required>Toilettes</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="1" {...field} />
 							</FormControl>
@@ -85,7 +84,7 @@ export default function PropertyFeaturesForm({
 					name="characteristics.parking_spaces_count"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Cocheras</FormLabel>
+							<FormLabel required>Cocheras</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="1" {...field} />
 							</FormControl>
@@ -95,14 +94,13 @@ export default function PropertyFeaturesForm({
 				/>
 			</div>
 
-			{/* Columna derecha */}
 			<div className="grid gap-4 items-start">
 				<FormField
 					control={form.control}
 					name="characteristics.floors_count"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Plantas</FormLabel>
+							<FormLabel required>Plantas</FormLabel>
 							<FormControl>
 								<Input type="number" placeholder="1" {...field} />
 							</FormControl>

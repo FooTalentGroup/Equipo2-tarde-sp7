@@ -31,14 +31,14 @@ type Props = {
 
 export default function PropertyBasicInfoForm({ form }: Props) {
 	return (
-		<div className="grid grid-cols-2 gap-10 items-start">
+		<div className="grid lg:grid-cols-2 gap-4  md:gap-10 items-start">
 			<div className="grid gap-4">
 				<FormField
 					control={form.control}
 					name="basic.title"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Título de la propiedad</FormLabel>
+							<FormLabel required>Título de la propiedad</FormLabel>
 							<FormControl>
 								<Input placeholder="Casa de campo" {...field} />
 							</FormControl>
@@ -52,7 +52,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 					name="values.prices.0.operation_type"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Tipo de operación</FormLabel>
+							<FormLabel required>Tipo de operación</FormLabel>
 							<Select onValueChange={field.onChange} value={field.value}>
 								<FormControl>
 									<SelectTrigger className="w-full">
@@ -80,7 +80,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 					name="basic.property_type"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Tipo de propiedad</FormLabel>
+							<FormLabel required>Tipo de propiedad</FormLabel>
 							<Select onValueChange={field.onChange} value={field.value}>
 								<FormControl>
 									<SelectTrigger className="w-full">
@@ -110,7 +110,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 					name="address.street"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Dirección</FormLabel>
+							<FormLabel required>Dirección</FormLabel>
 							<FormControl>
 								<Input placeholder="Av. Santa Fe 2456" {...field} />
 							</FormControl>
@@ -138,7 +138,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 					name="address.postal_code"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Código postal</FormLabel>
+							<FormLabel required>Código postal</FormLabel>
 							<FormControl>
 								<Input placeholder="1430" {...field} />
 							</FormControl>
@@ -166,14 +166,13 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 				/>
 			</div>
 
-			{/* Columna derecha */}
 			<div className="grid gap-4 items-start">
 				<FormField
 					control={form.control}
 					name="geography.country"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>País</FormLabel>
+							<FormLabel required>País</FormLabel>
 							<Select onValueChange={field.onChange} value={field.value}>
 								<FormControl>
 									<SelectTrigger className="w-full">
@@ -195,7 +194,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 					name="geography.province"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Provincia</FormLabel>
+							<FormLabel required>Provincia</FormLabel>
 							<Select onValueChange={field.onChange} value={field.value}>
 								<FormControl>
 									<SelectTrigger className="w-full">
@@ -225,7 +224,7 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 					name="geography.city"
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Ciudad</FormLabel>
+							<FormLabel required>Ciudad</FormLabel>
 							<FormControl>
 								<Input placeholder="Buenos Aires" {...field} />
 							</FormControl>

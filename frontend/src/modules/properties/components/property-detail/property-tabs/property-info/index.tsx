@@ -203,11 +203,6 @@ export default function PropertyInfo({ property }: Props) {
 						</div>
 					</Section>
 				</div>
-				{/* <div className="space-y-6">
-					<OwnerCard owner={property.owner} />
-					<RelatedInquiriesCard />
-					<RecentActivityCard />
-				</div> */}
 			</section>
 		</>
 	);

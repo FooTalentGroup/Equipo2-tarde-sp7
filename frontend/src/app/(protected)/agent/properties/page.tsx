@@ -1,10 +1,15 @@
 import { Suspense } from "react";
 
+import Link from "next/link";
+
 import SectionHeading from "@src/components/section-heading";
+import { Button } from "@src/components/ui/button";
+import { paths } from "@src/lib/paths";
 import PropertiesSkeleton from "@src/modules/properties/components/properties-skeleton";
 import PropertyFilterSheet from "@src/modules/properties/components/property-filter-sheet";
 import PropertyResults from "@src/modules/properties/components/property-results";
 import PropertySearch from "@src/modules/properties/components/property-search";
+import { Plus } from "lucide-react";
 
 export const metadata = {
 	title: "Propiedades",
@@ -46,8 +51,20 @@ export default async function PropertiesPage({ searchParams }: Props) {
 				<PropertyFilterSheet />
 			</div>
 			<Suspense key={JSON.stringify(filters)} fallback={<PropertiesSkeleton />}>
-				<PropertyResults filters={filters} />
+				<div className="pb-20">
+					<PropertyResults filters={filters} />
+				</div>
 			</Suspense>
+			<Button
+				variant="fab"
+				size="fab"
+				asChild
+				className="w-fit fixed bottom-4 right-4 md:hidden"
+			>
+				<Link href={paths.agent.properties.new()}>
+					<Plus /> Crear
+				</Link>
+			</Button>
 		</>
 	);
 }

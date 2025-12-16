@@ -47,7 +47,7 @@ export default function OwnerSelect({ form }: Props) {
 	if (isLoading) {
 		return (
 			<div className="space-y-2">
-				<FormLabel>Propietario asignado</FormLabel>
+				<FormLabel required>Propietario asignado</FormLabel>
 				<Skeleton className="h-10 w-full" />
 			</div>
 		);
@@ -68,7 +68,7 @@ export default function OwnerSelect({ form }: Props) {
 
 				return (
 					<FormItem className="flex flex-col">
-						<FormLabel>Propietario asignado</FormLabel>
+						<FormLabel required>Propietario asignado</FormLabel>
 						<Popover open={open} onOpenChange={setOpen}>
 							<PopoverTrigger asChild>
 								<FormControl>

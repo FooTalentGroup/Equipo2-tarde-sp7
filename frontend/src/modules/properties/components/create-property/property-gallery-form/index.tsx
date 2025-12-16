@@ -66,7 +66,7 @@ export default function PropertyGalleryForm({ form }: Props) {
 								}}
 								orientation="mixed"
 							>
-								<div className="grid grid-cols-4 gap-4">
+								<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 									<Sortable.Content asChild>
 										<FileUploadList className="contents">
 											{field.value?.map((file, index) => {
@@ -113,7 +113,7 @@ export default function PropertyGalleryForm({ form }: Props) {
 																	Imagen principal
 																</Badge>
 															)}
-															<div className="absolute right-0 bottom-0 left-0 grid grid-cols-2 items-center justify-between bg-sidebar-accent opacity-0 h-8 transition-opacity group-hover:opacity-100">
+															<div className="absolute right-0 bottom-0 left-0 grid grid-cols-2 items-center justify-between bg-sidebar-accent h-8 transition-opacity opacity-100 lg:opacity-0 lg:group-hover:opacity-100">
 																<Sortable.ItemHandle asChild>
 																	<Button
 																		variant="ghost"
