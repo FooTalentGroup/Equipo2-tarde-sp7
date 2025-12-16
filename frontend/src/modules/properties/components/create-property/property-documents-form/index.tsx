@@ -25,7 +25,7 @@ type Props = {
 	form: UseFormReturn<PropertyForm>;
 };
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 export default function PropertyDocumentsForm({ form }: Props) {
 	return (

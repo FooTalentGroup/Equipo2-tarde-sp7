@@ -166,7 +166,6 @@ export default function PropertyBasicInfoForm({ form }: Props) {
 				/>
 			</div>
 
-			{/* Columna derecha */}
 			<div className="grid gap-4 items-start">
 				<FormField
 					control={form.control}
