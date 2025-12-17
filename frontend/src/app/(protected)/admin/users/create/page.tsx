@@ -216,9 +216,9 @@ export default function CreateUserPage() {
 						{error && <p className="text-red-500 text-sm">{error}</p>}
 
 						<div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4 pb-4">
-							<Link href={paths.admin.dashboard()} className="w-full">
+							<Link href={paths.admin.dashboard()}>
 								<Button
-									className="cursor-pointer h-12 px-6 py-3 sm:min-w-36 w-full text-black"
+									className="cursor-pointer h-12 px-6 py-3 max-sm:w-full sm:min-w-36 text-black"
 									type="button"
 									variant="outline"
 									disabled={isSubmitting}
@@ -227,7 +227,7 @@ export default function CreateUserPage() {
 								</Button>
 							</Link>
 							<Button
-								className="bg-tertiary cursor-pointer h-12 px-6 py-3 sm:min-w-36 w-full"
+								className="bg-tertiary cursor-pointer h-12 px-6 py-3 max-sm:w-full sm:min-w-36"
 								type="submit"
 								disabled={isSubmitting}
 							>
