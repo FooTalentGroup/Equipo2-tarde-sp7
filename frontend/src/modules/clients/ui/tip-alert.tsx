@@ -3,7 +3,7 @@ import { Info } from "lucide-react";
 
 export default function TipAlert() {
 	return (
-		<Card className="w-[275px] h-fit rounded-xl border-none shadow-md/20 p-4 mt-4">
+		<Card className="w-[275px] h-fit rounded-xl border-none shadow-md/20 p-4 mt-4 hidden lg:block">
 			<div className="flex items-start gap-3">
 				<div className="flex p-2 items-center justify-center rounded-md bg-secondary-light/50 text-secondary">
 					<Info className="h-5 w-5" />

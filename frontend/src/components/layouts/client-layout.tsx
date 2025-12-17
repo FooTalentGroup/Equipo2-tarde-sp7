@@ -25,8 +25,8 @@ function ClientsLayoutContent({ children, activeTab }: ClientsLayoutProps) {
 
 			{/* Search and Navigation Tabs */}
 			<div className="w-full">
-				<div className="flex items-center my-4">
-					<div className="w-full max-w-2/3">
+				<div className="flex flex-col items-center lg:flex-row my-4 gap-4 lg:gap-1">
+					<div className="w-full lg:max-w-2/3">
 						<div className="relative">
 							<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
 							<Input
@@ -39,7 +39,7 @@ function ClientsLayoutContent({ children, activeTab }: ClientsLayoutProps) {
 						</div>
 					</div>
 
-					<div className="justify-start gap-2 rounded-none bg-transparent px-5 text-black flex">
+					<div className="justify-start gap-2 w-full rounded-none bg-transparent px-0 lg:px-5 text-black flex">
 						<Link
 							href={paths.agent.clients.leads.index()}
 							className={`px-3 py-1.5 rounded-md transition-colors ${

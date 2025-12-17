@@ -60,7 +60,7 @@ export function TenantsCard({ tenant, onEdit, onDelete }: TenantsCardProps) {
 			onClick={handleCardClick}
 		>
 			<CardContent className="p-0 w-full">
-				<div className="flex items-start justify-between px-4 py-4">
+				<div className="flex items-start justify-between px-4 lg:py-4">
 					<div className="flex items-center gap-4">
 						<div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-semibold text-slate-700">
 							{tenant.first_name.charAt(0)}
@@ -70,19 +70,26 @@ export function TenantsCard({ tenant, onEdit, onDelete }: TenantsCardProps) {
 								<span className="font-semibold text-slate-900">
 									{tenantName}
 								</span>
-								<StatusBadge status="inquilino" className="text-xs">
+								<StatusBadge
+									status="inquilino"
+									className="text-xs hidden lg:inline-flex"
+								>
 									Inquilino
 								</StatusBadge>
 							</div>
 							<div className="text-sm text-slate-500 mt-1">
-								Tel: {tenant.phone} · {propertyTitle}
+								<div>
+									<span className="hidden lg:inline-flex">Tel: </span>
+									{tenant.phone} ·
+								</div>
+								<div>{propertyTitle}</div>
 							</div>
 						</div>
 					</div>
-					<div className="flex items-center gap-4">
-						<div className="text-right mr-2">
+					<div className="flex flex-col lg:flex-row items-end lg:items-center lg:gap-4">
+						<div className="text-right mr-2 order-2 lg:-order-1">
 							<div className="text-xs text-slate-500">Alquiler</div>
-							<div className="text-2xl font-semibold text-slate-900">
+							<div className="lg:text-2xl font-semibold text-slate-900">
 								{monthlyAmount
 									? `$${monthlyAmount.toLocaleString("es-AR")}`
 									: "N/A"}
@@ -90,7 +97,11 @@ export function TenantsCard({ tenant, onEdit, onDelete }: TenantsCardProps) {
 						</div>
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-								<Button variant="ghost" size="icon" className="h-8 w-8 -mt-5">
+								<Button
+									variant="ghost"
+									size="icon"
+									className="h-8 w-8 -mt-1 lg:-mt-5"
+								>
 									<MoreHorizontal className="h-4 w-4 text-slate-500" />
 								</Button>
 							</DropdownMenuTrigger>

@@ -28,9 +28,6 @@ export default function ListConsultations({
 	consultationsData,
 	isSelectionMode = false,
 	selectedIds = new Set(),
-	onStartSelection,
-	onCancelSelection,
-	onDeleteSelected,
 	onSelectionChange,
 }: Props) {
 	const [consultations, setConsultations] = useState<Consultation[]>(
@@ -67,18 +64,6 @@ export default function ListConsultations({
 			newSet.add(consultationId);
 		}
 		onSelectionChange?.(newSet);
-	};
-
-	const handleStartSelection = () => {
-		onStartSelection?.();
-	};
-
-	const handleCancelSelection = () => {
-		onCancelSelection?.();
-	};
-
-	const handleDeleteSelected = async () => {
-		onDeleteSelected?.();
 	};
 
 	const handleMarkAsRead = async (id: number) => {

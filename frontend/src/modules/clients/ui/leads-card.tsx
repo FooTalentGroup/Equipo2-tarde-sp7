@@ -50,7 +50,7 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 			onClick={handleCardClick}
 		>
 			<CardContent className="p-0 w-full">
-				<div className="flex items-start justify-between px-4 py-3">
+				<div className="flex items-start justify-between px-4 lg:py-4">
 					<div className="flex items-center gap-4 flex-1">
 						<div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center font-semibold text-slate-700">
 							{lead.first_name.charAt(0)}
@@ -58,19 +58,22 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 						<div className="text-left flex-1 min-w-0">
 							<div className="flex items-center gap-2">
 								<span className="font-semibold text-slate-900">{leadName}</span>
-								<StatusBadge status="lead" className="text-xs">
+								<StatusBadge
+									status="lead"
+									className="text-xs hidden lg:inline-flex"
+								>
 									Lead
 								</StatusBadge>
 							</div>
 							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500 mt-1">
 								<div className="flex items-center gap-1">
-									<Mail className="h-3.5 w-3.5" />
-									<span className="truncate">{lead.email}</span>
+									<Phone className="h-3.5 w-3.5 hidden lg:inline-flex" />
+									<span>{lead.phone}</span>
 								</div>
 								<span className="text-slate-300">·</span>
 								<div className="flex items-center gap-1">
-									<Phone className="h-3.5 w-3.5" />
-									<span>{lead.phone}</span>
+									<Mail className="h-3.5 w-3.5 hidden lg:inline-flex" />
+									<span className="truncate">{lead.email}</span>
 								</div>
 							</div>
 						</div>

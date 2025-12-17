@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useState } from "react";
+
+import { useRouter } from "next/navigation";
 
 import { Button } from "@src/components/ui/button";
+import type { Consultation } from "@src/types/consultations";
+import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { deleteConsultation } from "../service/consultation-service";
@@ -11,28 +15,26 @@ import ListConsultations from "./ListConsultations";
 
 interface Props {
 	filters: ConsultationFilterForm;
-	initialData: { data: any[]; total: number };
+	initialData: { data: Consultation[]; total: number };
 	isSelectionMode?: boolean;
 	onCancelSelection?: () => void;
 }
 
 export default function ConsultationResults({
-	filters,
 	initialData,
 	isSelectionMode: externalIsSelectionMode = false,
 	onCancelSelection: externalOnCancelSelection,
 }: Props) {
 	const [internalIsSelectionMode, setInternalIsSelectionMode] = useState(false);
 	const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+	const router = useRouter();
 
-	// Usar el estado externo si se proporciona, de lo contrario usar el interno
 	const isSelectionMode = externalIsSelectionMode || internalIsSelectionMode;
 	const onCancelSelection =
 		externalOnCancelSelection || (() => setInternalIsSelectionMode(false));
 
 	const handleStartSelection = () => {
 		if (externalOnCancelSelection) {
-			// Si hay un manejador externo, no cambiar el estado interno
 			return;
 		}
 		setInternalIsSelectionMode(true);
@@ -48,7 +50,6 @@ export default function ConsultationResults({
 		if (selectedIds.size === 0) return;
 
 		try {
-			// Eliminar las consultas seleccionadas
 			for (const id of selectedIds) {
 				await deleteConsultation(id);
 			}
@@ -58,10 +59,8 @@ export default function ConsultationResults({
 			);
 			handleCancelSelection();
 
-			// Recargar los datos después de eliminar
-			window.location.reload();
-		} catch (error) {
-			console.error("Error deleting consultations:", error);
+			startTransition(() => router.refresh());
+		} catch {
 			toast.error("Error al eliminar las consultas");
 		}
 	};
@@ -69,7 +68,7 @@ export default function ConsultationResults({
 	return (
 		<div className="w-full">
 			{isSelectionMode && (
-				<div className="flex items-center justify-between mb-4">
+				<div className="flex items-center lg:justify-between gap-4 lg:gap-0 mb-4">
 					<div className="flex items-center gap-2">
 						<Button variant="outline" size="sm" onClick={handleCancelSelection}>
 							Cancelar
@@ -84,7 +83,8 @@ export default function ConsultationResults({
 						onClick={handleDeleteSelected}
 						disabled={selectedIds.size === 0}
 					>
-						Eliminar seleccionadas
+						<TrashIcon className="size-4 lg:hidden" />
+						<span className="hidden lg:inline">Eliminar seleccionadas</span>
 					</Button>
 				</div>
 			)}

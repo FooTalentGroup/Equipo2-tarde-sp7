@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 import TenantForm from "@src/modules/clients/components/tenants/tenants-form";
-import TipAlert from "@src/modules/clients/ui/TipAlert";
+import TipAlert from "@src/modules/clients/ui/tip-alert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 
 export const dynamic = "force-dynamic";
