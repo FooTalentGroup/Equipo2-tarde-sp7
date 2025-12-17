@@ -15,7 +15,7 @@ import { parseAmount } from "@src/lib/parsing";
 import PropertySelect from "@src/modules/clients/ui/property-select";
 import type { RentedProperty } from "@src/types/clients/tenant";
 import type { Property as FullProperty } from "@src/types/property";
-import { Building2, PlusIcon } from "lucide-react";
+import { Building2, HousePlus, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -33,7 +33,6 @@ interface ClientPropertiesProps {
 	onDeleteProperty?: (propertyId: string | number) => Promise<void>;
 }
 
-// Normalize Property or RentedProperty into a single shape
 function normalizeProperty(
 	property: ClientProperty | RentedProperty,
 ): ClientProperty {
@@ -106,7 +105,12 @@ export function ClientProperties({
 						<Popover open={open} onOpenChange={setOpen}>
 							<PopoverTrigger asChild>
 								<Button variant="outline">
-									<PlusIcon /> Agregar Propiedad
+									<span className="hidden lg:inline-flex">
+										<PlusIcon /> Agregar Propiedad
+									</span>
+									<span className="inline-flex lg:hidden">
+										<HousePlus className="h-5 w-5" />
+									</span>
 								</Button>
 							</PopoverTrigger>
 							<PopoverContent
@@ -157,9 +161,9 @@ export function ClientProperties({
 							</PopoverContent>
 						</Popover>
 					) : (
-						<div className="">
+						<div className="text-end lg:mr-2">
 							<div className="text-xs text-slate-500">Alquiler</div>
-							<div className="text-2xl font-semibold text-slate-900">
+							<div className="lg:text-2xl font-semibold text-slate-900">
 								{hasRent ? `$${monthlyAmount.toLocaleString("es-AR")}` : "N/A"}
 							</div>
 						</div>
@@ -168,12 +172,7 @@ export function ClientProperties({
 
 				<div className="space-y-4">
 					{normalizedProperties.map((property) => (
-						<ClientPropertyCard
-							key={property.id}
-							property={property}
-							// TODO: Enable when backend implements delete endpoints
-							/* onDelete={onDeleteProperty} */
-						/>
+						<ClientPropertyCard key={property.id} property={property} />
 					))}
 				</div>
 			</CardContent>
