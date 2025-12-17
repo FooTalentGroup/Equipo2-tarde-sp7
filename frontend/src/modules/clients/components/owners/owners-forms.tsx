@@ -49,7 +49,6 @@ export default function OwnerForm({
 	leadId,
 }: OwnerFormProps) {
 	const router = useRouter();
-	/* const availableProperties = getPropertiesWithoutOwner(); */
 
 	const form = useForm<OwnerFormData>({
 		resolver: zodResolver(ownerFormSchema),
@@ -66,14 +65,11 @@ export default function OwnerForm({
 		},
 	});
 
-	// Selección simple de propiedad (por ahora no multi-select)
-
 	const handleSubmit = async (data: OwnerFormData) => {
 		try {
 			if (onSubmit) {
 				await onSubmit(data);
 			} else {
-				// Preparar datos para el backend
 				const propertyId =
 					data.property_id && data.property_id !== ""
 						? Number(data.property_id)
@@ -103,7 +99,6 @@ export default function OwnerForm({
 					ownerData as CreateOwner,
 				);
 
-				// Si se creó desde un lead, eliminar el lead y mostrar mensaje combinado
 				if (leadId) {
 					try {
 						await deleteClientById(leadId);
@@ -116,7 +111,6 @@ export default function OwnerForm({
 					toast.success("Propietario guardado exitosamente");
 				}
 
-				// Redirigir al listado de propietarios
 				router.push(paths.agent.clients.owners.index());
 			}
 		} catch (error) {
@@ -126,7 +120,7 @@ export default function OwnerForm({
 	};
 
 	return (
-		<div className="w-full max-w-2/3 mt-4 p-4 rounded-xl shadow-md/20">
+		<div className="w-full lg:max-w-2/3 mt-4 p-4 rounded-xl shadow-md/20">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
 					{/* Nombre y Apellido */}

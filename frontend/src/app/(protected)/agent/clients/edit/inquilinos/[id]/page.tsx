@@ -1,7 +1,7 @@
 import TenantForm from "@src/modules/clients/components/tenants/tenants-form";
 import type { TenantFormData } from "@src/modules/clients/schemas/tenant-form.schema";
 import { getClientById } from "@src/modules/clients/services/clients-service";
-import TipAlert from "@src/modules/clients/ui/TipAlert";
+import TipAlert from "@src/modules/clients/ui/tip-alert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 import type { TenantApiResponse } from "@src/types/clients/tenant";
 

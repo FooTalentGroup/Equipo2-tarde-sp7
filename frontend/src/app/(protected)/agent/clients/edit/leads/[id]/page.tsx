@@ -1,7 +1,7 @@
 import LeadsForm from "@src/modules/clients/components/leads/leads-form";
 import type { ContactFormData } from "@src/modules/clients/schemas/contact-form.schema";
 import { getClientById } from "@src/modules/clients/services/clients-service";
-import TipAlert from "@src/modules/clients/ui/TipAlert";
+import TipAlert from "@src/modules/clients/ui/tip-alert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 import type { LeadApiResponse } from "@src/types/clients/lead";
 

@@ -78,7 +78,6 @@ export default function LeadsForm({
 				return;
 			}
 
-			// Mapear y enviar según modo (crear/editar)
 			const payload: Partial<CreateLead> = {
 				first_name: data.first_name,
 				last_name: data.last_name,
@@ -112,7 +111,7 @@ export default function LeadsForm({
 	};
 
 	return (
-		<div className="w-full max-w-2/3 mt-4 p-4 rounded-xl shadow-md/20">
+		<div className="w-full lg:max-w-2/3 mt-4 p-4 rounded-xl shadow-md/20">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
 					{/* Nombre y Apellido */}

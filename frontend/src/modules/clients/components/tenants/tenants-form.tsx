@@ -136,7 +136,7 @@ export default function TenantForm({
 	};
 
 	return (
-		<div className="w-full max-w-2/3 mt-4 p-4 rounded-xl shadow-md/20">
+		<div className="w-full lg:max-w-2/3 mt-4 p-4 rounded-xl shadow-md/20">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
 					{/* Nombre y Apellido */}

@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import OwnerForm from "@src/modules/clients/components/owners/owners-forms";
 import type { OwnerFormData } from "@src/modules/clients/schemas/owner-form.schema";
 import { getClientById } from "@src/modules/clients/services/clients-service";
-import TipAlert from "@src/modules/clients/ui/TipAlert";
+import TipAlert from "@src/modules/clients/ui/tip-alert";
 import { getProperties } from "@src/modules/properties/services/property-service";
 import type { LeadApiResponse } from "@src/types/clients/lead";
 
