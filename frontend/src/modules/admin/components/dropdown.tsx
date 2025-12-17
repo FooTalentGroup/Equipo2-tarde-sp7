@@ -27,7 +27,7 @@ export const Dropdown = ({ id, user, onUserUpdated }: DropdownProps) => {
 						<Ellipsis className="text-input-border stroke-1.5" />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent>
+				<DropdownMenuContent className="mx-3">
 					<DropdownMenuGroup>
 						<DropdownMenuItem onSelect={() => setEditOpen(true)}>
 							Editar

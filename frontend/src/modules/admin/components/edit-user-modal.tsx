@@ -50,24 +50,27 @@ export const EditUserModal = ({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-2xl bg-white">
+			<DialogContent className="sm:max-w-2xl bg-white max-h-[85vh] overflow-y-auto">
 				<DialogHeader>
-					<DialogTitle className="text-secondary text-3xl">
+					<DialogTitle className="text-secondary max-sm:text-2xl text-3xl">
 						Editar agente
 					</DialogTitle>
-					<DialogDescription className="text-muted-foreground font-medium text-base">
+					<DialogDescription className="text-muted-foreground font-medium max-sm:text-sm text-base">
 						Modifique los detalles del agente {user.first_name} {user.last_name}
 					</DialogDescription>
 				</DialogHeader>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-						<div className="grid grid-cols-2 gap-4 gap-x-8">
+					<form
+						onSubmit={form.handleSubmit(onSubmit)}
+						className="space-y-3 sm:space-y-4"
+					>
+						<div className="grid min-[480px]:grid-cols-2 gap-4 gap-x-8">
 							<FormField
 								control={form.control}
 								name="first_name"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel className="text-secondary-dark">
+										<FormLabel className="max-sm:text-sm text-secondary-dark">
 											Nombre
 										</FormLabel>
 										<FormControl>
@@ -75,7 +78,7 @@ export const EditUserModal = ({
 												placeholder="Ej: Juan"
 												{...field}
 												value={field.value || ""}
-												className="placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
+												className="max-sm:text-sm placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -88,7 +91,7 @@ export const EditUserModal = ({
 								name="last_name"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel className="text-secondary-dark">
+										<FormLabel className="max-sm:text-sm text-secondary-dark">
 											Apellido
 										</FormLabel>
 										<FormControl>
@@ -96,7 +99,7 @@ export const EditUserModal = ({
 												placeholder="Ej: Pérez"
 												{...field}
 												value={field.value || ""}
-												className="placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
+												className="max-sm:text-sm placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -109,7 +112,7 @@ export const EditUserModal = ({
 								name="email"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel className="text-secondary-dark">
+										<FormLabel className="max-sm:text-sm text-secondary-dark">
 											Correo electrónico
 										</FormLabel>
 										<FormControl>
@@ -118,7 +121,7 @@ export const EditUserModal = ({
 												placeholder="correo@ejemplo.com"
 												{...field}
 												value={field.value || ""}
-												className="placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
+												className="max-sm:text-sm placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -131,7 +134,7 @@ export const EditUserModal = ({
 								name="phone"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel className="text-secondary-dark">
+										<FormLabel className="max-sm:text-sm text-secondary-dark">
 											Teléfono
 										</FormLabel>
 										<FormControl>
@@ -139,7 +142,7 @@ export const EditUserModal = ({
 												placeholder="04121234567"
 												{...field}
 												value={field.value || ""}
-												className="placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
+												className="max-sm:text-sm placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
 											/>
 										</FormControl>
 										<FormMessage />
@@ -152,7 +155,7 @@ export const EditUserModal = ({
 								name="password"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel className="text-secondary-dark">
+										<FormLabel className="max-sm:text-sm text-secondary-dark">
 											Contraseña
 										</FormLabel>
 										<div className="relative">
@@ -162,7 +165,7 @@ export const EditUserModal = ({
 													placeholder="Jane Doe"
 													{...field}
 													value={field.value || ""}
-													className="placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
+													className="max-sm:text-sm placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
 												/>
 											</FormControl>
 											<button
@@ -183,7 +186,7 @@ export const EditUserModal = ({
 								name="confirmPassword"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel className="text-secondary-dark">
+										<FormLabel className="max-sm:text-sm text-secondary-dark">
 											Confirmar contraseña
 										</FormLabel>
 										<div className="relative">
@@ -193,7 +196,7 @@ export const EditUserModal = ({
 													placeholder="Jane Doe"
 													{...field}
 													value={field.value || ""}
-													className="placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
+													className="max-sm:text-sm placeholder:text-pagination-border border border-input-border shadow-input-border h-10"
 												/>
 											</FormControl>
 											<button
@@ -219,23 +222,23 @@ export const EditUserModal = ({
 												<FormLabel>Rol</FormLabel>
 												<FormControl>
 													<div className="flex gap-4">
-														<label className="flex items-center gap-2">
+														<label className="max-sm:text-sm flex items-center gap-2">
 															<input
 																type="radio"
 																value="admin"
 																checked={field.value === "admin"}
 																onChange={() => field.onChange("admin")}
-																className="h-4 w-4"
+																className="h-4 w-4 max-sm:text-sm"
 															/>
 															Administrador
 														</label>
-														<label className="flex items-center gap-2">
+														<label className="max-sm:text-sm flex items-center gap-2">
 															<input
 																type="radio"
 																value="agent"
 																checked={field.value === "agent"}
 																onChange={() => field.onChange("agent")}
-																className="h-4 w-4"
+																className="h-4 w-4 max-sm:text-sm"
 															/>
 															Agente
 														</label>
@@ -268,10 +271,10 @@ export const EditUserModal = ({
 
 						{error && <p className="text-red-500 text-sm">{error}</p>}
 
-						<DialogFooter className="mt-12">
+						<DialogFooter className="mt-12 max-sm:flex-col">
 							<Button type="submit" disabled={isSubmitting}>
 								{isSubmitting && (
-									<Spinner className="mr-2 h-4 w-4 animate-spin" />
+									<Spinner className="mr-2 h-4 w-4 animate-spin max-sm:text-sm" />
 								)}
 								{isSubmitting ? "Guardando..." : "Guardar cambios"}
 							</Button>
@@ -280,6 +283,7 @@ export const EditUserModal = ({
 								variant="outline"
 								onClick={() => onOpenChange?.(false)}
 								disabled={isSubmitting}
+								className="max-sm:text-sm"
 							>
 								Cancelar
 							</Button>

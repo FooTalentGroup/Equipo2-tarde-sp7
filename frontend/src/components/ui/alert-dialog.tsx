@@ -137,7 +137,7 @@ function AlertDialogHeader({
 	if (activeVariant.icon) {
 		const { container, icon: Icon, iconClass } = activeVariant;
 		return (
-			<div className="flex gap-4" {...props}>
+			<div className="flex gap-4 items-center" {...props}>
 				<div
 					className={cn(
 						"flex h-10 w-10 shrink-0 items-center justify-center rounded-md sm:mx-0 sm:h-10 sm:w-10",
