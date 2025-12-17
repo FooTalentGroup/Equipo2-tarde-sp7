@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Clock, MailIcon, MoreHorizontal, PhoneIcon } from "lucide-react";
 
-import { ConsultationDeleteAction } from "../components/ConsultationDeleteAction";
+import { ConsultationDeleteAction } from "../components/consultation-delete-action";
 
 interface ConsultationCardProps {
 	consultation: Consultation;

@@ -1,5 +1,5 @@
 import { Heading } from "@src/components/ui/heading";
-import ConsultationResults from "@src/modules/consultations/components/ConsultationResults";
+import ConsultationResults from "@src/modules/consultations/components/consultation-results";
 export const metadata = {
 	title: "Dashboard",
 	description: "Gestión de propiedades inmobiliarias",
@@ -11,7 +11,7 @@ import Link from "next/link";
 
 import { paths } from "@src/lib/paths";
 import { getConsultations } from "@src/modules/consultations/service/consultation-service";
-import ConsultationsSkeleton from "@src/modules/consultations/ui/ConsultationsSkeleton";
+import ConsultationsSkeleton from "@src/modules/consultations/ui/consultations-skeleton";
 import { InfoList } from "@src/modules/dashboard/components/info-list";
 
 type SearchParams = { [key: string]: string | string[] | undefined };

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import ConsultationFilters from "@src/modules/consultations/components/ConsultationFilters";
-import ConsultationResults from "@src/modules/consultations/components/ConsultationResults";
+import ConsultationFilters from "@src/modules/consultations/components/consultation-filters";
+import ConsultationResults from "@src/modules/consultations/components/consultation-results";
 import type { ConsultationFilterForm } from "@src/modules/consultations/types/consultation-filter";
 import type { Consultation } from "@src/types/consultations";
 

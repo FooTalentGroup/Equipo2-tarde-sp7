@@ -1,9 +1,9 @@
 import { Suspense } from "react";
 
 import SectionHeading from "@src/components/section-heading";
-import ConsultationsClient from "@src/modules/consultations/components/ConsultationsClient";
+import ConsultationsClient from "@src/modules/consultations/components/consultations-client";
 import { getConsultations } from "@src/modules/consultations/service/consultation-service";
-import ConsultationsSkeleton from "@src/modules/consultations/ui/ConsultationsSkeleton";
+import ConsultationsSkeleton from "@src/modules/consultations/ui/consultations-skeleton";
 
 export const metadata = {
 	title: "Consultas",
