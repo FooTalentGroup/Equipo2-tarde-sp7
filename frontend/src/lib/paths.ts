@@ -31,22 +31,22 @@ export const paths = {
 				edit: (id: string | number) => `/agent/clients/edit/leads/${id}`,
 			},
 			inquilinos: {
-				index: () => "/agent/clients/inquilinos",
+				index: () => "/agent/clients/tenants",
 				new: (id?: string | number) =>
 					id
-						? `/agent/clients/create/inquilinos/${id}`
-						: "/agent/clients/create/inquilinos",
-				detail: (id: string | number) => `/agent/clients/inquilinos/${id}`,
-				edit: (id: string | number) => `/agent/clients/edit/inquilinos/${id}`,
+						? `/agent/clients/create/tenants/${id}`
+						: "/agent/clients/create/tenants",
+				detail: (id: string | number) => `/agent/clients/tenants/${id}`,
+				edit: (id: string | number) => `/agent/clients/edit/tenants/${id}`,
 			},
 			owners: {
-				index: () => "/agent/clients/propietarios",
+				index: () => "/agent/clients/owners",
 				new: (id?: string | number) =>
 					id
-						? `/agent/clients/create/propietarios/${id}`
-						: "/agent/clients/create/propietarios",
-				detail: (id: string | number) => `/agent/clients/propietarios/${id}`,
-				edit: (id: string | number) => `/agent/clients/edit/propietarios/${id}`,
+						? `/agent/clients/create/owners/${id}`
+						: "/agent/clients/create/owners",
+				detail: (id: string | number) => `/agent/clients/owners/${id}`,
+				edit: (id: string | number) => `/agent/clients/edit/owners/${id}`,
 			},
 		},
 		properties: {
