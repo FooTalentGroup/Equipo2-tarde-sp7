@@ -7,7 +7,7 @@ export const InfoList = async () => {
 	const data = await getDashboardInfo();
 
 	return (
-		<ul className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 items-center">
+		<ul className="grid max-[480px]:grid-cols-1 grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 items-center">
 			<li>
 				<InfoAgentsCard
 					icon={House}
