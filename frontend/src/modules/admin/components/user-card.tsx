@@ -6,7 +6,7 @@ import { Text } from "@src/components/ui/text";
 import type { UserProp } from "../types";
 import { Dropdown } from "./dropdown";
 
-export const UserCard = ({ user }: UserProp) => {
+export function UserCard({ user }: UserProp) {
 	const handleUserUpdated = () => {
 		window.location.reload();
 	};
@@ -57,4 +57,4 @@ export const UserCard = ({ user }: UserProp) => {
 			</div>
 		</div>
 	);
-};
+}

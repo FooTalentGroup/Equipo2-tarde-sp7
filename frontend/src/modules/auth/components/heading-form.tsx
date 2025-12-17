@@ -5,7 +5,7 @@ type HeadingFormProp = {
 	title?: string;
 };
 
-export const HeadingForm = ({ title }: HeadingFormProp) => {
+export function HeadingForm({ title }: HeadingFormProp) {
 	return (
 		<div className="flex flex-col items-center gap-[26.6px]">
 			<Logo width={75.27} height={77.24} />
@@ -14,4 +14,4 @@ export const HeadingForm = ({ title }: HeadingFormProp) => {
 			</Heading>
 		</div>
 	);
-};
+}

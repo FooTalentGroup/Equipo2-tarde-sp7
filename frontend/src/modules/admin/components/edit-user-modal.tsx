@@ -24,16 +24,16 @@ import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { Eye, EyeOff } from "lucide-react";
 
-import { useEditUserForm } from "../hooks/useEditUserForm";
+import { useEditUserForm } from "../hooks/use-edit-user-form";
 import type { EditUserFormData } from "../schemas/edit-user";
 import type { EditUserModalProps } from "../types";
 
-export const EditUserModal = ({
+export function EditUserModal({
 	user,
 	onUserUpdated,
 	open,
 	onOpenChange,
-}: EditUserModalProps) => {
+}: EditUserModalProps) {
 	const [showPassword, setShowPassword] = useState(false);
 	const { form, handleSubmit, isSubmitting, error, isAdmin } =
 		useEditUserForm(user);
@@ -293,4 +293,4 @@ export const EditUserModal = ({
 			</DialogContent>
 		</Dialog>
 	);
-};
+}

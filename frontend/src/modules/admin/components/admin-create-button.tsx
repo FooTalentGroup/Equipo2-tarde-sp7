@@ -4,7 +4,7 @@ import { Text } from "@src/components/ui/text";
 import { paths } from "@src/lib/paths";
 import { Plus } from "lucide-react";
 
-export const AdminCreateLink = () => {
+export function AdminCreateAgentLink() {
 	return (
 		<Link
 			href={paths.admin.users.create()}
@@ -16,4 +16,4 @@ export const AdminCreateLink = () => {
 			</Text>
 		</Link>
 	);
-};
+}

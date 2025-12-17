@@ -18,11 +18,7 @@ import { toast } from "sonner";
 
 import type { DeleteUserProps } from "../types";
 
-export const DeleteUserAlert = ({
-	id,
-	open,
-	onOpenChange,
-}: DeleteUserProps) => {
+export function DeleteUserAlert({ id, open, onOpenChange }: DeleteUserProps) {
 	const router = useRouter();
 	const [isDeleting, setIsDeleting] = useState(false);
 
@@ -75,4 +71,4 @@ export const DeleteUserAlert = ({
 			</AlertDialogContent>
 		</AlertDialog>
 	);
-};
+}

@@ -1,6 +1,6 @@
 import { Heading } from "@src/components/ui/heading";
 
-export const UserHeader = () => {
+export function UserHeader() {
 	return (
 		<Heading
 			variant="h3"
@@ -10,4 +10,4 @@ export const UserHeader = () => {
 			Lista de agentes
 		</Heading>
 	);
-};
+}
