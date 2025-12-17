@@ -3,7 +3,7 @@ import { CircleAlert, House, MessageSquare, UserCheck } from "lucide-react";
 import { getDashboardInfo } from "../services/dashboard-info";
 import { InfoAgentsCard } from "./info-agents-card";
 
-export const InfoList = async () => {
+export async function InfoList() {
 	const data = await getDashboardInfo();
 
 	return (
@@ -42,4 +42,4 @@ export const InfoList = async () => {
 			</li>
 		</ul>
 	);
-};
+}

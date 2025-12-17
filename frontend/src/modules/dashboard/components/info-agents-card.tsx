@@ -2,12 +2,12 @@ import { Heading } from "@src/components/ui/heading";
 import { Text } from "@src/components/ui/text";
 import { cn } from "@src/lib/utils";
 import type { InfoCardProps } from "@src/modules/dashboard/types";
-export const InfoAgentsCard = ({
+export function InfoAgentsCard({
 	icon: Icon,
 	title,
 	description,
 	className,
-}: InfoCardProps) => {
+}: InfoCardProps) {
 	return (
 		<article
 			className={cn(
@@ -24,4 +24,4 @@ export const InfoAgentsCard = ({
 			</div>
 		</article>
 	);
-};
+}

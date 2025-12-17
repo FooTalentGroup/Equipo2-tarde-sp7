@@ -4,7 +4,7 @@ type LogoProps = {
 	height?: number;
 };
 
-export const Logo = ({ className, width = 79, height = 81 }: LogoProps) => {
+export function Logo({ className, width = 79, height = 81 }: LogoProps) {
 	return (
 		<svg
 			className={className}
@@ -23,4 +23,4 @@ export const Logo = ({ className, width = 79, height = 81 }: LogoProps) => {
 			/>
 		</svg>
 	);
-};
+}
