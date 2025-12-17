@@ -4,11 +4,13 @@ import { useState } from "react";
 
 import ConsultationFilters from "@src/modules/consultations/components/ConsultationFilters";
 import ConsultationResults from "@src/modules/consultations/components/ConsultationResults";
+import type { ConsultationFilterForm } from "@src/modules/consultations/types/consultation-filter";
+import type { Consultation } from "@src/types/consultations";
 
 interface Props {
 	unreadCount: number;
-	filters: any;
-	initialData: any;
+	filters: ConsultationFilterForm;
+	initialData: { data: Consultation[]; total: number };
 }
 
 export default function ConsultationsClient({

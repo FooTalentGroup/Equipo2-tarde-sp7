@@ -57,43 +57,47 @@ export default function ConsultationFilters({
 		isRead === "false" ? "unread" : startDate && endDate ? "last7" : "all";
 
 	return (
-		<div className="flex items-center gap-3 mt-2">
-			{/* Últimos 7 días */}
-			<Button
-				variant={activeFilter === "last7" ? "tertiary" : "outline"}
-				onClick={handleLast7Days}
-				className="flex items-center gap-2 border-gray-300"
-			>
-				<Funnel className="size-4" />
-				Últimos 7 días
-			</Button>
+		<div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 lg:gap-3 lg:mt-2">
+			<div className="flex gap-3">
+				{/* Últimos 7 días */}
+				<Button
+					variant={activeFilter === "last7" ? "tertiary" : "outline"}
+					onClick={handleLast7Days}
+					className="flex items-center gap-2 border-gray-300"
+				>
+					<Funnel className="size-4" />
+					Últimos 7 días
+				</Button>
 
-			{/* No leídos */}
-			<Button
-				variant={activeFilter === "unread" ? "tertiary" : "outline"}
-				onClick={handleUnread}
-				className="flex items-center gap-2 border-gray-300"
-			>
-				<Mail className="size-4" />
-				No leídos
-				{unreadCount > 0 && (
-					<Badge className="ml-1 bg-[#3B82F6] text-white text-xs rounded-full min-w-6 h-6 px-0.5 flex items-center justify-center leading-none">
-						{unreadCount}
-					</Badge>
-				)}
-			</Button>
+				{/* No leídos */}
+				<Button
+					variant={activeFilter === "unread" ? "tertiary" : "outline"}
+					onClick={handleUnread}
+					className="flex items-center gap-2 border-gray-300"
+				>
+					<Mail className="size-4" />
+					No leídos
+					{unreadCount > 0 && (
+						<Badge className="ml-1 bg-[#3B82F6] text-white text-xs rounded-full min-w-6 h-6 px-0.5 flex items-center justify-center leading-none">
+							{unreadCount}
+						</Badge>
+					)}
+				</Button>
+			</div>
 
-			{/* Todos */}
-			<Button
-				variant={activeFilter === "all" ? "tertiary" : "outline"}
-				onClick={handleAll}
-				className="border-gray-300"
-			>
-				Todas
-			</Button>
+			<div className="flex gap-3">
+				{/* Todos */}
+				<Button
+					variant={activeFilter === "all" ? "tertiary" : "outline"}
+					onClick={handleAll}
+					className="border-gray-300"
+				>
+					Todas
+				</Button>
 
-			{/* Borrar todas */}
-			<DeleteAllConsultationsAction onStartSelection={onStartSelection} />
+				{/* Borrar todas */}
+				<DeleteAllConsultationsAction onStartSelection={onStartSelection} />
+			</div>
 		</div>
 	);
 }
