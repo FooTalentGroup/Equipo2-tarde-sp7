@@ -18,11 +18,7 @@ import { toast } from "sonner";
 
 import type { DeleteUserProps } from "../types";
 
-export const DeleteUserAlert = ({
-	id,
-	open,
-	onOpenChange,
-}: DeleteUserProps) => {
+export function DeleteUserAlert({ id, open, onOpenChange }: DeleteUserProps) {
 	const router = useRouter();
 	const [isDeleting, setIsDeleting] = useState(false);
 
@@ -37,7 +33,7 @@ export const DeleteUserAlert = ({
 				throw new Error("Error al eliminar el agente");
 			}
 
-			toast.success("agente eliminado exitosamente");
+			toast.success("Agente eliminado exitosamente");
 			onOpenChange?.(false);
 			router.refresh();
 		} catch (error) {
@@ -52,11 +48,11 @@ export const DeleteUserAlert = ({
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle className="text-secondary text-xl">
+					<AlertDialogTitle className="text-secondary sm:text-lg md:text-xl items-center">
 						¿Estás seguro de eliminar este agente?
 					</AlertDialogTitle>
 				</AlertDialogHeader>
-				<AlertDialogDescription className="text-gray-800">
+				<AlertDialogDescription className="text-gray-800 ">
 					Esta acción no se puede deshacer. Esto eliminará permanentemente esta
 					cuenta y se borrará de la base de datos.
 				</AlertDialogDescription>
@@ -75,4 +71,4 @@ export const DeleteUserAlert = ({
 			</AlertDialogContent>
 		</AlertDialog>
 	);
-};
+}

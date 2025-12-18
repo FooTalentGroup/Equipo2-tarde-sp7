@@ -35,12 +35,10 @@ export const useEditUserForm = (user: CardUserProps) => {
 			phone: data.phone,
 		};
 
-		// Solo agregar password si no está vacío
 		if (data.password && data.password.trim() !== "") {
 			updateData.password = data.password;
 		}
 
-		// Solo admin puede cambiar role_id y active
 		if (user.role === "admin") {
 			const roleId = data.role === "admin" ? 1 : 2;
 			updateData.role_id = roleId;

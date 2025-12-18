@@ -15,7 +15,7 @@ import { Ellipsis } from "lucide-react";
 import type { DropdownProps } from "../types";
 import { DeleteUserAlert, EditUserModal } from "./";
 
-export const Dropdown = ({ id, user, onUserUpdated }: DropdownProps) => {
+export function Dropdown({ id, user, onUserUpdated }: DropdownProps) {
 	const [editOpen, setEditOpen] = useState(false);
 	const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -27,7 +27,7 @@ export const Dropdown = ({ id, user, onUserUpdated }: DropdownProps) => {
 						<Ellipsis className="text-input-border stroke-1.5" />
 					</Button>
 				</DropdownMenuTrigger>
-				<DropdownMenuContent>
+				<DropdownMenuContent className="mx-3">
 					<DropdownMenuGroup>
 						<DropdownMenuItem onSelect={() => setEditOpen(true)}>
 							Editar
@@ -51,4 +51,4 @@ export const Dropdown = ({ id, user, onUserUpdated }: DropdownProps) => {
 			<DeleteUserAlert id={id} open={deleteOpen} onOpenChange={setDeleteOpen} />
 		</>
 	);
-};
+}

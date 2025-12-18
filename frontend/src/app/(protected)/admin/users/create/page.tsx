@@ -1,4 +1,3 @@
-// app/(protected)/admin/users/create/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -17,7 +16,7 @@ import {
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
-import { useCreateUserForm } from "@src/modules/admin/hooks/useCreateUserForm";
+import { useCreateUserForm } from "@src/modules/admin/hooks/use-create-user-form";
 import type { CreateUserFormData } from "@src/modules/admin/schemas/create-user";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 
@@ -32,7 +31,6 @@ export default function CreateUserPage() {
 	return (
 		<section className="min-h-dvh bg-white">
 			<div className="max-w-5xl mx-auto">
-				{/* Header con botón de volver */}
 				<div className="mb-8 rounded-md shadow-create-user py-4 px-4">
 					<Link
 						href={paths.admin.dashboard()}
@@ -46,13 +44,12 @@ export default function CreateUserPage() {
 					<h1 className="text-secondary text-3xl font-bold">Nuevo agente</h1>
 				</div>
 
-				{/* Formulario */}
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
 						className="space-y-6 px-4 shadow-create-user"
 					>
-						<div className="grid grid-cols-2 gap-4 gap-x-8">
+						<div className="grid sm:grid-cols-2 gap-4 gap-x-8">
 							<FormField
 								control={form.control}
 								name="first_name"
@@ -207,7 +204,6 @@ export default function CreateUserPage() {
 							/>
 						</div>
 
-						{/* Información sobre el rol fijo */}
 						<div className="bg-blue-50 border border-blue-200 rounded-md p-4 mt-4">
 							<p className="text-blue-800 text-sm">
 								<strong>Nota:</strong> Todos los nuevos agentes serán creados
@@ -219,10 +215,10 @@ export default function CreateUserPage() {
 
 						{error && <p className="text-red-500 text-sm">{error}</p>}
 
-						<div className="flex justify-end gap-4 pt- pb-4">
+						<div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-4 pb-4">
 							<Link href={paths.admin.dashboard()}>
 								<Button
-									className="cursor-pointer h-12 px-6 py-3 sm:min-w-36 text-black"
+									className="cursor-pointer h-12 px-6 py-3 max-sm:w-full sm:min-w-36 text-black"
 									type="button"
 									variant="outline"
 									disabled={isSubmitting}
@@ -231,7 +227,7 @@ export default function CreateUserPage() {
 								</Button>
 							</Link>
 							<Button
-								className="bg-tertiary cursor-pointer h-12 px-6 py-3 sm:min-w-36"
+								className="bg-tertiary cursor-pointer h-12 px-6 py-3 max-sm:w-full sm:min-w-36"
 								type="submit"
 								disabled={isSubmitting}
 							>

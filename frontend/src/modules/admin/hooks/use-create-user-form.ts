@@ -49,7 +49,7 @@ export const useCreateUserForm = () => {
 			email: data.email,
 			phone: data.phone,
 			password: data.password,
-			role_id: 2, // Siempre agent (2)
+			role_id: 2,
 		};
 	};
 
@@ -75,7 +75,6 @@ export const useCreateUserForm = () => {
 				throw new Error(errorData.error || "Error al crear usuario");
 			}
 
-			// Redirigir a la lista de usuarios después de crear
 			router.push(paths.admin.dashboard());
 			return { success: true };
 		} catch (err) {

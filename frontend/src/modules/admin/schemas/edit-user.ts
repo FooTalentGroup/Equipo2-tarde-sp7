@@ -30,11 +30,9 @@ export const editUserSchema = z
 	})
 	.refine(
 		(data) => {
-			// Si se ingresa password, entonces debe haber confirmPassword y deben coincidir
 			if (data.password && data.password.trim() !== "") {
 				return data.password === data.confirmPassword;
 			}
-			// Si no hay password, es válido (no se va a cambiar)
 			return true;
 		},
 		{

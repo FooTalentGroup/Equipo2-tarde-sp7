@@ -3,11 +3,11 @@ import { CircleAlert, House, MessageSquare, UserCheck } from "lucide-react";
 import { getDashboardInfo } from "../services/dashboard-info";
 import { InfoAgentsCard } from "./info-agents-card";
 
-export const InfoList = async () => {
+export async function InfoList() {
 	const data = await getDashboardInfo();
 
 	return (
-		<ul className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 items-center">
+		<ul className="grid max-[480px]:grid-cols-1 grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 items-center">
 			<li>
 				<InfoAgentsCard
 					icon={House}
@@ -42,4 +42,4 @@ export const InfoList = async () => {
 			</li>
 		</ul>
 	);
-};
+}

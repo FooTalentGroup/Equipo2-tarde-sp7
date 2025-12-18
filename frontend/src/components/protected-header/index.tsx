@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { Button } from "@src/components/ui/button";
 import { paths } from "@src/lib/paths";
-import { AdminCreateLink } from "@src/modules/admin/components/admin-create-button";
+import { AdminCreateAgentLink } from "@src/modules/admin/components/admin-create-button";
 import { getCurrentUser } from "@src/modules/auth/lib/dal";
 import { ROLES } from "@src/types/user";
 
@@ -53,7 +53,7 @@ export default async function ProtectedHeader() {
 					{user?.role === ROLES.AGENT ? (
 						<ActionDropdown />
 					) : (
-						<AdminCreateLink />
+						<AdminCreateAgentLink />
 					)}
 				</div>
 				<UserMenuTrigger user={user} />

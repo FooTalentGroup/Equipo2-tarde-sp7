@@ -10,7 +10,7 @@ export default async function AdminUsersPage() {
 
 		return (
 			<section className="grid min-h-dvh max-h-fit grid-rows-[auto_1fr]">
-				<header className="flex justify-between border-b border-border pb-8">
+				<header className="flex justify-between border-b border-border pb-4 sm:pb-8">
 					<UserHeader />
 				</header>
 				<main>
@@ -28,11 +28,11 @@ export default async function AdminUsersPage() {
 
 		return (
 			<section className="grid min-h-dvh max-h-fit grid-rows-[auto_1fr_auto]">
-				<header className="flex justify-between border-b border-border pb-8">
+				<header className="flex justify-between border-b border-border pb-4 sm:pb-8">
 					<UserHeader />
 				</header>
 				<main className="flex flex-col items-center justify-center h-full">
-					<div className="text-center p-8">
+					<div className="text-center p-4 sm:p-8">
 						<p className="text-red-500 text-lg font-medium mb-4">
 							❌ {errorMessage}
 						</p>

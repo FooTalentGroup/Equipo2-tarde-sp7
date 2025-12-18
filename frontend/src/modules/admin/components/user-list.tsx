@@ -1,7 +1,7 @@
 import type { ListUserProps } from "../types";
 import { UserCard } from "./user-card";
 
-export const UserList = ({ users }: ListUserProps) => {
+export function UserList({ users }: ListUserProps) {
 	return (
 		<ul className="flex flex-col">
 			<li>
@@ -11,4 +11,4 @@ export const UserList = ({ users }: ListUserProps) => {
 			</li>
 		</ul>
 	);
-};
+}
