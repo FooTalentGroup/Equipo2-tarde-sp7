@@ -18,8 +18,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Check, HousePlus, Loader2 } from "lucide-react";
 
-import { ConsultationActions } from "./ConsultationActions";
-import { ConsultationContactInfo } from "./ConsultationContactInfo";
+import { ConsultationActions } from "./consultation-actions";
+import { ConsultationContactInfo } from "./consultation-contact-info";
 
 // Memoizamos componentes hijos para evitar renders innecesarios
 const MemoConsultationContactInfo = memo(ConsultationContactInfo);

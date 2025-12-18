@@ -13,18 +13,40 @@ interface ClientsLayoutProps {
 }
 
 export default function CreateClientLayout({ children }: ClientsLayoutProps) {
+	type Tab = "leads" | "inquilinos" | "propietarios";
 	const pathname = usePathname() || "";
-	let activeTab: "leads" | "inquilinos" | "propietarios" = "leads";
+	let activeTab: Tab = "leads";
 
-	if (pathname.includes("/agent/clients/create/inquilinos")) {
-		activeTab = "inquilinos";
-	} else if (pathname.includes("/agent/clients/create/leads")) {
-		activeTab = "leads";
-	} else if (
-		pathname.includes("/agent/clients/create/new/propietarios") ||
-		pathname.includes("/agent/clients/create/propietarios")
-	) {
-		activeTab = "propietarios";
+	// Mapping limpio entre rutas y pestañas usando helpers centralizados en `paths`
+	const tabMappings: { tab: Tab; matchPaths: string[] }[] = [
+		{
+			tab: "leads",
+			matchPaths: [
+				paths.agent.clients.leads.new(),
+				paths.agent.clients.leads.index(),
+			],
+		},
+		{
+			tab: "inquilinos",
+			matchPaths: [
+				paths.agent.clients.inquilinos.new(),
+				paths.agent.clients.inquilinos.index(),
+			],
+		},
+		{
+			tab: "propietarios",
+			matchPaths: [
+				paths.agent.clients.owners.new(),
+				paths.agent.clients.owners.index(),
+			],
+		},
+	];
+
+	for (const mapping of tabMappings) {
+		if (mapping.matchPaths.some((p) => p && pathname.startsWith(p))) {
+			activeTab = mapping.tab;
+			break;
+		}
 	}
 	return (
 		<div className="w-full mx-auto">

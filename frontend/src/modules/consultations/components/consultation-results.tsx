@@ -11,7 +11,7 @@ import { toast } from "sonner";
 
 import { deleteConsultation } from "../service/consultation-service";
 import type { ConsultationFilterForm } from "../types/consultation-filter";
-import ListConsultations from "./ListConsultations";
+import ListConsultations from "./list-consultations";
 
 interface Props {
 	filters: ConsultationFilterForm;

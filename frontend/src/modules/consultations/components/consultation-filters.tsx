@@ -5,7 +5,7 @@ import { Button } from "@src/components/ui/button";
 import { Funnel, Mail } from "lucide-react";
 import { parseAsString, useQueryState } from "nuqs";
 
-import { DeleteAllConsultationsAction } from "../ui/DeleteAllConsultationsAction";
+import { DeleteAllConsultationsAction } from "../ui/delete-all-consultations-action";
 
 interface Props {
 	unreadCount: number;
