@@ -7,7 +7,6 @@ import { getClients } from "@src/modules/clients/services/clients-service";
 import type { BaseContact, BaseContactWithId } from "@src/types/clients/base";
 import { toast } from "sonner";
 
-// Tipo flexible que acepta tanto contactos completos como parciales
 type ContactInput =
 	| BaseContact
 	| BaseContactWithId
@@ -41,7 +40,6 @@ export function useContactManager({
 			return;
 		}
 
-		// Si el contacto ya tiene ID, asumimos que existe
 		if ("id" in contact && contact.id) {
 			setExistingContact(contact as BaseContactWithId);
 			return;
@@ -50,7 +48,6 @@ export function useContactManager({
 		setIsChecking(true);
 
 		try {
-			// Buscar primero por teléfono
 			if (contact.phone) {
 				const phoneResult = await getClients<BaseContactWithId>("clients", {
 					search: contact.phone,
@@ -62,7 +59,6 @@ export function useContactManager({
 				}
 			}
 
-			// Si no se encontró por teléfono, buscar por email
 			if (contact.email) {
 				const emailResult = await getClients<BaseContactWithId>("clients", {
 					search: contact.email,
@@ -74,7 +70,6 @@ export function useContactManager({
 				}
 			}
 
-			// No se encontró el contacto
 			setExistingContact(null);
 		} catch (error) {
 			console.error("Error checking contact:", error);
@@ -84,12 +79,10 @@ export function useContactManager({
 		}
 	}, [contact]);
 
-	// Verificar si el contacto ya existe
 	useEffect(() => {
 		checkExistingContact();
 	}, [checkExistingContact]);
 
-	// Agregar nuevo contacto
 	const addContact = async () => {
 		if (!contact) return false;
 
@@ -110,19 +103,16 @@ export function useContactManager({
 		}
 	};
 
-	// Ver perfil del contacto existente
 	const viewContact = () => {
 		if (!existingContact?.id) {
 			console.error("No contact ID available");
 			return;
 		}
 
-		// Redirigir al perfil del contacto
 		router.push(paths.agent.clients.leads.detail(existingContact.id));
 		toast.success("Redirigiendo al perfil del contacto");
 	};
 
-	// Manejar clic en el botón (agregar o ver)
 	const handleAddOrView = async (): Promise<boolean> => {
 		if (existingContact) {
 			viewContact();
@@ -130,7 +120,6 @@ export function useContactManager({
 		} else {
 			const success = await addContact();
 			if (success) {
-				// Re-verifica para refrescar el estado con el contacto ya persistido
 				await checkExistingContact();
 			}
 			return success;

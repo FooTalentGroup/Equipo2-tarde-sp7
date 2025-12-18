@@ -1,4 +1,3 @@
-// Estructura basada en la respuesta real del backend
 export interface Property {
 	id: number;
 	title: string;
@@ -90,7 +89,7 @@ export const MOCK_PROPERTIES: Property[] = [
 			id: 2,
 			name: "Departamento",
 		},
-		owner: null, // Sin dueño
+		owner: null,
 		main_address: {
 			full_address: "Av. Corrientes 2421 3B",
 			neighborhood: "Recoleta",
@@ -125,7 +124,7 @@ export const MOCK_PROPERTIES: Property[] = [
 			id: 3,
 			name: "Local Comercial",
 		},
-		owner: null, // Sin dueño
+		owner: null,
 		main_address: {
 			full_address: "Av. Córdoba 3456",
 			neighborhood: "Microcentro",
@@ -200,7 +199,7 @@ export const MOCK_PROPERTIES: Property[] = [
 			id: 2,
 			name: "Departamento",
 		},
-		owner: null, // Sin dueño
+		owner: null,
 		main_address: {
 			full_address: "Av. Libertador 7890 10B",
 			neighborhood: "Núñez",
@@ -235,7 +234,7 @@ export const MOCK_PROPERTIES: Property[] = [
 			id: 4,
 			name: "Oficina",
 		},
-		owner: null, // Sin dueño
+		owner: null,
 		main_address: {
 			full_address: "Av. Alicia Moreau de Justo 1234",
 			neighborhood: "Puerto Madero",
@@ -270,7 +269,7 @@ export const MOCK_PROPERTIES: Property[] = [
 			id: 2,
 			name: "Departamento",
 		},
-		owner: null, // Sin dueño
+		owner: null,
 		main_address: {
 			full_address: "Av. Rivadavia 5678 4D",
 			neighborhood: "Caballito",
@@ -345,7 +344,7 @@ export const MOCK_PROPERTIES: Property[] = [
 			id: 3,
 			name: "Local Comercial",
 		},
-		owner: null, // Sin dueño
+		owner: null,
 		main_address: {
 			full_address: "Av. Corrientes 6789",
 			neighborhood: "Villa Crespo",
@@ -380,7 +379,7 @@ export const MOCK_PROPERTIES: Property[] = [
 			id: 2,
 			name: "Departamento",
 		},
-		owner: null, // Sin dueño
+		owner: null,
 		main_address: {
 			full_address: "Av. 9 de Julio 1500 15A",
 			neighborhood: "San Nicolás",
@@ -455,7 +454,7 @@ export const MOCK_PROPERTIES: Property[] = [
 			id: 2,
 			name: "Departamento",
 		},
-		owner: null, // Sin dueño
+		owner: null,
 		main_address: {
 			full_address: "Av. Triunvirato 4321",
 			neighborhood: "Villa Urquiza",
@@ -484,12 +483,10 @@ export const MOCK_PROPERTIES: Property[] = [
 	},
 ];
 
-// Helper para obtener solo propiedades sin dueño
 export const getPropertiesWithoutOwner = (): Property[] => {
 	return MOCK_PROPERTIES.filter((property) => property.owner === null);
 };
 
-// Helper para formatear la dirección completa para el select
 export const formatPropertyAddress = (property: Property): string => {
 	const { full_address, neighborhood } = property.main_address;
 	return neighborhood ? `${full_address} - ${neighborhood}` : full_address;

@@ -20,7 +20,6 @@ export function useAddPropertyOfInterest({
 	);
 	const [isLoading, setIsLoading] = useState(false);
 
-	// Cargar propiedades de interés del cliente cuando cambia el clientId
 	useEffect(() => {
 		if (clientId) {
 			setIsLoading(true);

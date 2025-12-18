@@ -1,5 +1,3 @@
-// types/consultation.ts
-
 export interface ConsultationClient {
 	id: number;
 	first_name: string;
