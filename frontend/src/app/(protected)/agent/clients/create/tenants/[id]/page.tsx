@@ -21,7 +21,6 @@ async function Page({ params }: PageProps) {
 
 	console.log("Loading inquilinos create page with id:", id);
 
-	// Cargar propiedades en el servidor con autenticación
 	const cookieStore = await cookies();
 	const token = cookieStore.get("authToken")?.value || "";
 
@@ -32,14 +31,12 @@ async function Page({ params }: PageProps) {
 
 	const availableProperties = propertyResponse.properties;
 
-	// Si hay id, cargar datos del lead para prellenar
 	let initialValues: Partial<TenantFormData> | undefined;
 	if (id) {
 		try {
 			const leadData = await getClientById<LeadApiResponse>(id);
 			console.log("Lead data fetched:", leadData);
 			if (leadData) {
-				// Mapear datos del lead a formato de tenant
 				const email = leadData.client.email || "";
 				const formattedEmail =
 					email && !email.endsWith(".ar") ? `${email}.ar` : email;
@@ -55,7 +52,6 @@ async function Page({ params }: PageProps) {
 					email: formattedEmail,
 					phone: formattedPhone,
 					dni: leadData.client.dni || "",
-					// Otros campos opcionales pueden dejarse sin prellenar
 				};
 				console.log("Initial values set:", initialValues);
 			} else {

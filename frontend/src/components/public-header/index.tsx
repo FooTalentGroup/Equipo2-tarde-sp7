@@ -42,20 +42,6 @@ export default async function PublicHeader() {
 					/>
 				</svg>
 			)}
-			{/* <div className="flex gap-2 justify-self-end">
-				<Button asChild variant="ghost">
-					<Link href={paths.public.landing()}>Inicio</Link>
-				</Button>
-				<Button asChild variant="ghost">
-					<Link href={paths.public.rent()}>Alquiler</Link>
-				</Button>
-				<Button asChild variant="ghost">
-					<Link href={paths.public.sale()}>Venta</Link>
-				</Button>
-				<Button asChild variant="tertiary">
-					<Link href={paths.public.contact()}>Contáctanos</Link>
-				</Button>
-			</div> */}
 		</header>
 	);
 }

@@ -20,10 +20,8 @@ export default async function OwnerDetailPage({
 }) {
 	const { id } = await params;
 
-	// Obtener datos del propietario desde el backend (nueva estructura)
 	const responseData = await getClientById<OwnerApiResponse>(id);
 
-	// Si no hay datos, mostrar fallback
 	if (!responseData || !responseData.client) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
@@ -37,7 +35,6 @@ export default async function OwnerDetailPage({
 	const ownerData = responseData.client;
 	const ownedProperties = responseData.owned_properties || [];
 
-	// Propiedades disponibles para asignar (desde backend)
 	const { properties: availableProperties } = await getProperties({
 		includeArchived: false,
 	});
@@ -52,7 +49,6 @@ export default async function OwnerDetailPage({
 		await removeOwnedProperty(id, propertyId);
 	}
 
-	// Mapear datos del backend
 	const owner = {
 		id: String(ownerData.id),
 		first_name: ownerData.first_name,
@@ -67,7 +63,6 @@ export default async function OwnerDetailPage({
 		notes: ownerData.notes ?? "",
 	};
 
-	// Mapear propiedades desde el backend con la estructura completa
 	const properties = ownedProperties.map((prop) => ({
 		id: String(prop.id),
 		address: prop.address.full_address,
@@ -84,7 +79,6 @@ export default async function OwnerDetailPage({
 	return (
 		<div className="min-h-screen">
 			<div className="w-full">
-				{/* Header */}
 				<ClientHeader
 					id={owner.id}
 					firstName={owner.first_name}
@@ -94,7 +88,6 @@ export default async function OwnerDetailPage({
 					editPath={paths.agent.clients.owners.edit(id)}
 				/>
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-					{/* Columna izquierda - Información */}
 					<div className="lg:col-span-1 space-y-6">
 						<ClientContactInfo
 							phone={owner.phone}
@@ -105,7 +98,6 @@ export default async function OwnerDetailPage({
 						<ClientNotes notes={owner.notes} clientId={owner.id} />
 					</div>
 
-					{/* Columna derecha - Propiedades */}
 					<div className="lg:col-span-2">
 						<ClientProperties
 							properties={properties}

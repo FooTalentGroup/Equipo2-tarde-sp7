@@ -1,7 +1,6 @@
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
-// Schema para el formulario de propietarios
 export const ownerFormSchema = z.object({
 	first_name: z
 		.string()

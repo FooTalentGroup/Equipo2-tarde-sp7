@@ -55,7 +55,6 @@ export default function UserMenuTrigger({ user }: Props) {
 					<div className="hidden md:grid flex-1 text-left text-sm leading-tight">
 						<p className="truncate font-medium text-lg">{`${user.first_name} ${user.last_name}`}</p>
 					</div>
-					{/* <ChevronsUpDown className="ml-auto size-4" /> */}
 				</SidebarMenuButton>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
@@ -64,35 +63,6 @@ export default function UserMenuTrigger({ user }: Props) {
 				align="end"
 				sideOffset={4}
 			>
-				{/* <DropdownMenuLabel className="p-0 font-normal">
-					<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-						<Avatar className="h-8 w-8 rounded-full">
-							<AvatarImage
-								src="https://github.com/shadcn.png"
-								alt={`${user.first_name} ${user.last_name}`}
-							/>
-							<AvatarFallback className="rounded-lg">
-								{user.first_name}
-							</AvatarFallback>
-						</Avatar>
-						<div className="grid flex-1 text-left text-sm leading-tight">
-							<span className="truncate font-medium">{user.first_name}</span>
-							<span className="truncate text-xs">{user.email}</span>
-						</div>
-					</div>
-				</DropdownMenuLabel>
-				<DropdownMenuSeparator /> */}
-				{/* <DropdownMenuGroup>
-					{navigation[0].items.map((item) => (
-						<DropdownMenuItem key={item.href} asChild>
-							<Link href={item.href} className="flex items-center gap-2">
-								<item.icon className="h-4 w-4" />
-								{item.title}
-							</Link>
-						</DropdownMenuItem>
-					))}
-				</DropdownMenuGroup> */}
-				{/* <DropdownMenuSeparator /> */}
 				<AlertDialog>
 					<AlertDialogTrigger asChild>
 						<DropdownMenuItem

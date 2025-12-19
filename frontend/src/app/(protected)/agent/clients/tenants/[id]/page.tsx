@@ -15,10 +15,8 @@ export default async function TenantDetailPage({
 }) {
 	const { id } = await params;
 
-	// Obtener datos del lead desde el backend (nueva estructura)
 	const responseData = await getClientById<TenantApiResponse>(id);
 
-	// Si no hay datos, mostrar fallback
 	if (!responseData || !responseData.client) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
@@ -33,7 +31,6 @@ export default async function TenantDetailPage({
 	const rented = responseData.rented_property;
 	const properties = rented ? [rented] : [];
 
-	// Mapear datos del backend
 	const client = {
 		id: String(clientData.id),
 		first_name: clientData.first_name,
@@ -48,26 +45,9 @@ export default async function TenantDetailPage({
 		notes: clientData.notes ?? "",
 	};
 
-	// Mapear propiedades desde el backend con la estructura completa
-	/* const properties = {
-		id: String(rentedProperty.id),
-		address: rentedProperty.address.full_address,
-		city: rentedProperty.address.city.name,
-		type: rentedProperty.property_type.name,
-		rooms: rentedProperty.bedrooms,
-		bathrooms: rentedProperty.bathrooms,
-		surface: parseFloat(rentedProperty.surface_area),
-		image: rentedProperty.main_image?.url || "",
-		status: rentedProperty.property_status.name.toLowerCase(),
-		age: rentedProperty.publication_date
-			? new Date(rentedProperty.publication_date).toLocaleDateString("es-AR")
-			: "",
-	}; */
-
 	return (
 		<div className="min-h-screen">
 			<div className="w-full">
-				{/* Header */}
 				<ClientHeader
 					id={client.id}
 					firstName={client.first_name}
@@ -77,7 +57,6 @@ export default async function TenantDetailPage({
 					dni={client.dni}
 				/>
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-					{/* Columna izquierda - Información */}
 					<div className="lg:col-span-1 space-y-6">
 						<ClientContactInfo
 							phone={client.phone}
@@ -88,7 +67,6 @@ export default async function TenantDetailPage({
 						<ClientNotes notes={client.notes} clientId={client.id} />
 					</div>
 
-					{/* Columna derecha - Propiedades */}
 					<div className="lg:col-span-2">
 						<ClientProperties
 							properties={properties}

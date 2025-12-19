@@ -112,7 +112,6 @@ export default function ProtectedSidebar({ role }: Props) {
 				throw new Error(result.error);
 			}
 
-			// Actualizar la URL del logo con la respuesta del servidor
 			if (result.data?.logo_url) {
 				setLogoUrl(result.data.logo_url);
 			}

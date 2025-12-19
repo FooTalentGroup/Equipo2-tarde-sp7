@@ -79,7 +79,6 @@ export function LeadsCard({ lead, onEdit, onDelete }: LeadsCardProps) {
 						</div>
 					</div>
 
-					{/* Menú de acciones */}
 					<div className="flex items-center gap-2 shrink-0">
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>

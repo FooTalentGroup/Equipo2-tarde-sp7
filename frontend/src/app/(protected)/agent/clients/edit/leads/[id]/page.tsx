@@ -32,7 +32,6 @@ export default async function Page({
 	const firstInterestedPropertyId =
 		clientResponse.properties_of_interest?.[0]?.id ?? null;
 
-	// Determinar consultation_type_id desde las consultas del lead
 	const consultationTypeId =
 		clientResponse.consultations?.[0]?.consultation_type?.id || 1;
 

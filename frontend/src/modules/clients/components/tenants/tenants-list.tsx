@@ -31,7 +31,6 @@ export function TenantsList({ tenants, itemsPerPage = 10 }: TenantsListProps) {
 	>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	// Filtrar tenants basado en el término de búsqueda
 	const filteredTenants = useMemo(() => {
 		return filterData(tenants, [
 			"first_name",
@@ -45,7 +44,6 @@ export function TenantsList({ tenants, itemsPerPage = 10 }: TenantsListProps) {
 
 	const totalPages = Math.ceil(filteredTenants.length / itemsPerPage);
 
-	// Calcular items de la página actual
 	const paginatedTenants = useMemo(() => {
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		const endIndex = startIndex + itemsPerPage;

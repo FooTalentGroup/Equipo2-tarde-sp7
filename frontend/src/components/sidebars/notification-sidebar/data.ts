@@ -49,16 +49,4 @@ export const contractsAndRentals: Notification[] = [
 		description: "Inquilino solicitó renovación de contrato",
 		schedule: "22/12/2025",
 	},
-	// {
-	// 	status: "increase",
-	// 	title: "Aumento de alquiler - Villa Crespo",
-	// 	description: "Aplicar ajuste anual del contrato",
-	// 	schedule: "15/12/2025",
-	// },
-	// {
-	// 	status: "expiration",
-	// 	title: "Vencimiento próximo - Caballito",
-	// 	description: "Contactar inquilino para renovación",
-	// 	schedule: "20/12/2025",
-	// },
 ];

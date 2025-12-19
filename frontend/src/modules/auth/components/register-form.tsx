@@ -50,7 +50,6 @@ export default function RegisterForm({
 			first_name: "",
 			last_name: "",
 			confirmPassword: "",
-			// role: "",
 		},
 	});
 
@@ -205,38 +204,6 @@ export default function RegisterForm({
 							);
 						}}
 					/>
-
-					{/* <FormField
-						control={form.control}
-						name="confirmPassword"
-						render={({ field }) => {
-							return (
-								<FormItem>
-									<FormLabel className="text-secondary-dark font-semibold">
-										Repetir Contraseña *
-									</FormLabel>
-									<div className="flex items-center relative">
-										<FormControl className="relative">
-											<Input
-												type={showPassword ? "text" : "password"}
-												className="text-base border-input-border focus-visible:border-2 focus-visible:border-input-active focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 md:min-w-[480px] h-10 py-2 shadow-input-border text-primary-normal-active aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
-												placeholder=" "
-												{...field}
-											/>
-										</FormControl>
-										<button
-											type="button"
-											className="absolute right-2"
-											onClick={() => setShowPassword(!showPassword)}
-										>
-											{showPassword ? <EyeOff /> : <Eye />}
-										</button>
-										</div>
-										<FormMessageWithIcon />
-								</FormItem>
-							);
-						}}
-					/>*/}
 
 					<Button
 						type="submit"
