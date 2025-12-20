@@ -1,5 +1,4 @@
 import { CustomError } from "../errors/custom.error";
-import { Profile } from '../../data/postgres/models/users/profile.model';
 
 export class ProfileEntity {
 
@@ -16,7 +15,7 @@ export class ProfileEntity {
         public created_at?: Date,
     ) {}
 
-    static fromObject(object: Record<string, unknown>): ProfileEntity {
+    static fromObject(object: { [key: string]: any }): ProfileEntity {
         const { 
             id,
             first_name,

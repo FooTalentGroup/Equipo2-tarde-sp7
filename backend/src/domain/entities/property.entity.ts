@@ -1,5 +1,4 @@
 import { CustomError } from '../errors/custom.error';
-import { Property } from '../../data/postgres/models/properties/property.model';
 
 /**
  * Entity de dominio para Property
@@ -26,7 +25,7 @@ export class PropertyEntity {
         public updated_at?: Date,
     ) {}
 
-    static fromObject(object: Record<string, unknown>): PropertyEntity {
+    static fromObject(object: { [key: string]: any }): PropertyEntity {
         const {
             id,
             title,
