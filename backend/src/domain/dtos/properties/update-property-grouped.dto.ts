@@ -235,8 +235,9 @@ export class UpdatePropertyGroupedDto {
             console.error('Request body keys:', Object.keys(object));
             console.error('Request body sample:', JSON.stringify(object).substring(0, 500));
             
+            const message = error instanceof Error ? error.message : 'Error parsing property update data. Please check that all JSON fields are properly formatted.';
             return [
-                error.message || 'Error parsing property update data. Please check that all JSON fields are properly formatted.',
+                message,
                 undefined
             ];
         }
