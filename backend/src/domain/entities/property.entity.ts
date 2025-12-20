@@ -1,4 +1,5 @@
 import { CustomError } from '../errors/custom.error';
+import { Property } from '../../data/postgres/models/properties/property.model';
 
 /**
  * Entity de dominio para Property

@@ -1,4 +1,5 @@
 import { CustomError } from "../errors/custom.error";
+import { Profile } from '../../data/postgres/models/users/profile.model';
 
 export class ProfileEntity {
 

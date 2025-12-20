@@ -1,4 +1,5 @@
 import { CustomError } from '../errors/custom.error';
+import { Client } from '../../data/postgres/models/clients/client.model';
 
 /**
  * Domain Entity for Client
