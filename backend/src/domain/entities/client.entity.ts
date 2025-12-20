@@ -29,7 +29,7 @@ export class ClientEntity {
      * Creates a ClientEntity from database object WITHOUT format validation
      * Use this when reading from database (data already validated on creation)
      */
-    static fromDatabaseObject(object: { [key: string]: any }): ClientEntity {
+    static fromDatabaseObject(object: Record<string, unknown>): ClientEntity {
         const {
             id,
             first_name,
@@ -112,7 +112,7 @@ export class ClientEntity {
      * Creates a ClientEntity from an object WITH full validation
      * Use this when creating or updating clients (input validation)
      */
-    static fromObject(object: { [key: string]: any }): ClientEntity {
+    static fromObject(object: Record<string, unknown>): ClientEntity {
         const {
             id,
             first_name,

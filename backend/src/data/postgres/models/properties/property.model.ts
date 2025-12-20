@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface Property {
     id?: number;
@@ -104,7 +105,7 @@ export class PropertyModel {
         
         // Construir dinámicamente el INSERT solo con campos que tienen valores
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         const placeholders: string[] = [];
         let paramIndex = 1;
 
@@ -324,7 +325,7 @@ export class PropertyModel {
         `;
         
         const conditions: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         // Join con property_prices si hay filtros de precio
@@ -426,7 +427,7 @@ export class PropertyModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         // Helper para agregar campos

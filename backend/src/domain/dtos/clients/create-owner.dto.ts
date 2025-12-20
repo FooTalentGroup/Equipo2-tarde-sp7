@@ -28,7 +28,7 @@ export class CreateOwnerDto {
         public readonly property_id?: number,
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, CreateOwnerDto?] {
+    static create(object: Record<string, unknown>): [string?, CreateOwnerDto?] {
         const {
             first_name,
             last_name,
@@ -65,13 +65,13 @@ export class CreateOwnerDto {
         return [
             undefined,
             new CreateOwnerDto(
-                first_name.trim(),
-                last_name.trim(),
-                phone.trim(),
-                email?.trim(),
-                dni?.trim(),
-                address?.trim(),
-                notes?.trim(),
+                (first_name as string).trim(),
+                (last_name as string).trim(),
+                (phone as string).trim(),
+                (email as string | undefined)?.trim(),
+                (dni as string | undefined)?.trim(),
+                (address as string | undefined)?.trim(),
+                (notes as string | undefined)?.trim(),
                 property_id ? Number(property_id) : undefined
             )
         ];

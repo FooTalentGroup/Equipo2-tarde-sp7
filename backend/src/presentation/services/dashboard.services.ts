@@ -1,4 +1,6 @@
 import { PostgresDatabase } from '../../data/postgres/database';
+import { CustomError } from '../../domain';
+import { SqlParams } from '../../data/types/sql.types';
 import {
 	ClientConsultationModel,
 	PropertyModel,
@@ -118,7 +120,7 @@ export class DashboardServices {
 		const archivedStatusId = archivedStatus?.id;
 
 		let query = `SELECT COUNT(*) as count FROM properties`;
-		const values: any[] = [];
+		const values: SqlParams = [];
 		
 		if (archivedStatusId) {
 			query += ` WHERE visibility_status_id != $1`;

@@ -1,5 +1,6 @@
-import { Pool, PoolClient } from 'pg';
+import { Pool, PoolClient, QueryResult } from 'pg';
 import { envs } from '../../config/envs';
+import { SqlParams } from '../types/sql.types';
 
 interface Options {
     dbName: string;
@@ -61,7 +62,7 @@ export class PostgresDatabase {
         return this.pool;
     }
 
-    static async query(text: string, params?: any[]): Promise<any> {
+    static async query<T = any>(text: string, params?: SqlParams): Promise<QueryResult<T>> {
         if (!this.pool) {
             throw new Error('No hay pool activo a PostgreSQL. Debes llamar a connect() primero.');
         }

@@ -66,7 +66,7 @@ export class UpdatePropertyGroupedDto {
         public readonly imageOrder?: ImageOrderItem[],
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, UpdatePropertyGroupedDto?] {
+    static create(object: Record<string, unknown>): [string?, UpdatePropertyGroupedDto?] {
         try {
             // Helper function to safely parse JSON strings
             const parseJsonField = (field: any, fieldName: string): [string?, any?] => {
@@ -78,14 +78,15 @@ export class UpdatePropertyGroupedDto {
                     try {
                         // Try to parse as JSON
                         return [undefined, JSON.parse(field)];
-                    } catch (error: any) {
+                    } catch (error) {
                         // If it fails, try to fix common issues
                         try {
                             // Replace single quotes with double quotes (common mistake)
                             const fixed = field.replace(/'/g, '"');
                             return [undefined, JSON.parse(fixed)];
                         } catch (e) {
-                            return [`Invalid JSON format in ${fieldName}: ${error.message}`, undefined];
+                            const errorMessage = error instanceof Error ? error.message : 'Invalid JSON format';
+                            return [`Invalid JSON format in ${fieldName}: ${errorMessage}`, undefined];
                         }
                     }
                 }
@@ -228,7 +229,7 @@ export class UpdatePropertyGroupedDto {
                     imageOrder
                 )
             ];
-        } catch (error: any) {
+        } catch (error) {
             // Log the error for debugging
             console.error('Error parsing UpdatePropertyGroupedDto:', error);
             console.error('Request body keys:', Object.keys(object));

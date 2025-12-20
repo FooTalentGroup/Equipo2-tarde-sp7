@@ -15,7 +15,7 @@ export class CreatePropertyPriceDto {
         public readonly operation_type?: string, // Nombre (Venta, Alquiler, etc.) - se resuelve a ID
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, CreatePropertyPriceDto?] {
+    static create(object: Record<string, unknown>): [string?, CreatePropertyPriceDto?] {
         const { 
             price, 
             currency_type_id, 
@@ -78,9 +78,9 @@ export class CreatePropertyPriceDto {
             new CreatePropertyPriceDto(
                 Number(price),
                 hasCurrencyId ? Number(currency_type_id) : undefined,
-                hasCurrencySymbol ? (currency_symbol || currency) : undefined,
+                hasCurrencySymbol ? ((currency_symbol || currency) as string) : undefined,
                 hasOperationId ? Number(operation_type_id) : undefined,
-                hasOperationName ? operation_type : undefined,
+                hasOperationName ? (operation_type as string) : undefined,
             )
         ];
     }

@@ -44,7 +44,7 @@ export class CreateTenantDto {
         public readonly external_reference?: string,
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, CreateTenantDto?] {
+    static create(object: Record<string, unknown>): [string?, CreateTenantDto?] {
         const {
             first_name,
             last_name,
@@ -140,8 +140,8 @@ export class CreateTenantDto {
                 return date;
             };
             
-            const startDate = parseDate(contract_start_date);
-            const endDate = parseDate(contract_end_date);
+            const startDate = parseDate(contract_start_date as string | Date);
+            const endDate = parseDate(contract_end_date as string | Date);
             if (endDate < startDate) {
                 return ['Contract end date must be after start date', undefined];
             }
@@ -160,15 +160,15 @@ export class CreateTenantDto {
         return [
             undefined,
             new CreateTenantDto(
-                first_name.trim(),
-                last_name.trim(),
-                phone.trim(),
-                email?.trim(),
-                dni?.trim(),
-                address?.trim(),
-                notes?.trim(),
+                (first_name as string).trim(),
+                (last_name as string).trim(),
+                (phone as string).trim(),
+                (email as string | undefined)?.trim(),
+                (dni as string | undefined)?.trim(),
+                (address as string | undefined)?.trim(),
+                (notes as string | undefined)?.trim(),
                 property_id ? Number(property_id) : undefined,
-                property_address?.trim(),
+                (property_address as string | undefined)?.trim(),
                 contract_start_date ? (typeof contract_start_date === 'string' 
                     ? contract_start_date 
                     : contract_start_date instanceof Date 
@@ -186,10 +186,10 @@ export class CreateTenantDto {
                         : String(next_increase_date)) : undefined,
                 monthly_amount ? Number(monthly_amount) : undefined,
                 currency_type_id ? Number(currency_type_id) : undefined,
-                currency_type?.trim(),
+                (currency_type as string | undefined)?.trim(),
                 remind_increase !== undefined ? Boolean(remind_increase) : undefined,
                 remind_contract_end !== undefined ? Boolean(remind_contract_end) : undefined,
-                external_reference?.trim()
+                (external_reference as string | undefined)?.trim()
             )
         ];
     }

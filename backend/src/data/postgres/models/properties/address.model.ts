@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface Address {
     id?: number;
@@ -73,7 +74,7 @@ export class AddressModel {
     ): Promise<Address[]> {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME} WHERE city_id = $1`;
-        const values: any[] = [cityId];
+        const values: SqlParams = [cityId];
         let paramIndex = 2;
 
         if (street) {
@@ -115,7 +116,7 @@ export class AddressModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.street !== undefined) {

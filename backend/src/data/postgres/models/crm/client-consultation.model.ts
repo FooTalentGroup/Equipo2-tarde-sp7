@@ -1,4 +1,5 @@
-import { PostgresDatabase } from "../../database";
+import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface ClientConsultation {
 	id?: number;
@@ -107,7 +108,7 @@ export class ClientConsultationModel {
 		const client = PostgresDatabase.getClient();
 		let query = `SELECT * FROM ${ClientConsultationModel.TABLE_NAME}`;
 		const conditions: string[] = [];
-		const values: any[] = [];
+		const values: SqlParams = [];
 		let paramIndex = 1;
 
 		if (filters) {
@@ -167,7 +168,7 @@ export class ClientConsultationModel {
 		const client = PostgresDatabase.getClient();
 
 		const fields: string[] = [];
-		const values: any[] = [];
+		const values: SqlParams = [];
 		let paramIndex = 1;
 
 		if (updateData.message !== undefined) {

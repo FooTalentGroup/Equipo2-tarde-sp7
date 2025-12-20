@@ -9,16 +9,16 @@ export class CreatePropertyGeographyDto {
         public readonly city: string,
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, CreatePropertyGeographyDto?] {
+    static create(object: Record<string, unknown>): [string?, CreatePropertyGeographyDto?] {
         const { country, province, city } = object;
 
-        if (!country || country.trim().length === 0) {
+        if (!country || typeof country !== 'string' || country.trim().length === 0) {
             return ['Country is required', undefined];
         }
-        if (!province || province.trim().length === 0) {
+        if (!province || typeof province !== 'string' || province.trim().length === 0) {
             return ['Province is required', undefined];
         }
-        if (!city || city.trim().length === 0) {
+        if (!city || typeof city !== 'string' || city.trim().length === 0) {
             return ['City is required', undefined];
         }
 

@@ -76,7 +76,7 @@ export class CreatePropertyDto {
         public readonly producer_commission_percentage?: number,
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, CreatePropertyDto?] {
+    static create(object: Record<string, unknown>): [string?, CreatePropertyDto?] {
         // Parsear propertyDetails si viene como string JSON
         let propertyDetails: any = {};
         if (typeof object.propertyDetails === 'string') {
@@ -302,7 +302,7 @@ export class CreatePropertyDto {
                     address,
                     prices,
                     ownerId ? Number(ownerId) : undefined, // Cliente propietario (opcional)
-                    propertyDetails.description?.trim() || object.description?.trim(),
+                    (propertyDetails.description as string | undefined)?.trim() || (object.description as string | undefined)?.trim(),
                     publicationDate,
                     featuredWeb,
                     validateOptionalNumber(propertyDetails.bedrooms_count || object.bedrooms_count, 'bedrooms_count'),
@@ -317,7 +317,7 @@ export class CreatePropertyDto {
                     validateOptionalNumber(propertyDetails.total_built_area || object.total_built_area, 'total_built_area'),
                     validateOptionalNumber(propertyDetails.uncovered_area || object.uncovered_area, 'uncovered_area'),
                     validateOptionalNumber(propertyDetails.total_area || object.total_area, 'total_area'),
-                    propertyDetails.zoning?.trim() || object.zoning?.trim(),
+                    (propertyDetails.zoning as string | undefined)?.trim() || (object.zoning as string | undefined)?.trim(),
                     hasSituationId ? Number(situationId) : undefined,
                     hasSituationName ? situationName.trim() : undefined,
                     hasAgeId ? Number(ageId) : undefined,
@@ -326,19 +326,20 @@ export class CreatePropertyDto {
                     hasOrientationName ? orientationName.trim() : undefined,
                     hasDispositionId ? Number(dispositionId) : undefined,
                     hasDispositionName ? dispositionName.trim() : undefined,
-                    propertyDetails.branch_name?.trim() || object.branch_name?.trim(),
-                    propertyDetails.appraiser?.trim() || object.appraiser?.trim(),
-                    propertyDetails.producer?.trim() || object.producer?.trim(),
-                    propertyDetails.maintenance_user?.trim() || object.maintenance_user?.trim(),
-                    propertyDetails.keys_location?.trim() || object.keys_location?.trim(),
-                    propertyDetails.internal_comments?.trim() || object.internal_comments?.trim(),
-                    propertyDetails.social_media_info?.trim() || object.social_media_info?.trim(),
+                    (propertyDetails.branch_name as string | undefined)?.trim() || (object.branch_name as string | undefined)?.trim(),
+                    (propertyDetails.appraiser as string | undefined)?.trim() || (object.appraiser as string | undefined)?.trim(),
+                    (propertyDetails.producer as string | undefined)?.trim() || (object.producer as string | undefined)?.trim(),
+                    (propertyDetails.maintenance_user as string | undefined)?.trim() || (object.maintenance_user as string | undefined)?.trim(),
+                    (propertyDetails.keys_location as string | undefined)?.trim() || (object.keys_location as string | undefined)?.trim(),
+                    (propertyDetails.internal_comments as string | undefined)?.trim() || (object.internal_comments as string | undefined)?.trim(),
+                    (propertyDetails.social_media_info as string | undefined)?.trim() || (object.social_media_info as string | undefined)?.trim(),
                     propertyDetails.operation_commission_percentage ? Number(propertyDetails.operation_commission_percentage) : undefined,
                     propertyDetails.producer_commission_percentage ? Number(propertyDetails.producer_commission_percentage) : undefined,
                 )
             ];
-        } catch (error: any) {
-            return [error.message || 'Invalid property data', undefined];
+        } catch (error) {
+            const message = error instanceof Error ? error.message : 'Invalid property data';
+            return [message, undefined];
         }
     }
 }

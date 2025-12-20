@@ -31,7 +31,7 @@ export class UpdateClientDto {
         public readonly city_id?: number,
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, UpdateClientDto?] {
+    static create(object: Record<string, unknown>): [string?, UpdateClientDto?] {
         const {
             first_name,
             last_name,
@@ -75,7 +75,7 @@ export class UpdateClientDto {
 
         // Validar first_name si se proporciona (usando validación compartida)
         if (first_name !== undefined) {
-            if (!first_name || first_name.trim().length === 0) {
+            if (!first_name || typeof first_name !== 'string' || first_name.trim().length === 0) {
                 return ['First name cannot be empty', undefined];
             }
             const firstNameError = validateFirstName(first_name);
@@ -84,7 +84,7 @@ export class UpdateClientDto {
 
         // Validar last_name si se proporciona (usando validación compartida)
         if (last_name !== undefined) {
-            if (!last_name || last_name.trim().length === 0) {
+            if (!last_name || typeof last_name !== 'string' || last_name.trim().length === 0) {
                 return ['Last name cannot be empty', undefined];
             }
             const lastNameError = validateLastName(last_name);
@@ -93,7 +93,7 @@ export class UpdateClientDto {
 
         // Validar formato de teléfono si se proporciona (usando validación compartida)
         if (phone !== undefined && phone !== null) {
-            if (phone.trim().length === 0) {
+            if (typeof phone !== 'string' || phone.trim().length === 0) {
                 return ['Phone cannot be empty', undefined];
             }
             const phoneError = validatePhone(phone);
@@ -108,7 +108,7 @@ export class UpdateClientDto {
 
         // Validar property_interest_phone si se proporciona
         if (property_interest_phone !== undefined && property_interest_phone !== null) {
-            if (property_interest_phone.trim().length > 0) {
+            if (typeof property_interest_phone === 'string' && property_interest_phone.trim().length > 0) {
                 const trimmedInterestPhone = property_interest_phone.trim();
                 const validCharsRegex = /^[\d\s\-\(\)\+\.]+$/;
                 if (!validCharsRegex.test(trimmedInterestPhone)) {
@@ -144,21 +144,21 @@ export class UpdateClientDto {
         return [
             undefined,
             new UpdateClientDto(
-                first_name?.trim(),
-                last_name?.trim(),
-                phone?.trim(),
+                (first_name as string | undefined)?.trim(),
+                (last_name as string | undefined)?.trim(),
+                (phone as string | undefined)?.trim(),
                 contact_category_id ? Number(contact_category_id) : undefined,
-                contact_category?.trim(),
-                email?.trim(),
-                dni?.trim(),
-                property_interest_phone?.trim(),
-                address?.trim(),
-                notes?.trim(),
-                interest_zone?.trim(),
+                (contact_category as string | undefined)?.trim(),
+                (email as string | undefined)?.trim(),
+                (dni as string | undefined)?.trim(),
+                (property_interest_phone as string | undefined)?.trim(),
+                (address as string | undefined)?.trim(),
+                (notes as string | undefined)?.trim(),
+                (interest_zone as string | undefined)?.trim(),
                 purchase_interest !== undefined ? Boolean(purchase_interest) : undefined,
                 rental_interest !== undefined ? Boolean(rental_interest) : undefined,
                 property_search_type_id ? Number(property_search_type_id) : undefined,
-                property_search_type?.trim(),
+                (property_search_type as string | undefined)?.trim(),
                 city_id ? Number(city_id) : undefined
             )
         ];

@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface Province {
     id?: number;
@@ -52,7 +53,7 @@ export class ProvinceModel {
     static async update(id: number, updateData: Partial<CreateProvinceDto>): Promise<Province | null> {
         const client = PostgresDatabase.getClient();
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.name) {

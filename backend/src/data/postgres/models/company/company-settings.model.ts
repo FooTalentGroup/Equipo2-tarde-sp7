@@ -1,4 +1,5 @@
 import { PostgresDatabase } from "../../database";
+import { SqlParams } from '../../../types/sql.types';
 
 export interface CompanySettings {
 	id: number;
@@ -67,7 +68,7 @@ export class CompanySettingsModel {
 		const client = PostgresDatabase.getClient();
 
 		const updates: string[] = [];
-		const values: any[] = [];
+		const values: SqlParams = [];
 		let paramIndex = 1;
 
 		if (data.logo_url !== undefined) {

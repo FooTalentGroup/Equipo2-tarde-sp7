@@ -3,7 +3,7 @@ export class DeleteMultipleConsultationsDto {
         public readonly consultation_ids: number[]
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, DeleteMultipleConsultationsDto?] {
+    static create(object: Record<string, unknown>): [string?, DeleteMultipleConsultationsDto?] {
         const { consultation_ids } = object;
 
         // Validar que consultation_ids existe

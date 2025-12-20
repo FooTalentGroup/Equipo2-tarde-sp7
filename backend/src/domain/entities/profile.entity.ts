@@ -15,7 +15,7 @@ export class ProfileEntity {
         public created_at?: Date,
     ) {}
 
-    static fromObject(object: { [key: string]: any }): ProfileEntity {
+    static fromObject(object: Record<string, unknown>): ProfileEntity {
         const { 
             id,
             first_name,

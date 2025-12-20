@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiOptions } from 'cloudinary';
 import { envs } from './envs';
 import { FileUploadAdapter } from '../domain/interfaces/file-upload.adapter';
 
@@ -50,7 +50,7 @@ export class CloudinaryAdapter implements FileUploadAdapter {
         this.validateConfig();
         
         try {
-            const uploadOptions: any = {
+            const uploadOptions: Partial<UploadApiOptions> = {
                 resource_type: options?.resourceType || 'auto',
             };
 

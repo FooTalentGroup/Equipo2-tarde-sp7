@@ -29,7 +29,7 @@ export class CreateLeadDto {
         public readonly property_id?: number,
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, CreateLeadDto?] {
+    static create(object: Record<string, unknown>): [string?, CreateLeadDto?] {
         const {
             first_name,
             last_name,
@@ -71,13 +71,13 @@ export class CreateLeadDto {
         return [
             undefined,
             new CreateLeadDto(
-                first_name.trim(),
-                last_name.trim(),
-                phone.trim(),
-                email.trim(),
-                notes?.trim(),
+                (first_name as string).trim(),
+                (last_name as string).trim(),
+                (phone as string).trim(),
+                (email as string).trim(),
+                (notes as string | undefined)?.trim(),
                 consultation_type_id ? Number(consultation_type_id) : undefined,
-                consultation_type?.trim(),
+                (consultation_type as string | undefined)?.trim(),
                 property_id ? Number(property_id) : undefined
             )
         ];

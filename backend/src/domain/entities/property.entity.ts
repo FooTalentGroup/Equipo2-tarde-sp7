@@ -25,7 +25,7 @@ export class PropertyEntity {
         public updated_at?: Date,
     ) {}
 
-    static fromObject(object: { [key: string]: any }): PropertyEntity {
+    static fromObject(object: Record<string, unknown>): PropertyEntity {
         const {
             id,
             title,

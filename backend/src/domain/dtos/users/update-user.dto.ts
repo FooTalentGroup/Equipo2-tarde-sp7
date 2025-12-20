@@ -17,7 +17,7 @@ export class UpdateUserDto {
         public readonly active?: boolean, // Solo admin puede cambiar esto
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, UpdateUserDto?] {
+    static create(object: Record<string, unknown>): [string?, UpdateUserDto?] {
         const {
             first_name,
             last_name,
@@ -35,21 +35,21 @@ export class UpdateUserDto {
         }
 
         // Validar formato de email si se proporciona
-        if (email && email.trim().length > 0) {
+        if (email && typeof email === 'string' && email.trim().length > 0) {
             if (!regularExps.email.test(email.trim())) {
                 return ['Email format is invalid', undefined];
             }
         }
 
         // Validar formato de phone si se proporciona
-        if (phone && phone.trim().length > 0) {
+        if (phone && typeof phone === 'string' && phone.trim().length > 0) {
             if (!regularExps.phone.test(phone.trim())) {
                 return ['Phone format is invalid', undefined];
             }
         }
 
         // Validar longitud de password si se proporciona
-        if (password) {
+        if (password && typeof password === 'string') {
             if (password.length < 6) {
                 return ['Password must be at least 6 characters', undefined];
             }
@@ -59,10 +59,10 @@ export class UpdateUserDto {
         }
 
         // Validar longitud de nombres si se proporcionan
-        if (first_name && first_name.trim().length > 0 && first_name.trim().length < 2) {
+        if (first_name && typeof first_name === 'string' && first_name.trim().length > 0 && first_name.trim().length < 2) {
             return ['First name must be at least 2 characters', undefined];
         }
-        if (last_name && last_name.trim().length > 0 && last_name.trim().length < 2) {
+        if (last_name && typeof last_name === 'string' && last_name.trim().length > 0 && last_name.trim().length < 2) {
             return ['Last name must be at least 2 characters', undefined];
         }
 
@@ -93,11 +93,11 @@ export class UpdateUserDto {
         return [
             undefined,
             new UpdateUserDto(
-                first_name?.trim(),
-                last_name?.trim(),
-                email?.trim().toLowerCase(),
-                phone?.trim(),
-                password, // No trimear password
+                (first_name as string | undefined)?.trim(),
+                (last_name as string | undefined)?.trim(),
+                (email as string | undefined)?.trim().toLowerCase(),
+                (phone as string | undefined)?.trim(),
+                password as string | undefined, // No trimear password
                 normalizedRole,
                 normalizedRoleId,
                 active !== undefined ? (typeof active === 'boolean' ? active : active === 'true') : undefined

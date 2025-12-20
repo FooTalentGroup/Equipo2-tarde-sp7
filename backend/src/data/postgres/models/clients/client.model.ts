@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface Client {
     id?: number;
@@ -113,7 +114,7 @@ export class ClientModel {
     }): Promise<Client[]> {
         const dbClient = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME} WHERE deleted = false`;
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (filters) {
@@ -154,7 +155,7 @@ export class ClientModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.first_name) {

@@ -8,8 +8,8 @@
  * @param first_name - Nombre a validar
  * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
  */
-export function validateFirstName(first_name: string): [string?, void?] {
-    if (!first_name || first_name.trim().length === 0) {
+export function validateFirstName(first_name: unknown): [string?, void?] {
+    if (!first_name || typeof first_name !== 'string' || first_name.trim().length === 0) {
         return ['First name is required', undefined];
     }
     
@@ -29,8 +29,8 @@ export function validateFirstName(first_name: string): [string?, void?] {
  * @param last_name - Apellido a validar
  * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
  */
-export function validateLastName(last_name: string): [string?, void?] {
-    if (!last_name || last_name.trim().length === 0) {
+export function validateLastName(last_name: unknown): [string?, void?] {
+    if (!last_name || typeof last_name !== 'string' || last_name.trim().length === 0) {
         return ['Last name is required', undefined];
     }
     
@@ -50,8 +50,8 @@ export function validateLastName(last_name: string): [string?, void?] {
  * @param phone - Teléfono a validar
  * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
  */
-export function validatePhone(phone: string): [string?, void?] {
-    if (!phone || phone.trim().length === 0) {
+export function validatePhone(phone: unknown): [string?, void?] {
+    if (!phone || typeof phone !== 'string' || phone.trim().length === 0) {
         return ['Phone is required', undefined];
     }
 
@@ -90,12 +90,12 @@ export function validatePhone(phone: string): [string?, void?] {
  * @param required - Si es true, el email es requerido. Por defecto false
  * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
  */
-export function validateEmail(email: string | undefined, required: boolean = false): [string?, void?] {
-    if (required && (!email || email.trim().length === 0)) {
+export function validateEmail(email: unknown, required: boolean = false): [string?, void?] {
+    if (required && (!email || typeof email !== 'string' || email.trim().length === 0)) {
         return ['Email is required', undefined];
     }
 
-    if (email && email.trim().length > 0) {
+    if (email && typeof email === 'string' && email.trim().length > 0) {
         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(email.trim())) {
             return ['Invalid email format', undefined];
@@ -113,8 +113,8 @@ export function validateEmail(email: string | undefined, required: boolean = fal
  * @param dni - DNI a validar
  * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
  */
-export function validateDni(dni: string | undefined): [string?, void?] {
-    if (dni && dni.trim().length > 0) {
+export function validateDni(dni: unknown): [string?, void?] {
+    if (dni && typeof dni === 'string' && dni.trim().length > 0) {
         const trimmedDni = dni.trim();
         const dniRegex = /^[\d\s\-]{7,}$/;
         if (!dniRegex.test(trimmedDni)) {

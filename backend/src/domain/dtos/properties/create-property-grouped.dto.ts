@@ -54,7 +54,7 @@ export class CreatePropertyGroupedDto {
         public readonly internal?: CreatePropertyInternalDto,
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, CreatePropertyGroupedDto?] {
+    static create(object: Record<string, unknown>): [string?, CreatePropertyGroupedDto?] {
         try {
             // Helper function to safely parse JSON strings
             const parseJsonField = (field: any, fieldName: string): [string?, any?] => {
@@ -66,14 +66,15 @@ export class CreatePropertyGroupedDto {
                     try {
                         // Try to parse as JSON
                         return [undefined, JSON.parse(field)];
-                    } catch (error: any) {
+                    } catch (error) {
                         // If it fails, try to fix common issues
                         try {
                             // Replace single quotes with double quotes (common mistake)
                             const fixed = field.replace(/'/g, '"');
                             return [undefined, JSON.parse(fixed)];
                         } catch (e) {
-                            return [`Invalid JSON format in ${fieldName}: ${error.message}`, undefined];
+                            const errorMessage = error instanceof Error ? error.message : 'Invalid JSON format';
+                            return [`Invalid JSON format in ${fieldName}: ${errorMessage}`, undefined];
                         }
                     }
                 }
@@ -220,7 +221,7 @@ export class CreatePropertyGroupedDto {
                     internal
                 )
             ];
-        } catch (error: any) {
+        } catch (error) {
             // Log the error for debugging
             console.error('Error parsing CreatePropertyGroupedDto:', error);
             console.error('Request body keys:', Object.keys(object));
