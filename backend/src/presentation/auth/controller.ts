@@ -115,16 +115,13 @@ export class AuthController {
                 });
             }
             
-            // Calculate token expiration date
             const expiresAt = decodedToken.exp 
                 ? new Date(decodedToken.exp * 1000)
-                : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default 24h if not present
+                : new Date(Date.now() + 24 * 60 * 60 * 1000);
             
-            // Get IP and User Agent for audit trail
             const ip = req.ip || req.socket.remoteAddress;
             const userAgent = req.headers['user-agent'];
             
-            // Revoke token by adding to blacklist
             await RevokedTokenModel.create({
                 token_jti: decodedToken.jti,
                 user_id: parseInt(user.id),

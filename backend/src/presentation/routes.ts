@@ -12,33 +12,19 @@ export class AppRoutes {
 	static get routes(): Router {
 		const router = Router();
 
-		// Crear router para agrupar todas las rutas bajo /api
 		const apiRouter = Router();
 
-		// Rutas de autenticación
 		apiRouter.use("/auth", Authroutes.routes);
-
-		// Rutas de usuarios
 		apiRouter.use("/users", UserRoutes.routes);
-
-		// Rutas de propiedades
 		apiRouter.use("/properties", PropertyRoutes.routes);
-
-		// Rutas de clientes (incluye tenants, owners, leads)
 		apiRouter.use("/clients", ClientRoutes.routes);
-
-		// Rutas de consultas (público)
 		apiRouter.use("/consultations", ConsultationRoutes.routes);
-
-		// Rutas de dashboard
 		apiRouter.use("/dashboard", DashboardRoutes.routes);
-
-		// Rutas de configuración de la empresa (logo, etc.)
 		apiRouter.use("/company", CompanyRoutes.routes);
 
-		// Montar todas las rutas bajo /api
 		router.use("/api", apiRouter);
 
 		return router;
 	}
 }
+

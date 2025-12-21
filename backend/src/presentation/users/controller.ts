@@ -86,7 +86,6 @@ export class UserController {
                 });
             }
 
-            // Validate and create DTO
             const [error, updateUserDto] = UpdateUserDto.create(req.body);
             if (error || !updateUserDto) {
                 return res.status(400).json({
@@ -94,10 +93,7 @@ export class UserController {
                 });
             }
 
-            // Check if user is admin
             const isAdmin = user.isAdmin === true;
-
-            // Update user
             const updatedUser = await this.userServices.updateUser(userId, updateUserDto, isAdmin);
             return res.json({
                 message: 'User updated successfully',
@@ -128,7 +124,6 @@ export class UserController {
                 });
             }
 
-            // Delete user
             const result = await this.userServices.deleteUser(userId);
             return res.json(result);
         } catch (error) {

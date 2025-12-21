@@ -35,7 +35,6 @@ export class PropertyController {
 	 */
 	createProperty = async (req: Request, res: Response) => {
 		try {
-			// Obtener usuario del token (viene del middleware de autenticación)
 			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
@@ -50,7 +49,6 @@ export class PropertyController {
 				});
 			}
 
-			// Obtener imágenes del request (pueden venir como array o como campo único)
 			const images: Express.Multer.File[] = [];
 			if (req.files) {
 				if (Array.isArray(req.files)) {
@@ -70,10 +68,6 @@ export class PropertyController {
 				images.push(req.file);
 			}
 
-			// owner_id debe venir en el request (cliente propietario de la propiedad)
-			// captured_by_user_id es el usuario autenticado (agente que crea la propiedad)
-
-			// Validar y crear DTO (el owner_id debe venir en propertyDetails o en el body)
 			const [error, createPropertyDto] = CreatePropertyDto.create(req.body);
 
 			if (error || !createPropertyDto) {
@@ -82,7 +76,6 @@ export class PropertyController {
 				});
 			}
 
-			// Crear propiedad (todo en transacción)
 			const result = await this.propertyServices.createProperty(
 				createPropertyDto,
 				capturedByUserId,
@@ -188,7 +181,6 @@ export class PropertyController {
 				});
 			}
 
-			// Parsear body si viene como JSON string (form-data)
 			let updateData: Record<string, unknown> = req.body;
 			if (typeof req.body.propertyDetails === "string") {
 				try {
@@ -457,7 +449,6 @@ export class PropertyController {
 				});
 			}
 
-			// Update only the featured_web field
 			const result = await this.propertyServices.updateProperty(Number(id), {
 				featured_web,
 			});
