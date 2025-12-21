@@ -67,6 +67,12 @@ export class UserController {
             const { id } = req.params;
             const user = req.user;
             
+            if (!user) {
+                return res.status(401).json({
+                    message: 'User not authenticated'
+                });
+            }
+            
             if (!id) {
                 return res.status(400).json({
                     message: 'User ID is required'

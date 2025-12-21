@@ -94,6 +94,12 @@ export class AuthController {
             const user = req.user;
             const authHeader = req.headers.authorization;
             
+            if (!user || !user.id) {
+                return res.status(401).json({
+                    message: 'User not authenticated'
+                });
+            }
+            
             if (!authHeader) {
                 return res.status(400).json({
                     message: 'Token is required'
