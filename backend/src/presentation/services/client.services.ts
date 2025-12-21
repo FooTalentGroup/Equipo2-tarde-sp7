@@ -568,6 +568,34 @@ export class ClientServices {
             throw CustomError.badRequest('Client is already deleted');
         }
 
+        const ownedProperties = await PropertyModel.findAll({ owner_id: id });
+        if (ownedProperties.length > 0) {
+            throw CustomError.badRequest(
+                `Cannot delete client: has ${ownedProperties.length} active ${ownedProperties.length === 1 ? 'property' : 'properties'} as owner`
+            );
+        }
+
+        const { ClientRentalModel } = await import('../../data/postgres/models/rentals/client-rental.model');
+        const clientRentals = await ClientRentalModel.findByClientId(id);
+        
+        if (clientRentals.length > 0) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const activeRentals = clientRentals.filter((rental) => {
+                if (!rental.contract_end_date) return true;
+                const endDate = new Date(rental.contract_end_date);
+                endDate.setHours(0, 0, 0, 0);
+                return endDate >= today;
+            });
+
+            if (activeRentals.length > 0) {
+                throw CustomError.badRequest(
+                    `Cannot delete client: has ${activeRentals.length} active ${activeRentals.length === 1 ? 'rental' : 'rentals'}`
+                );
+            }
+        }
+
         const deleted = await ClientModel.delete(id);
         if (!deleted) {
             throw CustomError.internalServerError('Failed to delete client');
