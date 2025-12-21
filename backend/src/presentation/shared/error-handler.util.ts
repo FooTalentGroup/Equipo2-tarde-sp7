@@ -23,7 +23,7 @@ export class ErrorHandlerUtil {
 
         // Manejar errores de PostgreSQL
         if (error && typeof error === 'object' && 'code' in error) {
-            const pgError = error as any;
+            const pgError = error as Error & { code?: string; constraint?: string; detail?: string; column?: string };
             
             // Error 23505: Violación de restricción única
             if (pgError.code === '23505') {

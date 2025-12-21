@@ -65,7 +65,7 @@ export class UserController {
     updateUser = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
-            const user = (req as any).user;
+            const user = req.user;
             
             if (!id) {
                 return res.status(400).json({

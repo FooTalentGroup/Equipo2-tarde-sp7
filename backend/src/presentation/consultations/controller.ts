@@ -84,7 +84,7 @@ export class ConsultationController {
 	getAllConsultations = async (req: Request, res: Response) => {
 		try {
 			// Verificar que el usuario esté autenticado (viene del middleware)
-			const user = (req as any).user;
+			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
 					message: "User not authenticated",
@@ -127,7 +127,7 @@ export class ConsultationController {
 	deleteConsultation = async (req: Request, res: Response) => {
 		try {
 			// Verificar que el usuario esté autenticado
-			const user = (req as any).user;
+			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
 					message: "User not authenticated",
@@ -160,7 +160,7 @@ export class ConsultationController {
 	deleteMultipleConsultations = async (req: Request, res: Response) => {
 		try {
 			// Verificar que el usuario esté autenticado
-			const user = (req as any).user;
+			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
 					message: "User not authenticated",
@@ -196,7 +196,7 @@ export class ConsultationController {
 	markAsRead = async (req: Request, res: Response) => {
 		try {
 			// Verificar que el usuario esté autenticado
-			const user = (req as any).user;
+			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
 					message: "User not authenticated",
@@ -228,7 +228,7 @@ export class ConsultationController {
 	markAsUnread = async (req: Request, res: Response) => {
 		try {
 			// Verificar que el usuario esté autenticado
-			const user = (req as any).user;
+			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
 					message: "User not authenticated",
@@ -260,7 +260,7 @@ export class ConsultationController {
 	convertConsultationToLead = async (req: Request, res: Response) => {
 		try {
 			// Verificar que el usuario esté autenticado
-			const user = (req as any).user;
+			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
 					message: "User not authenticated",

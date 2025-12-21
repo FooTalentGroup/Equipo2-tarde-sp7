@@ -55,7 +55,7 @@ export class AuthMiddleware {
             }
             
             // Agregar información del usuario al request
-            (req as any).user = payload;
+            req.user = payload;
             
             next();
         } catch (error) {
@@ -78,7 +78,7 @@ export class AuthMiddleware {
      */
     requireAdmin = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = (req as any).user;
+            const user = req.user;
             
             if (!user || !user.id) {
                 return res.status(401).json({
@@ -109,14 +109,14 @@ export class AuthMiddleware {
                 }
 
                 // Actualizar el rol en el request si estaba faltante
-                (req as any).user = {
+                req.user = {
                     ...user,
                     role: role.name,
                     isAdmin: true
                 };
             } else {
                 // El token ya tiene el rol de admin
-                (req as any).user = {
+                req.user = {
                     ...user,
                     isAdmin: true
                 };
@@ -143,7 +143,7 @@ export class AuthMiddleware {
      */
     requireAdminOrOwner = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = (req as any).user;
+            const user = req.user;
             
             if (!user || !user.id) {
                 return res.status(401).json({
@@ -170,7 +170,7 @@ export class AuthMiddleware {
                 isAdmin = !!(role && role.name.toLowerCase() === 'admin');
                 
                 // Actualizar el rol en el request
-                (req as any).user = {
+                req.user = {
                     ...user,
                     role: role?.name || null
                 };
@@ -202,10 +202,12 @@ export class AuthMiddleware {
             }
 
             // Agregar información completa del usuario al request
-            (req as any).user = {
-                ...(req as any).user,
-                isAdmin
-            };
+            if (req.user) {
+                req.user = {
+                    ...req.user,
+                    isAdmin
+                };
+            }
             
             next();
         } catch (error) {

@@ -26,7 +26,7 @@ export class CompanyController {
 	updateLogo = async (req: Request, res: Response) => {
 		try {
 			const logoFile = req.file;
-			const user = (req as any).user;
+			const user = req.user;
 
 			if (!logoFile) {
 				return res.status(400).json({

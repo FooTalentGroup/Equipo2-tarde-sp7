@@ -22,7 +22,7 @@ export class ClientController {
      */
     createTenant = async (req: Request, res: Response) => {
         try {
-            const user = (req as any).user;
+            const user = req.user;
             if (!user || !user.id) {
                 return res.status(401).json({
                     message: 'User not authenticated'

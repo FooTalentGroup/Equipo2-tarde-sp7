@@ -219,8 +219,8 @@ export class TenantServices {
             // Construir objeto público del cliente sin campos obsoletos
             const clientPublic = clientEntity.toPublicObject();
             // Eliminar campos que ya no se usan
-            delete (clientPublic as any).property_interest_phone;
-            delete (clientPublic as any).property_search_type_id;
+            delete (clientPublic as Record<string, unknown>).property_interest_phone;
+            delete (clientPublic as Record<string, unknown>).property_search_type_id;
 
             return {
                 client: clientPublic,

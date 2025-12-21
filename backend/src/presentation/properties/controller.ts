@@ -36,7 +36,7 @@ export class PropertyController {
 	createProperty = async (req: Request, res: Response) => {
 		try {
 			// Obtener usuario del token (viene del middleware de autenticación)
-			const user = (req as any).user;
+			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
 					message: "User not authenticated",
@@ -511,7 +511,7 @@ export class PropertyController {
 	createPropertyGrouped = async (req: Request, res: Response) => {
 		try {
 			// Get user from token
-			const user = (req as any).user;
+			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
 					message: "User not authenticated",

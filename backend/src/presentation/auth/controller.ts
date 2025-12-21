@@ -69,7 +69,7 @@ export class AuthController {
     }
 
     getProfile(req: Request, res: Response){
-        const user = (req as any).user;
+        const user = req.user;
         
         if (!user || !user.id) {
             return res.status(401).json({
@@ -91,7 +91,7 @@ export class AuthController {
      */
     logout = async (req: Request, res: Response) => {
         try {
-            const user = (req as any).user;
+            const user = req.user;
             const authHeader = req.headers.authorization;
             
             if (!authHeader) {
