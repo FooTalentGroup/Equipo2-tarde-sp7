@@ -12,6 +12,7 @@ export class JwtAdapterImpl implements JwtAdapter {
         return new Promise((resolve, reject) => {
             const jti = uuidv4();
             
+            // @ts-ignore - jsonwebtoken types issue with expiresIn
             jwt.sign(
                 { 
                     ...payload,
