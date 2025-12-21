@@ -20,7 +20,6 @@ function ClientsLayoutContent({ children, activeTab }: ClientsLayoutProps) {
 
 	return (
 		<div className="w-full">
-			{/* Header */}
 			<SectionHeading title="Clientes" />
 
 			{/* Search and Navigation Tabs */}
@@ -74,7 +73,6 @@ function ClientsLayoutContent({ children, activeTab }: ClientsLayoutProps) {
 				</div>
 			</div>
 
-			{/* Content Area - Aquí se renderiza el contenido de cada página */}
 			<div className="mt-0">{children}</div>
 		</div>
 	);

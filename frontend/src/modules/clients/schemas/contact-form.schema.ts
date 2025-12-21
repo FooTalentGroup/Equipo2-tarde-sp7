@@ -1,9 +1,6 @@
 import { isValidPhoneNumber } from "react-phone-number-input";
 import { z } from "zod";
 
-// Schema para el formulario de contacto inicial
-// Este schema solo contiene los campos que se solicitan en el primer formulario
-// Los campos adicionales del Lead se agregarán en formularios posteriores
 export const contactFormSchema = z.object({
 	first_name: z
 		.string()
@@ -35,7 +32,6 @@ export const contactFormSchema = z.object({
 		.toLowerCase(),
 
 	consultation_type_id: z.number().int().positive(),
-	// interest_zone queda opcional/deprecado
 	interest_zone: z
 		.string()
 		.max(200, "La zona de interés no puede exceder 200 caracteres")
@@ -50,5 +46,4 @@ export const contactFormSchema = z.object({
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;
 
-// Tipo auxiliar para el tipo de consulta
 export type ConsultationType = "rental" | "sale" | "purchase";

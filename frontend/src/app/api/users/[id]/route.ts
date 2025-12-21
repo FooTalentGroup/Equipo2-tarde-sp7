@@ -10,10 +10,8 @@ export async function PUT(
 		const { id } = await params;
 		const body = await request.json();
 
-		// Obtener el token de autenticación
 		const authToken = request.cookies.get("auth_token")?.value;
 
-		// Hacer la petición al backend real
 		const response = await fetch(
 			`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`,
 			{
@@ -52,7 +50,6 @@ export async function DELETE(
 	try {
 		const { id } = await params;
 
-		// Get auth token from cookies
 		const authToken = request.cookies.get("auth_token")?.value;
 		console.log("DELETE request for user:", id, "Has token:", !!authToken);
 
@@ -60,7 +57,6 @@ export async function DELETE(
 			return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 		}
 
-		// Make request to backend API
 		const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/users/${id}`, {
 			method: "DELETE",
 			headers: {
@@ -78,7 +74,6 @@ export async function DELETE(
 			);
 		}
 
-		// Return success response
 		return NextResponse.json(
 			{ message: "Usuario eliminado exitosamente" },
 			{ status: 200 },

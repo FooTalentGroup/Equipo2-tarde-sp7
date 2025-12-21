@@ -42,14 +42,11 @@ export default function ListConsultations({
 
 	const handleCardClick = (consultation: Consultation) => {
 		if (isSelectionMode) {
-			// En modo selección, toggle la selección
 			handleToggleSelection(consultation.id);
 		} else {
-			// Modo normal: abrir el modal
 			setSelectedConsultation(consultation);
 			setDialogOpen(true);
 
-			// Marcar como leído al abrir
 			if (!consultation.is_read) {
 				handleMarkAsRead(consultation.id);
 			}
@@ -89,15 +86,12 @@ export default function ListConsultations({
 		try {
 			const result = await convertConsultationToLead(consultation.id);
 
-			// Si la conversión fue exitosa, guardar el contactId en el mapa
 			if (result?.client?.id) {
 				setConsultationContactMap((prev) =>
 					new Map(prev).set(consultation.id, result.client.id),
 				);
-				// Mantener el sheet abierto para que el usuario pueda agregar propiedades
 				toast.success("Contacto agregado exitosamente");
 			} else {
-				// Si no devolvió cliente, eliminar la consulta como antes
 				setConsultations((prev) =>
 					prev.filter((c) => c.id !== consultation.id),
 				);

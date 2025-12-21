@@ -52,14 +52,12 @@ export default function ConsultationFilters({
 		await Promise.all([setIsRead(null), setStartDate(null), setEndDate(null)]);
 	};
 
-	// Determinar filtro activo
 	const activeFilter =
 		isRead === "false" ? "unread" : startDate && endDate ? "last7" : "all";
 
 	return (
 		<div className="flex flex-col lg:flex-row items-start lg:items-center gap-2 lg:gap-3 lg:mt-2">
 			<div className="flex gap-3">
-				{/* Últimos 7 días */}
 				<Button
 					variant={activeFilter === "last7" ? "tertiary" : "outline"}
 					onClick={handleLast7Days}
@@ -69,7 +67,6 @@ export default function ConsultationFilters({
 					Últimos 7 días
 				</Button>
 
-				{/* No leídos */}
 				<Button
 					variant={activeFilter === "unread" ? "tertiary" : "outline"}
 					onClick={handleUnread}
@@ -86,7 +83,6 @@ export default function ConsultationFilters({
 			</div>
 
 			<div className="flex gap-3">
-				{/* Todos */}
 				<Button
 					variant={activeFilter === "all" ? "tertiary" : "outline"}
 					onClick={handleAll}
@@ -95,7 +91,6 @@ export default function ConsultationFilters({
 					Todas
 				</Button>
 
-				{/* Borrar todas */}
 				<DeleteAllConsultationsAction onStartSelection={onStartSelection} />
 			</div>
 		</div>

@@ -28,7 +28,6 @@ export function LeadsList({ leads, itemsPerPage = 10 }: LeadsListProps) {
 	>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	// Filtrar leads basado en el término de búsqueda
 	const filteredLeads = useMemo(() => {
 		return filterData(leads, [
 			"first_name",
@@ -42,7 +41,6 @@ export function LeadsList({ leads, itemsPerPage = 10 }: LeadsListProps) {
 
 	const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
 
-	// Calcular items de la página actual
 	const paginatedLeads = useMemo(() => {
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		const endIndex = startIndex + itemsPerPage;

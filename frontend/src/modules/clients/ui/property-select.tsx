@@ -39,7 +39,6 @@ export default function PropertySelect({
 }: PropertySelectProps) {
 	const [open, setOpen] = useState(false);
 
-	// Filtrar propiedades por tipo de operación, estado y visibilidad
 	const filteredProperties = useMemo(() => {
 		return availableProperties.filter(
 			(property) =>
@@ -49,7 +48,6 @@ export default function PropertySelect({
 		);
 	}, [availableProperties, operationTypes]);
 
-	// Mostrar la propiedad seleccionada aunque esté fuera del filtro
 	const selectedProperty = availableProperties.find(
 		(p) => p.id.toString() === value,
 	);
@@ -97,14 +95,6 @@ export default function PropertySelect({
 										<span className="font-medium truncate">
 											{property.main_address.full_address}
 										</span>
-										{/* <span className="font-medium truncate">
-                      {property.title}
-                    </span>
-                    {property.main_address?.full_address && (
-                      <span className="text-xs text-muted-foreground truncate">
-                        {property.main_address.full_address}
-                      </span>
-                    )} */}
 									</div>
 									<CheckIcon
 										className={cn(

@@ -28,7 +28,6 @@ export function OwnersList({ owners, itemsPerPage = 10 }: OwnersListProps) {
 	>(null);
 	const [isDeleting, setIsDeleting] = useState(false);
 
-	// Filtrar owners basado en el término de búsqueda
 	const filteredOwners = useMemo(() => {
 		return filterData(owners, [
 			"first_name",
@@ -42,7 +41,6 @@ export function OwnersList({ owners, itemsPerPage = 10 }: OwnersListProps) {
 
 	const totalPages = Math.ceil(filteredOwners.length / itemsPerPage);
 
-	// Calcular items de la página actual
 	const paginatedOwners = useMemo(() => {
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		const endIndex = startIndex + itemsPerPage;

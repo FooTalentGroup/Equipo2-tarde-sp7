@@ -33,7 +33,6 @@ export async function getConsultations(filters: ConsultationFilterForm) {
 		};
 	}>(url);
 
-	// Extrae el array de consultations y el total de pagination
 	const consultations = response.consultations || [];
 	const total = response.pagination?.total || consultations.length;
 
@@ -56,13 +55,10 @@ export async function deleteConsultation(id: number) {
 	return result;
 }
 export async function deleteAllConsultations() {
-	// Obtener todas las consultas para extraer sus IDs
 	const { data: consultations } = await getConsultations({});
 
-	// Extraer los IDs de todas las consultas
 	const consultationIds = consultations.map((consultation) => consultation.id);
 
-	// Enviar la solicitud de eliminación masiva con los IDs
 	await api.post(`/consultations/bulk-delete`, {
 		consultation_ids: consultationIds,
 	});

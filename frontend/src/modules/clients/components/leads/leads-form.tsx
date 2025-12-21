@@ -114,7 +114,6 @@ export default function LeadsForm({
 		<div className="w-full lg:max-w-2/3 mt-4 p-4 rounded-xl shadow-md/20">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-					{/* Nombre y Apellido */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
@@ -159,7 +158,6 @@ export default function LeadsForm({
 						/>
 					</div>
 
-					{/* Teléfono y Email */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
@@ -204,7 +202,6 @@ export default function LeadsForm({
 						/>
 					</div>
 
-					{/* Tipo de consulta y Zona de interés */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
@@ -260,7 +257,6 @@ export default function LeadsForm({
 						/>
 					</div>
 
-					{/* Notas */}
 					<div className="border-t border-t-grey-light pt-4">
 						<FormField
 							control={form.control}
@@ -289,7 +285,6 @@ export default function LeadsForm({
 						/>
 					</div>
 
-					{/* Botones */}
 					<div className="flex gap-3 justify-end pt-4">
 						<Button
 							type="button"

@@ -21,17 +21,13 @@ export function useWhatsAppSender({
 }: UseWhatsAppSenderProps) {
 	const [isSending, setIsSending] = useState(false);
 
-	// Función para limpiar y formatear el número de teléfono
 	const formatPhoneForWhatsApp = (phone: string): string | null => {
 		if (!phone || phone === "No disponible") return null;
 
-		// Limpiar el número (quitar espacios, guiones, paréntesis, etc)
 		let cleanPhone = phone.replace(/[\s\-()]/g, "");
 
-		// Quitar el símbolo + si existe
 		cleanPhone = cleanPhone.replace(/^\+/, "");
 
-		// Validar que sea un número válido
 		if (!/^[0-9]{10,15}$/.test(cleanPhone)) {
 			return null;
 		}
@@ -39,13 +35,11 @@ export function useWhatsAppSender({
 		return cleanPhone;
 	};
 
-	// Crear mensaje con saludo personalizado
 	const createFullMessage = (message: string): string => {
 		const greeting = `Hola ${contact?.first_name || ""}! Gracias por comunicarte con nuestra inmobiliaria!\n\n`;
 		return greeting + message;
 	};
 
-	// Copiar mensaje al portapapeles
 	const copyMessageToClipboard = async (message: string): Promise<boolean> => {
 		try {
 			await navigator.clipboard.writeText(message);
@@ -56,7 +50,6 @@ export function useWhatsAppSender({
 		}
 	};
 
-	// Enviar mensaje por WhatsApp
 	const sendWhatsAppMessage = async (
 		message: string,
 		options?: {
@@ -77,24 +70,14 @@ export function useWhatsAppSender({
 			return false;
 		}
 
-		// Crear mensaje completo con saludo
 		const fullMessage = createFullMessage(message);
 
-		// Copiar al portapapeles
-		/* await copyMessageToClipboard(fullMessage); */
-
-		// Codificar el mensaje completo para la URL
 		const encodedMessage = encodeURIComponent(fullMessage);
 
-		// Crear el link de WhatsApp
 		const whatsappUrl = `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodedMessage}`;
 
-		// Abrir WhatsApp en una nueva pestaña
 		window.open(whatsappUrl, "_blank");
 
-		// Mostrar notificación
-
-		// Guardar en base de datos si se solicita
 		if (options?.saveToDatabase && onSendResponse && consultationId) {
 			setIsSending(true);
 			try {

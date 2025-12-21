@@ -27,7 +27,7 @@ interface ClientHeaderProps {
 	dni?: string;
 	status: "lead" | "inquilino" | "propietario";
 	editPath: string;
-	consultationTypeName?: string; // nuevo: tipo de consulta a mostrar
+	consultationTypeName?: string;
 }
 
 export function ClientHeader({
@@ -94,7 +94,6 @@ export function ClientHeader({
 											{statusLabel}
 										</StatusBadge>
 									</div>
-									{/* Tipo de consulta - solo para leads */}
 									{status === "lead" && (
 										<div className="text-xs text-balance lg:text-sm text-slate-600">
 											Tipo de consulta:{" "}

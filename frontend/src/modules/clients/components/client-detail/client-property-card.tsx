@@ -37,7 +37,6 @@ export function ClientPropertyCard({ property }: ClientPropertyCardProps) {
 		>
 			<CardContent className="px-4 py-1 overflow-visible">
 				<div className="flex gap-4 overflow-visible">
-					{/* Imagen */}
 					<div className="w-32 h-32 bg-slate-200 rounded-lg shrink-0 overflow-hidden relative">
 						{property.image ? (
 							<Image
@@ -51,7 +50,6 @@ export function ClientPropertyCard({ property }: ClientPropertyCardProps) {
 						)}
 					</div>
 
-					{/* Información */}
 					<div className="flex-1">
 						<div className="flex items-start justify-between mb-2 lg:mb-6">
 							<div>
