@@ -1,31 +1,23 @@
-/**
- * DTO para precio de una propiedad
- * Una propiedad puede tener múltiples precios (venta, alquiler, etc.)
- * 
- * Acepta IDs o símbolos/nombres para mayor flexibilidad:
- * - currency: "ARS" | "USD" | "EUR" (símbolo) O currency_type_id: 1 (ID)
- * - operation_type: "Venta" | "Alquiler" | "Alquiler Temporal" (nombre) O operation_type_id: 1 (ID)
- */
+
 export class CreatePropertyPriceDto {
     constructor(
         public readonly price: number,
-        public readonly currency_type_id?: number, // ID (si se proporciona directamente)
-        public readonly currency_symbol?: string, // Símbolo (ARS, USD, EUR) - se resuelve a ID
-        public readonly operation_type_id?: number, // ID (si se proporciona directamente)
-        public readonly operation_type?: string, // Nombre (Venta, Alquiler, etc.) - se resuelve a ID
+        public readonly currency_type_id?: number,
+        public readonly currency_symbol?: string,
+        public readonly operation_type_id?: number,
+        public readonly operation_type?: string,
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, CreatePropertyPriceDto?] {
+    static create(object: Record<string, unknown>): [string?, CreatePropertyPriceDto?] {
         const { 
             price, 
             currency_type_id, 
-            currency, // Alias para currency_symbol
+            currency, 
             currency_symbol,
             operation_type_id, 
             operation_type 
         } = object;
 
-        // Validar precio
         if (price === undefined || price === null) {
             return ['Price is required', undefined];
         }
@@ -33,7 +25,6 @@ export class CreatePropertyPriceDto {
             return ['Price must be a positive number', undefined];
         }
 
-        // Validar currency: debe tener ID o símbolo
         const hasCurrencyId = currency_type_id !== undefined && currency_type_id !== null;
         const hasCurrencySymbol = (currency_symbol || currency) !== undefined && (currency_symbol || currency) !== null;
         
@@ -53,7 +44,6 @@ export class CreatePropertyPriceDto {
             return ['Currency symbol must be a string (e.g., "ARS", "USD", "EUR")', undefined];
         }
 
-        // Validar operation_type: debe tener ID o nombre
         const hasOperationId = operation_type_id !== undefined && operation_type_id !== null;
         const hasOperationName = operation_type !== undefined && operation_type !== null;
         
@@ -78,9 +68,9 @@ export class CreatePropertyPriceDto {
             new CreatePropertyPriceDto(
                 Number(price),
                 hasCurrencyId ? Number(currency_type_id) : undefined,
-                hasCurrencySymbol ? (currency_symbol || currency) : undefined,
+                hasCurrencySymbol ? ((currency_symbol || currency) as string) : undefined,
                 hasOperationId ? Number(operation_type_id) : undefined,
-                hasOperationName ? operation_type : undefined,
+                hasOperationName ? (operation_type as string) : undefined,
             )
         ];
     }

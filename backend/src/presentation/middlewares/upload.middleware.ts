@@ -2,26 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { CustomError } from '../../domain';
 
-/**
- * Middleware para manejar la subida de archivos
- * Configura multer para procesar archivos en memoria
- */
 export class UploadMiddleware {
-    /**
-     * Configura multer para almacenar archivos en memoria
-     * Los archivos estarán disponibles en req.files o req.file
-     */
     private static storage = multer.memoryStorage();
 
-    /**
-     * Filtro de tipos de archivo permitidos para imágenes
-     */
     private static imageFileFilter = (
         req: Request,
         file: Express.Multer.File,
         cb: multer.FileFilterCallback
     ) => {
-        // Tipos MIME permitidos para imágenes
         const allowedMimes = [
             'image/jpeg',
             'image/jpg',
@@ -37,15 +25,11 @@ export class UploadMiddleware {
         }
     };
 
-    /**
-     * Filtro de tipos de archivo permitidos para documentos PDF
-     */
     private static documentFileFilter = (
         req: Request,
         file: Express.Multer.File,
         cb: multer.FileFilterCallback
     ) => {
-        // Solo PDF permitidos
         if (file.mimetype === 'application/pdf') {
             cb(null, true);
         } else {
@@ -53,11 +37,6 @@ export class UploadMiddleware {
         }
     };
 
-    /**
-     * Middleware para subir un solo archivo
-     * @param fieldName Nombre del campo en el formulario (default: 'file')
-     * @param maxSize Tamaño máximo en bytes (default: 5MB)
-     */
     static single(fieldName: string = 'file', maxSize: number = 5 * 1024 * 1024) {
         const upload = multer({
             storage: UploadMiddleware.storage,
@@ -89,12 +68,6 @@ export class UploadMiddleware {
         };
     }
 
-    /**
-     * Middleware para subir múltiples archivos
-     * @param fieldName Nombre del campo en el formulario (default: 'files')
-     * @param maxCount Número máximo de archivos (default: 10)
-     * @param maxSize Tamaño máximo por archivo en bytes (default: 5MB)
-     */
     static multiple(fieldName: string = 'files', maxCount: number = 10, maxSize: number = 5 * 1024 * 1024) {
         const upload = multer({
             storage: UploadMiddleware.storage,
@@ -132,11 +105,6 @@ export class UploadMiddleware {
         };
     }
 
-    /**
-     * Middleware para subir archivos con campos específicos
-     * @param fields Array de objetos con name y maxCount
-     * @param maxSize Tamaño máximo por archivo en bytes (default: 5MB)
-     */
     static fields(fields: Array<{ name: string; maxCount?: number }>, maxSize: number = 5 * 1024 * 1024) {
         const upload = multer({
             storage: UploadMiddleware.storage,
@@ -168,12 +136,6 @@ export class UploadMiddleware {
         };
     }
 
-    /**
-     * Middleware para subir múltiples documentos PDF
-     * @param fieldName Nombre del campo en el formulario (default: 'documents')
-     * @param maxCount Número máximo de archivos (default: 10)
-     * @param maxSize Tamaño máximo por archivo en bytes (default: 10MB para PDFs)
-     */
     static documents(fieldName: string = 'documents', maxCount: number = 10, maxSize: number = 10 * 1024 * 1024) {
         const upload = multer({
             storage: UploadMiddleware.storage,
@@ -211,10 +173,6 @@ export class UploadMiddleware {
         };
     }
 
-    /**
-     * Middleware combinado para subir imágenes y documentos
-     * @param options Configuración de límites
-     */
     static imagesAndDocuments(options: {
         imageField?: string;
         documentField?: string;
@@ -235,7 +193,6 @@ export class UploadMiddleware {
         const upload = multer({
             storage: UploadMiddleware.storage,
             fileFilter: (req, file, cb) => {
-                // Determinar el tipo de filtro según el campo
                 if (file.fieldname === imageField) {
                     UploadMiddleware.imageFileFilter(req, file, cb);
                 } else if (file.fieldname === documentField) {

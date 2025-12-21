@@ -1,10 +1,8 @@
-// DTOs originales (mantener para compatibilidad)
 export * from './create-property.dto';
 export * from './create-property-address.dto';
 export * from './create-property-geography.dto';
 export * from './create-property-price.dto';
 
-// Nuevos DTOs agrupados
 export * from './create-property-basic.dto';
 export * from './create-property-characteristics.dto';
 export * from './create-property-surface.dto';

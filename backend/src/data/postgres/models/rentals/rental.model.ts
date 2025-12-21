@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface Rental {
     id?: number;
@@ -30,7 +31,7 @@ export interface CreateRentalDto {
 export interface RentalFilters {
     property_id?: number;
     client_rental_id?: number;
-    active?: boolean; // end_date IS NULL OR end_date >= CURRENT_DATE
+    active?: boolean; 
     created_by_user_id?: number;
     limit?: number;
     offset?: number;
@@ -79,7 +80,7 @@ export class RentalModel {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME}`;
         const conditions: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (filters) {
@@ -139,7 +140,7 @@ export class RentalModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.start_date) {

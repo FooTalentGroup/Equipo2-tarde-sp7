@@ -1,6 +1,4 @@
-/**
- * DTO para superficies de la propiedad
- */
+
 export interface CreatePropertySurfaceDto {
     land_area?: number;
     semi_covered_area?: number;

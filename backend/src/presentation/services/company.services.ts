@@ -5,16 +5,12 @@ import type { FileUploadAdapter } from "../../domain/interfaces/file-upload.adap
 export class CompanyServices {
 	constructor(private readonly fileUploadAdapter: FileUploadAdapter) {}
 
-	/**
-	 * Get company settings (logo, name, etc.)
-	 * Public endpoint - no authentication required
-	 */
+	
 	async getCompanySettings() {
 		try {
 			const settings = await CompanySettingsModel.findSettings();
 
 			if (!settings) {
-				// Return default values if no settings exist
 				return {
 					logo_url: null,
 					company_name: "Inmobiliaria",
@@ -31,13 +27,8 @@ export class CompanyServices {
 		}
 	}
 
-	/**
-	 * Update company logo
-	 * Admin only - requires authentication
-	 */
 	async updateCompanyLogo(file: Express.Multer.File, userId: number) {
 		try {
-			// Validate file type
 			const allowedMimeTypes = ["image/jpeg", "image/jpg", "image/png"];
 			if (!allowedMimeTypes.includes(file.mimetype)) {
 				throw CustomError.badRequest(
@@ -45,19 +36,15 @@ export class CompanyServices {
 				);
 			}
 
-			// Get current settings to delete old logo if exists
 			const currentSettings = await CompanySettingsModel.findSettings();
 			const oldLogoUrl = currentSettings?.logo_url;
 
-			// Upload new logo to Cloudinary
 			const logoUrl = await this.fileUploadAdapter.uploadFile(file.buffer, {
 				folder: "company",
 				resourceType: "image",
-				// Use a fixed public_id so it always replaces the same file
 				publicId: "logo",
 			});
 
-			// Update database with new logo URL
 			const updatedSettings = await CompanySettingsModel.updateLogo(
 				logoUrl,
 				userId,
@@ -67,12 +54,10 @@ export class CompanyServices {
 				throw CustomError.internalServerError("Failed to update company logo");
 			}
 
-			// Delete old logo from Cloudinary if it exists and is different
 			if (oldLogoUrl && oldLogoUrl !== logoUrl) {
 				try {
 					await this.fileUploadAdapter.deleteFile(oldLogoUrl);
 				} catch (deleteError) {
-					// Log error but don't fail the request
 					console.error(
 						"Error deleting old logo from Cloudinary:",
 						deleteError,

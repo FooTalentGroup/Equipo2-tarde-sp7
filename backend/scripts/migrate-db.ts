@@ -4,7 +4,6 @@ import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { get } from 'env-var';
 
-// Obtener variables de entorno
 const dbConfig = {
   host: get('POSTGRES_HOST').default('localhost').asString(),
   port: get('POSTGRES_PORT').default(5432).asPortNumber(),
@@ -25,7 +24,6 @@ async function migrateDatabase() {
     await client.connect();
     console.log('✅ Conexión establecida\n');
 
-    // Leer el archivo SQL
     const sqlPath = join(process.cwd(), 'src/data/postgres/models/schema.sql');
     console.log(`📄 Leyendo archivo SQL: ${sqlPath}`);
     
@@ -33,25 +31,18 @@ async function migrateDatabase() {
     
     console.log('📦 Procesando script SQL...\n');
 
-    // Dividir el SQL por sentencias correctamente
-    // Eliminar comentarios primero para simplificar el parsing
     let cleanSql = sql
-      // Eliminar comentarios de línea (-- ...)
       .replace(/--.*$/gm, '')
-      // Eliminar comentarios multilínea (/* ... */)
       .replace(/\/\*[\s\S]*?\*\//g, '');
     
-    // Dividir por punto y coma, filtrar líneas vacías
-    // Mejorar el parsing para manejar mejor las sentencias complejas
     const statements = cleanSql
       .split(';')
       .map(stmt => stmt.trim())
       .filter(stmt => {
-        // Filtrar líneas vacías y comentarios residuales
         const trimmed = stmt.trim();
         return trimmed.length > 0 && 
                !trimmed.match(/^\s*$/) &&
-               !trimmed.match(/^COMMENT\s+ON/i); // Filtrar comentarios que pueden causar problemas
+               !trimmed.match(/^COMMENT\s+ON/i);
       });
 
     console.log(`📦 Ejecutando ${statements.length} sentencias SQL...\n`);
@@ -60,7 +51,6 @@ async function migrateDatabase() {
     let skippedCount = 0;
     let errorCount = 0;
 
-    // Ejecutar cada sentencia
     for (let i = 0; i < statements.length; i++) {
       const statement = statements[i];
       
@@ -70,7 +60,6 @@ async function migrateDatabase() {
         await client.query(statement);
         successCount++;
         
-        // Extraer nombre de la tabla/objeto creado para mostrar mensaje descriptivo
         const createMatch = statement.match(/CREATE\s+(?:TABLE|EXTENSION|INDEX)\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:public\.)?["']?(\w+)["']?/i);
         const objectName = createMatch ? createMatch[1] : null;
         
@@ -86,7 +75,6 @@ async function migrateDatabase() {
           console.log(`   ✅ [${i + 1}/${statements.length}] ${preview}...`);
         }
       } catch (err: any) {
-        // Si es un error de "already exists" o constraint duplicada, lo ignoramos
         const errorMessage = err.message.toLowerCase();
         if (errorMessage.includes('already exists') || 
             errorMessage.includes('does not exist') ||
@@ -185,6 +173,5 @@ async function migrateDatabase() {
   }
 }
 
-// Ejecutar la migración
 migrateDatabase();
 

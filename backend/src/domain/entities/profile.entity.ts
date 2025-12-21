@@ -19,22 +19,22 @@ export class ProfileEntity {
         const { 
             id,
             first_name,
-            nombre, // Alias para compatibilidad
+            nombre, 
             last_name,
-            apellido, // Alias para compatibilidad
+            apellido, 
             email, 
             password_hash,
-            password, // Alias para compatibilidad
+            password,
             phone,
-            telefono, // Alias para compatibilidad
+            telefono, 
             role_id,
-            id_rol, // Alias para compatibilidad
+            id_rol, 
             active,
-            activo, // Alias para compatibilidad
+            activo, 
             deleted,
-            borrado_logico, // Alias para compatibilidad
+            borrado_logico,
             created_at,
-            fecha_creacion, // Alias para compatibilidad
+            fecha_creacion, 
         } = object;
         
         const profileId = id;
@@ -48,7 +48,6 @@ export class ProfileEntity {
         const profileCreatedAt = created_at || fecha_creacion;
         
         if (!profileId) throw CustomError.badRequest('Id is required');
-        // Aceptar UUIDs (strings) o números
         if (!profileFirstName || profileFirstName.trim().length === 0) {
             throw CustomError.badRequest('First name is required');
         }
@@ -68,7 +67,6 @@ export class ProfileEntity {
             throw CustomError.badRequest('Role is required');
         }
         
-        // Validate date if it exists
         let createdAt: Date | undefined;
         
         if (profileCreatedAt) {
@@ -78,7 +76,6 @@ export class ProfileEntity {
             }
         }
 
-        // Convertir a números (la tabla users usa SERIAL)
         const finalId = typeof profileId === 'string' ? Number(profileId) : profileId;
         const finalRoleId = typeof profileRole === 'string' ? Number(profileRole) : profileRole;
         
@@ -91,7 +88,7 @@ export class ProfileEntity {
             profileFirstName.trim(),
             profileLastName.trim(),
             email.trim().toLowerCase(),
-            profilePassword, // Password is already hashed from database
+            profilePassword,
             finalRoleId,
             profilePhone?.trim() || undefined,
             profileActive,
@@ -104,7 +101,6 @@ export class ProfileEntity {
         return `${this.first_name} ${this.last_name}`.trim();
     }
 
-    // Return public object without password
     toPublicObject() {
         const { password_hash: _, ...publicProfile } = this;
         return {

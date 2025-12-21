@@ -1,12 +1,3 @@
-/**
- * Interfaces para datos enriquecidos
- * Estos tipos representan datos después de hacer JOINs y agregar información relacionada
- * A diferencia de los tipos Row, estos incluyen objetos anidados completos
- */
-
-// ============================================================================
-// Interfaces auxiliares para objetos anidados comunes
-// ============================================================================
 
 export interface CurrencyInfo {
 	id: number | undefined;
@@ -81,9 +72,6 @@ export interface ContactCategoryInfo {
 	name: string;
 }
 
-// ============================================================================
-// Interfaces para datos enriquecidos de Property
-// ============================================================================
 
 export interface EnrichedPropertyPrice {
 	id?: number;
@@ -137,10 +125,6 @@ export interface EnrichedPropertyMultimedia {
 	uploaded_at?: Date;
 }
 
-// ============================================================================
-// Interfaces para datos enriquecidos de Client
-// ============================================================================
-
 export interface EnrichedClient {
 	id: number;
 	first_name: string;
@@ -170,10 +154,6 @@ export interface EnrichedConsultation {
 	} | null;
 }
 
-// ============================================================================
-// Interfaces para resultados de consultas SQL con JOINs
-// ============================================================================
-
 export interface ConsultationQueryRow {
 	id: number;
 	consultation_date: Date;
@@ -181,28 +161,20 @@ export interface ConsultationQueryRow {
 	response?: string;
 	response_date?: Date;
 	is_read: boolean;
-	// Datos del cliente (si existe)
 	client_id?: number;
 	client_first_name?: string;
 	client_last_name?: string;
 	client_email?: string;
 	client_phone?: string;
-	// Datos del consultante (si no hay cliente)
 	consultant_first_name?: string;
 	consultant_last_name?: string;
 	consultant_email?: string;
 	consultant_phone?: string;
-	// Datos de la propiedad
 	property_id?: number;
 	property_title?: string;
-	// Tipo de consulta
 	consultation_type_id: number;
 	consultation_type_name: string;
 }
-
-// ============================================================================
-// Interfaces para Property con datos completos (para listados)
-// ============================================================================
 
 export interface PropertyListItem {
 	id: number;
@@ -215,13 +187,11 @@ export interface PropertyListItem {
 	featured_web?: boolean;
 	publication_date?: Date;
 	updated_at?: Date;
-	// IDs de catálogos (necesarios para algunas operaciones)
 	property_type_id?: number;
 	property_status_id?: number;
 	visibility_status_id?: number;
 	owner_id?: number;
 	age_id?: number;
-	// Catálogos enriquecidos (nombres)
 	property_type_name?: string;
 	property_status_name?: string;
 	visibility_status_name?: string;
@@ -232,29 +202,21 @@ export interface PropertyListItem {
 	disposition_name?: string;
 	situation_id?: number;
 	situation_name?: string;
-	// Campos adicionales
 	rooms_count?: number;
 	land_area?: number;
 	covered_area?: number;
-	// Precio principal
 	main_price?: number;
 	main_currency_type_id?: number;
 	main_operation_type_id?: number;
-	// Dirección principal
 	main_address?: string;
 	main_neighborhood?: string;
 	main_city_name?: string;
 	main_city_id?: number;
 	main_province_name?: string;
-	// Imagen principal
 	primary_image_id?: number;
 	primary_image_path?: string;
 	images_count?: number;
 }
-
-// ============================================================================
-// Interfaces para respuestas de Property Details
-// ============================================================================
 
 export interface PropertyDetails {
 	description?: string;
@@ -281,10 +243,6 @@ export interface PropertyDetails {
 	age: PropertyAgeInfo | null;
 }
 
-// ============================================================================
-// Interfaces para Rental
-// ============================================================================
-
 export interface EnrichedRental {
 	id?: number;
 	contract_start_date: Date | null;
@@ -294,10 +252,6 @@ export interface EnrichedRental {
 	currency: CurrencyInfo | null;
 	external_reference: string | null;
 }
-
-// ============================================================================
-// Interfaces para Client.services - Propiedades enriquecidas con detalles completos
-// ============================================================================
 
 export interface EnrichedPropertyWithDetails {
 	id?: number;

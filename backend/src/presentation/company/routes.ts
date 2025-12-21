@@ -10,7 +10,6 @@ export class CompanyRoutes {
 	static get routes(): Router {
 		const router = Router();
 
-		// Initialize dependencies using imported adapters
 		const companyServices = new CompanyServices(cloudinaryAdapter);
 		const controller = new CompanyController(companyServices);
 		const authMiddleware = new AuthMiddleware(jwtAdapter);
@@ -109,7 +108,7 @@ export class CompanyRoutes {
 			"/logo",
 			authMiddleware.authenticate,
 			authMiddleware.requireAdmin,
-			UploadMiddleware.single("logo", 2 * 1024 * 1024), // 2MB max
+			UploadMiddleware.single("logo", 2 * 1024 * 1024),
 			(req, res) => controller.updateLogo(req, res),
 		);
 

@@ -50,42 +50,22 @@ import type {
 	PropertyListItem
 } from '../../domain/interfaces/enriched-data';
 
-/**
- * Service for handling property operations
- * Uses transactions to ensure atomicity
- */
+
 export class PropertyServices {
 	constructor(private readonly fileUploadAdapter: FileUploadAdapter) {}
 
-	/**
-	 * Crea una propiedad completa con todas sus relaciones
-	 * TODO EN UNA TRANSACCIÓN: Si falla cualquier paso, se revierte todo
-	 *
-	 * Pasos:
-	 * 1. Validar/obtener geografía (country -> province -> city)
-	 * 2. Crear dirección
-	 * 3. Crear propiedad
-	 * 4. Vincular dirección con propiedad
-	 * 5. Crear precios
-	 * 6. Subir imágenes a Cloudinary
-	 * 7. Crear registros de multimedia
-	 *
-	 * Si cualquier paso falla, se hace ROLLBACK de todo
-	 */
 	async createProperty(
 		createPropertyDto: CreatePropertyDto,
 		capturedByUserId: number,
 		images?: Express.Multer.File[],
 	) {
 		return await TransactionHelper.executeInTransaction(async () => {
-			// 0. Validar que el owner (cliente propietario) existe si se proporciona
 			let finalOwnerId: number | undefined;
 
 			if (
 				createPropertyDto.owner_id !== undefined &&
 				createPropertyDto.owner_id !== null
 			) {
-				// Convertir a número si viene como string
 				const ownerIdNumber = Number(createPropertyDto.owner_id);
 				
 				if (isNaN(ownerIdNumber) || ownerIdNumber <= 0) {
@@ -104,7 +84,6 @@ export class PropertyServices {
 				finalOwnerId = ownerIdNumber;
 			}
 
-			// 1. Obtener/validar geografía (country -> province -> city)
 			const geography = await this.resolveGeography(
 				createPropertyDto.geography,
 			);
@@ -127,7 +106,6 @@ export class PropertyServices {
 				city_id: geography.cityId,
 			});
 
-			// 3. Resolver IDs de catálogos si se enviaron nombres
 			const propertyTypeId = await this.resolveCatalogId(
 				createPropertyDto.property_type_id,
 				createPropertyDto.property_type,
@@ -149,7 +127,6 @@ export class PropertyServices {
 				"Visibility status",
 			);
 
-			// Resolver opcionales
 			const situationId = createPropertyDto.situation_id
 				? createPropertyDto.situation_id
 				: createPropertyDto.situation
@@ -190,8 +167,6 @@ export class PropertyServices {
 						)
 					: undefined;
 
-			// 4. Crear propiedad
-			// Convertir publication_date a Date si viene como string
 			let publicationDate: Date | undefined;
 			if (createPropertyDto.publication_date) {
 				if (typeof createPropertyDto.publication_date === "string") {
@@ -245,16 +220,13 @@ export class PropertyServices {
 				throw CustomError.internalServerError("Failed to create property");
 			}
 
-			// 5. Vincular dirección con propiedad
 			await PropertyAddressModel.create({
 				property_id: property.id,
 				address_id: address.id!,
 			});
 
-			// 6. Crear precios (resolver IDs si se enviaron símbolos/nombres)
 			const prices = [];
 			for (const priceDto of createPropertyDto.prices) {
-				// Resolver currency_type_id si se envió símbolo
 				let currencyTypeId = priceDto.currency_type_id;
 				if (!currencyTypeId && priceDto.currency_symbol) {
 					const currencyType = await CurrencyTypeModel.findBySymbol(
@@ -268,7 +240,6 @@ export class PropertyServices {
 					currencyTypeId = currencyType.id;
 				}
 
-				// Resolver operation_type_id si se envió nombre
 				let operationTypeId = priceDto.operation_type_id;
 				if (!operationTypeId && priceDto.operation_type) {
 					const operationType = await PropertyOperationTypeModel.findByName(
@@ -297,13 +268,11 @@ export class PropertyServices {
 				prices.push(price);
 			}
 
-			// 7. Subir imágenes y crear registros de multimedia
 			const uploadedImages: string[] = [];
 			const multimediaRecords = [];
 
 			if (images && images.length > 0) {
 				try {
-					// Subir todas las imágenes a Cloudinary
 					for (let i = 0; i < images.length; i++) {
 						const image = images[i];
 						const imageUrl = await this.fileUploadAdapter.uploadFile(
@@ -315,19 +284,16 @@ export class PropertyServices {
 						);
 						uploadedImages.push(imageUrl);
 
-						// Crear registro de multimedia
 						const multimedia = await PropertyMultimediaModel.create({
 							property_id: property.id,
 							file_path: imageUrl,
 							media_type: image.mimetype || "image/jpeg",
-							is_primary: i === 0, // Primera imagen es primary
+							is_primary: i === 0,
 						});
 						multimediaRecords.push(multimedia);
 					}
 				} catch (error: unknown) {
-					// Si falla la subida de imágenes, la transacción hará ROLLBACK
 					const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-					// Pero también intentamos limpiar las imágenes subidas a Cloudinary
 					for (const url of uploadedImages) {
 						try {
 							await this.fileUploadAdapter.deleteFile(url);
@@ -344,7 +310,6 @@ export class PropertyServices {
 				}
 			}
 
-			// Enriquecer respuesta con nombres de catálogos
 			const [
 				propertyType,
 				propertyStatus,
@@ -364,7 +329,6 @@ export class PropertyServices {
 				? await CountryModel.findById(addressProvince.country_id)
 				: null;
 
-			// Enriquecer precios con moneda y tipo de operación
 			const enrichedPrices = await Promise.all(
 				prices.map(async (price: PropertyPrice) => {
 					const [currency, operationType] = await Promise.all([
@@ -394,12 +358,9 @@ export class PropertyServices {
 				}),
 			);
 
-			// Retornar propiedad completa con TODOS los campos (incluyendo nulls)
-			// Incluimos objetos enriquecidos completos, no solo IDs
 			return {
 				property: {
 					...property,
-					// Catálogos principales enriquecidos (objetos completos, no solo IDs)
 					property_type: propertyType
 						? {
 								id: propertyType.id,
@@ -418,7 +379,6 @@ export class PropertyServices {
 								name: visibilityStatus.name,
 							}
 						: null,
-					// Owner ID
 					owner_id: property.owner_id || null,
 					address: {
 						id: address.id,
@@ -448,7 +408,6 @@ export class PropertyServices {
 								}
 							: null,
 					},
-					// Precios enriquecidos (con objetos de moneda y operación completos)
 					prices: enrichedPrices.map((price: EnrichedPropertyPrice) => ({
 						id: price.id,
 						property_id: price.property_id,
@@ -457,23 +416,15 @@ export class PropertyServices {
 						operation_type: price.operation_type || null,
 						updated_at: price.updated_at,
 					})),
-					// Imágenes
 					images: multimediaRecords,
 				},
 			};
 		});
 	}
 
-	/**
-	 * Resuelve la geografía: obtiene o crea country, province, city
-	 * Retorna los IDs necesarios
-	 *
-	 * NOTA: Usa el mismo client de la transacción vía PostgresDatabase.getClient()
-	 */
 	private async resolveGeography(
 		geography: CreatePropertyDto["geography"],
 	): Promise<{ countryId: number; provinceId: number; cityId: number }> {
-		// Obtener o crear país
 		let country = await CountryModel.findByName(geography.country);
 		if (!country) {
 			country = await CountryModel.create({ name: geography.country });
@@ -482,7 +433,6 @@ export class PropertyServices {
 			throw CustomError.internalServerError("Failed to resolve country");
 		}
 
-		// Obtener o crear provincia
 		let province = await ProvinceModel.findByName(geography.province);
 		if (!province) {
 			province = await ProvinceModel.create({
@@ -490,7 +440,6 @@ export class PropertyServices {
 				country_id: country.id,
 			});
 		} else if (province.country_id !== country.id) {
-			// Si la provincia existe pero pertenece a otro país, error
 			throw CustomError.badRequest(
 				`Province "${geography.province}" belongs to a different country`,
 			);
@@ -499,7 +448,6 @@ export class PropertyServices {
 			throw CustomError.internalServerError("Failed to resolve province");
 		}
 
-		// Obtener o crear ciudad
 		let city = await CityModel.findByNameAndProvince(
 			geography.city,
 			province.id,
@@ -521,9 +469,6 @@ export class PropertyServices {
 		};
 	}
 
-	/**
-	 * Construye la dirección completa a partir de los datos
-	 */
 	private buildFullAddress(address: CreatePropertyDto["address"]): string {
 		const parts: string[] = [];
 
@@ -540,10 +485,6 @@ export class PropertyServices {
 		return parts.join(" ").trim() || address.street;
 	}
 
-	/**
-	 * Gets a property by ID with all its complete relations
-	 * Includes all images, all prices, all addresses with enriched data
-	 */
 	async getPropertyById(id: number, includeArchived: boolean = false) {
 		const property = await PropertyModel.findByIdWithRelations(
 			id,
@@ -553,7 +494,6 @@ export class PropertyServices {
 			throw CustomError.notFound(`Property with ID ${id} not found`);
 		}
 
-		// Enrich with catalog names
 		const [
 			propertyType,
 			propertyStatus,
@@ -580,7 +520,6 @@ export class PropertyServices {
 				: Promise.resolve(null),
 		]);
 
-		// Enriquecer precios con moneda y tipo de operación
 		const enrichedPrices = await Promise.all(
 			(property.prices || []).map(async (price: PropertyPriceRow) => {
 				const [currency, operationType] = await Promise.all([
@@ -610,7 +549,6 @@ export class PropertyServices {
 			}),
 		);
 
-		// Enrich addresses with city and province
 		const enrichedAddresses = await Promise.all(
 			(property.addresses || []).map(async (address: PropertyAddressRow) => {
 				if (!address || !address.city_id) return null;
@@ -652,7 +590,6 @@ export class PropertyServices {
 			}),
 		);
 
-		// Obtener servicios vinculados
 		const propertyServices = await PropertyServiceModel.findByPropertyId(id);
 		const enrichedServices = await Promise.all(
 			propertyServices.map(async (ps: PropertyService) => {
@@ -666,10 +603,8 @@ export class PropertyServices {
 			}),
 		);
 
-		// Obtener documentos
 		const documents = await PropertyDocumentModel.findByPropertyId(id);
 
-		// Obtener expensas
 		const expenses = await ExpenseModel.findByPropertyId(id);
 		const enrichedExpenses = await Promise.all(
 			expenses.map(async (expense: Expense) => {
@@ -693,7 +628,6 @@ export class PropertyServices {
 			}),
 		);
 
-		// Obtener propietario (owner) si existe
 		let owner = null;
 		if (property.owner_id) {
 			const ownerClient = await ClientModel.findById(property.owner_id);
@@ -718,11 +652,7 @@ export class PropertyServices {
 			}
 		}
 
-		// Obtener inquilino activo (si existe)
-		// Un rental está activo si end_date es NULL o end_date >= fecha actual
 		let activeTenant = null;
-
-		// Buscar el rental más reciente para esta propiedad
 		const recentRentals = await RentalModel.findAll({
 			property_id: id,
 			limit: 1,
@@ -730,8 +660,6 @@ export class PropertyServices {
 		if (recentRentals.length > 0) {
 			const rental = recentRentals[0];
 
-			// Verificar si está activo: end_date es NULL o >= fecha actual
-			// Comparar solo las fechas (sin hora) para evitar problemas de zona horaria
 			const today = new Date();
 			const todayYear = today.getUTCFullYear();
 			const todayMonth = today.getUTCMonth();
@@ -739,16 +667,13 @@ export class PropertyServices {
 
 			let isActive = false;
 			if (!rental.end_date) {
-				// Si no hay fecha de fin, está activo
 				isActive = true;
 			} else {
-				// Comparar solo año, mes y día usando UTC
 				const endDate = new Date(rental.end_date);
 				const endYear = endDate.getUTCFullYear();
 				const endMonth = endDate.getUTCMonth();
 				const endDay = endDate.getUTCDate();
 
-				// Comparar fechas normalizadas (solo año, mes, día)
 				if (endYear > todayYear) {
 					isActive = true;
 				} else if (endYear === todayYear) {
@@ -799,12 +724,9 @@ export class PropertyServices {
 			}
 		}
 
-		// Structure complete response with ALL fields (including nulls)
-		// We include enriched objects, not just IDs
 		return {
 			property: {
 				...property,
-				// Catálogos principales enriquecidos (objetos completos, no solo IDs)
 				property_type: propertyType
 					? {
 							id: propertyType.id,
@@ -823,11 +745,8 @@ export class PropertyServices {
 							name: visibilityStatus.name,
 						}
 					: null,
-				// Owner ID
 				owner_id: property.owner_id || null,
-				// Owner completo (si existe)
 				owner: owner,
-				// Catálogos opcionales enriquecidos (objetos completos, no solo IDs)
 				age: age
 					? {
 							id: age.id,
@@ -852,7 +771,6 @@ export class PropertyServices {
 							name: situation.name,
 						}
 					: null,
-				// Precios enriquecidos (con objetos de moneda y operación, no solo IDs)
 				prices: enrichedPrices.map((price: EnrichedPropertyPrice) => ({
 					id: price.id,
 					property_id: price.property_id,
@@ -861,7 +779,6 @@ export class PropertyServices {
 					operation_type: price.operation_type || null,
 					updated_at: price.updated_at,
 				})),
-				// Direcciones enriquecidas (con objetos de ciudad, provincia, país, no solo IDs)
 				addresses: enrichedAddresses
 					.filter((a) => a !== null)
 					.map((addr: EnrichedPropertyAddress) => ({
@@ -875,15 +792,10 @@ export class PropertyServices {
 						longitude: addr.longitude || null,
 						city: addr.city || null,
 					})),
-				// Imágenes
 				images: property.images || [],
-				// Servicios
 				services: enrichedServices.filter((s) => s !== null),
-				// Documentos
 				documents: documents,
-				// Expensas
 				expenses: enrichedExpenses,
-				// Inquilino activo (si existe)
 				active_tenant: activeTenant,
 			},
 		};
@@ -912,7 +824,6 @@ export class PropertyServices {
 	}) {
 		const properties = await PropertyModel.findAll(filters);
 
-		// Enrich with currency and operation type data from main price
 		const { CurrencyTypeModel } = await import(
 			"../../data/postgres/models/payments/currency-type.model"
 		);
@@ -922,7 +833,6 @@ export class PropertyServices {
 
 		const enrichedProperties = await Promise.all(
 			properties.map(async (property: PropertyListItem) => {
-				// Obtener información de moneda y tipo de operación del precio principal
 				let mainPriceInfo = null;
 				if (
 					property.main_price &&
@@ -954,14 +864,12 @@ export class PropertyServices {
 					};
 				}
 
-				// Structure summarized response
 				return {
 					id: property.id,
 					title: property.title,
 					description: property.description,
 					publication_date: property.publication_date,
 					featured_web: property.featured_web,
-					// Catálogos con nombres
 					property_type: {
 						id: property.property_type_id,
 						name: property.property_type_name,
@@ -974,9 +882,7 @@ export class PropertyServices {
 						id: property.visibility_status_id,
 						name: property.visibility_status_name,
 					},
-					// Owner ID
 					owner_id: property.owner_id || null,
-					// Catálogos opcionales
 					age: property.age_id
 						? {
 								id: property.age_id,
@@ -1001,7 +907,6 @@ export class PropertyServices {
 								name: property.situation_name,
 							}
 						: null,
-					// Características básicas
 					bedrooms_count: property.bedrooms_count,
 					bathrooms_count: property.bathrooms_count,
 					rooms_count: property.rooms_count,
@@ -1009,9 +914,7 @@ export class PropertyServices {
 					land_area: property.land_area,
 					covered_area: property.covered_area,
 					total_area: property.total_area,
-					// Precio principal
 					main_price: mainPriceInfo,
-					// Dirección principal
 					main_address: property.main_address
 						? {
 								full_address: property.main_address,
@@ -1029,7 +932,6 @@ export class PropertyServices {
 									: null,
 							}
 						: null,
-					// Imagen principal
 					primary_image: property.primary_image_path
 						? {
 								id: property.primary_image_id,
@@ -1046,10 +948,6 @@ export class PropertyServices {
 		return { properties: enrichedProperties, count: enrichedProperties.length };
 	}
 
-	/**
-	 * Actualiza una propiedad
-	 * Solo actualiza los campos proporcionados
-	 */
 	async updateProperty(
 		id: number,
 		updateData: {
@@ -1078,13 +976,10 @@ export class PropertyServices {
 			producer_commission_percentage?: number;
 		},
 	) {
-		// Verificar que la propiedad existe
 		const existingProperty = await PropertyModel.findById(id);
 		if (!existingProperty) {
 			throw CustomError.notFound(`Property with ID ${id} not found`);
 		}
-
-		// Actualizar propiedad
 		const updatedProperty = await PropertyModel.update(id, updateData);
 		if (!updatedProperty) {
 			throw CustomError.internalServerError("Failed to update property");
@@ -1093,17 +988,12 @@ export class PropertyServices {
 		return { property: updatedProperty };
 	}
 
-	/**
-	 * Archiva una propiedad (soft delete usando visibility_status)
-	 */
 	async archiveProperty(id: number) {
-		// Verificar que la propiedad existe
 		const property = await PropertyModel.findById(id);
 		if (!property) {
 			throw CustomError.notFound(`Property with ID ${id} not found`);
 		}
 
-		// Archivar
 		const archived = await PropertyModel.archive(id);
 		if (!archived) {
 			throw CustomError.internalServerError("Failed to archive property");
@@ -1112,17 +1002,12 @@ export class PropertyServices {
 		return { message: "Property archived successfully" };
 	}
 
-	/**
-	 * Restores an archived property
-	 */
 	async unarchiveProperty(id: number, newVisibilityStatusId?: number) {
-		// Verificar que la propiedad existe (incluyendo archivadas)
 		const property = await PropertyModel.findById(id, true);
 		if (!property) {
 			throw CustomError.notFound(`Property with ID ${id} not found`);
 		}
 
-		// Restaurar
 		const restored = await PropertyModel.unarchive(id, newVisibilityStatusId);
 		if (!restored) {
 			throw CustomError.internalServerError("Failed to unarchive property");
@@ -1131,18 +1016,12 @@ export class PropertyServices {
 		return { message: "Property unarchived successfully" };
 	}
 
-	/**
-	 * Physically deletes a property (hard delete)
-	 * ⚠️ Only if it has no active rentals/sales
-	 */
 	async deleteProperty(id: number) {
-		// Verify that the property exists
 		const property = await PropertyModel.findById(id, true);
 		if (!property) {
 			throw CustomError.notFound(`Property with ID ${id} not found`);
 		}
 
-		// Try to delete (may fail if there are RESTRICT constraints)
 		try {
 			const deleted = await PropertyModel.delete(id);
 			if (!deleted) {
@@ -1150,7 +1029,6 @@ export class PropertyServices {
 			}
 			return { message: "Property deleted successfully" };
 		} catch (error: unknown) {
-			// If there's a foreign key constraint error, it means it has RESTRICT relationships
 			if (error && typeof error === 'object' && 'code' in error && error.code === "23503") {
 				throw CustomError.badRequest(
 					"Cannot delete property: it has active rentals or sales. Archive it instead.",
@@ -1161,27 +1039,13 @@ export class PropertyServices {
 		}
 	}
 
-	/**
-	 * Creates a property using the grouped structure
-	 * ALL IN A TRANSACTION: If any step fails, everything is reverted
-	 *
-	 * Steps:
-	 * 1. Validate/get geography
-	 * 2. Create address
-	 * 3. Resolve services (create if they don't exist)
-	 * 4. Create property with all grouped data
-	 * 5. Link address
-	 * 6. Create prices and expenses
-	 * 7. Link services
-	 * 8. Upload images and PDF documents
-	 * 9. Create multimedia and document records
-	 */
+	
 	async createPropertyGrouped(
 		createPropertyGroupedDto: CreatePropertyGroupedDto,
 		capturedByUserId: number,
 		images?: Express.Multer.File[],
 		documents?: Express.Multer.File[],
-		documentNames?: string[], // Array of names corresponding to each document
+		documentNames?: string[],
 	) {
 		return await TransactionHelper.executeInTransaction(async () => {
 			const {
@@ -1195,11 +1059,9 @@ export class PropertyServices {
 				internal,
 			} = createPropertyGroupedDto;
 
-			// 0. Validate owner (property owner client) if provided
 			let finalOwnerId: number | undefined;
 			console.log('[PropertyServices] basic.owner_id:', basic.owner_id, 'type:', typeof basic.owner_id);
 			if (basic.owner_id !== undefined && basic.owner_id !== null) {
-				// Convertir a número si viene como string
 				const ownerIdNumber = Number(basic.owner_id);
 				console.log('[PropertyServices] ownerIdNumber after conversion:', ownerIdNumber, 'isNaN:', isNaN(ownerIdNumber));
 				
@@ -1221,7 +1083,6 @@ export class PropertyServices {
 				console.log('[PropertyServices] owner_id is undefined or null');
 			}
 
-			// 1. Resolve geography
 			const geography = await this.resolveGeography(geoData);
 
 			await this.checkDuplicateAddress(
@@ -1242,8 +1103,6 @@ export class PropertyServices {
 				city_id: geography.cityId,
 			});
 
-			// 3. Resolve main catalog IDs
-			// Try basic first, then characteristics as fallback
 			const propertyTypeId = await this.resolveCatalogId(
 				basic.property_type_id || characteristics?.property_type_id,
 				basic.property_type || characteristics?.property_type,
@@ -1265,7 +1124,6 @@ export class PropertyServices {
 				"Visibility status",
 			);
 
-			// 4. Resolve optional characteristic catalogs
 			const situationId = characteristics?.situation_id
 				? characteristics.situation_id
 				: characteristics?.situation
@@ -1306,7 +1164,6 @@ export class PropertyServices {
 						)
 					: undefined;
 
-			// 5. Convert publication_date if it comes as string
 			let publicationDate: Date | undefined;
 			if (basic.publication_date) {
 				if (typeof basic.publication_date === "string") {
@@ -1316,7 +1173,6 @@ export class PropertyServices {
 				}
 			}
 
-			// 6. Create property
 			console.log('[PropertyServices] Creating property with finalOwnerId:', finalOwnerId, 'type:', typeof finalOwnerId);
 			const propertyDataToInsert = {
 				title: basic.title,
@@ -1328,7 +1184,6 @@ export class PropertyServices {
 				visibility_status_id: visibilityStatusId,
 				owner_id: finalOwnerId,
 				captured_by_user_id: capturedByUserId,
-				// Characteristics
 				bedrooms_count: characteristics?.bedrooms_count,
 				bathrooms_count: characteristics?.bathrooms_count,
 				rooms_count: characteristics?.rooms_count,
@@ -1339,7 +1194,6 @@ export class PropertyServices {
 				age_id: ageId,
 				orientation_id: orientationId,
 				disposition_id: dispositionId,
-				// Surface
 				land_area: surface?.land_area,
 				semi_covered_area: surface?.semi_covered_area,
 				covered_area: surface?.covered_area,
@@ -1347,7 +1201,6 @@ export class PropertyServices {
 				uncovered_area: surface?.uncovered_area,
 				total_area: surface?.total_area,
 				zoning: surface?.zoning,
-				// Internal information
 				branch_name: internal?.branch_name,
 				appraiser: internal?.appraiser,
 				producer: internal?.producer,
@@ -1367,13 +1220,11 @@ export class PropertyServices {
 				throw CustomError.internalServerError("Failed to create property");
 			}
 
-			// 7. Link address
 			await PropertyAddressModel.create({
 				property_id: property.id,
 				address_id: address.id!,
 			});
 
-			// 8. Create prices
 			const prices = [];
 			for (const priceDto of values.prices) {
 				let currencyTypeId = priceDto.currency_type_id;
@@ -1417,7 +1268,6 @@ export class PropertyServices {
 				prices.push(price);
 			}
 
-			// 9. Create expenses (optional)
 			const expenses = [];
 			if (values.expenses && values.expenses.length > 0) {
 				for (const expenseDto of values.expenses) {
@@ -1448,7 +1298,6 @@ export class PropertyServices {
 				}
 			}
 
-			// 10. Resolve and link services (create if they don't exist)
 			if (
 				servicesData &&
 				servicesData.services &&
@@ -1457,7 +1306,6 @@ export class PropertyServices {
 				for (const serviceName of servicesData.services) {
 					if (!serviceName || !serviceName.trim()) continue;
 
-					// Find or create service
 					let service = await CatalogServiceModel.findByName(
 						serviceName.trim(),
 					);
@@ -1473,7 +1321,6 @@ export class PropertyServices {
 						);
 					}
 
-					// Link service to property
 					await PropertyServiceModel.create({
 						property_id: property.id,
 						service_id: service.id,
@@ -1481,7 +1328,6 @@ export class PropertyServices {
 				}
 			}
 
-			// 11. Upload images and create multimedia records
 			const uploadedImages: string[] = [];
 			const multimediaRecords = [];
 
@@ -1543,7 +1389,6 @@ export class PropertyServices {
 				);
 			}
 
-			// 12. Upload PDF documents and create records
 			const uploadedDocuments: string[] = [];
 			const documentRecords = [];
 
@@ -1552,14 +1397,12 @@ export class PropertyServices {
 					for (let i = 0; i < documents.length; i++) {
 						const document = documents[i];
 
-						// Validate that it's a PDF
 						if (document.mimetype !== "application/pdf") {
 							throw CustomError.badRequest(
 								`Document ${i + 1} must be a PDF file`,
 							);
 						}
 
-						// Get document name (from array or original filename)
 						const documentName =
 							documentNames && documentNames[i]
 								? documentNames[i].trim()
@@ -1579,18 +1422,15 @@ export class PropertyServices {
 						);
 						uploadedDocuments.push(documentUrl);
 
-						// Create document record
-						// Use property owner_id as client_id for the document
 						const docRecord = await PropertyDocumentModel.create({
 							property_id: property.id,
-							client_id: finalOwnerId || undefined, // Use property owner as the client
+							client_id: finalOwnerId || undefined,
 							document_name: documentName,
 							file_path: documentUrl,
 						});
 						documentRecords.push(docRecord);
 					}
 				} catch (error: unknown) {
-					// Clean up uploaded documents
 					for (const url of uploadedDocuments) {
 						try {
 							await this.fileUploadAdapter.deleteFile(url);
@@ -1605,7 +1445,6 @@ export class PropertyServices {
 				}
 			}
 
-			// 13. Enrich response
 			const [
 				propertyType,
 				propertyStatus,
@@ -1625,7 +1464,6 @@ export class PropertyServices {
 				? await CountryModel.findById(addressProvince.country_id)
 				: null;
 
-			// Enrich prices
 			const enrichedPrices = await Promise.all(
 				prices.map(async (price: PropertyPrice) => {
 					const [currency, operationType] = await Promise.all([
@@ -1655,7 +1493,6 @@ export class PropertyServices {
 				}),
 			);
 
-			// Enrich expenses
 			const enrichedExpenses =
 				expenses.length > 0
 					? await Promise.all(
@@ -1682,7 +1519,6 @@ export class PropertyServices {
 						)
 					: [];
 
-			// Get linked services
 			const propertyServices = await PropertyServiceModel.findByPropertyId(
 				property.id,
 			);
@@ -1698,11 +1534,9 @@ export class PropertyServices {
 				}),
 			);
 
-			// Return complete response with ALL fields (including nulls)
 			return {
 				property: {
 					...property,
-					// Main catalogs
 					property_type: propertyType
 						? {
 								id: propertyType.id,
@@ -1721,9 +1555,7 @@ export class PropertyServices {
 								name: visibilityStatus.name,
 							}
 						: null,
-					// Owner ID
 					owner_id: property.owner_id || null,
-					// Optional catalogs
 					age: ageId
 						? {
 								id: ageId,
@@ -1782,28 +1614,17 @@ export class PropertyServices {
 								}
 							: null,
 					},
-					// Prices
 					prices: enrichedPrices,
-					// Expenses
 					expenses: enrichedExpenses,
-					// Services
 					services: enrichedServices.filter((s) => s !== null),
-					// Images
+					
 					images: multimediaRecords,
-					// Documents
 					documents: documentRecords,
 				},
 			};
 		});
 	}
 
-	/**
-	 * Updates a property using the grouped structure
-	 * ALL IN A TRANSACTION: If any step fails, everything is reverted
-	 * 
-	 * Only provided fields will be updated. Prices, expenses, and services will be ADDED (not replaced).
-	 * Images and documents will be ADDED (not replaced).
-	 */
 	async updatePropertyGrouped(
 		id: number,
 		updatePropertyGroupedDto: UpdatePropertyGroupedDto,
@@ -1813,7 +1634,6 @@ export class PropertyServices {
 		userId?: number,
 	) {
 		return await TransactionHelper.executeInTransaction(async () => {
-			// Verify that the property exists
 			const existingProperty = await PropertyModel.findById(id, true);
 			if (!existingProperty) {
 				throw CustomError.notFound(`Property with ID ${id} not found`);
@@ -1831,7 +1651,6 @@ export class PropertyServices {
 				imageOrder,
 			} = updatePropertyGroupedDto;
 
-			// 0. Validate and update owner_id if provided
 			let finalOwnerId: number | undefined = existingProperty.owner_id;
 			if (basic?.owner_id !== undefined && basic.owner_id !== null) {
 				const ownerIdNumber = Number(basic.owner_id);
@@ -1851,7 +1670,6 @@ export class PropertyServices {
 				finalOwnerId = ownerIdNumber;
 			}
 
-			// 1. Update geography and address if provided
 			let address = null;
 			if (geoData && addrData) {
 				const geography = await this.resolveGeography(geoData);
@@ -1902,7 +1720,6 @@ export class PropertyServices {
 				}
 			}
 
-			// 2. Resolve catalog IDs if provided in basic
 			let propertyTypeId = existingProperty.property_type_id;
 			let propertyStatusId = existingProperty.property_status_id;
 			let visibilityStatusId = existingProperty.visibility_status_id;
@@ -1936,7 +1753,6 @@ export class PropertyServices {
 				}
 			}
 
-			// 3. Resolve optional characteristic catalogs
 			const situationId = characteristics?.situation_id
 				? characteristics.situation_id
 				: characteristics?.situation
@@ -1977,7 +1793,6 @@ export class PropertyServices {
 						)
 					: existingProperty.disposition_id;
 
-			// 4. Prepare update data for property
 			const updateData: Record<string, unknown> = {};
 
 			if (basic?.title) updateData.title = basic.title;
@@ -1993,7 +1808,6 @@ export class PropertyServices {
 			if (visibilityStatusId !== existingProperty.visibility_status_id) updateData.visibility_status_id = visibilityStatusId;
 			if (finalOwnerId !== existingProperty.owner_id) updateData.owner_id = finalOwnerId;
 
-			// Characteristics
 			if (characteristics?.bedrooms_count !== undefined) updateData.bedrooms_count = characteristics.bedrooms_count;
 			if (characteristics?.bathrooms_count !== undefined) updateData.bathrooms_count = characteristics.bathrooms_count;
 			if (characteristics?.rooms_count !== undefined) updateData.rooms_count = characteristics.rooms_count;
@@ -2005,7 +1819,6 @@ export class PropertyServices {
 			if (orientationId !== existingProperty.orientation_id) updateData.orientation_id = orientationId;
 			if (dispositionId !== existingProperty.disposition_id) updateData.disposition_id = dispositionId;
 
-			// Surface
 			if (surface?.land_area !== undefined) updateData.land_area = surface.land_area;
 			if (surface?.semi_covered_area !== undefined) updateData.semi_covered_area = surface.semi_covered_area;
 			if (surface?.covered_area !== undefined) updateData.covered_area = surface.covered_area;
@@ -2014,7 +1827,6 @@ export class PropertyServices {
 			if (surface?.total_area !== undefined) updateData.total_area = surface.total_area;
 			if (surface?.zoning !== undefined) updateData.zoning = surface.zoning;
 
-			// Internal information
 			if (internal?.branch_name !== undefined) updateData.branch_name = internal.branch_name;
 			if (internal?.appraiser !== undefined) updateData.appraiser = internal.appraiser;
 			if (internal?.producer !== undefined) updateData.producer = internal.producer;
@@ -2025,7 +1837,6 @@ export class PropertyServices {
 			if (internal?.operation_commission_percentage !== undefined) updateData.operation_commission_percentage = internal.operation_commission_percentage;
 			if (internal?.producer_commission_percentage !== undefined) updateData.producer_commission_percentage = internal.producer_commission_percentage;
 
-			// 5. Update property if there are changes
 			let property = existingProperty;
 			if (Object.keys(updateData).length > 0) {
 				const updated = await PropertyModel.update(id, updateData);
@@ -2035,12 +1846,11 @@ export class PropertyServices {
 				property = updated;
 			}
 
-			// 6. Actualizar precios (reemplazar existentes + guardar en historial)
-		const newPrices = [];
-		if (values?.prices && values.prices.length > 0) {
-			for (const priceDto of values.prices) {
-				let currencyTypeId = priceDto.currency_type_id;
-				if (!currencyTypeId && priceDto.currency_symbol) {
+			const newPrices = [];
+			if (values?.prices && values.prices.length > 0) {
+				for (const priceDto of values.prices) {
+					let currencyTypeId = priceDto.currency_type_id;
+					if (!currencyTypeId && priceDto.currency_symbol) {
 					const currencyType = await CurrencyTypeModel.findBySymbol(priceDto.currency_symbol);
 					if (!currencyType || !currencyType.id) {
 						throw CustomError.badRequest(`Currency symbol "${priceDto.currency_symbol}" not found`);
@@ -2061,14 +1871,12 @@ export class PropertyServices {
 					throw CustomError.badRequest("Failed to resolve currency or operation type");
 				}
 
-				// Verificar si ya existe un precio para este tipo de operación
 				const existingPrice = await PropertyPriceModel.findCurrentByPropertyAndOperation(
 					id,
 					operationTypeId
 				);
 
 				if (existingPrice && existingPrice.id) {
-					// El precio existe → Guardar en historial y actualizar
 					if (userId && existingPrice.price !== priceDto.price) {
 						await PriceHistoryModel.create({
 							property_id: id,
@@ -2086,7 +1894,6 @@ export class PropertyServices {
 					});
 					newPrices.push(updatedPrice);
 				} else {
-					// El precio no existe → Crear nuevo
 					const price = await PropertyPriceModel.create({
 						property_id: id,
 						price: priceDto.price,
@@ -2095,7 +1902,6 @@ export class PropertyServices {
 					});
 					newPrices.push(price);
 
-					// Opcionalmente guardar precio inicial en historial
 					if (userId) {
 						await PriceHistoryModel.create({
 							property_id: id,
@@ -2110,7 +1916,6 @@ export class PropertyServices {
 			}
 		}
 
-			// 7. Add new expenses if provided
 			const newExpenses = [];
 			if (values?.expenses && values.expenses.length > 0) {
 				for (const expenseDto of values.expenses) {
@@ -2137,12 +1942,10 @@ export class PropertyServices {
 				}
 			}
 
-			// 8. Add new services if provided (services are additive)
 			if (servicesData && servicesData.services && servicesData.services.length > 0) {
 				for (const serviceName of servicesData.services) {
 					if (!serviceName || !serviceName.trim()) continue;
 
-					// Find or create service
 					let service = await CatalogServiceModel.findByName(serviceName.trim());
 					if (!service) {
 						service = await CatalogServiceModel.create({
@@ -2154,7 +1957,6 @@ export class PropertyServices {
 						throw CustomError.internalServerError(`Failed to resolve service "${serviceName}"`);
 					}
 
-					// Link service to property (ON CONFLICT DO NOTHING handles duplicates)
 					await PropertyServiceModel.create({
 						property_id: id,
 						service_id: service.id,
@@ -2162,7 +1964,6 @@ export class PropertyServices {
 				}
 			}
 
-			// 9. Upload new images if provided (additive, not replacement)
 			const uploadedImages: string[] = [];
 			const multimediaRecords = [];
 			if (images && images.length > 0) {
@@ -2179,7 +1980,7 @@ export class PropertyServices {
 							property_id: id,
 							file_path: imageUrl,
 							media_type: image.mimetype || "image/jpeg",
-							is_primary: false, // New images are not primary by default
+							is_primary: false,
 						});
 						multimediaRecords.push(multimedia);
 					}
@@ -2196,7 +1997,6 @@ export class PropertyServices {
 				}
 			}
 
-			// 10. Upload new documents if provided (additive, not replacement)
 			const uploadedDocuments: string[] = [];
 			const documentRecords = [];
 			if (documents && documents.length > 0) {
@@ -2243,9 +2043,7 @@ export class PropertyServices {
 				}
 			}
 
-			// 11. Reorder images if imageOrder is provided
 			if (imageOrder && imageOrder.length > 0) {
-				// Validate that all image IDs belong to this property
 				const existingImages = await PropertyMultimediaModel.findByPropertyId(id);
 				const existingImageIds = existingImages.map(img => img.id).filter(id => id !== undefined) as number[];
 				
@@ -2257,10 +2055,8 @@ export class PropertyServices {
 					}
 				}
 
-				// Set all images as non-primary first
 				await PropertyMultimediaModel.clearPrimaryForProperty(id);
 
-				// Set the first image in the order as primary (or the one explicitly marked as primary)
 				let primaryImageId: number | undefined = undefined;
 				for (let i = 0; i < imageOrder.length; i++) {
 					const orderItem = imageOrder[i];
@@ -2271,20 +2067,15 @@ export class PropertyServices {
 					}
 				}
 
-				// If no image was marked as primary, set the first one
 				if (!primaryImageId && imageOrder.length > 0) {
 					await PropertyMultimediaModel.setAsPrimary(imageOrder[0].id, id);
 				}
 			}
-
-			// 12. Get updated property with all relations
 			return await this.getPropertyById(id, true);
 		});
 	}
 
-	/**
-	 * Builds the full address from the grouped DTO
-	 */
+	
 	private buildFullAddressFromGrouped(
 		address: CreatePropertyGroupedDto["address"],
 	): string {
@@ -2303,9 +2094,6 @@ export class PropertyServices {
 		return parts.join(" ").trim() || address.street;
 	}
 
-	/**
-	 * Resolves a catalog ID: uses ID if provided, searches by name if provided
-	 */
 	private async resolveCatalogId<T extends { id?: number }>(
 		id: number | undefined,
 		name: string | undefined,
@@ -2316,7 +2104,6 @@ export class PropertyServices {
 		catalogName: string,
 	): Promise<number> {
 		if (id) {
-			// Verify that the ID exists
 			const catalog = await model.findById(id);
 			if (!catalog || !catalog.id) {
 				throw CustomError.badRequest(`${catalogName} with ID ${id} not found`);
@@ -2337,10 +2124,6 @@ export class PropertyServices {
 		throw CustomError.badRequest(`${catalogName} ID or name is required`);
 	}
 
-	/**
-	 * Resolves an optional catalog ID by name
-	 * Creates the catalog automatically if it doesn't exist (like services)
-	 */
 	private async resolveCatalogIdByName<
 		T extends { id?: number },
 		CreateDto = { name: string },
@@ -2354,10 +2137,8 @@ export class PropertyServices {
 	): Promise<number | undefined> {
 		if (!name) return undefined;
 
-		// Try to find existing catalog
 		let catalog = await model.findByName(name.trim());
 
-		// If not found, create it automatically
 		if (!catalog || !catalog.id) {
 			catalog = await model.create({ name: name.trim() } as CreateDto);
 		}

@@ -12,7 +12,6 @@ import { PostgresDatabase } from './data/postgres/database';
 async function main() {
   
   try {
-    // Conectar a PostgreSQL
     await PostgresDatabase.connect({
       dbName: envs.POSTGRES_DB,
       user: envs.POSTGRES_USER,
@@ -21,7 +20,6 @@ async function main() {
       port: envs.POSTGRES_PORT,
     });
 
-    // Iniciar el servidor
     const server = new Server({
       port: envs.PORT,
       routes: AppRoutes.routes,
@@ -29,7 +27,6 @@ async function main() {
 
     server.start();
 
-    // Manejar cierre de la aplicación
     process.on('SIGINT', async () => {
       console.log('\n🛑 Cerrando aplicación...');
       await server.close();

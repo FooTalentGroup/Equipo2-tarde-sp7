@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface Expense {
     id?: number;
@@ -67,7 +68,7 @@ export class ExpenseModel {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME}`;
         const conditions: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (filters) {
@@ -112,7 +113,7 @@ export class ExpenseModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.amount !== undefined) {

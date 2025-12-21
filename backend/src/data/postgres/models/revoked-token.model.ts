@@ -23,9 +23,7 @@ export interface CreateRevokedTokenDto {
 export class RevokedTokenModel {
     private static readonly TABLE_NAME = 'revoked_tokens';
 
-    /**
-     * Revocar un token (agregarlo a la blacklist)
-     */
+  
     static async create(data: CreateRevokedTokenDto): Promise<RevokedToken> {
         const client = PostgresDatabase.getClient();
         
@@ -48,9 +46,7 @@ export class RevokedTokenModel {
         return result.rows[0];
     }
 
-    /**
-     * Verificar si un token está revocado
-     */
+   
     static async isRevoked(jti: string): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         
@@ -65,19 +61,14 @@ export class RevokedTokenModel {
         return result.rows.length > 0;
     }
 
-    /**
-     * Revocar todos los tokens de un usuario
-     * Útil para "cerrar todas las sesiones"
-     */
+ 
     static async revokeAllUserTokens(
         userId: number, 
         reason: string = 'security'
     ): Promise<number> {
         const client = PostgresDatabase.getClient();
         
-        // Nota: Esto marca que se revocaron todos los tokens del usuario
-        // En una implementación completa con tracking de tokens activos,
-        // aquí buscarías todos los tokens activos del usuario
+
         
         const query = `
             INSERT INTO ${this.TABLE_NAME} (token_jti, user_id, expires_at, reason)
@@ -94,9 +85,7 @@ export class RevokedTokenModel {
         return result.rowCount || 0;
     }
 
-    /**
-     * Limpiar tokens expirados (para cron job)
-     */
+ 
     static async cleanExpiredTokens(): Promise<number> {
         const client = PostgresDatabase.getClient();
         
@@ -109,9 +98,7 @@ export class RevokedTokenModel {
         return result.rowCount || 0;
     }
 
-    /**
-     * Obtener tokens revocados de un usuario
-     */
+ 
     static async getUserRevokedTokens(userId: number): Promise<RevokedToken[]> {
         const client = PostgresDatabase.getClient();
         
@@ -126,9 +113,7 @@ export class RevokedTokenModel {
         return result.rows;
     }
 
-    /**
-     * Obtener estadísticas de tokens revocados
-     */
+
     static async getStats(): Promise<{
         total: number;
         expired: number;

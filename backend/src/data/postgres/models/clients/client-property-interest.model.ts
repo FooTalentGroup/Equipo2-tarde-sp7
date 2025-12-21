@@ -35,7 +35,6 @@ export class ClientPropertyInterestModel {
             interestData.notes || null,
         ]);
 
-        // Si no se insertó por conflicto, obtener el registro existente
         if (result.rows.length === 0) {
             return await this.findByClientAndProperty(interestData.client_id, interestData.property_id) || {
                 client_id: interestData.client_id,

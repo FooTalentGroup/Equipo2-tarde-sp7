@@ -1,9 +1,5 @@
 import { CustomError } from '../errors/custom.error';
 
-/**
- * Entity de dominio para Property
- * Contiene la lógica de negocio y validaciones
- */
 export class PropertyEntity {
     constructor(
         public id: number,
@@ -84,21 +80,12 @@ export class PropertyEntity {
         );
     }
 
-    /**
-     * Valida que la propiedad pueda ser actualizada
-     */
     canBeUpdated(): boolean {
-        // Lógica de negocio: por ejemplo, no se puede actualizar si está vendida
-        // Esto se puede expandir según las reglas de negocio
         return true;
     }
 
-    /**
-     * Valida que la propiedad pueda ser archivada
-     */
+
     canBeArchived(): boolean {
-        // Lógica de negocio: por ejemplo, no se puede archivar si tiene rentas activas
-        // Esto se puede expandir según las reglas de negocio
         return true;
     }
 }

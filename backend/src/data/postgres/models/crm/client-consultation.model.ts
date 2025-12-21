@@ -1,8 +1,9 @@
-import { PostgresDatabase } from "../../database";
+import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface ClientConsultation {
 	id?: number;
-	client_id?: number; // Optional - null until converted to lead
+	client_id?: number; 
 	property_id?: number;
 	consultation_date?: Date;
 	consultation_type_id: number;
@@ -12,7 +13,7 @@ export interface ClientConsultation {
 	responded_by_user_id?: number;
 	response_date?: Date;
 	is_read?: boolean;
-	// Consultant information (temporary until conversion to lead)
+
 	consultant_first_name?: string;
 	consultant_last_name?: string;
 	consultant_phone?: string;
@@ -20,7 +21,7 @@ export interface ClientConsultation {
 }
 
 export interface CreateClientConsultationDto {
-	client_id?: number; // Optional - null until converted to lead
+	client_id?: number; 
 	property_id?: number;
 	consultation_type_id: number;
 	assigned_user_id?: number;
@@ -30,7 +31,7 @@ export interface CreateClientConsultationDto {
 	responded_by_user_id?: number;
 	response_date?: Date;
 	is_read?: boolean;
-	// Consultant information (temporary until conversion to lead)
+	
 	consultant_first_name?: string;
 	consultant_last_name?: string;
 	consultant_phone?: string;
@@ -107,7 +108,7 @@ export class ClientConsultationModel {
 		const client = PostgresDatabase.getClient();
 		let query = `SELECT * FROM ${ClientConsultationModel.TABLE_NAME}`;
 		const conditions: string[] = [];
-		const values: any[] = [];
+		const values: SqlParams = [];
 		let paramIndex = 1;
 
 		if (filters) {
@@ -167,7 +168,7 @@ export class ClientConsultationModel {
 		const client = PostgresDatabase.getClient();
 
 		const fields: string[] = [];
-		const values: any[] = [];
+		const values: SqlParams = [];
 		let paramIndex = 1;
 
 		if (updateData.message !== undefined) {

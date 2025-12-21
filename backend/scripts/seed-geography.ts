@@ -2,7 +2,6 @@ import 'dotenv/config';
 import { PostgresDatabase } from '../src/data/postgres/database';
 import { get } from 'env-var';
 
-// Get environment variables
 const dbConfig = {
   host: get('POSTGRES_HOST').default('localhost').asString(),
   port: get('POSTGRES_PORT').default(5432).asPortNumber(),
@@ -11,21 +10,17 @@ const dbConfig = {
   database: get('POSTGRES_DB').required().asString(),
 };
 
-// Helper function to insert or skip if exists
 async function insertIfNotExists(table: string, data: { [key: string]: any }, uniqueField: string | string[]): Promise<{ created: boolean; id: number }> {
   const client = PostgresDatabase.getClient();
   
-  // Handle composite unique fields (e.g., cities: name + province_id)
   let checkQuery: string;
   let checkValues: any[];
   
   if (Array.isArray(uniqueField)) {
-    // Composite unique check (for cities: name + province_id)
     const conditions = uniqueField.map((field, index) => `${field} = $${index + 1}`).join(' AND ');
     checkQuery = `SELECT id FROM ${table} WHERE ${conditions}`;
     checkValues = uniqueField.map(field => data[field]);
   } else {
-    // Single unique field check
     checkQuery = `SELECT id FROM ${table} WHERE ${uniqueField} = $1`;
     checkValues = [data[uniqueField]];
   }
@@ -65,7 +60,6 @@ async function seedGeography() {
     let totalCreated = 0;
     let totalExisting = 0;
 
-    // Countries
     console.log('🌍 Countries:');
     const argentina = await insertIfNotExists('countries', { name: 'Argentina' }, 'name');
     if (argentina.created) {
@@ -76,7 +70,6 @@ async function seedGeography() {
       totalExisting++;
     }
 
-    // Provinces (main provinces of Argentina)
     console.log('\n🗺️  Provinces:');
     const provinces = [
       { name: 'Buenos Aires', country_id: argentina.id },
@@ -118,7 +111,6 @@ async function seedGeography() {
       }
     }
 
-    // Cities (main cities of Buenos Aires province)
     console.log('\n🏙️  Cities (Buenos Aires Province):');
     const buenosAiresCities = [
       'Ciudad Autónoma de Buenos Aires',
@@ -159,7 +151,6 @@ async function seedGeography() {
       }
     }
 
-    // Cities (Córdoba)
     console.log('\n🏙️  Cities (Córdoba Province):');
     const cordobaCities = [
       'Córdoba',
@@ -180,7 +171,6 @@ async function seedGeography() {
       }
     }
 
-    // Cities (Santa Fe)
     console.log('\n🏙️  Cities (Santa Fe Province):');
     const santaFeCities = [
       'Rosario',
@@ -200,7 +190,6 @@ async function seedGeography() {
       }
     }
 
-    // Cities (Mendoza)
     console.log('\n🏙️  Cities (Mendoza Province):');
     const mendozaCities = [
       'Mendoza',
@@ -235,6 +224,5 @@ async function seedGeography() {
   }
 }
 
-// Execute seed
 seedGeography();
 

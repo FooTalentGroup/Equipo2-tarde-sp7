@@ -1,6 +1,3 @@
-/**
- * DTO para información interna de la propiedad
- */
 export interface CreatePropertyInternalDto {
     branch_name?: string;
     appraiser?: string;

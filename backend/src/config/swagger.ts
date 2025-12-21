@@ -2,24 +2,16 @@ import swaggerJSDoc from "swagger-jsdoc";
 import { Request } from "express";
 import { envs } from "./envs";
 
-/**
- * Detecta automáticamente la URL del servidor basándose en el request
- * Maneja proxies reversos (como Render) usando headers X-Forwarded-*
- */
+
 function detectServerUrl(req: Request): string {
-  // Detectar protocolo: considerar X-Forwarded-Proto para proxies (producción)
   const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
   
-  // Detectar host: considerar X-Forwarded-Host para proxies
   const host = req.get('x-forwarded-host') || req.get('host') || `localhost:${envs.PORT}`;
   
-  // Construir URL completa
   return `${protocol}://${host}`;
 }
 
-/**
- * Genera la configuración de Swagger con detección automática del servidor
- */
+
 function generateSwaggerSpec(req?: Request) {
   const baseOptions: swaggerJSDoc.Options = {
     definition: {
@@ -75,13 +67,10 @@ function generateSwaggerSpec(req?: Request) {
     apis: ["./src/presentation/**/routes.ts"], // Path to the API docs
   };
 
-  // Si hay un request, detectar automáticamente y agregar el servidor detectado
   if (req && baseOptions.definition) {
     const detectedUrl = detectServerUrl(req);
     const isLocal = detectedUrl.includes('localhost') || detectedUrl.includes('127.0.0.1');
     
-    // Agregar el servidor detectado como el primero (seleccionado por defecto)
-    // Evitar duplicados
     const existingUrls = baseOptions.definition.servers?.map((s: { url: string }) => s.url) || [];
     if (!existingUrls.includes(detectedUrl)) {
       if (baseOptions.definition.servers) {
@@ -91,7 +80,6 @@ function generateSwaggerSpec(req?: Request) {
         });
       }
     } else {
-      // Si ya existe, moverlo al principio
       if (baseOptions.definition.servers) {
         const serverIndex = baseOptions.definition.servers.findIndex((s: { url: string }) => s.url === detectedUrl);
         if (serverIndex > 0) {
@@ -105,7 +93,6 @@ function generateSwaggerSpec(req?: Request) {
   return swaggerJSDoc(baseOptions);
 }
 
-// Configuración base (sin request) - para compatibilidad
 const options: swaggerJSDoc.Options = {
   definition: {
     openapi: "3.0.0",
@@ -157,10 +144,8 @@ const options: swaggerJSDoc.Options = {
         },
       ],
     },
-    apis: ["./src/presentation/**/routes.ts"], // Path to the API docs
+    apis: ["./src/presentation/**/routes.ts"],
   };
 
 export const swaggerSpec = swaggerJSDoc(options);
-
-// Exportar función para generar spec dinámico basado en request
 export { generateSwaggerSpec };

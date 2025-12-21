@@ -1,4 +1,5 @@
 import { PostgresDatabase } from "../../database";
+import { SqlParams } from '../../../types/sql.types';
 
 export interface CompanySettings {
 	id: number;
@@ -9,9 +10,7 @@ export interface CompanySettings {
 }
 
 export class CompanySettingsModel {
-	/**
-	 * Get company settings (always returns the single record)
-	 */
+	
 	static async findSettings(): Promise<CompanySettings | null> {
 		const client = PostgresDatabase.getClient();
 
@@ -27,9 +26,7 @@ export class CompanySettingsModel {
 		}
 	}
 
-	/**
-	 * Update company logo URL
-	 */
+
 	static async updateLogo(
 		logoUrl: string,
 		updatedByUserId: number,
@@ -54,9 +51,7 @@ export class CompanySettingsModel {
 		}
 	}
 
-	/**
-	 * Update all company settings
-	 */
+
 	static async updateSettings(
 		data: {
 			logo_url?: string;
@@ -67,7 +62,7 @@ export class CompanySettingsModel {
 		const client = PostgresDatabase.getClient();
 
 		const updates: string[] = [];
-		const values: any[] = [];
+		const values: SqlParams = [];
 		let paramIndex = 1;
 
 		if (data.logo_url !== undefined) {
@@ -81,7 +76,6 @@ export class CompanySettingsModel {
 		}
 
 		if (updates.length === 0) {
-			// No updates to perform
 			return CompanySettingsModel.findSettings();
 		}
 

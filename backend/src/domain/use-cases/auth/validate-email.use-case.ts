@@ -1,7 +1,3 @@
-/**
- * Use Case: Validar formato de email
- * Regla de negocio pura, sin dependencias externas
- */
 export class ValidateEmailUseCase {
     static execute(email: string): boolean {
         if (!email || email.trim().length === 0) {

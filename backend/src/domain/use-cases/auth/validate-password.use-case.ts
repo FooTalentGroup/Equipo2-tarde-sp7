@@ -1,7 +1,3 @@
-/**
- * Use Case: Validar fortaleza de contraseña
- * Regla de negocio pura, sin dependencias externas
- */
 export class ValidatePasswordUseCase {
     static execute(password: string): { isValid: boolean; errors: string[] } {
         const errors: string[] = [];
@@ -18,17 +14,6 @@ export class ValidatePasswordUseCase {
         if (password.length > 100) {
             errors.push('Password must be less than 100 characters');
         }
-        
-        // Opcional: Validar complejidad
-        // if (!/[A-Z]/.test(password)) {
-        //     errors.push('Password must contain at least one uppercase letter');
-        // }
-        // if (!/[a-z]/.test(password)) {
-        //     errors.push('Password must contain at least one lowercase letter');
-        // }
-        // if (!/[0-9]/.test(password)) {
-        //     errors.push('Password must contain at least one number');
-        // }
         
         return {
             isValid: errors.length === 0,

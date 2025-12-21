@@ -12,5 +12,4 @@ export class BcryptAdapter implements HashAdapter {
     }
 }
 
-// Export instance for convenience
 export const bcryptAdapter = new BcryptAdapter();

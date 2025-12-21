@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiOptions } from 'cloudinary';
 import { envs } from './envs';
 import { FileUploadAdapter } from '../domain/interfaces/file-upload.adapter';
 
@@ -20,7 +20,6 @@ function getCloudinaryConfig() {
 
 const cloudinaryConfig = getCloudinaryConfig();
 
-// Configurar Cloudinary
 cloudinary.config({
     cloud_name: cloudinaryConfig.cloud_name,
     api_key: cloudinaryConfig.api_key,
@@ -50,7 +49,7 @@ export class CloudinaryAdapter implements FileUploadAdapter {
         this.validateConfig();
         
         try {
-            const uploadOptions: any = {
+            const uploadOptions: Partial<UploadApiOptions> = {
                 resource_type: options?.resourceType || 'auto',
             };
 
@@ -96,11 +95,9 @@ export class CloudinaryAdapter implements FileUploadAdapter {
     }
 
     async deleteFile(identifier: string): Promise<boolean> {
-        // Validar configuración antes de intentar eliminar
         this.validateConfig();
         
         try {
-            // Extraer public_id de la URL si es necesario
             const publicId = this.extractPublicId(identifier);
             
             const result = await cloudinary.uploader.destroy(publicId);
@@ -112,12 +109,10 @@ export class CloudinaryAdapter implements FileUploadAdapter {
     }
 
     private extractPublicId(url: string): string {
-        // Si ya es un public_id, retornarlo
         if (!url.includes('http')) {
             return url;
         }
 
-        // Extraer public_id de la URL de Cloudinary
         const parts = url.split('/');
         const filename = parts[parts.length - 1];
         return filename.split('.')[0];

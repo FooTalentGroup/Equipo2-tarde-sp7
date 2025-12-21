@@ -4,10 +4,6 @@ import { CustomError } from '../../domain';
 import { ProfileModel, RoleModel } from '../../data/postgres/models';
 import { RevokedTokenModel } from '../../data/postgres/models/revoked-token.model';
 
-/**
- * Middleware de autenticación JWT
- * Verifica que el token sea válido y extrae el usuario
- */
 export class AuthMiddleware {
     constructor(
         private readonly jwtAdapter: JwtAdapter
@@ -15,7 +11,6 @@ export class AuthMiddleware {
 
     authenticate = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            // Obtener token del header Authorization
             const authHeader = req.headers.authorization;
             
             if (!authHeader) {
@@ -24,7 +19,6 @@ export class AuthMiddleware {
                 });
             }
             
-            // Formato: "Bearer <token>"
             const parts = authHeader.split(' ');
             if (parts.length !== 2 || parts[0] !== 'Bearer') {
                 return res.status(401).json({
@@ -34,7 +28,6 @@ export class AuthMiddleware {
             
             const token = parts[1];
             
-            // Verificar y decodificar token
             const payload = await this.jwtAdapter.validateToken(token);
             
             if (!payload) {
@@ -43,7 +36,6 @@ export class AuthMiddleware {
                 });
             }
             
-            // Check if token has been revoked (blacklist)
             if (payload.jti) {
                 const isRevoked = await RevokedTokenModel.isRevoked(payload.jti);
                 
@@ -54,8 +46,7 @@ export class AuthMiddleware {
                 }
             }
             
-            // Agregar información del usuario al request
-            (req as any).user = payload;
+            req.user = payload;
             
             next();
         } catch (error) {
@@ -71,14 +62,9 @@ export class AuthMiddleware {
         }
     }
 
-    /**
-     * Middleware que verifica que el usuario autenticado sea admin
-     * Usa el rol del token para evitar consultas innecesarias a la BD
-     * Debe usarse después de authenticate
-     */
     requireAdmin = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = (req as any).user;
+            const user = req.user;
             
             if (!user || !user.id) {
                 return res.status(401).json({
@@ -86,11 +72,9 @@ export class AuthMiddleware {
                 });
             }
 
-            // Verificar rol desde el token (más eficiente)
             const userRole = user.role?.toLowerCase();
             
             if (userRole !== 'admin') {
-                // Si no hay rol en el token o no es admin, verificar en BD (backup)
                 const userId = typeof user.id === 'string' ? parseInt(user.id, 10) : user.id;
                 const profile = await ProfileModel.findById(userId);
                 
@@ -108,15 +92,13 @@ export class AuthMiddleware {
                     });
                 }
 
-                // Actualizar el rol en el request si estaba faltante
-                (req as any).user = {
+                req.user = {
                     ...user,
                     role: role.name,
                     isAdmin: true
                 };
             } else {
-                // El token ya tiene el rol de admin
-                (req as any).user = {
+                req.user = {
                     ...user,
                     isAdmin: true
                 };
@@ -136,14 +118,9 @@ export class AuthMiddleware {
         }
     }
 
-    /**
-     * Middleware que verifica que el usuario autenticado sea admin O el dueño del recurso
-     * Útil para permitir que usuarios editen su propio perfil o que admins editen cualquier perfil
-     * Debe usarse después de authenticate
-     */
     requireAdminOrOwner = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const user = (req as any).user;
+            const user = req.user;
             
             if (!user || !user.id) {
                 return res.status(401).json({
@@ -151,11 +128,9 @@ export class AuthMiddleware {
                 });
             }
 
-            // Verificar rol desde el token primero
             const userRole = user.role?.toLowerCase();
             let isAdmin = userRole === 'admin';
             
-            // Si no hay rol en el token, obtenerlo de la BD
             if (!userRole) {
                 const userId = typeof user.id === 'string' ? parseInt(user.id, 10) : user.id;
                 const profile = await ProfileModel.findById(userId);
@@ -169,14 +144,12 @@ export class AuthMiddleware {
                 const role = await RoleModel.findById(profile.role_id);
                 isAdmin = !!(role && role.name.toLowerCase() === 'admin');
                 
-                // Actualizar el rol en el request
-                (req as any).user = {
+                req.user = {
                     ...user,
                     role: role?.name || null
                 };
             }
 
-            // Obtener el ID del recurso desde los parámetros de la ruta
             const resourceId = req.params.id;
             if (!resourceId) {
                 return res.status(400).json({
@@ -191,7 +164,6 @@ export class AuthMiddleware {
                 });
             }
 
-            // Verificar si es admin o si es el dueño del recurso
             const userId = typeof user.id === 'string' ? parseInt(user.id, 10) : user.id;
             const isOwner = userId === resourceIdNumber;
             
@@ -201,11 +173,12 @@ export class AuthMiddleware {
                 });
             }
 
-            // Agregar información completa del usuario al request
-            (req as any).user = {
-                ...(req as any).user,
-                isAdmin
-            };
+            if (req.user) {
+                req.user = {
+                    ...req.user,
+                    isAdmin
+                };
+            }
             
             next();
         } catch (error) {

@@ -4,7 +4,6 @@
 -- Description: Create revoked_tokens table for JWT blacklist
 -- ========================================================
 
--- Create revoked_tokens table
 CREATE TABLE IF NOT EXISTS revoked_tokens (
     id SERIAL PRIMARY KEY,
     token_jti VARCHAR(255) UNIQUE NOT NULL,
@@ -15,18 +14,15 @@ CREATE TABLE IF NOT EXISTS revoked_tokens (
     ip_address VARCHAR(45),
     user_agent TEXT,
     
-    -- Foreign key
     CONSTRAINT fk_revoked_tokens_user 
         FOREIGN KEY (user_id) 
         REFERENCES users(id) 
         ON DELETE CASCADE,
     
-    -- Constraint for reason values
     CONSTRAINT chk_revoked_tokens_reason 
         CHECK (reason IN ('logout', 'new_login', 'manual', 'security'))
 );
 
--- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_revoked_tokens_jti 
     ON revoked_tokens(token_jti);
 
@@ -36,7 +32,6 @@ CREATE INDEX IF NOT EXISTS idx_revoked_tokens_user_id
 CREATE INDEX IF NOT EXISTS idx_revoked_tokens_expires 
     ON revoked_tokens(expires_at);
 
--- Add comments for documentation
 COMMENT ON TABLE revoked_tokens IS 'JWT tokens blacklist for revoked/logged out tokens';
 COMMENT ON COLUMN revoked_tokens.token_jti IS 'Unique JWT ID (jti claim) of the revoked token';
 COMMENT ON COLUMN revoked_tokens.user_id IS 'User who owned the token';

@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface PropertySale {
     id?: number;
@@ -73,7 +74,7 @@ export class PropertySaleModel {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME}`;
         const conditions: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (filters) {
@@ -122,7 +123,7 @@ export class PropertySaleModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.sale_date) {

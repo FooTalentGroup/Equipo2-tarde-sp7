@@ -3,30 +3,23 @@ export class DeleteMultipleConsultationsDto {
         public readonly consultation_ids: number[]
     ) {}
 
-    static create(object: { [key: string]: any }): [string?, DeleteMultipleConsultationsDto?] {
+    static create(object: Record<string, unknown>): [string?, DeleteMultipleConsultationsDto?] {
         const { consultation_ids } = object;
 
-        // Validar que consultation_ids existe
         if (!consultation_ids) {
             return ['consultation_ids is required'];
         }
-
-        // Validar que es un array
         if (!Array.isArray(consultation_ids)) {
             return ['consultation_ids must be an array'];
         }
 
-        // Validar que no está vacío
         if (consultation_ids.length === 0) {
             return ['At least one consultation ID is required'];
         }
-
-        // Validar que no exceda el límite
         if (consultation_ids.length > 100) {
             return ['Cannot delete more than 100 consultations at once'];
         }
 
-        // Validar que todos los elementos sean números enteros positivos
         for (const id of consultation_ids) {
             if (typeof id !== 'number') {
                 return ['All consultation IDs must be numbers'];

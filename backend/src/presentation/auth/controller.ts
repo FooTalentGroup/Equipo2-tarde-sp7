@@ -7,7 +7,6 @@ import { jwtAdapter } from '../../config';
 
 export class AuthController {
 
-    // DI
     constructor(
         private readonly authServices: AuthServices
     ){}
@@ -69,7 +68,7 @@ export class AuthController {
     }
 
     getProfile(req: Request, res: Response){
-        const user = (req as any).user;
+        const user = req.user;
         
         if (!user || !user.id) {
             return res.status(401).json({
@@ -86,13 +85,16 @@ export class AuthController {
         });
     }
 
-    /**
-     * Logout - Revoke current JWT token
-     */
     logout = async (req: Request, res: Response) => {
         try {
-            const user = (req as any).user;
+            const user = req.user;
             const authHeader = req.headers.authorization;
+            
+            if (!user || !user.id) {
+                return res.status(401).json({
+                    message: 'User not authenticated'
+                });
+            }
             
             if (!authHeader) {
                 return res.status(400).json({
@@ -109,16 +111,13 @@ export class AuthController {
                 });
             }
             
-            // Calculate token expiration date
             const expiresAt = decodedToken.exp 
                 ? new Date(decodedToken.exp * 1000)
-                : new Date(Date.now() + 24 * 60 * 60 * 1000); // Default 24h if not present
+                : new Date(Date.now() + 24 * 60 * 60 * 1000);
             
-            // Get IP and User Agent for audit trail
             const ip = req.ip || req.socket.remoteAddress;
             const userAgent = req.headers['user-agent'];
             
-            // Revoke token by adding to blacklist
             await RevokedTokenModel.create({
                 token_jti: decodedToken.jti,
                 user_id: parseInt(user.id),

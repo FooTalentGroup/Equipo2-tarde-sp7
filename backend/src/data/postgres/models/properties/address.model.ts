@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface Address {
     id?: number;
@@ -73,7 +74,7 @@ export class AddressModel {
     ): Promise<Address[]> {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME} WHERE city_id = $1`;
-        const values: any[] = [cityId];
+        const values: SqlParams = [cityId];
         let paramIndex = 2;
 
         if (street) {
@@ -94,7 +95,6 @@ export class AddressModel {
 
     static async findByCoordinates(latitude: number, longitude: number, radiusKm: number = 1): Promise<Address[]> {
         const client = PostgresDatabase.getClient();
-        // Simple distance calculation (Haversine formula would be better with PostGIS)
         const query = `
             SELECT *, 
                 (6371 * acos(
@@ -115,7 +115,7 @@ export class AddressModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.street !== undefined) {

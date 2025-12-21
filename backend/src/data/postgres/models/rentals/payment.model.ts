@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface Payment {
     id?: number;
@@ -72,7 +73,7 @@ export class PaymentModel {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME}`;
         const conditions: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (filters) {
@@ -117,7 +118,7 @@ export class PaymentModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.payment_date) {

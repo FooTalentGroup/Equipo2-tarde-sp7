@@ -1,12 +1,13 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface AuditLog {
     id?: number;
     affected_table: string;
     affected_record_id: number;
     action: string;
-    previous_data?: any;
-    new_data?: any;
+    previous_data?: Record<string, unknown>;
+    new_data?: Record<string, unknown>;
     changed_at?: Date;
     user_id: number;
 }
@@ -15,8 +16,8 @@ export interface CreateAuditLogDto {
     affected_table: string;
     affected_record_id: number;
     action: string;
-    previous_data?: any;
-    new_data?: any;
+    previous_data?: Record<string, unknown>;
+    new_data?: Record<string, unknown>;
     user_id: number;
 }
 
@@ -54,7 +55,6 @@ export class AuditLogModel {
             logData.user_id,
         ]);
 
-        // Parse JSONB fields
         const row = result.rows[0];
         if (row.previous_data) row.previous_data = typeof row.previous_data === 'string' ? JSON.parse(row.previous_data) : row.previous_data;
         if (row.new_data) row.new_data = typeof row.new_data === 'string' ? JSON.parse(row.new_data) : row.new_data;
@@ -80,7 +80,7 @@ export class AuditLogModel {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME}`;
         const conditions: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (filters) {
@@ -127,7 +127,6 @@ export class AuditLogModel {
 
         const result = await client.query(query, values);
         
-        // Parse JSONB fields
         return result.rows.map(row => {
             if (row.previous_data) row.previous_data = typeof row.previous_data === 'string' ? JSON.parse(row.previous_data) : row.previous_data;
             if (row.new_data) row.new_data = typeof row.new_data === 'string' ? JSON.parse(row.new_data) : row.new_data;

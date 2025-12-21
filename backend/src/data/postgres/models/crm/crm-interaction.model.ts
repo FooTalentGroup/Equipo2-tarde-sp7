@@ -1,4 +1,5 @@
 import { PostgresDatabase } from '../../database';
+import { SqlParams } from '../../../types/sql.types';
 
 export interface CrmInteraction {
     id?: number;
@@ -31,7 +32,7 @@ export interface CrmInteractionFilters {
     status?: string;
     start_datetime?: Date;
     end_datetime?: Date;
-    upcoming?: boolean; // scheduled_datetime >= CURRENT_TIMESTAMP
+    upcoming?: boolean; 
     limit?: number;
     offset?: number;
 }
@@ -76,7 +77,7 @@ export class CrmInteractionModel {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME}`;
         const conditions: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (filters) {
@@ -140,7 +141,7 @@ export class CrmInteractionModel {
         const client = PostgresDatabase.getClient();
         
         const fields: string[] = [];
-        const values: any[] = [];
+        const values: SqlParams = [];
         let paramIndex = 1;
 
         if (updateData.title) {
