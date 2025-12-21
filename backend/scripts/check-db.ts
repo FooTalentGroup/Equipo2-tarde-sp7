@@ -2,7 +2,6 @@ import 'dotenv/config';
 import { Client } from 'pg';
 import { get } from 'env-var';
 
-// Obtener variables de entorno
 const dbConfig = {
   host: get('POSTGRES_HOST').default('localhost').asString(),
   port: get('POSTGRES_PORT').default(5432).asPortNumber(),
@@ -23,12 +22,10 @@ async function checkDatabase() {
     await client.connect();
     console.log('✅ Conexión establecida correctamente!\n');
 
-    // Verificar versión de PostgreSQL
     const versionResult = await client.query('SELECT version()');
     console.log('📊 Versión de PostgreSQL:');
     console.log(`   ${versionResult.rows[0].version.split(',')[0]}\n`);
 
-    // Listar todas las tablas
     const tablesResult = await client.query(`
       SELECT table_name 
       FROM information_schema.tables 
@@ -47,7 +44,7 @@ async function checkDatabase() {
       console.log('');
     }
 
-    // Verificar extensiones
+
     const extensionsResult = await client.query(`
       SELECT extname 
       FROM pg_extension 
@@ -64,7 +61,7 @@ async function checkDatabase() {
     }
     console.log('');
 
-    // Contar registros en cada tabla (si existen)
+   
     if (tablesResult.rows.length > 0) {
       console.log('📊 Registros por tabla:');
       for (const row of tablesResult.rows) {
@@ -102,8 +99,6 @@ async function checkDatabase() {
     console.log('🔌 Conexión cerrada');
   }
 }
-
-// Ejecutar verificación
 checkDatabase();
 
 

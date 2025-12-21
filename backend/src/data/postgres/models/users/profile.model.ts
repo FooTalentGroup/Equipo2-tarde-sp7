@@ -30,7 +30,6 @@ export class ProfileModel {
     static async create(profileData: CreateProfileDto): Promise<Profile> {
         const client = PostgresDatabase.getClient();
         
-        // La tabla users usa password_hash y tiene active
         const query = `
             INSERT INTO ${this.TABLE_NAME} (first_name, last_name, email, password_hash, phone, role_id, active)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -50,7 +49,6 @@ export class ProfileModel {
         const result = await client.query(query, values);
         const row = result.rows[0];
         
-        // Mapear password_hash correctamente
         return {
             ...row,
             password_hash: row.password_hash
@@ -72,7 +70,6 @@ export class ProfileModel {
 
     static async findById(id: number | string): Promise<Profile | null> {
         const client = PostgresDatabase.getClient();
-        // La tabla users usa SERIAL (números)
         const query = `SELECT * FROM ${this.TABLE_NAME} WHERE id = $1 AND deleted = false`;
         const result = await client.query(query, [id]);
         const row = result.rows[0];
@@ -153,9 +150,7 @@ export class ProfileModel {
         }));
     }
 
-    /**
-     * Soft delete: marca el usuario como eliminado (deleted = true)
-     */
+ 
     static async delete(id: number): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         const query = `UPDATE ${this.TABLE_NAME} SET deleted = true WHERE id = $1`;
@@ -163,9 +158,7 @@ export class ProfileModel {
         return (result.rowCount ?? 0) > 0;
     }
 
-    /**
-     * Restaura un usuario eliminado lógicamente (soft delete)
-     */
+  
     static async restore(id: number): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         const query = `UPDATE ${this.TABLE_NAME} SET deleted = false WHERE id = $1`;
@@ -173,10 +166,7 @@ export class ProfileModel {
         return (result.rowCount ?? 0) > 0;
     }
 
-    /**
-     * Hard delete: elimina físicamente el registro de la base de datos
-     * ⚠️ Use con precaución: esta acción no se puede deshacer
-     */
+ 
     static async hardDelete(id: number): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         const query = `DELETE FROM ${this.TABLE_NAME} WHERE id = $1`;
@@ -184,7 +174,6 @@ export class ProfileModel {
         return (result.rowCount ?? 0) > 0;
     }
 
-    // Métodos de compatibilidad para código existente
     static async findByEmailWithPassword(email: string): Promise<Profile | null> {
         const client = PostgresDatabase.getClient();
         const query = `SELECT * FROM ${this.TABLE_NAME} WHERE email = $1 AND deleted = false`;

@@ -61,13 +61,11 @@ export class PropertyMultimediaModel {
     static async setAsPrimary(id: number, propertyId: number): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         
-        // Primero quitar primary de todos los demás
         await client.query(
             `UPDATE ${this.TABLE_NAME} SET is_primary = false WHERE property_id = $1`,
             [propertyId]
         );
         
-        // Luego establecer este como primary
         const result = await client.query(
             `UPDATE ${this.TABLE_NAME} SET is_primary = true WHERE id = $1 RETURNING id`,
             [id]
@@ -76,9 +74,7 @@ export class PropertyMultimediaModel {
         return (result.rowCount ?? 0) > 0;
     }
 
-    /**
-     * Clears the primary flag for all images of a property
-     */
+   
     static async clearPrimaryForProperty(propertyId: number): Promise<void> {
         const client = PostgresDatabase.getClient();
         await client.query(
@@ -87,18 +83,13 @@ export class PropertyMultimediaModel {
         );
     }
 
-    /**
-     * Updates the order of images by updating is_primary flag
-     * The first image in the array will be set as primary
-     */
+    
     static async updateImageOrder(propertyId: number, imageIds: number[]): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         
         try {
-            // Clear all primary flags
             await this.clearPrimaryForProperty(propertyId);
             
-            // Set the first image as primary if array is not empty
             if (imageIds.length > 0) {
                 const result = await client.query(
                     `UPDATE ${this.TABLE_NAME} SET is_primary = true WHERE id = $1 AND property_id = $2 RETURNING id`,

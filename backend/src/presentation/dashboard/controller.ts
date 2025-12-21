@@ -5,9 +5,7 @@ import type { DashboardServices } from '../services/dashboard.services';
 export class DashboardController {
 	constructor(private readonly dashboardServices: DashboardServices) {}
 
-	/**
-	 * Get dashboard data
-	 */
+	
 	getDashboard = async (req: Request, res: Response) => {
 		try {
 			const result = await this.dashboardServices.getDashboardData();

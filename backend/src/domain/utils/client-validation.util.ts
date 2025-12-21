@@ -1,13 +1,4 @@
-/**
- * Utilidades de validación compartidas para clientes
- * Extrae validaciones comunes usadas en múltiples DTOs
- */
 
-/**
- * Valida el nombre (first_name)
- * @param first_name - Nombre a validar
- * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
- */
 export function validateFirstName(first_name: unknown): [string?, void?] {
     if (!first_name || typeof first_name !== 'string' || first_name.trim().length === 0) {
         return ['First name is required', undefined];
@@ -24,11 +15,7 @@ export function validateFirstName(first_name: unknown): [string?, void?] {
     return [undefined, undefined];
 }
 
-/**
- * Valida el apellido (last_name)
- * @param last_name - Apellido a validar
- * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
- */
+
 export function validateLastName(last_name: unknown): [string?, void?] {
     if (!last_name || typeof last_name !== 'string' || last_name.trim().length === 0) {
         return ['Last name is required', undefined];
@@ -45,11 +32,6 @@ export function validateLastName(last_name: unknown): [string?, void?] {
     return [undefined, undefined];
 }
 
-/**
- * Valida el teléfono
- * @param phone - Teléfono a validar
- * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
- */
 export function validatePhone(phone: unknown): [string?, void?] {
     if (!phone || typeof phone !== 'string' || phone.trim().length === 0) {
         return ['Phone is required', undefined];
@@ -61,7 +43,6 @@ export function validatePhone(phone: unknown): [string?, void?] {
         return ['Invalid phone format: phone can only contain numbers, spaces, dashes, parentheses, plus sign, and dots', undefined];
     }
     
-    // Validar cantidad de dígitos (el formato se normalizará antes de guardar)
     const digitsOnly = trimmedPhone.replace(/\D/g, '');
     if (digitsOnly.length < 10) {
         return ['Invalid phone format: phone must contain at least 10 digits', undefined];
@@ -71,8 +52,6 @@ export function validatePhone(phone: unknown): [string?, void?] {
         return ['Invalid phone format: phone must contain at most 15 digits', undefined];
     }
     
-    // Validar que después de normalizar no exceda 15 caracteres
-    // (normalización quita espacios/guiones pero mantiene el +)
     const normalized = trimmedPhone.startsWith('+') 
         ? '+' + trimmedPhone.substring(1).replace(/[\s\-\(\)\.]/g, '')
         : digitsOnly;
@@ -84,12 +63,7 @@ export function validatePhone(phone: unknown): [string?, void?] {
     return [undefined, undefined];
 }
 
-/**
- * Valida el email
- * @param email - Email a validar
- * @param required - Si es true, el email es requerido. Por defecto false
- * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
- */
+
 export function validateEmail(email: unknown, required: boolean = false): [string?, void?] {
     if (required && (!email || typeof email !== 'string' || email.trim().length === 0)) {
         return ['Email is required', undefined];
@@ -108,11 +82,6 @@ export function validateEmail(email: unknown, required: boolean = false): [strin
     return [undefined, undefined];
 }
 
-/**
- * Valida el DNI
- * @param dni - DNI a validar
- * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
- */
 export function validateDni(dni: unknown): [string?, void?] {
     if (dni && typeof dni === 'string' && dni.trim().length > 0) {
         const trimmedDni = dni.trim();
@@ -129,11 +98,7 @@ export function validateDni(dni: unknown): [string?, void?] {
     return [undefined, undefined];
 }
 
-/**
- * Valida el property_id
- * @param property_id - ID de propiedad a validar
- * @returns Tupla [error?, void] - Si hay error, retorna el mensaje, si no, undefined
- */
+
 export function validatePropertyId(property_id: unknown): [string?, void?] {
     if (property_id !== undefined && property_id !== null) {
         if (isNaN(Number(property_id))) {

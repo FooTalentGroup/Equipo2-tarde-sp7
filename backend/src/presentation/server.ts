@@ -25,40 +25,32 @@ export class Server {
 	}
 
 	async start() {
-		//* Middlewares globales
-		this.app.use(express.json()); // raw
-		this.app.use(express.urlencoded({ extended: true })); // x-www-form-urlencoded
+		this.app.use(express.json()); 
+		this.app.use(express.urlencoded({ extended: true }));
+		this.app.disable("x-powered-by"); 
 
-		//* Security: Ocultar información del servidor
-		this.app.disable("x-powered-by"); // Oculta "X-Powered-By: Express"
-
-		//* CORS (configurar según necesidades)
 		const { CorsMiddleware } = await import("./middlewares/cors.middleware");
-		this.app.use(CorsMiddleware.configure(["*"])); // Permitir todos los orígenes en desarrollo
+		this.app.use(CorsMiddleware.configure(["*"])); 
 
-		//* Public Folder
 		this.app.use(express.static(this.publicPath));
 
-		//* Swagger Documentation
 		const { swaggerSpec, generateSwaggerSpec } = await import(
 			"../config/swagger"
 		);
 		const swaggerUi = await import("swagger-ui-express");
 
-		// Opciones personalizadas para Swagger UI
 		const swaggerUiOptions = {
 			customCss: ".swagger-ui .topbar { display: none }",
 			customSiteTitle: "RedProp API Documentation",
 			swaggerOptions: {
-				persistAuthorization: true, // Persiste el token entre recargas de página
-				displayRequestDuration: true, // Muestra el tiempo de respuesta
-				filter: true, // Habilita el filtro de endpoints
-				tryItOutEnabled: true, // Habilita "Try it out" por defecto
-				docExpansion: "list", // Expande solo los tags, no los endpoints
+				persistAuthorization: true,
+				displayRequestDuration: true,
+				filter: true, 
+				tryItOutEnabled: true,
+				docExpansion: "list", 
 			},
 		};
 
-		// Setup Swagger UI con detección automática del servidor basado en el request
 		const swaggerSetup = (
 			req: express.Request,
 			res: express.Response,
@@ -68,11 +60,9 @@ export class Server {
 			return swaggerUi.setup(dynamicSpec, swaggerUiOptions)(req, res, next);
 		};
 
-		// Setup Swagger UI at both /docs and /api-docs
 		this.app.use("/docs", swaggerUi.serve, swaggerSetup);
 		this.app.use("/api-docs", swaggerUi.serve, swaggerSetup);
 
-		//* Health Check Endpoint (para UptimeRobot y monitoreo)
 		this.app.get("/health", (req, res) => {
 			res.status(200).json({
 				status: "ok",
@@ -82,19 +72,14 @@ export class Server {
 			});
 		});
 
-		//* Routes
 		this.app.use(this.routes);
 
-		//* Error Handler (debe ir al final, después de todas las rutas)
 		const { ErrorHandlerMiddleware } = await import(
 			"./middlewares/error-handler.middleware"
 		);
 		this.app.use(ErrorHandlerMiddleware.handle);
 
-		//* SPA /^\/(?!api).*/  <== Únicamente si no empieza con la palabra api
-		// Exclude /docs, /api-docs, and /api routes from SPA routing
 		this.app.get("*", (req, res, next) => {
-			// Skip SPA routing for Swagger docs and API routes
 			if (
 				req.path.startsWith("/docs") ||
 				req.path.startsWith("/api-docs") ||

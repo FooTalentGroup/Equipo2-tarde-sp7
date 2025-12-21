@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Client } from 'pg';
 import { get } from 'env-var';
 
-// Obtener variables de entorno
+
 const dbConfig = {
   host: get('POSTGRES_HOST').default('localhost').asString(),
   port: get('POSTGRES_PORT').default(5432).asPortNumber(),
@@ -25,7 +25,6 @@ async function dropDatabase() {
 
     console.log('⚠️  ADVERTENCIA: Se eliminarán TODAS las tablas de la base de datos\n');
 
-    // Obtener todas las tablas de la base de datos dinámicamente
     console.log('📋 Obteniendo lista de tablas...\n');
     const tablesQuery = `
       SELECT tablename 
@@ -44,7 +43,6 @@ async function dropDatabase() {
       let droppedCount = 0;
       let notFoundCount = 0;
 
-      // Eliminar todas las tablas con CASCADE para eliminar dependencias automáticamente
       for (let i = 0; i < tablesToDrop.length; i++) {
         const tableName = tablesToDrop[i];
         
@@ -70,7 +68,6 @@ async function dropDatabase() {
       if (notFoundCount > 0) console.log(`   ⚠️  No encontradas: ${notFoundCount}`);
     }
 
-    // Eliminar todas las extensiones personalizadas (mantener las del sistema)
     console.log('\n📦 Eliminando extensiones personalizadas...\n');
     
     const extensionsToDrop = ['pgcrypto'];
@@ -101,7 +98,6 @@ async function dropDatabase() {
   }
 }
 
-// Ejecutar el drop
 dropDatabase();
 
 

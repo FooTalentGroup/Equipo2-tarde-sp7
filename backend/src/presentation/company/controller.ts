@@ -6,10 +6,6 @@ import type { CompanyServices } from "../services/company.services";
 export class CompanyController {
 	constructor(private readonly companyServices: CompanyServices) {}
 
-	/**
-	 * Get company settings (public endpoint)
-	 * GET /api/company/settings
-	 */
 	getSettings = async (req: Request, res: Response) => {
 		try {
 			const settings = await this.companyServices.getCompanySettings();
@@ -19,10 +15,6 @@ export class CompanyController {
 		}
 	};
 
-	/**
-	 * Update company logo (admin only)
-	 * PATCH /api/company/logo
-	 */
 	updateLogo = async (req: Request, res: Response) => {
 		try {
 			const logoFile = req.file;
@@ -53,9 +45,6 @@ export class CompanyController {
 		}
 	};
 
-	/**
-	 * Centralized error handler
-	 */
 	private handleError(error: unknown, res: Response) {
 		if (error instanceof CustomError) {
 			return res.status(error.statusCode).json({

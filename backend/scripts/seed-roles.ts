@@ -4,7 +4,6 @@ import { PostgresDatabase } from '../src/data/postgres/database';
 import { RoleModel } from '../src/data/postgres/models/users/role.model';
 import { get } from 'env-var';
 
-// Obtener variables de entorno
 const dbConfig = {
   host: get('POSTGRES_HOST').default('localhost').asString(),
   port: get('POSTGRES_PORT').default(5432).asPortNumber(),
@@ -13,7 +12,6 @@ const dbConfig = {
   database: get('POSTGRES_DB').required().asString(),
 };
 
-// Roles to create (only lowercase: admin and agent)
 const roles = [
   'admin',
   'agent'
@@ -26,7 +24,6 @@ async function seedRoles() {
     console.log(`   Database: ${dbConfig.database}`);
     console.log(`   User: ${dbConfig.user}\n`);
 
-    // Initialize database connection
     await PostgresDatabase.connect({
       dbName: dbConfig.database,
       port: dbConfig.port,
@@ -44,14 +41,12 @@ async function seedRoles() {
 
     for (const roleName of roles) {
       try {
-        // Check if role already exists
         const existingRole = await RoleModel.findByName(roleName);
         
         if (existingRole) {
           console.log(`   ⚠️  "${roleName}" - Already exists (ID: ${existingRole.id})`);
           existingCount++;
         } else {
-          // Create the role
           const newRole = await RoleModel.create({ name: roleName });
           console.log(`   ✅ "${roleName}" - Created (ID: ${newRole.id})`);
           createdCount++;
@@ -66,7 +61,6 @@ async function seedRoles() {
     console.log(`   ⚠️  Already existed: ${existingCount}`);
     console.log(`   📋 Total: ${roles.length}\n`);
 
-    // List all roles
     const allRoles = await RoleModel.findAll();
     console.log('📋 Roles in database:');
     allRoles.forEach((role, index) => {
@@ -85,6 +79,5 @@ async function seedRoles() {
   }
 }
 
-// Ejecutar el seed
 seedRoles();
 

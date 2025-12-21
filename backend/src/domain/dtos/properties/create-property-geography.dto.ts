@@ -1,7 +1,3 @@
-/**
- * DTO para datos geográficos de una propiedad
- * Adaptado a la nueva estructura: country -> province -> city
- */
 export class CreatePropertyGeographyDto {
     constructor(
         public readonly country: string,

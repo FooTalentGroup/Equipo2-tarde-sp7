@@ -32,7 +32,7 @@ export interface CrmInteractionFilters {
     status?: string;
     start_datetime?: Date;
     end_datetime?: Date;
-    upcoming?: boolean; // scheduled_datetime >= CURRENT_TIMESTAMP
+    upcoming?: boolean; 
     limit?: number;
     offset?: number;
 }

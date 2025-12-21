@@ -2,7 +2,6 @@ import 'dotenv/config';
 import { PostgresDatabase } from '../src/data/postgres/database';
 import { get } from 'env-var';
 
-// Get environment variables
 const dbConfig = {
   host: get('POSTGRES_HOST').default('localhost').asString(),
   port: get('POSTGRES_PORT').default(5432).asPortNumber(),
@@ -11,7 +10,6 @@ const dbConfig = {
   database: get('POSTGRES_DB').required().asString(),
 };
 
-// Helper function to insert or skip if exists
 async function insertIfNotExists(table: string, data: { [key: string]: any }, uniqueField: string): Promise<{ created: boolean; id: number }> {
   const client = PostgresDatabase.getClient();
   const checkQuery = `SELECT id FROM ${table} WHERE ${uniqueField} = $1`;
@@ -50,7 +48,6 @@ async function seedCatalogs() {
     let totalCreated = 0;
     let totalExisting = 0;
 
-    // Currency Types
     console.log('💰 Currency Types:');
     const currencies = [
       { name: 'Peso Argentino', symbol: 'ARS' },
@@ -68,7 +65,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Payment Methods
     console.log('\n💳 Payment Methods:');
     const paymentMethods = [
       { name: 'Efectivo' },
@@ -88,7 +84,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Payment Statuses
     console.log('\n📊 Payment Statuses:');
     const paymentStatuses = [
       { name: 'Pendiente' },
@@ -107,7 +102,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Consultation Types
     console.log('\n📞 Consultation Types:');
     const consultationTypes = [
       { name: 'Consulta General' },
@@ -126,7 +120,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Event Types
     console.log('\n📅 Event Types:');
     const eventTypes = [
       { name: 'Visita a Propiedad' },
@@ -147,7 +140,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Contact Categories
     console.log('\n👥 Contact Categories:');
     const contactCategories = [
       { name: 'Lead' },
@@ -165,7 +157,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Property Search Types
     console.log('\n🏠 Property Search Types:');
     const propertySearchTypes = [
       { name: 'Casa' },
@@ -186,7 +177,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Property Ages
     console.log('\n⏳ Property Ages:');
     const propertyAges = [
       { name: 'A estrenar' },
@@ -206,7 +196,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Orientations
     console.log('\n🧭 Orientations:');
     const orientations = [
       { name: 'Norte' },
@@ -229,7 +218,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Dispositions
     console.log('\n📐 Dispositions:');
     const dispositions = [
       { name: 'Frente' },
@@ -248,7 +236,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Property Situations
     console.log('\n📋 Property Situations:');
     const propertySituations = [
       { name: 'Regular' },
@@ -267,7 +254,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Property Types
     console.log('\n🏘️  Property Types:');
     const propertyTypes = [
       { name: 'Casa' },
@@ -290,7 +276,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Property Operation Types
     console.log('\n💼 Property Operation Types:');
     const operationTypes = [
       { name: 'Venta' },
@@ -308,7 +293,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Property Statuses
     console.log('\n📊 Property Statuses:');
     const propertyStatuses = [
       { name: 'Disponible' },
@@ -328,7 +312,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Visibility Statuses
     console.log('\n👁️  Visibility Statuses:');
     const visibilityStatuses = [
       { name: 'Publicado' },
@@ -346,7 +329,6 @@ async function seedCatalogs() {
       }
     }
 
-    // Catalog Services
     console.log('\n🔧 Catalog Services:');
     const services = [
       { name: 'Agua corriente' },
@@ -393,6 +375,5 @@ async function seedCatalogs() {
   }
 }
 
-// Execute seed
 seedCatalogs();
 

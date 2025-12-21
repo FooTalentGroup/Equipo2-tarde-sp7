@@ -6,18 +6,9 @@ import {
 import { CustomError, ClientEntity } from '../../../domain';
 import { normalizePhone } from '../../../domain/utils/phone-normalization.util';
 
-/**
- * Helper para operaciones comunes de creación de clientes
- * Extrae lógica compartida entre diferentes servicios de clientes
- */
 export class ClientCreationHelper {
     
-    /**
-     * Resuelve el ID de categoría de contacto por nombre
-     * @param categoryName - Nombre de la categoría (Lead, Inquilino, Propietario)
-     * @returns ID de la categoría
-     * @throws CustomError si la categoría no existe
-     */
+
     static async resolveContactCategory(categoryName: string): Promise<number> {
         const category = await ContactCategoryModel.findByName(categoryName);
         if (!category || !category.id) {
@@ -28,12 +19,6 @@ export class ClientCreationHelper {
         return category.id;
     }
 
-    /**
-     * Valida que una propiedad existe
-     * @param propertyId - ID de la propiedad a validar
-     * @returns La propiedad si existe
-     * @throws CustomError si la propiedad no existe
-     */
     static async validatePropertyExists(propertyId: number) {
         const property = await PropertyModel.findById(propertyId);
         if (!property) {
@@ -44,18 +29,7 @@ export class ClientCreationHelper {
         return property;
     }
 
-    /**
-     * Crea un cliente básico con los datos proporcionados
-     * Implementa detección de duplicados antes de crear:
-     * 1. Verifica por email (si se proporciona)
-     * 2. Verifica por DNI (si se proporciona)
-     * 3. Verifica por teléfono + nombre + apellido
-     * 
-     * @param clientData - Datos básicos del cliente
-     * @param categoryId - ID de la categoría de contacto
-     * @returns Objeto con el cliente y flag indicando si fue creado o ya existía
-     * @throws CustomError si falla la creación
-     */
+    
     static async createBaseClient(
         clientData: {
             first_name: string;
@@ -70,7 +44,6 @@ export class ClientCreationHelper {
         },
         categoryId: number
     ): Promise<{ client: ClientEntity; wasCreated: boolean }> {
-        // 1. PRIORIDAD 1: Verificar duplicado por email (si se proporciona)
         if (clientData.email) {
             const existingByEmail = await ClientModel.findByEmail(clientData.email);
             if (existingByEmail) {
@@ -80,7 +53,6 @@ export class ClientCreationHelper {
             }
         }
 
-        // 2. PRIORIDAD 1.5: Verificar duplicado por DNI (si se proporciona)
         if (clientData.dni) {
             const existingByDni = await ClientModel.findByDni(clientData.dni);
             if (existingByDni) {
@@ -90,7 +62,6 @@ export class ClientCreationHelper {
             }
         }
 
-        // 3. PRIORIDAD 2: Verificar duplicado por teléfono + nombre + apellido
         const normalizedPhone = normalizePhone(clientData.phone);
         const clientsByPhone = await ClientModel.findByPhone(normalizedPhone);
         
@@ -107,7 +78,6 @@ export class ClientCreationHelper {
             }
         }
 
-        // 4. No se encontró duplicado, crear nuevo cliente
         const newClient = await ClientModel.create({
             first_name: clientData.first_name,
             last_name: clientData.last_name,

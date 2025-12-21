@@ -92,7 +92,7 @@ export interface PropertyFilters {
     currency_type_id?: number;
     featured_web?: boolean;
     search?: string;
-    includeArchived?: boolean; // Si true, incluye propiedades archivadas
+    includeArchived?: boolean;
     limit?: number;
     offset?: number;
 }
@@ -103,13 +103,10 @@ export class PropertyModel {
     static async create(propertyData: CreatePropertyDto): Promise<Property> {
         const client = PostgresDatabase.getClient();
         
-        // Construir dinámicamente el INSERT solo con campos que tienen valores
         const fields: string[] = [];
         const values: SqlParams = [];
         const placeholders: string[] = [];
         let paramIndex = 1;
-
-        // Campos requeridos
         fields.push('title');
         values.push(propertyData.title);
         placeholders.push(`$${paramIndex++}`);
@@ -130,7 +127,6 @@ export class PropertyModel {
         values.push(propertyData.property_status_id);
         placeholders.push(`$${paramIndex++}`);
 
-        // Campos opcionales - solo agregar si tienen valores
         console.log('[PropertyModel] propertyData.owner_id:', propertyData.owner_id, 'type:', typeof propertyData.owner_id);
         if (propertyData.owner_id !== undefined && propertyData.owner_id !== null) {
             console.log('[PropertyModel] Adding owner_id to INSERT:', propertyData.owner_id);
@@ -141,7 +137,6 @@ export class PropertyModel {
             console.log('[PropertyModel] owner_id is undefined or null, NOT adding to INSERT');
         }
 
-        // Campos opcionales - solo agregar si tienen valores
         const addOptionalField = (fieldName: string, value: any) => {
             if (value !== undefined && value !== null && value !== '') {
                 fields.push(fieldName);
@@ -180,7 +175,6 @@ export class PropertyModel {
         addOptionalField('orientation_id', propertyData.orientation_id);
         addOptionalField('disposition_id', propertyData.disposition_id);
         
-        // updated_at siempre se agrega
         fields.push('updated_at');
         placeholders.push('CURRENT_TIMESTAMP');
 
@@ -198,7 +192,6 @@ export class PropertyModel {
         const client = PostgresDatabase.getClient();
         let query = `SELECT * FROM ${this.TABLE_NAME} WHERE id = $1`;
         
-        // Si no se incluyen archivadas, filtrar por visibility_status_id != "Archivada"
         if (!includeArchived) {
             query += ` AND visibility_status_id != (SELECT id FROM visibility_statuses WHERE name = 'Archivada')`;
         }
@@ -207,16 +200,12 @@ export class PropertyModel {
         return result.rows[0] || null;
     }
 
-    /**
-     * Obtiene una propiedad con todas sus relaciones (address, prices, images)
-     */
     static async findByIdWithRelations(id: number, includeArchived: boolean = false): Promise<any | null> {
         const property = await this.findById(id, includeArchived);
         if (!property || !property.id) {
             return null;
         }
 
-        // Obtener direcciones
         const { PropertyAddressModel } = await import('./property-address.model');
         const { AddressModel } = await import('./address.model');
         const propertyAddresses = await PropertyAddressModel.findByPropertyId(property.id);
@@ -224,11 +213,9 @@ export class PropertyModel {
             propertyAddresses.map(pa => AddressModel.findById(pa.address_id))
         );
 
-        // Obtener precios
         const { PropertyPriceModel } = await import('./property-price.model');
         const prices = await PropertyPriceModel.findByPropertyId(property.id);
 
-        // Obtener imágenes
         const { PropertyMultimediaModel } = await import('./property-multimedia.model');
         const images = await PropertyMultimediaModel.findByPropertyId(property.id);
 
@@ -243,7 +230,6 @@ export class PropertyModel {
     static async findAll(filters?: PropertyFilters): Promise<any[]> {
         const client = PostgresDatabase.getClient();
         
-        // SELECT con JOINs para traer nombres de catálogos y datos esenciales
         let query = `
             SELECT 
                 p.*,
@@ -328,14 +314,12 @@ export class PropertyModel {
         const values: SqlParams = [];
         let paramIndex = 1;
 
-        // Join con property_prices si hay filtros de precio
         let needsPriceJoin = false;
         if (filters?.min_price || filters?.max_price || filters?.operation_type_id || filters?.currency_type_id) {
             query += ` LEFT JOIN property_prices pp ON p.id = pp.property_id`;
             needsPriceJoin = true;
         }
 
-        // Join con addresses si hay filtro de ciudad
         let needsAddressJoin = false;
         if (filters?.city_id) {
             query += ` LEFT JOIN property_addresses pa ON p.id = pa.property_id LEFT JOIN addresses a ON pa.address_id = a.id`;
@@ -394,7 +378,6 @@ export class PropertyModel {
             }
         }
 
-        // Filtrar propiedades archivadas (a menos que se especifique lo contrario)
         if (!filters?.includeArchived) {
             conditions.push(`p.visibility_status_id != (SELECT id FROM visibility_statuses WHERE name = 'Archivada')`);
         }
@@ -403,7 +386,6 @@ export class PropertyModel {
             query += ` WHERE ${conditions.join(' AND ')}`;
         }
 
-        // Group by para evitar duplicados en joins (necesario cuando hay JOINs con múltiples resultados)
         if (needsPriceJoin || needsAddressJoin) {
             query += ` GROUP BY p.id, pt.name, ps.name, vs.name, pa_cat.name, o.name, d.name, psit.name, c.first_name, c.last_name, c.email, c.phone`;
         }
@@ -430,7 +412,6 @@ export class PropertyModel {
         const values: SqlParams = [];
         let paramIndex = 1;
 
-        // Helper para agregar campos
         const addField = (field: string, value: any) => {
             if (value !== undefined) {
                 fields.push(`${field} = $${paramIndex++}`);
@@ -478,7 +459,6 @@ export class PropertyModel {
             return await this.findById(id);
         }
 
-        // Siempre actualizar updated_at
         fields.push(`updated_at = CURRENT_TIMESTAMP`);
         values.push(id);
 
@@ -493,19 +473,9 @@ export class PropertyModel {
         return result.rows[0] || null;
     }
 
-    /**
-     * Archiva una propiedad cambiando su visibility_status_id a "Archivada"
-     * La propiedad permanece en la base de datos pero no aparece en búsquedas normales
-     * 
-     * ⚠️ IMPORTANTE: No se puede archivar si tiene relaciones RESTRICT activas:
-     * - client_rentals (rentas activas)
-     * - property_sales (ventas registradas)
-     * - rentals (contratos de alquiler activos)
-     */
     static async archive(id: number): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         
-        // Obtener el ID del estado "Archivada"
         const statusQuery = `SELECT id FROM visibility_statuses WHERE name = 'Archivada' LIMIT 1`;
         const statusResult = await client.query(statusQuery);
         
@@ -525,16 +495,12 @@ export class PropertyModel {
         return (result.rowCount ?? 0) > 0;
     }
 
-    /**
-     * Restaura una propiedad archivada cambiando su visibility_status_id
-     * Por defecto restaura a "Publicado", pero puedes especificar otro estado
-     */
+
     static async unarchive(id: number, newVisibilityStatusId?: number): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         
         let visibilityStatusId = newVisibilityStatusId;
         
-        // Si no se especifica, usar "Publicado" por defecto
         if (!visibilityStatusId) {
             const statusQuery = `SELECT id FROM visibility_statuses WHERE name = 'Publicado' LIMIT 1`;
             const statusResult = await client.query(statusQuery);
@@ -556,18 +522,6 @@ export class PropertyModel {
         return (result.rowCount ?? 0) > 0;
     }
 
-    /**
-     * Hard delete: elimina físicamente el registro de la base de datos
-     * ⚠️ Use con precaución: esta acción no se puede deshacer
-     * 
-     * ⚠️ RESTRICCIONES: No se puede eliminar si tiene:
-     * - client_rentals activos (ON DELETE RESTRICT)
-     * - property_sales registradas (ON DELETE RESTRICT)
-     * - rentals activos (ON DELETE RESTRICT)
-     * 
-     * Se eliminarán automáticamente (CASCADE):
-     * - property_prices, property_multimedia, property_documents, etc.
-     */
     static async delete(id: number): Promise<boolean> {
         const client = PostgresDatabase.getClient();
         const query = `DELETE FROM ${this.TABLE_NAME} WHERE id = $1`;

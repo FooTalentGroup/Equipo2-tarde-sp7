@@ -95,7 +95,6 @@ export class AddressModel {
 
     static async findByCoordinates(latitude: number, longitude: number, radiusKm: number = 1): Promise<Address[]> {
         const client = PostgresDatabase.getClient();
-        // Simple distance calculation (Haversine formula would be better with PostGIS)
         const query = `
             SELECT *, 
                 (6371 * acos(

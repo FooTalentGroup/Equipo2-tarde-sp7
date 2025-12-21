@@ -1,9 +1,4 @@
 import { CustomError } from '../errors/custom.error';
-
-/**
- * Domain Entity for Client
- * Contains business logic and validations
- */
 export class ClientEntity {
     constructor(
         public id: number,
@@ -25,10 +20,6 @@ export class ClientEntity {
         public deleted?: boolean,
     ) {}
 
-    /**
-     * Creates a ClientEntity from database object WITHOUT format validation
-     * Use this when reading from database (data already validated on creation)
-     */
     static fromDatabaseObject(object: { [key: string]: any }): ClientEntity {
         const {
             id,
@@ -50,8 +41,6 @@ export class ClientEntity {
             deleted,
         } = object;
 
-        // Only validate that required fields exist (not their format)
-        // Format validation was done when the data was created/updated
         if (!id) {
             throw CustomError.badRequest('Client ID is required');
         }
@@ -72,14 +61,13 @@ export class ClientEntity {
             throw CustomError.badRequest('Contact category ID is required');
         }
 
-        // Parse date if provided
         let registeredDate: Date | undefined = undefined;
         if (registered_at) {
             registeredDate = registered_at instanceof Date 
                 ? registered_at 
                 : new Date(registered_at);
             if (isNaN(registeredDate.getTime())) {
-                registeredDate = undefined; // Don't throw, just ignore invalid dates
+                registeredDate = undefined;
             }
         }
 
@@ -108,10 +96,6 @@ export class ClientEntity {
         );
     }
 
-    /**
-     * Creates a ClientEntity from an object WITH full validation
-     * Use this when creating or updating clients (input validation)
-     */
     static fromObject(object: { [key: string]: any }): ClientEntity {
         const {
             id,
@@ -133,7 +117,6 @@ export class ClientEntity {
             deleted,
         } = object;
 
-        // Validate required fields
         if (!id) {
             throw CustomError.badRequest('Client ID is required');
         }
@@ -142,7 +125,6 @@ export class ClientEntity {
             throw CustomError.badRequest('First name is required');
         }
 
-        // Validate first name length
         if (first_name.trim().length < 2) {
             throw CustomError.badRequest('First name must be at least 2 characters');
         }
@@ -155,7 +137,6 @@ export class ClientEntity {
             throw CustomError.badRequest('Last name is required');
         }
 
-        // Validate last name length
         if (last_name.trim().length < 2) {
             throw CustomError.badRequest('Last name must be at least 2 characters');
         }
@@ -172,33 +153,27 @@ export class ClientEntity {
             throw CustomError.badRequest('Contact category ID is required');
         }
 
-        // Validate email format if provided
         if (email && email.trim().length > 0) {
             if (!ClientEntity.isValidEmail(email)) {
                 throw CustomError.badRequest('Invalid email format');
             }
         }
 
-        // Validate phone format (basic validation)
         if (!ClientEntity.isValidPhone(phone)) {
             throw CustomError.badRequest('Invalid phone format');
         }
-
-        // Validate property_interest_phone if provided
         if (property_interest_phone && property_interest_phone.trim().length > 0) {
             if (!ClientEntity.isValidPhone(property_interest_phone)) {
                 throw CustomError.badRequest('Invalid property interest phone format');
             }
         }
 
-        // Validate DNI format if provided (basic validation - numbers and optional dashes)
         if (dni && dni.trim().length > 0) {
             if (!ClientEntity.isValidDni(dni)) {
                 throw CustomError.badRequest('Invalid DNI format');
             }
         }
 
-        // Validate dates
         let registeredDate: Date | undefined = undefined;
         if (registered_at) {
             registeredDate = registered_at instanceof Date 
@@ -234,49 +209,29 @@ export class ClientEntity {
         );
     }
 
-    /**
-     * Returns full name of the client
-     */
+  
     get fullName(): string {
         return `${this.first_name} ${this.last_name}`.trim();
     }
 
-    /**
-     * Returns primary contact phone (prefers property_interest_phone if available)
-     */
     get primaryPhone(): string {
         return this.property_interest_phone || this.phone;
     }
 
-    /**
-     * Checks if client has any interest (purchase or rental)
-     */
     hasInterest(): boolean {
         return this.purchase_interest === true || this.rental_interest === true;
     }
 
-    /**
-     * Checks if client can be deleted
-     * Business rule: Cannot delete if has active properties or rentals
-     * For now, returns true but can be extended with actual checks
-     */
     canBeDeleted(): boolean {
-        // TODO: Add check for active properties
-        // TODO: Add check for active rentals
         return !this.deleted;
     }
 
-    /**
-     * Checks if client can be updated
-     * Business rule: Cannot update if deleted
-     */
+ 
     canBeUpdated(): boolean {
         return !this.deleted;
     }
 
-    /**
-     * Returns public object representation (excludes sensitive/internal data)
-     */
+   
     toPublicObject() {
         return {
             id: this.id,
@@ -298,39 +253,26 @@ export class ClientEntity {
         };
     }
 
-    /**
-     * Validates email format
-     */
     private static isValidEmail(email: string): boolean {
         const trimmedEmail = email.trim();
-        // More strict email validation
         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         return emailRegex.test(trimmedEmail) && trimmedEmail.length <= 255;
     }
 
-    /**
-     * Validates phone format (allows ONLY numbers, spaces, dashes, parentheses, plus sign)
-     * NO letters allowed
-     */
     private static isValidPhone(phone: string): boolean {
         const trimmedPhone = phone.trim();
         
-        // Must contain only valid characters: digits, spaces, dashes, parentheses, plus sign, dots
-        // NO letters allowed
         const validCharsRegex = /^[\d\s\-\(\)\+\.]+$/;
         if (!validCharsRegex.test(trimmedPhone)) {
             return false;
         }
         
-        // Extract only digits
         const digitsOnly = trimmedPhone.replace(/\D/g, '');
         
-        // Must have at least 10 digits
         if (digitsOnly.length < 10) {
             return false;
         }
         
-        // Must have at most 15 digits (international standard)
         if (digitsOnly.length > 15) {
             return false;
         }
@@ -338,11 +280,7 @@ export class ClientEntity {
         return true;
     }
 
-    /**
-     * Validates DNI format (allows numbers and optional dashes/spaces)
-     */
     private static isValidDni(dni: string): boolean {
-        // Basic validation: at least 7 digits, allows dashes and spaces
         const dniRegex = /^[\d\s\-]{7,}$/;
         const digitsOnly = dni.replace(/\D/g, '');
         return dniRegex.test(dni) && digitsOnly.length >= 7 && digitsOnly.length <= 15;

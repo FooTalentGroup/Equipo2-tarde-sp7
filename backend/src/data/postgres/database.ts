@@ -69,10 +69,7 @@ export class PostgresDatabase {
         return await this.pool.query(text, params);
     }
 
-    /**
-     * Obtiene un cliente del pool para transacciones.
-     * IMPORTANTE: Siempre llamar client.release() después de usarlo.
-     */
+  
     static async getPoolClient(): Promise<PoolClient> {
         if (!this.pool) {
             throw new Error('No hay pool activo a PostgreSQL. Debes llamar a connect() primero.');
@@ -80,9 +77,6 @@ export class PostgresDatabase {
         return await this.pool.connect();
     }
 
-    /**
-     * @deprecated Usa query() para queries normales o getPoolClient() para transacciones.
-     */
     static getClient(): Pool {
         return this.getPool();
     }

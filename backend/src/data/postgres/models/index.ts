@@ -1,4 +1,3 @@
-// Exportar todos los modelos organizados por dominio
 
 export * from "./clients";
 export * from "./company";

@@ -55,7 +55,6 @@ export class AuditLogModel {
             logData.user_id,
         ]);
 
-        // Parse JSONB fields
         const row = result.rows[0];
         if (row.previous_data) row.previous_data = typeof row.previous_data === 'string' ? JSON.parse(row.previous_data) : row.previous_data;
         if (row.new_data) row.new_data = typeof row.new_data === 'string' ? JSON.parse(row.new_data) : row.new_data;
@@ -128,7 +127,6 @@ export class AuditLogModel {
 
         const result = await client.query(query, values);
         
-        // Parse JSONB fields
         return result.rows.map(row => {
             if (row.previous_data) row.previous_data = typeof row.previous_data === 'string' ? JSON.parse(row.previous_data) : row.previous_data;
             if (row.new_data) row.new_data = typeof row.new_data === 'string' ? JSON.parse(row.new_data) : row.new_data;

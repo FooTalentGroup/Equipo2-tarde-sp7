@@ -23,13 +23,8 @@ export class ConsultationController {
 		});
 	};
 
-	/**
-	 * Create a property consultation from public website
-	 * No authentication required - public endpoint
-	 */
 	createPropertyConsultation = async (req: Request, res: Response) => {
 		try {
-			// Validate DTO
 			const [error, createConsultationDto] =
 				CreatePropertyConsultationDto.create(req.body);
 
@@ -39,7 +34,6 @@ export class ConsultationController {
 				});
 			}
 
-			// Create consultation
 			const result = await this.consultationServices.createPropertyConsultation(
 				createConsultationDto,
 			);
@@ -50,13 +44,8 @@ export class ConsultationController {
 		}
 	};
 
-	/**
-	 * Create a general consultation from public website (without property)
-	 * No authentication required - public endpoint
-	 */
 	createGeneralConsultation = async (req: Request, res: Response) => {
 		try {
-			// Validate DTO
 			const [error, createConsultationDto] =
 				CreateGeneralConsultationDto.create(req.body);
 
@@ -66,7 +55,6 @@ export class ConsultationController {
 				});
 			}
 
-			// Create general consultation
 			const result = await this.consultationServices.createGeneralConsultation(
 				createConsultationDto,
 			);
@@ -77,13 +65,8 @@ export class ConsultationController {
 		}
 	};
 
-	/**
-	 * Get all consultations with filters and pagination
-	 * Requires authentication
-	 */
 	getAllConsultations = async (req: Request, res: Response) => {
 		try {
-			// Verificar que el usuario esté autenticado (viene del middleware)
 			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
@@ -120,13 +103,8 @@ export class ConsultationController {
 		}
 	};
 
-	/**
-	 * Delete a single consultation
-	 * Requires authentication
-	 */
 	deleteConsultation = async (req: Request, res: Response) => {
 		try {
-			// Verificar que el usuario esté autenticado
 			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
@@ -137,7 +115,6 @@ export class ConsultationController {
 			const { id } = req.params;
 			const consultationId = parseInt(id);
 
-			// Validar que el ID sea un número válido
 			if (isNaN(consultationId) || consultationId <= 0) {
 				return res.status(400).json({
 					message: "Invalid consultation ID",
@@ -153,13 +130,8 @@ export class ConsultationController {
 		}
 	};
 
-	/**
-	 * Delete multiple consultations
-	 * Requires authentication
-	 */
 	deleteMultipleConsultations = async (req: Request, res: Response) => {
 		try {
-			// Verificar que el usuario esté autenticado
 			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
@@ -167,7 +139,6 @@ export class ConsultationController {
 				});
 			}
 
-			// Validar DTO
 			const [error, deleteDto] = DeleteMultipleConsultationsDto.create(
 				req.body,
 			);
@@ -189,13 +160,8 @@ export class ConsultationController {
 		}
 	};
 
-	/**
-	 * Mark a consultation as read
-	 * Requires authentication
-	 */
 	markAsRead = async (req: Request, res: Response) => {
 		try {
-			// Verificar que el usuario esté autenticado
 			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
@@ -206,7 +172,6 @@ export class ConsultationController {
 			const { id } = req.params;
 			const consultationId = parseInt(id);
 
-			// Validar que el ID sea un número válido
 			if (isNaN(consultationId) || consultationId <= 0) {
 				return res.status(400).json({
 					message: "Invalid consultation ID",
@@ -221,13 +186,8 @@ export class ConsultationController {
 		}
 	};
 
-	/**
-	 * Mark a consultation as unread
-	 * Requires authentication
-	 */
 	markAsUnread = async (req: Request, res: Response) => {
 		try {
-			// Verificar que el usuario esté autenticado
 			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
@@ -238,7 +198,6 @@ export class ConsultationController {
 			const { id } = req.params;
 			const consultationId = parseInt(id);
 
-			// Validar que el ID sea un número válido
 			if (isNaN(consultationId) || consultationId <= 0) {
 				return res.status(400).json({
 					message: "Invalid consultation ID",
@@ -253,13 +212,8 @@ export class ConsultationController {
 		}
 	};
 
-	/**
-	 * Convert a consultation to a lead
-	 * Requires authentication
-	 */
 	convertConsultationToLead = async (req: Request, res: Response) => {
 		try {
-			// Verificar que el usuario esté autenticado
 			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
@@ -270,7 +224,6 @@ export class ConsultationController {
 			const { id } = req.params;
 			const consultationId = parseInt(id);
 
-			// Validar que el ID sea un número válido
 			if (isNaN(consultationId) || consultationId <= 0) {
 				return res.status(400).json({
 					message: "Invalid consultation ID",

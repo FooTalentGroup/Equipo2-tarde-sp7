@@ -12,31 +12,22 @@ import { CreateTenantDto } from '../../domain/dtos/clients/create-tenant.dto';
 import { CustomError, ClientEntity } from '../../domain';
 import { ClientCreationHelper } from './helpers/client-creation.helper';
 
-/**
- * Service para manejar operaciones específicas de inquilinos
- * Incluye creación de cliente + propiedad + contrato en una transacción
- */
+
 export class TenantServices {
     
-    /**
-     * Crea un inquilino con propiedad y contrato de alquiler
-     * Todo en una transacción: si falla cualquier paso, se revierte todo
-     */
+ 
     async createTenantWithProperty(
         createTenantDto: CreateTenantDto,
         createdByUserId: number
     ) {
         return await TransactionHelper.executeInTransaction(async () => {
-            // 1. Resolver contact_category_id para "Inquilino" usando helper
             const categoryId = await ClientCreationHelper.resolveContactCategory('Inquilino');
 
-            // 2. Validar que la propiedad existe si se proporciona property_id
             let propertyId: number | undefined = undefined;
             if (createTenantDto.property_id) {
                 await ClientCreationHelper.validatePropertyExists(createTenantDto.property_id);
                 propertyId = createTenantDto.property_id;
 
-                // Verificar si la propiedad ya tiene un alquiler activo
                 const activeRental = await RentalModel.findActiveByPropertyId(propertyId);
                 if (activeRental) {
                     throw CustomError.badRequest(
@@ -45,15 +36,12 @@ export class TenantServices {
                 }
             }
 
-            // 3. Resolver currency_type_id si se proporciona nombre o símbolo
             let currencyTypeId: number | undefined = undefined;
             if (createTenantDto.currency_type_id) {
                 currencyTypeId = createTenantDto.currency_type_id;
             } else if (createTenantDto.currency_type) {
-                // Intentar buscar por nombre primero
                 let currencyType = await CurrencyTypeModel.findByName(createTenantDto.currency_type);
                 
-                // Si no se encuentra por nombre, intentar por símbolo
                 if (!currencyType || !currencyType.id) {
                     currencyType = await CurrencyTypeModel.findBySymbol(createTenantDto.currency_type);
                 }
@@ -66,7 +54,6 @@ export class TenantServices {
                 currencyTypeId = currencyType.id;
             }
 
-            // 3. Crear el cliente (inquilino) usando helper
             const { client: newClient, wasCreated } = await ClientCreationHelper.createBaseClient({
                 first_name: createTenantDto.first_name,
                 last_name: createTenantDto.last_name,
@@ -75,32 +62,26 @@ export class TenantServices {
                 dni: createTenantDto.dni,
                 address: createTenantDto.address,
                 notes: createTenantDto.notes,
-                rental_interest: true, // Marcar como interesado en alquiler
+                rental_interest: true,
             }, categoryId);
 
-            // 4. Si hay información de propiedad y contrato, crear las relaciones
             let clientRental = null;
             let rental = null;
 
             if (propertyId && createTenantDto.contract_start_date && newClient.id) {
-                // Normalizar fechas para evitar problemas de zona horaria
-                // Parsear string YYYY-MM-DD directamente y crear Date en UTC
                 const normalizeDate = (date: string | Date | undefined): Date | undefined => {
                     if (!date) return undefined;
                     
                     let dateStr: string;
                     if (typeof date === 'string') {
-                        // Si es string, validar formato YYYY-MM-DD
                         if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
                             throw CustomError.badRequest(`Invalid date format. Expected YYYY-MM-DD, got: ${date}`);
                         }
                         dateStr = date;
                     } else {
-                        // Si es Date, convertir a string YYYY-MM-DD
                         dateStr = date.toISOString().split('T')[0];
                     }
                     
-                    // Parsear YYYY-MM-DD y crear Date en UTC (medianoche UTC)
                     const [year, month, day] = dateStr.split('-').map(Number);
                     return new Date(Date.UTC(year, month - 1, day));
                 };
@@ -109,7 +90,6 @@ export class TenantServices {
                 const normalizedEndDate = normalizeDate(createTenantDto.contract_end_date);
                 const normalizedIncreaseDate = normalizeDate(createTenantDto.next_increase_date);
 
-                // Crear client_rental (relación cliente-propiedad)
                 clientRental = await ClientRentalModel.create({
                     client_id: newClient.id,
                     property_id: propertyId,
@@ -121,7 +101,6 @@ export class TenantServices {
                     remind_contract_end: createTenantDto.remind_contract_end ?? false,
                 });
 
-                // Si hay monto mensual, crear el rental (detalles del contrato)
                 if (createTenantDto.monthly_amount && currencyTypeId && clientRental.id) {
                     rental = await RentalModel.create({
                         property_id: propertyId,
@@ -136,17 +115,14 @@ export class TenantServices {
                         remind_contract_end: createTenantDto.remind_contract_end ?? false,
                     });
 
-                    // Actualizar estado de la propiedad a "Alquilada" (ID: 3)
                     await PropertyModel.update(propertyId, {
                         property_status_id: 3
                     });
                 }
             }
 
-            // 5. Crear entity del cliente para retornar
             const clientEntity = ClientEntity.fromDatabaseObject(newClient);
 
-            // 6. Obtener información completa de la propiedad alquilada si existe
             let rentedProperty = null;
             if (clientRental && propertyId) {
                 const property = await PropertyModel.findById(propertyId);
@@ -180,7 +156,6 @@ export class TenantServices {
                 }
             }
 
-            // 7. Obtener propiedades de interés si existen
             let propertiesOfInterest: Array<{
                 id: number;
                 title: string;
@@ -216,16 +191,14 @@ export class TenantServices {
                 }
             }
 
-            // Construir objeto público del cliente sin campos obsoletos
             const clientPublic = clientEntity.toPublicObject();
-            // Eliminar campos que ya no se usan
             delete (clientPublic as Record<string, unknown>).property_interest_phone;
             delete (clientPublic as Record<string, unknown>).property_search_type_id;
 
             return {
                 client: clientPublic,
-                rented_property: rentedProperty, // Propiedad que está alquilando actualmente
-                properties_of_interest: propertiesOfInterest, // Propiedades de interés (puede tener múltiples)
+                rented_property: rentedProperty,
+                properties_of_interest: propertiesOfInterest,
                 client_rental: clientRental ? {
                     id: clientRental.id,
                     property_id: clientRental.property_id,

@@ -10,9 +10,7 @@ export interface CompanySettings {
 }
 
 export class CompanySettingsModel {
-	/**
-	 * Get company settings (always returns the single record)
-	 */
+	
 	static async findSettings(): Promise<CompanySettings | null> {
 		const client = PostgresDatabase.getClient();
 
@@ -28,9 +26,7 @@ export class CompanySettingsModel {
 		}
 	}
 
-	/**
-	 * Update company logo URL
-	 */
+
 	static async updateLogo(
 		logoUrl: string,
 		updatedByUserId: number,
@@ -55,9 +51,7 @@ export class CompanySettingsModel {
 		}
 	}
 
-	/**
-	 * Update all company settings
-	 */
+
 	static async updateSettings(
 		data: {
 			logo_url?: string;
@@ -82,7 +76,6 @@ export class CompanySettingsModel {
 		}
 
 		if (updates.length === 0) {
-			// No updates to perform
 			return CompanySettingsModel.findSettings();
 		}
 

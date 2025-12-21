@@ -6,11 +6,7 @@ import {
     validateDni 
 } from '../../utils/client-validation.util';
 
-/**
- * DTO para actualizar un cliente
- * Todos los campos son opcionales (PATCH)
- * Usa validaciones compartidas para mantener consistencia
- */
+
 export class UpdateClientDto {
     constructor(
         public readonly first_name?: string,
@@ -51,7 +47,6 @@ export class UpdateClientDto {
             city_id
         } = object;
 
-        // Validar contact_category si se proporciona
         if (contact_category_id && contact_category) {
             return ['Provide either contact_category_id OR contact_category name, not both', undefined];
         }
@@ -60,7 +55,6 @@ export class UpdateClientDto {
             return ['Contact category ID must be a number', undefined];
         }
 
-        // Validar property_search_type si se proporciona
         if (property_search_type_id && property_search_type) {
             return ['Provide either property_search_type_id OR property_search_type name, not both', undefined];
         }
@@ -73,7 +67,6 @@ export class UpdateClientDto {
             return ['City ID must be a number', undefined];
         }
 
-        // Validar first_name si se proporciona (usando validación compartida)
         if (first_name !== undefined) {
             if (!first_name || typeof first_name !== 'string' || first_name.trim().length === 0) {
                 return ['First name cannot be empty', undefined];
@@ -82,7 +75,6 @@ export class UpdateClientDto {
             if (firstNameError[0]) return [firstNameError[0], undefined];
         }
 
-        // Validar last_name si se proporciona (usando validación compartida)
         if (last_name !== undefined) {
             if (!last_name || typeof last_name !== 'string' || last_name.trim().length === 0) {
                 return ['Last name cannot be empty', undefined];
@@ -91,7 +83,6 @@ export class UpdateClientDto {
             if (lastNameError[0]) return [lastNameError[0], undefined];
         }
 
-        // Validar formato de teléfono si se proporciona (usando validación compartida)
         if (phone !== undefined && phone !== null) {
             if (typeof phone !== 'string' || phone.trim().length === 0) {
                 return ['Phone cannot be empty', undefined];
@@ -100,13 +91,11 @@ export class UpdateClientDto {
             if (phoneError[0]) return [phoneError[0], undefined];
         }
 
-        // Validar email si se proporciona (usando validación compartida)
         if (email !== undefined && email !== null) {
             const emailError = validateEmail(email, false);
             if (emailError[0]) return [emailError[0], undefined];
         }
 
-        // Validar property_interest_phone si se proporciona
         if (property_interest_phone !== undefined && property_interest_phone !== null) {
             if (typeof property_interest_phone === 'string' && property_interest_phone.trim().length > 0) {
                 const trimmedInterestPhone = property_interest_phone.trim();
@@ -124,13 +113,11 @@ export class UpdateClientDto {
             }
         }
 
-        // Validar DNI si se proporciona (usando validación compartida)
         if (dni !== undefined && dni !== null) {
             const dniError = validateDni(dni);
             if (dniError[0]) return [dniError[0], undefined];
         }
 
-        // Validar que al menos un campo esté presente
         const hasAnyField = first_name || last_name || phone || contact_category_id || contact_category ||
             email !== undefined || dni !== undefined || property_interest_phone !== undefined ||
             address !== undefined || notes !== undefined || interest_zone !== undefined ||

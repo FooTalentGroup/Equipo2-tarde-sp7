@@ -10,14 +10,12 @@ const secret = envs.JWT_SECRET as string;
 export class JwtAdapterImpl implements JwtAdapter {
     async generateToken(payload: JwtPayload, duration: string = '24h'): Promise<string> {
         return new Promise((resolve, reject) => {
-            // Generate unique JWT ID for blacklist tracking
             const jti = uuidv4();
             
-            // @ts-ignore - jsonwebtoken types issue with expiresIn
             jwt.sign(
                 { 
                     ...payload,
-                    jti  // Add unique identifier for token revocation
+                    jti 
                 },
                 secret,
                 { expiresIn: duration },
@@ -52,5 +50,4 @@ export class JwtAdapterImpl implements JwtAdapter {
     }
 }
 
-// Export instance for convenience
-export const jwtAdapter = new JwtAdapterImpl(); // singleton pattern
+export const jwtAdapter = new JwtAdapterImpl(); 

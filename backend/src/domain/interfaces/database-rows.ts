@@ -1,7 +1,3 @@
-/**
- * Tipos para filas de base de datos
- * Estos tipos representan la estructura de datos que viene de la DB
- */
 
 export interface PropertyPriceRow {
 	id: number;
@@ -66,7 +62,6 @@ export interface PropertyRow {
 	total_area?: number;
 	parking_spaces_count?: number;
 	age_id?: number;
-	// Campos adicionales que pueden ser necesarios
 	rooms_count?: number;
 	toilets_count?: number;
 	floors_count?: number;

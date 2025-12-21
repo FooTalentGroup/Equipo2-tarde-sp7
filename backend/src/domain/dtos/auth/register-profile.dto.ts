@@ -14,7 +14,6 @@ export class RegisterProfileDto {
     static create( object: { [key: string]: any }): [string?, RegisterProfileDto?] {
         const { first_name, last_name, email, password, phone, role_id, whatsapp_number } = object;
         
-        // Validar campos requeridos
         if (!first_name || first_name.trim().length === 0) {
             return ['First name is required', undefined];
         }
@@ -28,12 +27,10 @@ export class RegisterProfileDto {
             return ['Password is required', undefined];
         }
         
-        // Validar formato de email
         if (!regularExps.email.test(email.trim())) {
             return ['Email format is invalid', undefined];
         }
         
-        // Validar longitud de password
         if (password.length < 6) {
             return ['Password must be at least 6 characters', undefined];
         }
@@ -41,21 +38,18 @@ export class RegisterProfileDto {
             return ['Password must be less than 100 characters', undefined];
         }
         
-        // Validar formato de phone si se proporciona
         if (phone && phone.trim().length > 0) {
             if (!regularExps.phone.test(phone.trim())) {
                 return ['Phone format is invalid', undefined];
             }
         }
         
-        // Validar formato de whatsapp_number si se proporciona
         if (whatsapp_number && whatsapp_number.trim().length > 0) {
             if (!regularExps.whatsapp.test(whatsapp_number.trim())) {
                 return ['WhatsApp number format is invalid', undefined];
             }
         }
 
-        // Validar longitud de nombres
         if (first_name.trim().length < 2) {
             return ['First name must be at least 2 characters', undefined];
         }
@@ -69,7 +63,7 @@ export class RegisterProfileDto {
                 first_name.trim(),
                 last_name.trim(),
                 email.trim().toLowerCase(),
-                password, // No trimear password por seguridad
+                password,
                 phone?.trim() || undefined,
                 role_id || undefined,
                 whatsapp_number?.trim() || undefined

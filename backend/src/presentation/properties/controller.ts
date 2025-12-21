@@ -23,16 +23,6 @@ export class PropertyController {
 		});
 	};
 
-	/**
-	 * Crea una nueva propiedad
-	 *
-	 * Form-data esperado:
-	 * - propertyDetails: JSON string con detalles de la propiedad
-	 * - geography: JSON string con {country, province, city}
-	 * - address: JSON string con {street, number, neighborhood, etc.}
-	 * - prices: JSON string con array de precios
-	 * - images: Array de archivos (opcional)
-	 */
 	createProperty = async (req: Request, res: Response) => {
 		try {
 			const user = req.user;
@@ -91,9 +81,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Obtiene una propiedad por ID con todas sus relaciones
-	 */
 	getPropertyById = async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
@@ -115,9 +102,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Lists properties with optional filters
-	 */
 	listProperties = async (req: Request, res: Response) => {
 		try {
 			const {
@@ -168,9 +152,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Actualiza una propiedad
-	 */
 	updateProperty = async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
@@ -205,9 +186,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Archiva una propiedad
-	 */
 	archiveProperty = async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
@@ -225,9 +203,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Archives a property using grouped structure (allows additional updates)
-	 */
 	archivePropertyGrouped = async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
@@ -238,7 +213,6 @@ export class PropertyController {
 				});
 			}
 
-			// Get images
 			const images: Express.Multer.File[] = [];
 			if (req.files) {
 				if (typeof req.files === "object" && !Array.isArray(req.files)) {
@@ -256,7 +230,6 @@ export class PropertyController {
 				}
 			}
 
-			// Get PDF documents
 			const documents: Express.Multer.File[] = [];
 			let documentNames: string[] = [];
 
@@ -272,7 +245,6 @@ export class PropertyController {
 				}
 			}
 
-			// Get document names if provided
 			if (req.body.documentNames) {
 				try {
 					if (typeof req.body.documentNames === "string") {
@@ -285,10 +257,7 @@ export class PropertyController {
 				}
 			}
 
-			// Prepare body data for DTO creation, ensuring visibility_status is "Archivada"
 			const bodyWithArchive: Record<string, unknown> = { ...req.body };
-			
-			// Parse and merge basic data if it exists, or create new
 			let basicData: Record<string, unknown> = { visibility_status: "Archivada" };
 			if (bodyWithArchive.basic) {
 				try {
@@ -297,13 +266,11 @@ export class PropertyController {
 						: bodyWithArchive.basic;
 					basicData = { ...parsedBasic, visibility_status: "Archivada" };
 				} catch (error) {
-					// If parsing fails, use default with archive status
 					basicData = { visibility_status: "Archivada" };
 				}
 			}
 			bodyWithArchive.basic = JSON.stringify(basicData);
 
-			// Validate and create grouped DTO
 			const [error, initialDto] = UpdatePropertyGroupedDto.create(
 				bodyWithArchive,
 			);
@@ -311,11 +278,9 @@ export class PropertyController {
 			let updatePropertyGroupedDto = initialDto;
 
 			if (error || !initialDto) {
-				// If validation fails because no fields provided, create minimal DTO for archiving
 				if (!req.body.basic && !req.body.geography && !req.body.address &&
 					!req.body.values && !req.body.characteristics && !req.body.surface &&
 					!req.body.services && !req.body.internal) {
-					// No fields provided, create minimal DTO just for archiving
 					const [archiveError, archiveDto] = UpdatePropertyGroupedDto.create({
 						basic: JSON.stringify({ visibility_status: "Archivada" })
 					});
@@ -326,7 +291,6 @@ export class PropertyController {
 						});
 					}
 					
-					// Use the archive DTO
 					const result = await this.propertyServices.updatePropertyGrouped(
 						Number(id),
 						archiveDto,
@@ -346,16 +310,13 @@ export class PropertyController {
 				});
 			}
 
-			// At this point, updatePropertyGroupedDto is guaranteed to be defined
 			if (!updatePropertyGroupedDto) {
 				return res.status(400).json({
 					message: "Failed to create update DTO",
 				});
 			}
 
-			// Ensure visibility_status is always "Archivada" (create new basic object if needed)
 			if (!updatePropertyGroupedDto.basic || Object.keys(updatePropertyGroupedDto.basic).length === 0) {
-				// Create a new DTO with basic field set
 				const newDto = new UpdatePropertyGroupedDto(
 					{ visibility_status: "Archivada" },
 					updatePropertyGroupedDto.geography,
@@ -368,7 +329,6 @@ export class PropertyController {
 				);
 				updatePropertyGroupedDto = newDto;
 			} else {
-				// Create new DTO with merged basic data that includes visibility_status
 				const mergedBasic = { 
 					...updatePropertyGroupedDto.basic, 
 					visibility_status: "Archivada" 
@@ -386,7 +346,6 @@ export class PropertyController {
 				updatePropertyGroupedDto = newDto;
 			}
 
-			// Archive and update property (all in transaction)
 			const result = await this.propertyServices.updatePropertyGrouped(
 				Number(id),
 				updatePropertyGroupedDto,
@@ -404,9 +363,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Restaura una propiedad archivada
-	 */
 	unarchiveProperty = async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
@@ -428,10 +384,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Toggle featured_web status (publish/unpublish on landing page)
-	 * Only admin can publish/unpublish properties on the landing page
-	 */
 	toggleFeaturedWeb = async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
@@ -463,9 +415,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Elimina físicamente una propiedad (hard delete)
-	 */
 	deleteProperty = async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
@@ -483,25 +432,9 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Creates a new property using grouped structure
-	 *
-	 * Expected form-data:
-	 * - Basic: JSON string with basic information
-	 * - Geography: JSON string with {country, province, city}
-	 * - Address: JSON string with {street, number, neighborhood, etc.}
-	 * - Characteristics: JSON string (optional) with physical characteristics
-	 * - Surface: JSON string (optional) with surface data
-	 * - Services: JSON string (optional) with {services: ["name1", "name2"]}
-	 * - Values: JSON string with {prices: [...], expenses: [...]}
-	 * - Internal: JSON string (optional) with internal information
-	 * - images: Array of files (optional)
-	 * - documents: Array of PDF files (optional)
-	 * - documentNames: JSON string array with document names (optional, must match documents)
-	 */
+
 	createPropertyGrouped = async (req: Request, res: Response) => {
 		try {
-			// Get user from token
 			const user = req.user;
 			if (!user || !user.id) {
 				return res.status(401).json({
@@ -516,7 +449,6 @@ export class PropertyController {
 				});
 			}
 
-			// Get images
 			const images: Express.Multer.File[] = [];
 			if (req.files) {
 				if (typeof req.files === "object" && !Array.isArray(req.files)) {
@@ -530,12 +462,10 @@ export class PropertyController {
 						images.push(...files);
 					}
 				} else if (Array.isArray(req.files)) {
-					// If files come as array, they might all be images
 					images.push(...req.files);
 				}
 			}
 
-			// Debug: Log files received
 			console.log("Files received:", {
 				hasFiles: !!req.files,
 				filesType: typeof req.files,
@@ -547,7 +477,6 @@ export class PropertyController {
 						: [],
 			});
 
-			// Get PDF documents
 			const documents: Express.Multer.File[] = [];
 			let documentNames: string[] = [];
 
@@ -563,7 +492,6 @@ export class PropertyController {
 				}
 			}
 
-			// Get document names if provided
 			if (req.body.documentNames) {
 				try {
 					if (typeof req.body.documentNames === "string") {
@@ -572,12 +500,11 @@ export class PropertyController {
 						documentNames = req.body.documentNames;
 					}
 				} catch (error) {
-					// If parsing fails, use default names
 					console.warn("Could not parse documentNames, using defaults");
 				}
 			}
 
-			// Debug: Log the raw body to see what's being received
+			console.log('[PropertyController] req.body.basic (raw):', req.body.basic);
 			console.log('[PropertyController] req.body.basic (raw):', req.body.basic);
 			if (req.body.basic && typeof req.body.basic === 'string') {
 				try {
@@ -589,7 +516,6 @@ export class PropertyController {
 				}
 			}
 
-			// Validate and create grouped DTO
 			const [error, createPropertyGroupedDto] = CreatePropertyGroupedDto.create(
 				req.body,
 			);
@@ -600,7 +526,6 @@ export class PropertyController {
 				});
 			}
 
-			// Create property (all in transaction)
 			const result = await this.propertyServices.createPropertyGrouped(
 				createPropertyGroupedDto,
 				capturedByUserId,
@@ -618,9 +543,6 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Updates a property using grouped structure
-	 */
 	updatePropertyGrouped = async (req: Request, res: Response) => {
 		try {
 			const { id } = req.params;
@@ -631,7 +553,6 @@ export class PropertyController {
 				});
 			}
 
-			// Get images
 			const images: Express.Multer.File[] = [];
 			if (req.files) {
 				if (typeof req.files === "object" && !Array.isArray(req.files)) {
@@ -649,7 +570,6 @@ export class PropertyController {
 				}
 			}
 
-			// Get PDF documents
 			const documents: Express.Multer.File[] = [];
 			let documentNames: string[] = [];
 
@@ -665,7 +585,6 @@ export class PropertyController {
 				}
 			}
 
-			// Get document names if provided
 			if (req.body.documentNames) {
 				try {
 					if (typeof req.body.documentNames === "string") {
@@ -678,7 +597,6 @@ export class PropertyController {
 				}
 			}
 
-			// Validate and create grouped DTO
 			const [error, updatePropertyGroupedDto] = UpdatePropertyGroupedDto.create(
 				req.body,
 			);
@@ -689,12 +607,10 @@ export class PropertyController {
 				});
 			}
 
-			// Get user from token for price history tracking
-		const user = (req as any).user;
-		const userId = user?.id ? parseInt(user.id, 10) : undefined;
+			const user = (req as any).user;
+			const userId = user?.id ? parseInt(user.id, 10) : undefined;
 
-		// Update property (all in transaction)
-		const result = await this.propertyServices.updatePropertyGrouped(
+			const result = await this.propertyServices.updatePropertyGrouped(
 			Number(id),
 			updatePropertyGroupedDto,
 			images.length > 0 ? images : undefined,
@@ -712,50 +628,35 @@ export class PropertyController {
 		}
 	};
 
-	/**
-	 * Get document download URL
-	 * Returns document info with download URL (Cloudinary transformation)
-	 */
 	getDocumentDownloadUrl = async (req: Request, res: Response) => {
 		try {
 			const { documentId } = req.params;
-
-			// Validation: documentId must be a valid number
 			if (!documentId || isNaN(Number(documentId))) {
 				return res.status(400).json({
 					message: "Invalid document ID",
 				});
 			}
 
-			// Import PropertyDocumentModel
 			const { PropertyDocumentModel } = await import(
 				"../../data/postgres/models/properties/property-document.model"
 			);
-
-			// Find document in database
 			const document = await PropertyDocumentModel.findById(Number(documentId));
-
-			// Validation: document must exist
 			if (!document) {
 				return res.status(404).json({
 					message: "Document not found",
 				});
 			}
 
-			// Generate download URL with Cloudinary transformation
-			// fl_attachment forces download instead of opening in browser
 			const downloadUrl = document.file_path.replace(
 				"/upload/",
 				"/upload/fl_attachment/",
 			);
-
-			// Return document information
 			return res.json({
 				document: {
 					id: document.id,
 					document_name: document.document_name,
-					file_path: document.file_path, // Original URL for preview
-					download_url: downloadUrl, // URL that forces download
+					file_path: document.file_path,
+					download_url: downloadUrl,
 					uploaded_at: document.uploaded_at,
 				},
 			});

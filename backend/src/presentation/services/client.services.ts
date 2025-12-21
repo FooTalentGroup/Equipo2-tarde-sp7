@@ -20,14 +20,10 @@ import type {
     RentedPropertyWithDetails
 } from '../../domain/interfaces/enriched-data';
 
-/**
- * Service para manejar operaciones de clientes
- */
+
 export class ClientServices {
     
-    /**
-     * Lista clientes con filtros opcionales
-     */
+  
     async listClients(filters?: {
         contact_category_id?: number;
         purchase_interest?: boolean;
@@ -40,7 +36,6 @@ export class ClientServices {
     }) {
         let clients = await ClientModel.findAll(filters);
 
-        // Si hay búsqueda por texto, filtrar en memoria
         if (filters?.search) {
             const searchLower = filters.search.toLowerCase();
             clients = clients.filter(client => 
@@ -52,15 +47,12 @@ export class ClientServices {
             );
         }
 
-        // Enriquecer con nombres de catálogos, propiedades y usar entities
         const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
         const enrichedClients = await Promise.all(
             clients.map(async (client) => {
-                // Create entity from database object (no format validation needed for reading)
                 const clientEntity = ClientEntity.fromDatabaseObject(client);
                 const category = await ContactCategoryModel.findById(clientEntity.contact_category_id);
                 
-                // Obtener propiedades asociadas usando el helper
                 const categoryName = category?.name || null;
                 const properties = await this.enrichClientWithProperties(clientEntity.id, categoryName);
                 
@@ -78,19 +70,14 @@ export class ClientServices {
         return { clients: enrichedClients, count: enrichedClients.length };
     }
 
-    /**
-     * Obtiene un cliente por ID
-     */
     async getClientById(id: number) {
         const client = await ClientModel.findById(id);
         if (!client) {
             throw CustomError.notFound(`Client with ID ${id} not found`);
         }
 
-        // Create entity from database object (no format validation needed for reading)
         const clientEntity = ClientEntity.fromDatabaseObject(client);
 
-        // Enriquecer con nombres de catálogos
         const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
         const category = await ContactCategoryModel.findById(clientEntity.contact_category_id);
         
@@ -131,11 +118,9 @@ export class ClientServices {
             }
         }
 
-        // Obtener propiedades relacionadas usando el helper
         const categoryName = category?.name;
         const properties = await this.enrichClientWithProperties(clientEntity.id, categoryName || null);
 
-        // Para Leads: obtener consultas con tipo de consulta
         let consultations: EnrichedConsultation[] = [];
         if (categoryName === 'Lead') {
             consultations = await this.getClientConsultations(clientEntity.id);
@@ -159,10 +144,6 @@ export class ClientServices {
         };
     }
 
-    /**
-     * Helper privado: Enriquece los datos de una propiedad individual
-     * Agrega precio, imagen principal, dirección completa, características y antigüedad
-     */
     private async enrichPropertyDetails(property: PropertyRow): Promise<PropertyDetails> {
         const { PropertyPriceModel } = await import('../../data/postgres/models/properties/property-price.model');
         const { PropertyMultimediaModel } = await import('../../data/postgres/models/properties/property-multimedia.model');
@@ -172,7 +153,6 @@ export class ClientServices {
         const { PropertyOperationTypeModel } = await import('../../data/postgres/models/properties/property-operation-type.model');
         const { CurrencyTypeModel } = await import('../../data/postgres/models/payments/currency-type.model');
 
-        // Obtener todos los datos en paralelo para optimizar performance
         const [prices, mainImage, propertyAddresses, age] = await Promise.all([
             PropertyPriceModel.findByPropertyId(property.id),
             PropertyMultimediaModel.findPrimaryByPropertyId(property.id),
@@ -180,7 +160,6 @@ export class ClientServices {
             property.age_id ? PropertyAgeModel.findById(property.age_id) : Promise.resolve(null)
         ]);
 
-        // Procesar todos los precios (venta, alquiler, etc.)
         let pricesData: Array<{
             amount: number;
             currency: CurrencyInfo | null;
@@ -210,7 +189,6 @@ export class ClientServices {
             );
         }
 
-        // Procesar dirección completa con ubicación
         let addressData = null;
         if (propertyAddresses.length > 0) {
             const address = await AddressModel.findById(propertyAddresses[0].address_id);
@@ -248,7 +226,6 @@ export class ClientServices {
             }
         }
 
-        // Procesar imagen principal
         let imageData = null;
         if (mainImage) {
             imageData = {
@@ -258,7 +235,6 @@ export class ClientServices {
             };
         }
 
-        // Procesar antigüedad
         let ageData = null;
         if (age) {
             ageData = {
@@ -274,16 +250,12 @@ export class ClientServices {
             bathrooms: property.bathrooms_count,
             garage: (property.parking_spaces_count || 0) > 0,
             address: addressData,
-            prices: pricesData,  // Array de precios
+            prices: pricesData,  
             main_image: imageData,
             age: ageData
         };
     }
 
-    /**
-     * Helper privado: Enriquece un cliente con sus propiedades asociadas
-     * según su categoría (Lead, Propietario, Inquilino)
-     */
     private async enrichClientWithProperties(
         clientId: number,
         categoryName: string | null
@@ -292,7 +264,6 @@ export class ClientServices {
         owned_properties: OwnedPropertyWithDetails[];
         rented_property: RentedPropertyWithDetails | null;
     }> {
-        // Obtener propiedades relacionadas según el tipo de cliente
         const { PropertyModel } = await import('../../data/postgres/models/properties/property.model');
         const { PropertyTypeModel } = await import('../../data/postgres/models/properties/property-type.model');
         const { PropertyStatusModel } = await import('../../data/postgres/models/properties/property-status.model');
@@ -304,7 +275,6 @@ export class ClientServices {
         let ownedProperties: OwnedPropertyWithDetails[] = [];
         let rentedProperty: RentedPropertyWithDetails | null = null;
 
-        // Para Leads: obtener propiedades de interés desde client_property_interests
         if (categoryName === 'Lead') {
             const interests = await ClientPropertyInterestModel.findByClientId(clientId);
             
@@ -335,7 +305,6 @@ export class ClientServices {
             }
         }
 
-        // Para Owners: obtener propiedades propias desde properties donde owner_id = client.id
         if (categoryName === 'Propietario') {
             const properties = await PropertyModel.findAll({ owner_id: clientId });
             
@@ -359,24 +328,21 @@ export class ClientServices {
             );
         }
 
-        // Para Inquilinos: obtener propiedad alquilada activa desde client_rentals
         if (categoryName === 'Inquilino') {
             const clientRentals = await ClientRentalModel.findByClientId(clientId);
             
             if (clientRentals.length > 0) {
-                // Ordenar por fecha de inicio (más reciente primero)
                 const sortedRentals = clientRentals.sort((a, b) => {
                     const dateA = a.contract_start_date ? new Date(a.contract_start_date).getTime() : 0;
                     const dateB = b.contract_start_date ? new Date(b.contract_start_date).getTime() : 0;
                     return dateB - dateA;
                 });
 
-                // Buscar el alquiler activo (contract_end_date IS NULL o >= fecha actual)
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 
                 const activeRental = sortedRentals.find((rental) => {
-                    if (!rental.contract_end_date) return true; // Sin fecha de fin = activo
+                    if (!rental.contract_end_date) return true;
                     const endDate = new Date(rental.contract_end_date);
                     endDate.setHours(0, 0, 0, 0);
                     return endDate >= today;
@@ -391,7 +357,6 @@ export class ClientServices {
                             this.enrichPropertyDetails(property as PropertyRow)
                         ]);
 
-                        // Obtener información del alquiler desde rentals
                         const rentals = await RentalModel.findAll({ property_id: activeRental.property_id });
                         const rentalInfo = rentals.find(r => r.client_rental_id === activeRental.id);
 
@@ -420,7 +385,6 @@ export class ClientServices {
                 }
             }
 
-            // También obtener propiedades de interés para Inquilinos (pueden tener múltiples)
             const interests = await ClientPropertyInterestModel.findByClientId(clientId);
             
             if (interests.length > 0) {
@@ -451,33 +415,26 @@ export class ClientServices {
         }
 
         return {
-            properties_of_interest: propertiesOfInterest, // Para Leads e Inquilinos
-            owned_properties: ownedProperties, // Para Owners
-            rented_property: rentedProperty // Para Inquilinos (solo la activa)
+            properties_of_interest: propertiesOfInterest,
+            owned_properties: ownedProperties,
+            rented_property: rentedProperty
         };
     }
 
-    /**
-     * Helper privado: Obtiene las consultas de un cliente con información de tipo
-     * Incluye el tipo de consulta para cada consulta asociada
-     */
     private async getClientConsultations(clientId: number): Promise<any[]> {
         const { ClientConsultationModel } = await import('../../data/postgres/models/crm/client-consultation.model');
         const { ConsultationTypeModel } = await import('../../data/postgres/models/crm/consultation-type.model');
         
-        // Obtener todas las consultas del cliente
         const consultations = await ClientConsultationModel.findByClientId(clientId);
         
         if (consultations.length === 0) {
             return [];
         }
         
-        // Enriquecer cada consulta con su tipo
         const enrichedConsultations = await Promise.all(
             consultations.map(async (consultation) => {
                 const consultationType = await ConsultationTypeModel.findById(consultation.consultation_type_id);
                 
-                // Obtener información de la propiedad si existe
                 let property = null;
                 if (consultation.property_id) {
                     const propertyData = await PropertyModel.findById(consultation.property_id);
@@ -508,25 +465,18 @@ export class ClientServices {
         return enrichedConsultations;
     }
 
-    /**
-     * Actualiza un cliente
-     */
     async updateClient(id: number, updateClientDto: UpdateClientDto) {
-        // Verificar que el cliente existe y crear entity
         const existingClient = await ClientModel.findById(id);
         if (!existingClient) {
             throw CustomError.notFound(`Client with ID ${id} not found`);
         }
 
-        // Create entity from database object to check business rules
         const clientEntity = ClientEntity.fromDatabaseObject(existingClient);
         
-        // Check if client can be updated
         if (!clientEntity.canBeUpdated()) {
             throw CustomError.badRequest('Cannot update deleted client');
         }
 
-        // Resolver contact_category_id si se envió nombre
         let contactCategoryId: number | undefined = updateClientDto.contact_category_id;
         if (!contactCategoryId && updateClientDto.contact_category) {
             const category = await ContactCategoryModel.findByName(updateClientDto.contact_category);
@@ -538,7 +488,6 @@ export class ClientServices {
             contactCategoryId = category.id;
         }
 
-        // Resolver property_search_type_id si se envió nombre
         let propertySearchTypeId: number | undefined = updateClientDto.property_search_type_id;
         if (!propertySearchTypeId && updateClientDto.property_search_type) {
             const { PropertySearchTypeModel } = await import('../../data/postgres/models/clients/property-search-type.model');
@@ -551,7 +500,6 @@ export class ClientServices {
             propertySearchTypeId = searchType.id;
         }
 
-        // Preparar datos de actualización - solo incluir campos que realmente cambiaron
         const updateData: Record<string, unknown> = {};
         
         if (updateClientDto.first_name !== undefined && hasValueChanged(updateClientDto.first_name, existingClient.first_name)) {
@@ -597,33 +545,25 @@ export class ClientServices {
             updateData.city_id = updateClientDto.city_id;
         }
 
-        // Si no hay cambios, retornar el cliente existente sin actualizar
         if (Object.keys(updateData).length === 0) {
             return { client: clientEntity.toPublicObject() };
         }
-
-        // Actualizar cliente solo con los campos que cambiaron
         const updatedClient = await ClientModel.update(id, updateData);
         if (!updatedClient) {
             throw CustomError.internalServerError('Failed to update client');
         }
 
-        // Create entity from database object (data already validated before saving)
         const updatedClientEntity = ClientEntity.fromDatabaseObject(updatedClient);
 
         return { client: updatedClientEntity.toPublicObject() };
     }
 
-    /**
-     * Soft delete: marca el cliente como eliminado
-     */
     async deleteClient(id: number) {
         const client = await ClientModel.findById(id);
         if (!client) {
             throw CustomError.notFound(`Client with ID ${id} not found`);
         }
 
-        // Check if client is already deleted (no need to create entity for this simple check)
         if (client.deleted === true) {
             throw CustomError.badRequest('Client is already deleted');
         }
@@ -636,9 +576,7 @@ export class ClientServices {
         return { message: 'Client deleted successfully' };
     }
 
-    /**
-     * Restaura un cliente eliminado (soft delete)
-     */
+    
     async restoreClient(id: number) {
         const restored = await ClientModel.restore(id);
         if (!restored) {
@@ -648,9 +586,6 @@ export class ClientServices {
         return { message: 'Client restored successfully' };
     }
 
-    /**
-     * Helper para resolver geografía (country -> province -> city)
-     */
     private async resolveGeography(geography: {
         country?: string;
         province?: string;
@@ -660,13 +595,10 @@ export class ClientServices {
             throw CustomError.badRequest('Country, province, and city are required for geography');
         }
 
-        // Buscar o crear país
         let country = await CountryModel.findByName(geography.country);
         if (!country || !country.id) {
             country = await CountryModel.create({ name: geography.country });
         }
-
-        // Buscar o crear provincia
         let province = await ProvinceModel.findByName(geography.province);
         if (!province || !province.id) {
             province = await ProvinceModel.create({
@@ -675,7 +607,6 @@ export class ClientServices {
             });
         }
 
-        // Buscar o crear ciudad
         let city = await CityModel.findByNameAndProvince(geography.city, province.id!);
         if (!city || !city.id) {
             city = await CityModel.create({
@@ -687,30 +618,22 @@ export class ClientServices {
         return { cityId: city.id! };
     }
 
-    /**
-     * Agrega una propiedad de interés a un cliente (Lead o Inquilino)
-     */
     async addPropertyOfInterest(clientId: number, propertyId: number, notes?: string) {
-        // Verificar que el cliente existe
         const client = await ClientModel.findById(clientId);
         if (!client) {
             throw CustomError.notFound(`Client with ID ${clientId} not found`);
         }
 
-        // Verificar que la propiedad existe
         const property = await PropertyModel.findById(propertyId);
         if (!property) {
             throw CustomError.notFound(`Property with ID ${propertyId} not found`);
         }
-
-        // Crear la relación en client_property_interests
         const propertyInterest = await ClientPropertyInterestModel.create({
             client_id: clientId,
             property_id: propertyId,
             notes: notes || undefined,
         });
 
-        // Obtener información enriquecida de la propiedad
         const { PropertyTypeModel } = await import('../../data/postgres/models/properties/property-type.model');
         const { PropertyStatusModel } = await import('../../data/postgres/models/properties/property-status.model');
         
@@ -736,17 +659,12 @@ export class ClientServices {
         };
     }
 
-    /**
-     * Asocia una propiedad a un Owner (actualiza owner_id en la propiedad)
-     */
     async addOwnedProperty(clientId: number, propertyId: number) {
-        // Verificar que el cliente existe y es Owner
         const client = await ClientModel.findById(clientId);
         if (!client) {
             throw CustomError.notFound(`Client with ID ${clientId} not found`);
         }
 
-        // Verificar que es Owner
         const { ContactCategoryModel } = await import('../../data/postgres/models/clients/contact-category.model');
         const category = await ContactCategoryModel.findById(client.contact_category_id);
         
@@ -754,13 +672,10 @@ export class ClientServices {
             throw CustomError.badRequest('Client must be an Owner to associate properties');
         }
 
-        // Verificar que la propiedad existe
         const property = await PropertyModel.findById(propertyId);
         if (!property) {
             throw CustomError.notFound(`Property with ID ${propertyId} not found`);
         }
-
-        // Actualizar el owner_id de la propiedad
         const updatedProperty = await PropertyModel.update(propertyId, {
             owner_id: clientId
         });
@@ -769,7 +684,6 @@ export class ClientServices {
             throw CustomError.internalServerError('Failed to associate property with owner');
         }
 
-        // Obtener información enriquecida de la propiedad
         const { PropertyTypeModel } = await import('../../data/postgres/models/properties/property-type.model');
         const { PropertyStatusModel } = await import('../../data/postgres/models/properties/property-status.model');
         

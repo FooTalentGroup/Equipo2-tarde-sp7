@@ -31,7 +31,7 @@ export interface CreateRentalDto {
 export interface RentalFilters {
     property_id?: number;
     client_rental_id?: number;
-    active?: boolean; // end_date IS NULL OR end_date >= CURRENT_DATE
+    active?: boolean; 
     created_by_user_id?: number;
     limit?: number;
     offset?: number;

@@ -1,10 +1,7 @@
 import { Response } from 'express';
 import { CustomError } from '../../domain';
 
-/**
- * Utilidad para manejar errores de forma consistente en todos los controladores
- * Extrae la lógica común de manejo de errores de PostgreSQL y CustomError
- */
+
 export class ErrorHandlerUtil {
     
     /**
@@ -21,16 +18,13 @@ export class ErrorHandlerUtil {
             return;
         }
 
-        // Manejar errores de PostgreSQL
         if (error && typeof error === 'object' && 'code' in error) {
             const pgError = error as Error & { code?: string; constraint?: string; detail?: string; column?: string };
             
-            // Error 23505: Violación de restricción única
             if (pgError.code === '23505') {
                 const constraint = pgError.constraint || '';
                 const detail = pgError.detail || '';
                 
-                // Detectar qué campo está duplicado
                 if (constraint.includes('email')) {
                     const emailMatch = detail.match(/\(email\)=\(([^)]+)\)/);
                     const email = emailMatch ? emailMatch[1] : 'el email proporcionado';
@@ -56,14 +50,12 @@ export class ErrorHandlerUtil {
                     return;
                 }
                 
-                // Error genérico de restricción única
                 res.status(409).json({
                     message: 'Ya existe un registro con estos datos. Por favor, verifique la información.'
                 });
                 return;
             }
             
-            // Error 23503: Violación de clave foránea
             if (pgError.code === '23503') {
                 res.status(400).json({
                     message: 'Los datos proporcionados no son válidos. Verifique las referencias a otros registros.'
@@ -71,7 +63,6 @@ export class ErrorHandlerUtil {
                 return;
             }
             
-            // Error 23502: Violación de NOT NULL
             if (pgError.code === '23502') {
                 const column = pgError.column || 'campo';
                 res.status(400).json({
@@ -80,9 +71,7 @@ export class ErrorHandlerUtil {
                 return;
             }
             
-            // Error 22001: Valor demasiado largo para el tipo de dato
             if (pgError.code === '22001') {
-                // Intentar identificar el campo problemático del mensaje de error
                 const errorMessage = pgError.message || '';
                 let fieldName = 'campo';
                 
@@ -101,7 +90,6 @@ export class ErrorHandlerUtil {
             }
         }
 
-        // Error genérico
         const controllerLabel = controllerName ? `${controllerName} ` : '';
         console.error(`${controllerLabel}Controller Error:`, error);
         res.status(500).json({

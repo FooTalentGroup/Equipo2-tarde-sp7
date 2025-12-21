@@ -7,7 +7,6 @@ import { jwtAdapter } from '../../config';
 
 export class AuthController {
 
-    // DI
     constructor(
         private readonly authServices: AuthServices
     ){}
@@ -86,9 +85,6 @@ export class AuthController {
         });
     }
 
-    /**
-     * Logout - Revoke current JWT token
-     */
     logout = async (req: Request, res: Response) => {
         try {
             const user = req.user;

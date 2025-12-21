@@ -57,7 +57,7 @@ export class AuthServices {
                 user: {
                     ...publicUser,
                     role: role?.name || null,
-                    role_id: undefined // Remove role_id from response
+                    role_id: undefined 
                 },
                 token
             };
@@ -96,7 +96,7 @@ export class AuthServices {
             user: {
                 ...publicUser,
                 role: role?.name || null,
-                role_id: undefined // Remove role_id from response
+                role_id: undefined 
             },
             token
         };
@@ -116,7 +116,7 @@ export class AuthServices {
             return {
                 ...publicUser,
                 role: role?.name || null,
-                role_id: undefined // Remove role_id from response
+                role_id: undefined 
             };
         } catch (error) {
             if (error instanceof CustomError) {

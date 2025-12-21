@@ -1,6 +1,4 @@
-/**
- * DTO para dirección de una propiedad
- */
+
 export class CreatePropertyAddressDto {
     constructor(
         public readonly street: string,
@@ -18,7 +16,6 @@ export class CreatePropertyAddressDto {
             return ['Street is required', undefined];
         }
 
-        // Validar coordenadas si se proporcionan
         if (latitude !== undefined && latitude !== null && (typeof latitude !== 'number' || isNaN(Number(latitude)) || Number(latitude) < -90 || Number(latitude) > 90)) {
             return ['Latitude must be a number between -90 and 90', undefined];
         }

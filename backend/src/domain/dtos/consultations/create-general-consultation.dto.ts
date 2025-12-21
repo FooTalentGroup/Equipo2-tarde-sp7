@@ -14,7 +14,6 @@ export class CreateGeneralConsultationDto {
 	}): [string?, CreateGeneralConsultationDto?] {
 		const { first_name, last_name, phone, email, message } = object;
 
-		// Validar first_name
 		if (!first_name) return ["First name is required"];
 		if (typeof first_name !== "string") return ["First name must be a string"];
 		if (first_name.trim().length < 2)
@@ -22,7 +21,6 @@ export class CreateGeneralConsultationDto {
 		if (first_name.trim().length > 100)
 			return ["First name must be less than 100 characters"];
 
-		// Validar last_name
 		if (!last_name) return ["Last name is required"];
 		if (typeof last_name !== "string") return ["Last name must be a string"];
 		if (last_name.trim().length < 2)
@@ -30,14 +28,12 @@ export class CreateGeneralConsultationDto {
 		if (last_name.trim().length > 100)
 			return ["Last name must be less than 100 characters"];
 
-		// Validar phone
 		if (!phone) return ["Phone is required"];
 		if (typeof phone !== "string") return ["Phone must be a string"];
 		if (phone.trim().length < 8) return ["Phone must be at least 8 characters"];
 		if (phone.trim().length > 20)
 			return ["Phone must be less than 20 characters"];
 
-		// Validar message
 		if (!message) return ["Message is required"];
 		if (typeof message !== "string") return ["Message must be a string"];
 		if (message.trim().length < 10)
@@ -45,7 +41,6 @@ export class CreateGeneralConsultationDto {
 		if (message.trim().length > 1000)
 			return ["Message must be less than 1000 characters"];
 
-		// Validar email (opcional)
 		let trimmedEmail: string | undefined;
 		if (email !== undefined && email !== null && email !== "") {
 			if (typeof email !== "string") return ["Email must be a string"];
@@ -56,7 +51,6 @@ export class CreateGeneralConsultationDto {
 				return ["Email must be less than 255 characters"];
 		}
 
-		// Normalizar teléfono para que quepa en la BD (máximo 15 caracteres)
 		const normalizedPhone = normalizePhone(phone.trim());
 
 		return [

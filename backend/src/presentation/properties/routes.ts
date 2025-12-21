@@ -10,7 +10,6 @@ export class PropertyRoutes {
 	static get routes(): Router {
 		const router = Router();
 
-		// Inicializar dependencias
 		const propertyServices = new PropertyServices(cloudinaryAdapter);
 		const controller = new PropertyController(propertyServices);
 		const authMiddleware = new AuthMiddleware(jwtAdapter);
@@ -179,8 +178,8 @@ export class PropertyRoutes {
 
 		router.post(
 			"/",
-			authMiddleware.authenticate, // Requiere autenticación
-			UploadMiddleware.multiple("images", 10, 5 * 1024 * 1024), // Máximo 10 imágenes, 5MB cada una
+			authMiddleware.authenticate,
+			UploadMiddleware.multiple("images", 10, 5 * 1024 * 1024), 
 			(req, res) => controller.createProperty(req, res),
 		);
 
@@ -381,8 +380,8 @@ export class PropertyRoutes {
 				documentField: "documents",
 				maxImages: 10,
 				maxDocuments: 10,
-				maxImageSize: 5 * 1024 * 1024, // 5MB
-				maxDocumentSize: 10 * 1024 * 1024, // 10MB for PDFs
+				maxImageSize: 5 * 1024 * 1024, 
+				maxDocumentSize: 10 * 1024 * 1024, 
 			}),
 			(req, res) => controller.createPropertyGrouped(req, res),
 		);
@@ -516,8 +515,8 @@ export class PropertyRoutes {
 				documentField: "documents",
 				maxImages: 10,
 				maxDocuments: 10,
-				maxImageSize: 5 * 1024 * 1024, // 5MB
-				maxDocumentSize: 10 * 1024 * 1024, // 10MB for PDFs
+				maxImageSize: 5 * 1024 * 1024, 
+				maxDocumentSize: 10 * 1024 * 1024, 
 			}),
 			(req, res) => controller.archivePropertyGrouped(req, res),
 		);
@@ -674,8 +673,8 @@ export class PropertyRoutes {
 				documentField: "documents",
 				maxImages: 10,
 				maxDocuments: 10,
-				maxImageSize: 5 * 1024 * 1024, // 5MB
-				maxDocumentSize: 10 * 1024 * 1024, // 10MB for PDFs
+				maxImageSize: 5 * 1024 * 1024, 
+				maxDocumentSize: 10 * 1024 * 1024, 
 			}),
 			(req, res) => controller.updatePropertyGrouped(req, res),
 		);

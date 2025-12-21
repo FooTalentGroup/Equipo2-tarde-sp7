@@ -2,21 +2,9 @@ import { CreatePropertyGeographyDto } from './create-property-geography.dto';
 import { CreatePropertyAddressDto } from './create-property-address.dto';
 import { CreatePropertyPriceDto } from './create-property-price.dto';
 
-/**
- * DTO principal para crear una propiedad
- * 
- * Estructura esperada en form-data:
- * - propertyDetails: JSON string con los detalles de la propiedad
- * - geography: JSON string con country, province, city
- * - address: JSON string con street, number, neighborhood, etc.
- * - prices: JSON string con array de precios [{price, currency_type_id, operation_type_id}]
- * - images: Array de archivos (opcional)
- */
 export class CreatePropertyDto {
     constructor(
-        // Detalles básicos (requeridos primero)
         public readonly title: string,
-        // Acepta ID o nombre para mayor flexibilidad (requeridos - uno u otro)
         public readonly property_type_id: number | undefined,
         public readonly property_type: string | undefined,
         public readonly property_status_id: number | undefined,
@@ -24,20 +12,14 @@ export class CreatePropertyDto {
         public readonly visibility_status_id: number | undefined,
         public readonly visibility_status: string | undefined,
         
-        // Geografía y dirección (requeridos)
         public readonly geography: CreatePropertyGeographyDto,
         public readonly address: CreatePropertyAddressDto,
         
-        // Precios (array - puede tener venta y/o alquiler) (requerido)
         public readonly prices: CreatePropertyPriceDto[],
-        public readonly owner_id?: number, // Opcional: cliente propietario (tabla clients)
-
-        // Opcionales (después de los requeridos)
+        public readonly owner_id?: number, 
         public readonly description?: string,
         public readonly publication_date?: Date | string,
         public readonly featured_web?: boolean,
-        
-        // Características físicas (opcionales)
         public readonly bedrooms_count?: number,
         public readonly bathrooms_count?: number,
         public readonly rooms_count?: number,
@@ -51,8 +33,6 @@ export class CreatePropertyDto {
         public readonly uncovered_area?: number,
         public readonly total_area?: number,
         public readonly zoning?: string,
-        
-        // Catálogos opcionales (aceptan ID o nombre)
         public readonly situation_id?: number,
         public readonly situation?: string,
         public readonly age_id?: number,
@@ -61,8 +41,6 @@ export class CreatePropertyDto {
         public readonly orientation?: string,
         public readonly disposition_id?: number,
         public readonly disposition?: string,
-        
-        // Información interna (opcionales)
         public readonly branch_name?: string,
         public readonly appraiser?: string,
         public readonly producer?: string,
@@ -70,14 +48,11 @@ export class CreatePropertyDto {
         public readonly keys_location?: string,
         public readonly internal_comments?: string,
         public readonly social_media_info?: string,
-        
-        // Comisiones (opcionales)
         public readonly operation_commission_percentage?: number,
         public readonly producer_commission_percentage?: number,
     ) {}
 
     static create(object: Record<string, unknown>): [string?, CreatePropertyDto?] {
-        // Parsear propertyDetails si viene como string JSON
         let propertyDetails: any = {};
         if (typeof object.propertyDetails === 'string') {
             try {
@@ -89,7 +64,6 @@ export class CreatePropertyDto {
             propertyDetails = object.propertyDetails;
         }
 
-        // Parsear geography
         let geographyData: any = {};
         if (typeof object.geography === 'string') {
             try {
@@ -101,7 +75,6 @@ export class CreatePropertyDto {
             geographyData = object.geography;
         }
 
-        // Parsear address
         let addressData: any = {};
         if (typeof object.address === 'string') {
             try {
@@ -113,7 +86,6 @@ export class CreatePropertyDto {
             addressData = object.address;
         }
 
-        // Parsear prices (array)
         let pricesData: any[] = [];
         if (typeof object.prices === 'string') {
             try {
@@ -124,17 +96,13 @@ export class CreatePropertyDto {
         } else if (Array.isArray(object.prices)) {
             pricesData = object.prices;
         } else if (object.prices) {
-            // Si viene un solo precio, convertirlo a array
             pricesData = [object.prices];
         }
 
-        // Validar campos requeridos
         const title = propertyDetails.title || object.title;
         if (!title || title.trim().length === 0) {
             return ['Title is required', undefined];
         }
-
-        // Validar property_type: debe tener ID o nombre
         const propertyTypeId = propertyDetails.property_type_id || object.property_type_id;
         const propertyTypeName = propertyDetails.property_type || object.property_type;
         const hasPropertyTypeId = propertyTypeId !== undefined && propertyTypeId !== null;
@@ -150,7 +118,6 @@ export class CreatePropertyDto {
             return ['Property type ID must be a number', undefined];
         }
 
-        // Validar property_status: debe tener ID o nombre
         const propertyStatusId = propertyDetails.property_status_id || object.property_status_id;
         const propertyStatusName = propertyDetails.property_status || object.property_status;
         const hasPropertyStatusId = propertyStatusId !== undefined && propertyStatusId !== null;
@@ -166,7 +133,6 @@ export class CreatePropertyDto {
             return ['Property status ID must be a number', undefined];
         }
 
-        // Validar visibility_status: debe tener ID o nombre
         const visibilityStatusId = propertyDetails.visibility_status_id || object.visibility_status_id;
         const visibilityStatusName = propertyDetails.visibility_status || object.visibility_status;
         const hasVisibilityStatusId = visibilityStatusId !== undefined && visibilityStatusId !== null;
@@ -183,24 +149,17 @@ export class CreatePropertyDto {
         }
 
 
-        // Validar geography
         const [geoError, geography] = CreatePropertyGeographyDto.create(geographyData);
         if (geoError || !geography) {
             return [geoError || 'Invalid geography data', undefined];
         }
-
-        // Validar address
         const [addrError, address] = CreatePropertyAddressDto.create(addressData);
         if (addrError || !address) {
             return [addrError || 'Invalid address data', undefined];
         }
-
-        // Validar prices (debe tener al menos uno)
         if (!pricesData || pricesData.length === 0) {
             return ['At least one price is required', undefined];
         }
-        // owner_id es opcional (cliente propietario)
-        // Puede venir en propertyDetails (form-data) o directamente en object
         const ownerId = propertyDetails.owner_id || object.owner_id;
         if (ownerId !== undefined && ownerId !== null && isNaN(Number(ownerId))) {
             return ['Owner ID must be a number if provided. This should be a client (propietario) ID.', undefined];
@@ -215,7 +174,6 @@ export class CreatePropertyDto {
             prices.push(price);
         }
 
-        // Validar números opcionales
         const validateOptionalNumber = (value: any, fieldName: string): number | undefined => {
             if (value === undefined || value === null || value === '') {
                 return undefined;
@@ -228,7 +186,6 @@ export class CreatePropertyDto {
         };
 
         try {
-            // Validar opcionales (situation, age, orientation, disposition)
             const situationId = propertyDetails.situation_id || object.situation_id;
             const situationName = propertyDetails.situation || object.situation;
             const hasSituationId = situationId !== undefined && situationId !== null;
@@ -261,7 +218,6 @@ export class CreatePropertyDto {
                 return ['Provide either disposition_id OR disposition name, not both', undefined];
             }
 
-            // Validar y parsear publication_date si viene
             let publicationDate: Date | undefined = undefined;
             if (propertyDetails.publication_date || object.publication_date) {
                 const dateValue = propertyDetails.publication_date || object.publication_date;
@@ -275,7 +231,6 @@ export class CreatePropertyDto {
                 }
             }
 
-            // Validar featured_web
             let featuredWeb: boolean | undefined = undefined;
             if (propertyDetails.featured_web !== undefined || object.featured_web !== undefined) {
                 const value = propertyDetails.featured_web !== undefined ? propertyDetails.featured_web : object.featured_web;
@@ -301,7 +256,7 @@ export class CreatePropertyDto {
                     geography,
                     address,
                     prices,
-                    ownerId ? Number(ownerId) : undefined, // Cliente propietario (opcional)
+                    ownerId ? Number(ownerId) : undefined,
                     (propertyDetails.description as string | undefined)?.trim() || (object.description as string | undefined)?.trim(),
                     publicationDate,
                     featuredWeb,

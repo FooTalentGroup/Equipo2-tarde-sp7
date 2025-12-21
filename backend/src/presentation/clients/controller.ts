@@ -17,9 +17,6 @@ export class ClientController {
         private readonly leadServices: LeadServices
     ) {}
 
-    /**
-     * Crea un nuevo inquilino con propiedad y contrato de alquiler
-     */
     createTenant = async (req: Request, res: Response) => {
         try {
             const user = req.user;
@@ -51,9 +48,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Crea un nuevo propietario y lo asocia a una propiedad si se proporciona
-     */
     createOwner = async (req: Request, res: Response) => {
         try {
             const [error, createOwnerDto] = CreateOwnerDto.create(req.body);
@@ -75,9 +69,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Crea un nuevo Lead con propiedad de interés si se proporciona
-     */
     createLead = async (req: Request, res: Response) => {
         try {
             const [error, createLeadDto] = CreateLeadDto.create(req.body);
@@ -101,9 +92,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Lista clientes con filtros opcionales
-     */
     listClients = async (req: Request, res: Response) => {
         try {
             const {
@@ -135,9 +123,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Obtiene un cliente por ID
-     */
     getClientById = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
@@ -155,9 +140,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Actualiza un cliente
-     */
     updateClient = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
@@ -186,9 +168,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Soft delete: marca el cliente como eliminado
-     */
     deleteClient = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
@@ -206,9 +185,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Restaura un cliente eliminado
-     */
     restoreClient = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
@@ -226,9 +202,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Agrega una propiedad de interés a un cliente
-     */
     addPropertyOfInterest = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
@@ -261,9 +234,6 @@ export class ClientController {
         }
     }
 
-    /**
-     * Asocia una propiedad a un Owner
-     */
     addOwnedProperty = async (req: Request, res: Response) => {
         try {
             const { id } = req.params;

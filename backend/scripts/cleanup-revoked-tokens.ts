@@ -3,14 +3,6 @@ import { RevokedTokenModel } from '../src/data/postgres/models/revoked-token.mod
 import { PostgresDatabase } from '../src/data/postgres/database';
 import { get } from 'env-var';
 
-/**
- * Script para limpiar tokens revocados expirados
- * Debe ejecutarse periódicamente (ej: diariamente via cron job)
- * 
- * Uso: npm run cleanup:tokens
- */
-
-// Obtener variables de entorno
 const dbConfig = {
   host: get('POSTGRES_HOST').default('localhost').asString(),
   port: get('POSTGRES_PORT').default(5432).asPortNumber(),
@@ -26,7 +18,6 @@ async function cleanupRevokedTokens() {
         console.log(`   Host: ${dbConfig.host}:${dbConfig.port}`);
         console.log(`   Database: ${dbConfig.database}\n`);
         
-        // Connect to database
         await PostgresDatabase.connect({
             dbName: dbConfig.database,
             port: dbConfig.port,
@@ -37,19 +28,16 @@ async function cleanupRevokedTokens() {
         
         console.log('✅ Database connected\n');
         
-        // Get stats before cleanup
         const statsBefore = await RevokedTokenModel.getStats();
         console.log(`📊 Before cleanup:`);
         console.log(`   - Total tokens: ${statsBefore.total}`);
         console.log(`   - Active tokens: ${statsBefore.active}`);
         console.log(`   - Expired tokens: ${statsBefore.expired}`);
         
-        // Clean expired tokens
         const deleted = await RevokedTokenModel.cleanExpiredTokens();
         
         console.log(`\n✅ Cleaned up ${deleted} expired tokens`);
         
-        // Get stats after cleanup
         const statsAfter = await RevokedTokenModel.getStats();
         console.log(`\n📊 After cleanup:`);
         console.log(`   - Total tokens: ${statsAfter.total}`);
@@ -67,6 +55,5 @@ async function cleanupRevokedTokens() {
     }
 }
 
-// Run cleanup
 cleanupRevokedTokens();
 
