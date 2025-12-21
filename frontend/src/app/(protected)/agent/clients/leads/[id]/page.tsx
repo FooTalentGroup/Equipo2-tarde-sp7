@@ -20,10 +20,8 @@ export default async function LeadDetailPage({
 }) {
 	const { id } = await params;
 
-	// Obtener datos del lead desde el backend (nueva estructura)
 	const responseData = await getClientById<LeadApiResponse>(id);
 
-	// Si no hay datos, mostrar fallback
 	if (!responseData || !responseData.client) {
 		return (
 			<div className="min-h-screen flex items-center justify-center">
@@ -42,7 +40,6 @@ export default async function LeadDetailPage({
 				"Consulta general")
 			: "Consulta general";
 
-	// Propiedades disponibles para asignar (desde backend)
 	const { properties: availableProperties } = await getProperties({
 		includeArchived: false,
 	});
@@ -57,7 +54,6 @@ export default async function LeadDetailPage({
 		await removePropertyOfInterest(id, propertyId);
 	}
 
-	// Mapear datos del backend
 	const client = {
 		id: String(clientData.id),
 		first_name: clientData.first_name,
@@ -72,7 +68,6 @@ export default async function LeadDetailPage({
 		notes: clientData.notes ?? "",
 	};
 
-	// Mapear propiedades desde el backend con la estructura completa
 	const properties = propertiesOfInterest.map((prop) => ({
 		id: String(prop.id),
 		address: prop.address.full_address,
@@ -91,7 +86,6 @@ export default async function LeadDetailPage({
 	return (
 		<div className="min-h-screen">
 			<div className="w-full">
-				{/* Header */}
 				<ClientHeader
 					id={client.id}
 					firstName={client.first_name}
@@ -101,7 +95,6 @@ export default async function LeadDetailPage({
 					consultationTypeName={consultationTypeName}
 				/>
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-					{/* Columna izquierda - Información */}
 					<div className="lg:col-span-1 space-y-6">
 						<ClientContactInfo
 							phone={client.phone}
@@ -112,7 +105,6 @@ export default async function LeadDetailPage({
 						<ClientNotes notes={client.notes} clientId={client.id} />
 					</div>
 
-					{/* Columna derecha - Propiedades */}
 					<div className="lg:col-span-2">
 						<ClientProperties
 							properties={properties}

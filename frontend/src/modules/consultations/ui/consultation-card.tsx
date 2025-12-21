@@ -43,7 +43,6 @@ export function ConsultationCard({
 		{ locale: es },
 	);
 
-	// Obtener el contacto disponible (client o consultant)
 	const contact = consultation.client || consultation.consultant;
 	const contactName = contact
 		? `${contact.first_name} ${contact.last_name}`
@@ -75,7 +74,6 @@ export function ConsultationCard({
 			<CardContent className="p-0 w-full">
 				<div className="flex items-start justify-between px-4 py-1">
 					<div className="flex items-center gap-4 flex-1">
-						{/* Checkbox para selección */}
 						{isSelectionMode && (
 							<Checkbox
 								checked={isSelected}
@@ -85,9 +83,7 @@ export function ConsultationCard({
 							/>
 						)}
 
-						{/* Información principal */}
 						<div className="text-left flex-1 min-w-0">
-							{/* Nombre */}
 							<div className="flex items-center gap-2 mb-1">
 								<span className="font-semibold text-slate-900 text-lg">
 									{contactName}
@@ -108,19 +104,6 @@ export function ConsultationCard({
 									)}
 								</div>
 							</div>
-							{/* Propiedad */}
-							{/* {consultation.property && (
-								<div className="text-sm text-slate-600 mb-2">
-									{consultation.property.title}
-								</div>
-							)} */}
-							{/* Tipo de consulta */}
-							{/* {consultation.consultation_type && (
-								<div className="text-xs text-slate-600 mb-2 font-medium">
-									{consultation.consultation_type.name}
-								</div>
-							)} */}
-							{/* Contacto */}
 							<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
 								<div className="flex items-center gap-1">
 									<MailIcon className="h-3.5 w-3.5" />
@@ -132,7 +115,6 @@ export function ConsultationCard({
 									<span>{contactPhone}</span>
 								</div>
 							</div>
-							{/* Fecha */}
 							<div className="flex items-center gap-1 text-xs text-slate-400 mt-2">
 								<Clock className="h-3 w-3" />
 								<span>{formattedDate}</span>
@@ -140,7 +122,6 @@ export function ConsultationCard({
 						</div>
 					</div>
 
-					{/* Indicador de leído y menú de acciones */}
 					<div className="flex items-center gap-2 shrink-0">
 						{!consultation.is_read && (
 							<div className="bg-secondary-light/30 w-8 h-8 flex items-center justify-center rounded-sm">

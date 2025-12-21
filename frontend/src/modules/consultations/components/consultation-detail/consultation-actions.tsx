@@ -37,7 +37,6 @@ export function ConsultationActions({
 
 	const handleLogAndOpenContact = useCallback(async () => {
 		if (existingContact && consultation.client?.id) {
-			// Si es un contacto existente, navegar al detalle
 			return;
 		}
 		const success = await handleAddOrView();
@@ -58,7 +57,6 @@ export function ConsultationActions({
 				</a>
 			</Button>
 
-			{/* Botón Agregar / Ver Contacto */}
 			{existingContact && consultation.client?.id ? (
 				<Button variant={"outline"} asChild className="w-full" size="lg">
 					<Link href={paths.agent.clients.leads.detail(consultation.client.id)}>

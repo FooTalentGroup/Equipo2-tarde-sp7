@@ -59,7 +59,6 @@ export default function TenantForm({
 			dni: "",
 			phone: "",
 			email: "",
-			/* address: "", */
 			property_id: "",
 			contract_start_date: "",
 			contract_end_date: "",
@@ -100,7 +99,6 @@ export default function TenantForm({
 				if (clientId) {
 					await updateClientById(clientId, tenantData);
 					toast.success("Inquilino actualizado exitosamente");
-					// redirigir a detalle usando paths centralizado
 					router.push(paths.agent.clients.inquilinos.detail(clientId));
 					return;
 				}
@@ -110,7 +108,6 @@ export default function TenantForm({
 					tenantData as CreateTenant,
 				);
 
-				// Si se creó desde un lead, eliminar el lead y mostrar mensaje combinado
 				if (leadId) {
 					try {
 						await deleteClientById(leadId);
@@ -139,7 +136,6 @@ export default function TenantForm({
 		<div className="w-full lg:max-w-2/3 mt-4 p-4 rounded-xl shadow-md/20">
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-					{/* Nombre y Apellido */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
@@ -184,7 +180,6 @@ export default function TenantForm({
 						/>
 					</div>
 
-					{/* DNI y Teléfono */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
@@ -230,7 +225,6 @@ export default function TenantForm({
 						/>
 					</div>
 
-					{/* Email y Dirección */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
@@ -280,7 +274,6 @@ export default function TenantForm({
 						/>
 					</div>
 
-					{/* Fechas del Contrato */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
@@ -309,7 +302,6 @@ export default function TenantForm({
 						/>
 					</div>
 
-					{/* Fecha próximo aumento y Monto */}
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 						<FormField
 							control={form.control}
@@ -348,7 +340,6 @@ export default function TenantForm({
 						/>
 					</div>
 
-					{/* Notas */}
 					<div className="border-t border-t-grey-light pt-4">
 						<FormField
 							control={form.control}
@@ -377,7 +368,6 @@ export default function TenantForm({
 						/>
 					</div>
 
-					{/* Botones */}
 					<div className="flex gap-3 justify-end pt-4">
 						<Button
 							type="button"

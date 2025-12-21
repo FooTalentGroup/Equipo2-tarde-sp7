@@ -33,7 +33,6 @@ export default async function Page({
 
 	const toE164 = (p?: string) => {
 		if (!p) return "";
-		// Normaliza a AR (+54) si no incluye prefijo
 		if (!p.startsWith("+")) {
 			const digits = p.replace(/\D/g, "");
 			return `+54${digits}`;

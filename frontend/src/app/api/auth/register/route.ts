@@ -4,7 +4,6 @@ export async function POST(request: NextRequest) {
 	try {
 		const body = await request.json();
 
-		// Validar campos requeridos
 		const requiredFields = ["first_name", "last_name", "email", "password"];
 		const missingFields = requiredFields.filter((field) => !body[field]);
 
@@ -15,7 +14,6 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Validar formato de email
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(body.email)) {
 			return NextResponse.json({ error: "Email inválido" }, { status: 400 });
@@ -30,7 +28,6 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Preparar payload para el backend
 		const payload = {
 			first_name: body.first_name,
 			last_name: body.last_name,
@@ -40,7 +37,6 @@ export async function POST(request: NextRequest) {
 			role_id: body.role_id ? Number(body.role_id) : 2, // Default a agent
 		};
 
-		// Hacer petición al backend real
 		const backendResponse = await fetch(
 			`${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
 			{
@@ -53,7 +49,6 @@ export async function POST(request: NextRequest) {
 			},
 		);
 
-		// Manejar respuesta del backend
 		if (!backendResponse.ok) {
 			let errorMessage = "Error al registrar usuario";
 
@@ -61,7 +56,6 @@ export async function POST(request: NextRequest) {
 				const errorData = await backendResponse.json();
 				errorMessage = errorData.message || errorData.error || errorMessage;
 			} catch {
-				// Si la respuesta no es JSON, usar texto
 				errorMessage = await backendResponse.text();
 			}
 
@@ -71,7 +65,6 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		// Si todo sale bien
 		const data = await backendResponse.json();
 		return NextResponse.json(data, { status: 201 });
 	} catch (error) {

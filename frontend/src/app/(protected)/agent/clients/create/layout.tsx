@@ -17,7 +17,6 @@ export default function CreateClientLayout({ children }: ClientsLayoutProps) {
 	const pathname = usePathname() || "";
 	let activeTab: Tab = "leads";
 
-	// Mapping limpio entre rutas y pestañas usando helpers centralizados en `paths`
 	const tabMappings: { tab: Tab; matchPaths: string[] }[] = [
 		{
 			tab: "leads",
@@ -50,7 +49,6 @@ export default function CreateClientLayout({ children }: ClientsLayoutProps) {
 	}
 	return (
 		<div className="w-full mx-auto">
-			{/* Header */}
 			<SectionHeading title="Nuevo cliente" />
 
 			{/* Search and Navigation Tabs */}
@@ -91,7 +89,6 @@ export default function CreateClientLayout({ children }: ClientsLayoutProps) {
 				</div>
 			</div>
 
-			{/* Content Area - Aquí se renderiza el contenido de cada página */}
 			<div className="mt-0">{children}</div>
 		</div>
 	);

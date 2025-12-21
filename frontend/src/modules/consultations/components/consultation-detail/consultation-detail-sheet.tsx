@@ -21,7 +21,6 @@ import { Check, HousePlus, Loader2 } from "lucide-react";
 import { ConsultationActions } from "./consultation-actions";
 import { ConsultationContactInfo } from "./consultation-contact-info";
 
-// Memoizamos componentes hijos para evitar renders innecesarios
 const MemoConsultationContactInfo = memo(ConsultationContactInfo);
 const MemoConsultationActions = memo(ConsultationActions);
 
@@ -75,19 +74,15 @@ export function ConsultationDetailSheet({
 			>
 				{consultation ? (
 					<>
-						{/* Header */}
 						<SheetHeader className="px-6 py-4 border-b">
 							<SheetTitle className="text-lg font-semibold">
 								Detalle de Consulta
 							</SheetTitle>
 						</SheetHeader>
 
-						{/* Content - scrollable */}
 						<div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
-							{/* Cliente Info */}
 							<MemoConsultationContactInfo consultation={consultation} />
 
-							{/* Tipo de consulta (siempre que exista) */}
 							{consultation.consultation_type?.name && (
 								<div>
 									<h3 className="font-semibold text-sm mb-2">
@@ -101,7 +96,6 @@ export function ConsultationDetailSheet({
 								</div>
 							)}
 
-							{/* Propiedad consultada (solo si hay propiedad) */}
 							{hasProperty && (
 								<div>
 									<div className="flex items-center justify-between mb-2">
