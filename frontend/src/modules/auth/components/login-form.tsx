@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,9 +14,13 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@src/components/ui/form";
+import { Heading } from "@src/components/ui/heading";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
+import { HeadingForm } from "@src/modules/auth/components/heading-form";
+import { ROLES } from "@src/types/user";
+import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -23,17 +28,17 @@ import { loginAction } from "../actions/auth.actions";
 import { type LoginFormData, loginSchema } from "../schemas/login";
 
 type LoginFormProps = {
+	title?: string;
 	heading?: string;
 	buttonText?: string;
 	onSubmit?: (data: LoginFormData) => Promise<void> | void;
-	redirectTo?: string;
 };
 
 export default function LoginForm({
-	heading = "RedProp",
+	title = "REDPROP",
+	heading = "INICIAR SESIÓN",
 	buttonText = "Iniciar Sesión",
 	onSubmit,
-	redirectTo,
 }: LoginFormProps) {
 	const form = useForm<LoginFormData>({
 		resolver: zodResolver(loginSchema),
@@ -42,6 +47,7 @@ export default function LoginForm({
 			password: "",
 		},
 	});
+	const [showPassword, setShowPassword] = useState(false);
 
 	const router = useRouter();
 
@@ -53,13 +59,20 @@ export default function LoginForm({
 				const result = await loginAction(data);
 
 				if (result.success) {
-					toast.success(result.message);
+					toast.success("Bienvenido");
 
-					const redirect = redirectTo || paths.dashboard();
+					let redirect = "";
+
+					if (result.role === ROLES.ADMIN) {
+						redirect = paths.admin.dashboard();
+					} else {
+						redirect = paths.agent.dashboard();
+					}
+
 					router.push(redirect);
 					router.refresh();
 				} else {
-					toast.error(result.message || "Error al iniciar sesión");
+					toast.error("Error al iniciar sesión");
 				}
 			}
 		} catch (error) {
@@ -71,25 +84,37 @@ export default function LoginForm({
 	};
 
 	return (
-		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
-			{heading && <h1 className="text-xl font-semibold">{heading}</h1>}
+		<div className="bg-primary-foreground grid items-center gap-y-4 rounded-md px-6 py-8">
+			<HeadingForm title={title} />
+			{heading && (
+				<Heading
+					align={"center"}
+					variant={"h1"}
+					weight={"semibold"}
+					className="text-secondary mb-7"
+				>
+					{heading}
+				</Heading>
+			)}
 
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(handleSubmit)}
-					className="w-full space-y-4"
+					className="w-full space-y-7"
 				>
 					<FormField
 						control={form.control}
 						name="email"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Correo electrónico</FormLabel>
+								<FormLabel className="text-secondary-dark font-semibold">
+									Usuario o Email
+								</FormLabel>
 								<FormControl>
 									<Input
 										type="email"
-										placeholder="correo@ejemplo.com"
-										className="text-sm"
+										className="text-base border-input-border focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active md:min-w-[480px] h-10 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+										placeholder=" "
 										{...field}
 									/>
 								</FormControl>
@@ -103,15 +128,33 @@ export default function LoginForm({
 						name="password"
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Contraseña</FormLabel>
-								<FormControl>
-									<Input
-										type="password"
-										placeholder="Tu contraseña"
-										className="text-sm"
-										{...field}
-									/>
-								</FormControl>
+								<FormLabel className="text-secondary-dark font-semibold">
+									Contraseña
+								</FormLabel>
+								<div className="flex items-center relative">
+									<FormControl>
+										<Input
+											type={showPassword ? "text" : "password"}
+											className="text-base border-input-border focus-visible:border-2 focus-visible:border-input-active focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 md:min-w-[480px] h-10 py-2 shadow-input-border text-primary-normal-active aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+											placeholder=" "
+											{...field}
+										/>
+									</FormControl>
+									<button
+										type="button"
+										className="absolute right-2"
+										onClick={() => setShowPassword(!showPassword)}
+									>
+										{showPassword ? <EyeOff /> : <Eye />}
+									</button>
+									<button
+										type="button"
+										className="absolute right-2"
+										onClick={() => setShowPassword(!showPassword)}
+									>
+										{showPassword ? <EyeOff /> : <Eye />}
+									</button>
+								</div>
 								<FormMessage />
 							</FormItem>
 						)}
@@ -119,7 +162,7 @@ export default function LoginForm({
 
 					<Button
 						type="submit"
-						className="w-full"
+						className="w-full text-base rounded-md py-3! px-6! h-12!"
 						disabled={form.formState.isSubmitting}
 					>
 						{form.formState.isSubmitting && <Spinner />}
@@ -127,12 +170,6 @@ export default function LoginForm({
 					</Button>
 				</form>
 			</Form>
-			<p className="text-sm text-center">
-				Aun no tienes cuenta?
-				<Button asChild className="font-semibold px-2 py-0" variant="link">
-					<Link href={paths.auth.register()}>Registrate</Link>
-				</Button>
-			</p>
 		</div>
 	);
 }

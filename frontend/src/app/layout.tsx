@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import { Montserrat, Open_Sans } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
+
+import NextTopLoader from "nextjs-toploader";
 
 import "@src/styles/index.css";
 
@@ -13,8 +15,8 @@ const montserrat = Montserrat({
 	weight: ["400", "500", "600", "700"],
 });
 
-const openSans = Open_Sans({
-	variable: "--font-open-sans",
+const inter = Inter({
+	variable: "--font-inter",
 	subsets: ["latin"],
 	weight: ["400", "500", "600", "700"],
 });
@@ -31,9 +33,13 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="es">
-			<body
-				className={`${montserrat.variable} ${openSans.variable} antialiased`}
-			>
+			<body className={`${montserrat.variable} ${inter.variable} antialiased`}>
+				<NextTopLoader
+					color="#083fb3"
+					showSpinner={false}
+					height={5}
+					shadow={false}
+				/>
 				{children}
 				<Toaster />
 			</body>

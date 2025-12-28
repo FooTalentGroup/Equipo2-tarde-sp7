@@ -1,22 +1,27 @@
 "use client";
 
+import { useState } from "react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@src/components/ui/button";
-import { ButtonGroup } from "@src/components/ui/button-group";
 import {
 	Form,
 	FormControl,
 	FormField,
 	FormItem,
 	FormLabel,
-	FormMessage,
+	FormMessageWithIcon,
 } from "@src/components/ui/form";
+import { Heading } from "@src/components/ui/heading";
 import { Input } from "@src/components/ui/input";
 import { Spinner } from "@src/components/ui/spinner";
 import { paths } from "@src/lib/paths";
+import { HeadingForm } from "@src/modules/auth/components/heading-form";
+import { ROLES } from "@src/types/user";
+import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -24,26 +29,27 @@ import { registerAction } from "../actions/auth.actions";
 import { type RegisterFormData, registerSchema } from "../schemas/register";
 
 type RegisterFormProps = {
+	title?: string;
 	heading?: string;
 	buttonText?: string;
 	onSubmit?: (data: RegisterFormData) => Promise<void> | void;
-	redirectTo?: string;
 };
 
 export default function RegisterForm({
-	heading = "RedProp",
-	buttonText = "Registrarse",
+	title = "REDPROP",
+	heading = "REGISTRO",
+	buttonText = "Aceptar",
 	onSubmit,
-	redirectTo,
 }: RegisterFormProps) {
+	const [showPassword, setShowPassword] = useState(true);
 	const form = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		defaultValues: {
 			email: "",
 			password: "",
-			firstName: "",
-			lastName: "",
-			role: "",
+			first_name: "",
+			last_name: "",
+			confirmPassword: "",
 		},
 	});
 
@@ -58,7 +64,15 @@ export default function RegisterForm({
 
 				if (result.success) {
 					toast.success(result.message);
-					const redirect = redirectTo || paths.dashboard();
+
+					let redirect = "";
+
+					if (result.role === ROLES.ADMIN) {
+						redirect = paths.admin.dashboard();
+					} else {
+						redirect = paths.agent.dashboard();
+					}
+
 					router.push(redirect);
 					router.refresh();
 				} else {
@@ -74,49 +88,63 @@ export default function RegisterForm({
 	};
 
 	return (
-		<div className="border-muted bg-background grid items-center gap-y-4 rounded-md border px-6 py-8 shadow-md">
-			{heading && <h1 className="text-xl font-semibold">{heading}</h1>}
+		<div className="bg-primary-foreground grid items-center gap-y-4 rounded-md px-6 py-8">
+			<HeadingForm title={title} />
+			{heading && (
+				<Heading
+					align={"center"}
+					variant={"h1"}
+					weight={"semibold"}
+					className="text-secondary mb-7"
+				>
+					{heading}
+				</Heading>
+			)}
 
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(handleSubmit)}
-					className="w-full space-y-4"
+					className="w-full space-y-7"
 				>
-					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div className="grid grid-cols-1 gap-7">
 						<FormField
 							control={form.control}
-							name="firstName"
+							name="first_name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Nombre</FormLabel>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Nombre *
+									</FormLabel>
 									<FormControl>
 										<Input
 											type="text"
-											placeholder="Tu nombre"
-											className="text-sm"
+											placeholder=" "
+											className="text-base border-input-border focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-10 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
 											{...field}
 										/>
 									</FormControl>
-									<FormMessage />
+									<FormMessageWithIcon />
 								</FormItem>
 							)}
 						/>
 
 						<FormField
 							control={form.control}
-							name="lastName"
+							name="last_name"
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>Apellido</FormLabel>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Apellido *
+									</FormLabel>
 									<FormControl>
 										<Input
 											type="text"
-											placeholder="Tu apellido"
-											className="text-sm"
+											className="text-base border-input-border focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active h-10 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+											placeholder=" "
 											{...field}
 										/>
 									</FormControl>
-									<FormMessage />
+									<FormMessageWithIcon />
 								</FormItem>
 							)}
 						/>
@@ -125,75 +153,61 @@ export default function RegisterForm({
 					<FormField
 						control={form.control}
 						name="email"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Correo electrónico</FormLabel>
-								<FormControl>
-									<Input
-										type="email"
-										placeholder="correo@ejemplo.com"
-										className="text-sm"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+						render={({ field }) => {
+							return (
+								<FormItem>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Email *
+									</FormLabel>
+									<FormControl>
+										<Input
+											type="email"
+											className="text-base border-input-border focus-visible:border-input-active focus-visible:shadow-input-active focus-visible:border-2 focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 text-primary-normal-active md:min-w-[480px] h-10 py-2 shadow-input-border aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+											placeholder=" "
+											{...field}
+										/>
+									</FormControl>
+									<FormMessageWithIcon />
+								</FormItem>
+							);
+						}}
 					/>
 
 					<FormField
 						control={form.control}
 						name="password"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Contraseña</FormLabel>
-								<FormControl>
-									<Input
-										type="password"
-										placeholder="Tu contraseña"
-										className="text-sm"
-										{...field}
-									/>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
-					/>
-
-					<FormField
-						control={form.control}
-						name="role"
-						render={({ field }) => (
-							<FormItem>
-								<FormLabel>Tipo de cuenta</FormLabel>
-								<FormControl>
-									<ButtonGroup className="w-full">
-										<Button
+						render={({ field }) => {
+							return (
+								<FormItem>
+									<FormLabel className="text-secondary-dark font-semibold">
+										Contraseña *
+									</FormLabel>
+									<div className="flex items-center relative">
+										<FormControl className="relative">
+											<Input
+												type={showPassword ? "text" : "password"}
+												className="text-base border-input-border focus-visible:border-2 focus-visible:border-input-active focus-visible:ring-0 rounded-lg not-placeholder-shown:border-input-active not-placeholder-shown:border-2 md:min-w-[480px] h-10 py-2 shadow-input-border text-primary-normal-active aria-invalid:bg-input-danger aria-invalid:border-danger-normal"
+												placeholder=" "
+												{...field}
+											/>
+										</FormControl>
+										<button
 											type="button"
-											variant={field.value === "AGENTE" ? "default" : "outline"}
-											className="flex-1"
-											onClick={() => field.onChange("AGENTE")}
+											className="absolute right-2"
+											onClick={() => setShowPassword(!showPassword)}
 										>
-											Agente
-										</Button>
-										<Button
-											type="button"
-											variant={field.value === "ADMIN" ? "default" : "outline"}
-											className="flex-1"
-											onClick={() => field.onChange("ADMIN")}
-										>
-											Propietario
-										</Button>
-									</ButtonGroup>
-								</FormControl>
-								<FormMessage />
-							</FormItem>
-						)}
+											{showPassword ? <EyeOff /> : <Eye />}
+										</button>
+										<FormMessageWithIcon />
+									</div>
+								</FormItem>
+							);
+						}}
 					/>
 
 					<Button
 						type="submit"
-						className="w-full"
+						className="w-full text-base rounded-md py-3! px-6! h-12!"
 						disabled={form.formState.isSubmitting}
 					>
 						{form.formState.isSubmitting && <Spinner />}
@@ -201,10 +215,17 @@ export default function RegisterForm({
 					</Button>
 				</form>
 			</Form>
-			<p className="text-sm text-center">
-				Ya tienes cuenta?
-				<Button asChild className="font-semibold px-2 py-0" variant="link">
-					<Link href={paths.auth.login()}>Inicia sesión</Link>
+			<p className="text-center text-secondary">
+				¿Ya tienes cuenta?
+				<Button
+					asChild
+					className="font-semibold text-primary px-2!"
+					variant="link"
+					size="lg"
+				>
+					<Link className="font-semibold" href={paths.auth.login()}>
+						Inicia sesión
+					</Link>
 				</Button>
 			</p>
 		</div>

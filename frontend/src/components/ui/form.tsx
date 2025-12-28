@@ -6,6 +6,7 @@ import type * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
 import { Label } from "@src/components/ui/label";
 import { cn } from "@src/lib/utils";
+import { Info } from "lucide-react";
 import {
 	Controller,
 	type ControllerProps,
@@ -89,18 +90,23 @@ function FormItem({ className, ...props }: React.ComponentProps<"div">) {
 
 function FormLabel({
 	className,
+	required = false,
+	children,
 	...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+}: React.ComponentProps<typeof LabelPrimitive.Root> & { required?: boolean }) {
 	const { error, formItemId } = useFormField();
 
 	return (
 		<Label
 			data-slot="form-label"
 			data-error={!!error}
-			className={cn("data-[error=true]:text-destructive", className)}
+			className={cn("font-semibold text-base text-foreground", className)}
 			htmlFor={formItemId}
 			{...props}
-		/>
+		>
+			{children}
+			{required && <span className="text-danger-normal -ml-1">*</span>}
+		</Label>
 	);
 }
 
@@ -148,11 +154,37 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
 		<p
 			data-slot="form-message"
 			id={formMessageId}
-			className={cn("text-destructive text-sm", className)}
+			className={cn("text-danger-normal", className)}
 			{...props}
 		>
 			{body}
 		</p>
+	);
+}
+
+function FormMessageWithIcon({
+	className,
+	...props
+}: React.ComponentProps<"p">) {
+	const { error, formMessageId } = useFormField();
+	const body = error ? String(error?.message ?? "") : props.children;
+
+	if (!body) {
+		return null;
+	}
+
+	return (
+		<div className="flex items-center gap-1.5 pointer-events-none">
+			<Info className="text-danger-normal" />
+			<p
+				data-slot="form-message"
+				id={formMessageId}
+				className={cn("text-danger-normal", className)}
+				{...props}
+			>
+				{body}
+			</p>
+		</div>
 	);
 }
 
@@ -165,4 +197,5 @@ export {
 	FormDescription,
 	FormMessage,
 	FormField,
+	FormMessageWithIcon,
 };

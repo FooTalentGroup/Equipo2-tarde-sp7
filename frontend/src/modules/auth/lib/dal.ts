@@ -1,15 +1,35 @@
+/**
+ * Data Access Layer (DAL)
+ *
+ * Provides cached query functions for retrieving authentication data in Server Components.
+ * All functions are optimized with React cache() to deduplicate requests within a single render.
+ *
+ * @module dal
+ * @layer Data Access
+ * @usage Import in Server Components for reading user data
+ * @security All functions are server-only and never exposed to the client
+ */
+
 import "server-only";
 import { cache } from "react";
 
 import type { User } from "@src/types";
 
-import { getToken, getUser } from "./session";
+import { getToken, getUser, setSession } from "./session";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 /**
- * Verifica la sesión actual consultando al backend
- * Usa React cache() para evitar múltiples llamadas en un mismo render
+ * Gets the current user from the cookie
+ * Reads user data stored in cookies without making backend requests
+ */
+export const getCurrentUser = cache(
+	async (): Promise<User | null> => await getUser(),
+);
+
+/**
+ * Verifies the current session by consulting the backend
+ * Validates that the token is valid and returns authentication status
  */
 export const verifySession = cache(
 	async (): Promise<{
@@ -23,14 +43,13 @@ export const verifySession = cache(
 		}
 
 		try {
-			// Verificar el token con el backend
 			const response = await fetch(`${API_URL}/auth/me`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				cache: "no-store", // No cachear la respuesta del usuario
+				cache: "no-store",
 			});
 
 			if (!response.ok) {
@@ -47,23 +66,44 @@ export const verifySession = cache(
 );
 
 /**
- * Obtiene el usuario actual (primero desde cookie, luego verifica con backend)
+ * Refreshes user data from the backend and updates the cookie
+ * Fetches the most recent user data from the backend
  */
-export const getCurrentUser = cache(async (): Promise<User | null> => {
-	// Primero intentar obtener de la cookie
-	const userFromCookie = await getUser();
+export const refreshUser = cache(async (): Promise<User | null> => {
+	const token = await getToken();
 
-	if (userFromCookie) {
-		// Verificar que la sesión sea válida
-		const { isAuth, user } = await verifySession();
-		return isAuth ? user : null;
+	if (!token) {
+		return null;
 	}
 
-	return null;
+	try {
+		const response = await fetch(`${API_URL}/auth/me`, {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${token}`,
+			},
+			cache: "no-store",
+		});
+
+		if (!response.ok) {
+			return null;
+		}
+
+		const user: User = await response.json();
+
+		await setSession(token, user);
+
+		return user;
+	} catch (error) {
+		console.error("Error refreshing user:", error);
+		return null;
+	}
 });
 
 /**
- * Verifica si el usuario tiene un rol específico
+ * Checks if the user has a specific role
+ * Compares the current user's role_id with the allowed roles
  */
 export async function checkUserRole(allowedRoles: string[]): Promise<boolean> {
 	const user = await getCurrentUser();
@@ -72,5 +112,5 @@ export async function checkUserRole(allowedRoles: string[]): Promise<boolean> {
 		return false;
 	}
 
-	return allowedRoles.includes(user.role);
+	return allowedRoles.includes(user.role_id);
 }

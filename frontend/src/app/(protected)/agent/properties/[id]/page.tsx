@@ -1,0 +1,23 @@
+import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
+
+import PropertyDetailView from "@src/modules/properties/components/property-detail";
+import { getPropertyById } from "@src/modules/properties/services/property-service";
+
+type Props = {
+	params: Promise<{ id?: string }>;
+};
+
+export default async function EditPropertyPage({ params }: Props) {
+	const resolved = await params;
+	const id = resolved?.id;
+
+	const cookieStore = await cookies();
+	const token = cookieStore.get("auth_token")?.value;
+
+	const data = await getPropertyById(Number(id), { token });
+
+	if (!data) return notFound();
+
+	return <PropertyDetailView property={data.property} />;
+}

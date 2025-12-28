@@ -1,103 +1,123 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Backend - Real Estate Management System
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend desarrollado con TypeScript, Express y PostgreSQL siguiendo Clean Architecture.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🏗️ Arquitectura
 
-## Description
+El proyecto sigue **Clean Architecture** con separación de capas:
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Domain**: Entidades, DTOs, Use Cases, Interfaces (reglas de negocio puras)
+- **Data**: Modelos de base de datos, adaptadores de datos
+- **Presentation**: Controllers, Services, Routes, Middlewares
 
-## Project setup
-
-```bash
-$ pnpm install
-
-$ pnpm prisma:generate
-
-$ pnpm prisma:migrate
+## 📁 Estructura del Proyecto
 
 ```
-
-## Compile and run the project
-
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+src/
+├── config/          # Configuración (JWT, Bcrypt, Cloudinary, envs)
+├── data/            # Capa de datos (modelos PostgreSQL)
+├── domain/          # Capa de dominio (entities, DTOs, use cases)
+└── presentation/    # Capa de presentación (controllers, services, routes, middlewares)
 ```
 
-## Run tests
+## 🚀 Instalación
 
-```bash
-# unit tests
-$ pnpm run test
+1. Copiar `.env.template` a `.env` y configurar las variables de entorno
+2. Ejecutar `npm install` para instalar las dependencias
+3. Configurar `docker-compose.yml` y ejecutar `docker-compose up -d` para levantar PostgreSQL
+4. Ejecutar `npm run db:setup` para crear la base de datos y datos iniciales
+5. Ejecutar `npm run dev` para levantar el proyecto en modo desarrollo
 
-# e2e tests
-$ pnpm run test:e2e
+## ⚙️ Variables de Entorno
 
-# test coverage
-$ pnpm run test:cov
+### Requeridas
+
+```env
+PORT=3000
+POSTGRES_DB=nombre_de_tu_base_de_datos
+POSTGRES_USER=tu_usuario
+POSTGRES_PASSWORD=tu_contraseña
+JWT_SECRET=tu_secret_key_super_segura_minimo_32_caracteres
 ```
 
-## Deployment
+### Opcionales con Valores por Defecto
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+```env
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+DB_POOL_MAX=20
+DB_POOL_MIN=5
+DB_POOL_IDLE_TIMEOUT=30000
+DB_POOL_CONNECTION_TIMEOUT=2000
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Opcionales (Cloudinary)
 
-## Resources
+```env
+CLOUDINARY_CLOUD_NAME=tu-cloud-name
+CLOUDINARY_API_KEY=tu-api-key
+CLOUDINARY_API_SECRET=tu-api-secret
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Para Docker Compose
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```env
+PGADMIN_EMAIL=admin@admin.com
+PGADMIN_PASSWORD=tu_contraseña_pgadmin
+PGADMIN_PORT=5050
+```
 
-## Support
+**Nota:** Copia `.env.template` a `.env` y configura las variables según tu entorno.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 📜 Scripts Disponibles
 
-## Stay in touch
+- `npm run dev` - Inicia el servidor en modo desarrollo
+- `npm run build` - Compila TypeScript a JavaScript
+- `npm run start` - Compila y ejecuta en producción
+- `npm run db:migrate` - Ejecuta las migraciones de la base de datos
+- `npm run db:setup` - Configura la base de datos completa (migrate + seeds)
+- `npm run db:reset` - Resetea la base de datos (drop + migrate + seeds)
+- `npm run db:drop` - Elimina todas las tablas
+- `npm run db:check` - Verifica el estado de la base de datos
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🛣️ Endpoints
 
-## License
+Para ver la documentación completa de todos los endpoints, consulta [API_DOCUMENTATION.md](./API_DOCUMENTATION.md)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Resumen de Endpoints
+
+- **Autenticación**: `/auth/*` - Login, registro, validación de email
+- **REST API**: `/rest/v1/*` - CRUD completo para todos los recursos
+- **Funciones**: `/functions/v1/*` - Funciones especiales (crear propiedad completa)
+
+## 🔐 Autenticación
+
+La mayoría de endpoints requieren autenticación JWT. Incluye el token en el header:
+
+```
+Authorization: Bearer <tu-token-jwt>
+```
+
+## 📦 Tecnologías
+
+- **TypeScript** - Lenguaje de programación
+- **Express** - Framework web
+- **PostgreSQL** - Base de datos
+- **JWT** - Autenticación
+- **Bcrypt** - Hash de contraseñas
+- **Cloudinary** - Almacenamiento de imágenes
+- **Multer** - Manejo de archivos multipart/form-data
+
+## 🏛️ Patrones Implementados
+
+- **Clean Architecture** - Separación de capas
+- **Adapter Pattern** - Para Hash, JWT y FileUpload
+- **Repository Pattern** - Para acceso a datos
+- **DTO Pattern** - Para validación de entrada
+- **Use Cases** - Para reglas de negocio
+
+## 📝 Notas
+
+- Todas las operaciones complejas usan transacciones atómicas
+- Los endpoints de ubicación implementan "Get or Create" para evitar duplicados
+- El sistema soporta subida de imágenes mediante Cloudinary o URLs externas

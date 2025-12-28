@@ -1,0 +1,114 @@
+import { paths } from "@src/lib/paths";
+import {
+	ClientContactInfo,
+	ClientHeader,
+	ClientNotes,
+	ClientProperties,
+} from "@src/modules/clients/components/client-detail";
+import {
+	addOwnedProperty,
+	getClientById,
+	removeOwnedProperty,
+} from "@src/modules/clients/services/clients-service";
+import { getProperties } from "@src/modules/properties/services/property-service";
+import type { OwnerApiResponse } from "@src/types/clients/owner";
+
+export default async function OwnerDetailPage({
+	params,
+}: {
+	params: Promise<{ id: string }>;
+}) {
+	const { id } = await params;
+
+	const responseData = await getClientById<OwnerApiResponse>(id);
+
+	if (!responseData || !responseData.client) {
+		return (
+			<div className="min-h-screen flex items-center justify-center">
+				<p className="text-lg text-slate-600">
+					No se encontró el propietario solicitado
+				</p>
+			</div>
+		);
+	}
+
+	const ownerData = responseData.client;
+	const ownedProperties = responseData.owned_properties || [];
+
+	const { properties: availableProperties } = await getProperties({
+		includeArchived: false,
+	});
+
+	async function handleAddOwnedProperty(propertyId: string) {
+		"use server";
+		await addOwnedProperty(id, propertyId);
+	}
+
+	async function handleDeleteOwnedProperty(propertyId: string | number) {
+		"use server";
+		await removeOwnedProperty(id, propertyId);
+	}
+
+	const owner = {
+		id: String(ownerData.id),
+		first_name: ownerData.first_name,
+		last_name: ownerData.last_name,
+		email: ownerData.email,
+		phone: ownerData.phone,
+		dni: ownerData.dni ?? "",
+		address: ownerData.address ?? "",
+		created_at: ownerData.registered_at
+			? new Date(ownerData.registered_at).toLocaleDateString("es-AR")
+			: "",
+		notes: ownerData.notes ?? "",
+	};
+
+	const properties = ownedProperties.map((prop) => ({
+		id: String(prop.id),
+		address: prop.address.full_address,
+		city: prop.address.city.name,
+		type: prop.property_type.name,
+		rooms: prop.bedrooms,
+		bathrooms: prop.bathrooms,
+		surface: parseFloat(prop.surface_area),
+		image: prop.main_image?.url || "",
+		status: prop.property_status.name.toLowerCase(),
+		age: prop.age?.name || "",
+	}));
+
+	return (
+		<div className="min-h-screen">
+			<div className="w-full">
+				<ClientHeader
+					id={owner.id}
+					firstName={owner.first_name}
+					lastName={owner.last_name}
+					dni={owner.dni}
+					status="propietario"
+					editPath={paths.agent.clients.owners.edit(id)}
+				/>
+				<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+					<div className="lg:col-span-1 space-y-6">
+						<ClientContactInfo
+							phone={owner.phone}
+							email={owner.email}
+							address={owner.address}
+							createdAt={owner.created_at}
+						/>
+						<ClientNotes notes={owner.notes} clientId={owner.id} />
+					</div>
+
+					<div className="lg:col-span-2">
+						<ClientProperties
+							properties={properties}
+							availableProperties={availableProperties}
+							operationType={[1]}
+							onAddProperty={handleAddOwnedProperty}
+							onDeleteProperty={handleDeleteOwnedProperty}
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
